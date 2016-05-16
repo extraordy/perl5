@@ -1,0 +1,11 @@
+13. Exception Handling
+
+Objective
+
+Look at perldoc -f caller. Create a program in your /p3homework folder named whocalled.pl including a subroutine that can tell whether or not it is being called from an eval at any higher level. Test it with:
+
+in_eval(); # Prints 'No'
+eval { in_eval() }; # Prints 'Yes'
+eval { foo() }; sub foo { in_eval() } # Prints 'Yes'
+
+The argument to caller is an integer starting at 0 and going as high as necessary to still get a result.

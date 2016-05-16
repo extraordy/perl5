@@ -1,0 +1,10 @@
+3. Interacting with the System
+
+Objective
+
+Run the command netstat -an at the command line and observe the output. Create a program in your /p3homework folder named port_report.pl that reads the output of netstat -an from a piped open and prints a list of unique port numbers that this machine is listening on.
+
+If you're not familiar with netstat, the port number you're looking for is the number that occurs between a colon and white space on a line containing the word LISTEN.
+
+When you are done, hand in your perl script.
+

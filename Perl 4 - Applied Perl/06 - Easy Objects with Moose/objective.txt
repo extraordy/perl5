@@ -1,0 +1,28 @@
+6. Easy Objects with Moose
+
+Objective
+
+In the usebank.pl file in your /perl4homework/Project06 folder, insert use lib qw(your_home_directory/mylib/lib/perl5); after the use warnings; line and verify that running it produces this result:
+
+Command to Type:
+
+cold:~/perl4homework/Project06$ ./usebank.pl
+Statement for account 10001:
+22-Apr-2011 Check #101 to Greenpeace -250.00 750.00
+22-Apr-2011 Check #102 to O'Reilly -395.00 355.00
+
+When the commented-out code lines in usebank.pl are uncommented, the result of running it should be:
+
+Expected Output:
+
+cold:~/perl4homework/Project06$ ./usebank.pl
+Statement for account 10001:
+22-Apr-2011 Check #101 to Greenpeace -250.00 750.00
+22-Apr-2011 Check #102 to O'Reilly -395.00 355.00
+22-Apr-2011 Transfer to 10002 -100.00 255.00
+
+Statement for account 10002:
+22-Apr-2011 Transfer from 10001 100.00 5100.00
+22-Apr-2011 Interest at 1.5% 76.50 5176.50
+
+To do this, you need to convert SavingsAccount.pm to Moose. Edit it to insert the necessary statements where indicated. When you finish, hand in SavingsAccount.pm, along with usebank.pl, BankAccount.pm, and CheckingAccount.pm.

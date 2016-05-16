@@ -1,0 +1,110 @@
+<HTML>
+  <HEAD>
+    <TITLE>First Bank of O'Reilly</TITLE>
+  </HEAD>
+  <BODY>
+    <H2>First Bank of O'Reilly</H2>
+    <P>Automated Teller Machine</P>  
+    <TMPL_UNLESS NAME="logged_on">
+	    <TABLE BORDER="1" CELLPADDING="10"><TR><TD>
+	      <FORM ACTION="atm_main.cgi" METHOD="POST">
+	        Email:</BR>
+	        <INPUT TYPE="TEXT" NAME="email" VALUE="<TMPL_VAR NAME="email">"><P/>
+	        Password:</BR>
+	        <INPUT TYPE="PASSWORD" NAME="password" VALUE="<TMPL_VAR NAME="password">"><P/>
+	        <INPUT TYPE="SUBMIT" NAME="sbmt_logon" VALUE="Log on">      
+	      </FORM>
+	    </TD></TR></TABLE><P/>
+	    <A HREF="<TMPL_VAR NAME="setup">">Setup</A> a new account
+    </TMPL_UNLESS>
+    <TMPL_IF NAME="logged_on">
+
+    <TABLE BORDER="0" CELLPADDING="20"><TR><TD> 
+
+     	<TABLE BORDER="1" CELLPADDING="10"   WIDTH="100%"><TR><TD> 	    
+	    <TABLE BORDER="0" CELLPADDING="0" WIDTH="100%">
+              <TR><TD COLSPAN="2" ALIGN="center">ACCOUNT SUMMARY</TD></TR>
+              <TR><TD COLSPAN="2">&nbsp;</TD></TR>
+	      <TR><TD VALIGN="top"><FORM ACTION="atm_main.cgi" METHOD="POST">Account number&nbsp;&nbsp;&nbsp;</TD><TD VALIGN="top">  
+		  <SELECT NAME="from_account_number">
+		    <TMPL_LOOP NAME="from_account_loop">
+		      <OPTION VALUE="<TMPL_VAR NAME="from_account_number">"<TMPL_VAR NAME="checked">><TMPL_VAR NAME="from_account_number"></OPTION>
+		    </TMPL_LOOP>
+		  </SELECT></TD></TR> 
+	      <TR><TD>Owner(s) </TD><TD><TMPL_VAR NAME="owners"></TD></TR>   
+	      <TR><TD>Balance </TD><TD><TMPL_VAR NAME="balance"></TD></TR>
+	      <TR><TD COLSPAN="2">
+	          <INPUT TYPE="HIDDEN" NAME="email" VALUE="<TMPL_VAR NAME="email">">
+	          <INPUT TYPE="HIDDEN" NAME="digest" VALUE="<TMPL_VAR NAME="digest">"></TD></TR>
+	           <TR><TD COLSPAN="2">&nbsp;</TD></TR>
+	      <TR><TD><INPUT TYPE="SUBMIT" NAME="sbmt_change" VALUE="Change"></FORM></TD><TD>&nbsp;</TD></TR>
+	    </TABLE>	    
+          </TD></TR></TABLE>
+           
+          </TD><TD ROWSPAN=3>
+          
+           <TABLE BORDER="1" CELLPADDING="10" WIDTH="600" HEIGHT="660"><TR><TD>
+	    <TABLE BORDER="0" CELLPADDING="0" WIDTH="100%"  HEIGHT="100%">
+	      <TR><TD ALIGN="center" HEIGHT="20">STATEMENT</TD></TR>
+              <TR><TD><IFRAME FRAMEBORDER="0" SRC="atm_statement.cgi?<TMPL_VAR NAME=from_account_number>" HEIGHT="100%" WIDTH="100%"></IFRAME></TD></TR>
+              <TR><TD HEIGHT="20">&nbsp;</TD></TR>
+	      <TR><TD HEIGHT="20"><FORM ACTION="atm_main.cgi" METHOD="POST"><INPUT TYPE="SUBMIT" NAME="sbmt_email" VALUE="Email"></TD></TR>
+	      <TR><TD COLSPAN="2">
+	          <INPUT TYPE="HIDDEN" NAME="logged_on" VALUE="<TMPL_VAR NAME="logged_on">">
+	          <INPUT TYPE="HIDDEN" NAME="email" VALUE="<TMPL_VAR NAME="email">">
+	          <INPUT TYPE="HIDDEN" NAME="digest" VALUE="<TMPL_VAR NAME="digest">">
+	          <INPUT TYPE="HIDDEN" NAME="from_account_number" VALUE="<TMPL_VAR NAME="from_account_number">"></FORM></TD></TR>
+	    </TABLE>
+            </TD></TR></TABLE>
+          
+          </TD></TR><TR><TD>
+       
+           <TABLE BORDER="1" CELLPADDING="10" WIDTH="100%"><TR><TD>
+	    <TABLE BORDER="0" CELLPADDING="0" WIDTH="100%">
+	      <TR><TD COLSPAN="2" ALIGN="center">DEPOSIT / WITHDRAWAL</TD></TR>
+              <TR><TD COLSPAN="2">&nbsp;</TD></TR>
+	      <TR><TD VALIGN="top"><FORM ACTION="atm_main.cgi" METHOD="POST">Amount&nbsp;&nbsp;&nbsp;</TD>
+	          <TD VALIGN="top"><INPUT TYPE="text" NAME="dw_amount"></TD></TR> 
+	      <TR><TD>Type</TD><TD>
+		      <SELECT NAME="type">
+		       <OPTION VALUE="credit">Credit</OPTION>
+		       <OPTION VALUE="debit">Debit</OPTION>
+		      </SELECT></TD></TR>
+	      <TR><TD COLSPAN="2">
+	          <INPUT TYPE="HIDDEN" NAME="logged_on" VALUE="<TMPL_VAR NAME="logged_on">">
+	          <INPUT TYPE="HIDDEN" NAME="email" VALUE="<TMPL_VAR NAME="email">">
+	          <INPUT TYPE="HIDDEN" NAME="digest" VALUE="<TMPL_VAR NAME="digest">">
+	          <INPUT TYPE="HIDDEN" NAME="from_account_number" VALUE="<TMPL_VAR NAME="from_account_number">"></TD></TR>
+	      <TR><TD COLSPAN="2">&nbsp;</TD></TR>
+	      <TR><TD><INPUT TYPE="SUBMIT" NAME="sbmt_send_dw" VALUE="Send"></FORM></TD><TD>&nbsp;</TD></TR>
+	    </TABLE>
+            </TD></TR></TABLE>
+            
+            </TD></TR><TR><TD>
+            
+            <TABLE BORDER="1" CELLPADDING="10" WIDTH="100%"><TR><TD>
+	    <TABLE BORDER="0" CELLPADDING="0" WIDTH="100%">
+	      <TR><TD COLSPAN="2" ALIGN="center">TRANSFER</TD></TR>
+              <TR><TD COLSPAN="2">&nbsp;</TD></TR>
+	      <TR><TD VALIGN="top"><FORM ACTION="atm_main.cgi" METHOD="POST">Amount&nbsp;&nbsp;&nbsp;</TD>
+	          <TD VALIGN="top"><INPUT TYPE="text" NAME="tr_amount"></TD></TR> 
+	      <TR><TD VALIGN="top">Account number&nbsp;&nbsp;&nbsp;</TD><TD VALIGN="top">  
+		  <SELECT NAME="to_account_number">
+		    <TMPL_LOOP NAME="to_account_loop">
+		      <OPTION VALUE="<TMPL_VAR NAME="to_account_number">"<TMPL_VAR NAME="checked">><TMPL_VAR NAME="to_account_number"></OPTION>
+		    </TMPL_LOOP>
+		  </SELECT></TD></TR>
+              <TR><TD COLSPAN="2">&nbsp;</TD></TR>   
+	      <TR><TD COLSPAN="2"> 
+	      	  <INPUT TYPE="HIDDEN" NAME="logged_on" VALUE="<TMPL_VAR NAME="logged_on">">
+	          <INPUT TYPE="HIDDEN" NAME="email" VALUE="<TMPL_VAR NAME="email">">
+	          <INPUT TYPE="HIDDEN" NAME="digest" VALUE="<TMPL_VAR NAME="digest">">
+	          <INPUT TYPE="HIDDEN" NAME="from_account_number" VALUE="<TMPL_VAR NAME="from_account_number">"></TD></TR></TD></TR>
+	      <TR><TD><INPUT TYPE="SUBMIT" NAME="sbmt_send_tr" VALUE="Send"></FORM></TD><TD>&nbsp;</TD></TR>
+	    </TABLE>
+            </TD></TR></TABLE>
+            <TR><TD><FORM ACTION="atm_main.cgi" METHOD="POST"><INPUT TYPE="SUBMIT" NAME="sbmt_logout" VALUE="Log out"></FORM></TD></TR>                
+            </TD></TR></TABLE>            
+  </TMPL_IF>
+  </BODY>
+</HTML>

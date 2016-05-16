@@ -1,0 +1,7 @@
+13 Basic Unix Commands and Emacs
+
+Objective
+
+Create a new folder at the command line named MyFiles. Create a file in this folder using the emacs editor named myfile.txt. It doesn't matter what the file contains, as long as you use emacs to create it.
+
+When you finish, hand in only the myfile.txt file, not the MyFiles folder.

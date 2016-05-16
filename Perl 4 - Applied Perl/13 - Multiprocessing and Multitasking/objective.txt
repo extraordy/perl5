@@ -1,0 +1,10 @@
+13. Multiprocessing and Multitasking
+
+Objective
+
+Write a program /perl4homework/Project13/process.pl that forks, and the parent process blocks waiting for the child to complete, while the child process fetches the web page http://perl4.oreillyschool.com/ost-mirror/ and exits with an exit code set to the HTTP status code of fetching the page. The parent should print this code. The output should therefore look like:
+
+Expected Output:
+
+cold:~/perl4homework/Project13$ ./process.pl
+Code = 200

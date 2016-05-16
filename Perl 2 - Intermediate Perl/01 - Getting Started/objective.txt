@@ -1,0 +1,17 @@
+1. Getting Started
+
+Objective
+
+For your projects, you can use any directory you like, including the perl2 directory used in the course. You might prefer to use a different directory, just to keep the projects separate from the lesson files.
+
+Write a program named summarize.pl to classify songs listed in the files in the /software/Perl2/music/ directory.
+
+Each file name consists of an artist name and a song title, separated by a dash. Each file contains one line specifying the album, length, and genre, separated by colons. Output a report of the total length of all songs found for each artist. You should pass the files to the program at run time using:
+./summarize.pl /software/Perl2/music/*
+
+The output should look like:
+George_Harrison has a total of 4.65 in music Manfred_Mann has a total of 12.34 in music The_Hollies has a total of 5.82 in music
+
+Note: You can make your solution more elegant and shorter by using a special built-in variable that we have not mentioned yet. Inside a loop reading from the "diamond operator" (<>), Perl will set $ARGV to the name of the file it is currently reading. This is a special scalar variable that is not an element of @ARGV (because there are no brackets after it).
+
+When you finish, hand in your summarize.pl file by finding it in the folders at left below and dragging it to the Drop Here folder at right. Then, click Hand It In (at the bottom right of the screen—you may need to scroll down to find it!) to submit it to the instructor.

@@ -1,0 +1,63 @@
+11. Heterogeneous Data Structures
+
+Objective
+
+Create this hash-of-hashes version of the state program in /p3homework as state2.pl:
+
+#!/usr/bin/perl
+use strict;
+use warnings;
+
+my %state;
+my @names;
+while ( <> )
+{
+  chomp;
+  my ($abbreviation, @fields) = split /\s*\|\s*/;
+  @names = @fields and next if $abbreviation eq 'key';
+  @{ $state{$abbreviation} }{@names} = @fields;
+}
+
+Modify and extend the program to add an interactive loop to input additional largest cities, so that attribute can be multivalued. Add options for the user to dump out the entry for a given state, and to exit. Here is a dialogue with a program satisfying these requirements (using a copy of the state_full.data file we provided in the shared /software/Perl3 folder):
+
+cold:~/perl3$ ./state2.pl /software/Perl3/state_full.data
+(Q)uit, (D)ump <abbr>, (I)nput <abbr> <city>: D
+Invalid command
+cold:~/perl3$ ./state2.pl /software/Perl3/state_full.data
+(Q)uit, (D)ump <abbr>, (I)nput <abbr> <city>: D QQ
+$VAR1 = undef;
+(Q)uit, (D)ump <abbr>, (I)nput <abbr> <city>: D CA
+$VAR1 = {
+  'largest_city' => 'Los Angeles',
+  'name' => 'California',
+  'flower' => 'Golden Poppy',
+  'bird' => 'California Valley Quail',
+  'capital' => 'Sacramento'
+};
+(Q)uit, (D)ump <abbr>, (I)nput <abbr> <city>: I CA San Francisco
+(Q)uit, (D)ump <abbr>, (I)nput <abbr> <city>: D CA
+$VAR1 = {
+  'largest_city' => [
+    'Los Angeles',
+    'San Francisco'
+    ],
+  'name' => 'California',
+  'flower' => 'Golden Poppy',
+  'bird' => 'California Valley Quail',
+  'capital' => 'Sacramento'
+ };
+(Q)uit, (D)ump <abbr>, (I)nput <abbr> <city>: I CA San Diego
+(Q)uit, (D)ump <abbr>, (I)nput <abbr> <city>: D CA
+$VAR1 = {
+  'largest_city' => [
+    'Los Angeles',
+    'San Francisco',
+    'San Diego'
+    ],
+  'name' => 'California',
+  'flower' => 'Golden Poppy',
+  'bird' => 'California Valley Quail',
+  'capital' => 'Sacramento'
+ };
+(Q)uit, (D)ump <abbr>, (I)nput <abbr> <city>: Q
+cold:~/perl3$ 

@@ -1,0 +1,26 @@
+<HTML>
+  <HEAD>
+    <TITLE>First Bank of O'Reilly - Account Statement</TITLE>
+  </HEAD>
+  <BODY>
+    <H2>First Bank of O'Reilly</H2>
+    <P>Account Statement</P>
+   <TMPL_IF NAME="logged_on">
+   <TABLE BORDER="0">
+    <TR><TD>Account number</TD><TD><TMPL_VAR NAME="account_number"></TD></TR>
+    <TR><TD>Owner(s)</TD><TD><TMPL_VAR NAME="owners"></TD></TR>
+    <TR><TD>Balance</TD><TD><TMPL_VAR NAME="Balance"></TD></TR>
+   </TABLE></P>
+   <TABLE BORDER="0">
+    <TR><TH ALIGN="right">Date</TH><TH>&nbsp;&nbsp;&nbsp;</TH><TH ALIGN="right">What</TH><TH>&nbsp;&nbsp;&nbsp;</TH><TH ALIGN="right">Amount</TH><TH>&nbsp;&nbsp;&nbsp;</TH><TH ALIGN="right">Ending Balance</TH><TH>&nbsp;&nbsp;&nbsp;</TH><TH ALIGN="right">Transfer</TH></TR>
+    <TR><TD COLSPAN="9">&nbsp;</TD></TR>
+    <TMPL_LOOP NAME="transaction_loop">
+     <TR>
+      <TD ALIGN="right"><TMPL_VAR NAME="transaction_date"></TD><TD ALIGN="right">&nbsp;&nbsp;&nbsp;</TD><TD ALIGN="right"><TMPL_VAR NAME="type"></TD><TD>&nbsp;&nbsp;&nbsp;</TD>
+      <TD ALIGN="right"><TMPL_VAR NAME="amount"></TD><TD>&nbsp;&nbsp;&nbsp;</TD><TD ALIGN="right"><TMPL_VAR NAME="new_balance"></TD><TD>&nbsp;&nbsp;&nbsp;</TD><TD ALIGN="right"><TMPL_VAR NAME="transfer"></TD>
+     </TR>
+    </TMPL_LOOP>
+   </TABLE>
+   </TMPL_IF>
+  </BODY>
+</HTML>

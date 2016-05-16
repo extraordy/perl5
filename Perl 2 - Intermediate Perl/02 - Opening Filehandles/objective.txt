@@ -1,0 +1,16 @@
+2. Opening Filehandles
+
+Objective
+
+The file /software/Perl2/songz.txt contains the following text, which is equivalent to all the information you had in the previous lesson's project, in the format artist, title, album, length, genre, separated by colons:
+
+	George_Harrison:My_Sweet_Lord:All Things Must Pass:4.65:Folk rock
+	Manfred_Mann:Blinded_by_the_Light:The Roaring Silence:7.12:Progressive rock
+	Manfred_Mann:Do_Wah_Diddy:None:2.37:Pop rock
+	Manfred_Mann:The_Mighty_Quinn:Mighty Garvey!:2.85:Rock
+	The_Hollies:Bus_Stop:The Graham Gouldman Thing:2.9:Rock
+	The_Hollies:Carrie_Ann:None:2.92:Rock 
+
+Write a program named songz.pl that reads the file (passed as a command line argument) and uses it to create the same files (including the same content) that you were given in the previous lesson. The files should be located in your perl2 directory.
+
+Hand in songz.pl when you are done.

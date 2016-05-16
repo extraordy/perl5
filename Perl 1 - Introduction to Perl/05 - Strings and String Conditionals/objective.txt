@@ -1,0 +1,36 @@
+5. Strings and String Conditionals
+
+Objective
+
+The x operator is used to produce multiple copies of a string: the expression "Oh" x 3 evaluates to "OhOhOh".
+
+You'll need to use the x operator for this project. You can read more about it by running perldoc perlop or visit the perldoc site, "Multiplicative Operators."
+
+Create a new file named name_printer.pl with the following code:
+
+#!/usr/bin/perl
+use strict;
+use warnings;
+
+my $boss_first_name = "Penelope";
+my $boss_last_name = "Creighton-Ward";
+my $butler_first_name = "Aloysius";
+my $butler_last_name = "Parker";
+
+my $field_width = 15;
+
+print '|', ' 'x$field_width, '|', ' 'x$field_width, "|\n"; 
+
+Change this program so it will print out a line containing the boss's first and last names in the first field and the butler's first and last names in the second field.
+If a full name does not fit in a field, print out the first name only and then print the last name on the next line.
+The names should be left-justified in the fields.
+
+The output with the above settings should look like:
+
+|                          |                        | 
+|Penelope            |Aloysius Parker| 
+|Creighton-Ward |                        | 
+
+Try it with some of your own names.
+
+This program will be quite a bit longer than the ones you have written so far, probably about 50 lines.

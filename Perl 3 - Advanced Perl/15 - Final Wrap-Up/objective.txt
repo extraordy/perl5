@@ -1,0 +1,46 @@
+15. Final Wrap-Up
+
+Objective
+
+Start with the adventure game dispatch.pl from Lesson 12 (either the class version or your working extension in the homework). Make a copy in your /p3homework folder named dispatch2.pl and modify the copy to remove the static initializations of the hashes %inventory, %room_contents, and %location, and add another hash, %exit. Populate all of these hashes instead from the data file dungeon, which is in the /software/Perl3 folder. The structure of %exit will be equivalent to, for example:
+Hash structure
+
+%exit = ( attic => { down => 'house', east => 'mine' } )
+
+Implement the additional command go, which takes one argument, and moves you in the direction indicated, provided it is a valid exit from your current location. Add a listing of available exits to the look command. Here is a sample dialog that should be possible with your program:
+Expected Output:
+
+cold:~/p3homework$ ./dispatch2.pl /software/Perl3/dungeon
+Command: look
+ You are in the cave
+ There is a sword on the ground
+ There is a troll here
+ There are exits leading north, east
+Command: go west
+ Can't go west from here
+Command: go east
+Command: look
+ You are in the house
+ There is a lamp on the ground
+ There are exits leading west, down, up, east
+Command: go up
+Command: look
+ You are in the attic
+ There is a knife on the ground
+ There is a thief here
+ There are exits leading down
+Command: take knife
+ Taken
+Command: kill thief with knife
+Dispatched!
+Command: look
+ You are in the attic
+ There is a map on the ground
+ There are exits leading down
+Command: take map
+ Taken
+Command: go down
+Command: look
+ You are in the house
+ There is a lamp on the ground
+ There are exits leading west, down, up, east

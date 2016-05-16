@@ -1,0 +1,5 @@
+1. Introduction to Perl
+
+Objective:
+
+Modify hello_world.pl to print out your favorite poem, limerick, or quote. When you finish, hand in your hello_world.pl file by finding it in the folders at left below and dragging it to the Drop Here folder at right. Then, click Hand In (at the bottom right of the screen--you may need to scroll down to find it!) to submit it to the instructor.

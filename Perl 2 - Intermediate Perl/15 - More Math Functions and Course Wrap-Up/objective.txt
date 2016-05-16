@@ -1,0 +1,84 @@
+15. More Math Functions and Course Wrap-Up
+
+Objective
+
+For your final project, you'll write a program to emulate part of the functionality of the popular Apache web server! It is not necessary to understand Apache in order to do this exercise, but if you are interested, the relevant documentation is here. However, we are only implementing a subset of the functionality listed there. All the information you need for the exercise follows:
+
+Take a look at the following files:
+
+	/software/Perl2/htaccess_1
+	/software/Perl2/htaccess_2
+	/software/Perl2/htaccess_3
+	/software/Perl2/htaccess_4
+	/software/Perl2/htaccess_5
+
+Create a program named final_proj.pl that parses information contained in one or more files named on the command line or provided through standard input. The input will consist of lines of the following form; any other lines should be silently ignored:
+
+	order order
+	allow from address
+	deny from address
+
+Here is the explanation of the parameters above:
+
+order = one of the following alternatives:
+ - allow,deny
+ - deny,allow
+
+Anything other than those two alternatives should generate a warning. No spaces are allowed. More than one order directive should generate a warning; the last one will be the one that is in effect. If there is no order directive, the program should die with an error.
+
+address - one of the following alternatives:
+- a dotted IP address like n.n.n.n or a prefix thereof (an address that omits one or more of the components; for example, n.n.n). Example: 10.41.123.45 is a full IP address; 10.41.123 is a prefix.
+ - a fully qualified host name like name.name.name or a suffix thereof. Example: www.oreilly.com is a fully qualified host name, oreilly.com is a suffix. But because host names can contain any number of periods (for example, mx.local.ca.cdc.gov), there is actually no distinction between a fully qualified name and a suffix. This will become clearer when you see the rest of the instructions.
+
+After parsing the input, your program should loop, prompting the user to enter an IP address or host name. If the user enters quit, the program should exit. Otherwise, it will print "ALLOWED" or "REJECTED" depending on whether what the user entered would be accepted or rejected according to the following rules, which vary depending on the order:
+
+- Allow,Deny: First, all Allow directives are evaluated; at least one must match, or the request is rejected. Next, all Deny directives are evaluated. If any matches, the request is rejected. Last, any requests that do not match an Allow or a Deny directive are denied by default.
+
+- Deny,Allow: First, all Deny directives are evaluated; if any match, the request is denied unless it also matches an Allow directive. Any requests that do not match any Allow or Deny directives are permitted.
+
+So what constitutes a "match"? If the user enters a DNS name like www.oreilly.com, that will match an allow or deny directive that contains either www.oreilly.com, oreilly.com, or com. If the user enters a numeric IP address like 10.41.123.24, that will match an allow or deny directive that contains either 10.41.123.24, 10.41.123, 10.41, or 10.
+
+Here is a sample dialog session showing how your program should work for certain inputs (please match the output). Read the provided files so you understand how the results below were obtained:
+
+cold1:~$ ./project.pl /software/Perl2/htaccess_1
+No order directive in input
+cold1:~$ ./project.pl /software/Perl2/htaccess_2
+Input address to test: 1.2.3.4
+REJECTED
+Input address to test: 1.2.3
+ALLOWED
+Input address to test: 1.2.3.5
+REJECTED
+Input address to test: 1.2.3.6
+ALLOWED
+Input address to test: quit
+cold:~$ ./project.pl /software/Perl2/htaccess_3
+Input address to test: 1.2.3.4
+ALLOWED
+Input address to test: 1.2.3
+REJECTED
+Input address to test: 1.2.3.5
+REJECTED
+Input address to test: quit
+cold1:~$ ./project.pl /software/Perl2/htaccess_4
+Multiple ORDER directives
+Input address to test: mail.oreilly.com
+REJECTED
+Input address to test: www.oreilly.com
+ALLOWED
+Input address to test: home.scott.oreilly.com
+REJECTED
+Input address to test: boat.scott.oreilly.com
+REJECTED
+Input address to test: quit
+cold1:~$ ./project.pl /software/Perl2/htaccess_5
+Input address to test: mail.oreilly.com
+REJECTED
+Input address to test: home.scott.oreilly.com
+ALLOWED
+Input address to test: boat.scott.oreilly.com
+ALLOWED
+Input address to test: quit
+cold1:~$
+
+When finished, submit final_proj.pl.

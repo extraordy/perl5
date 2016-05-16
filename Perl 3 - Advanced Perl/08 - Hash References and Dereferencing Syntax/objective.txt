@@ -1,0 +1,19 @@
+8. Hash References and Dereferencing Syntax
+
+Objective
+
+Write and test a program in your /p3homework folder named comp_hashes.pl containing a subroutine to compare two hashes %first and %second, and report if they are identical. Here are some examples of how it should behave:
+-------------------------------------------------------------------------------------------------------------------------------------------
+| %first                                                                                              |  %second                                                                   |   Result       |
+=============================================================================================
+| ( Wallace => 1, Gromit => 2 )                                                         | ( Gromit => 2, Wallace => 1 )                                    | True           |  
+-------------------------------------------------------------------------------------------------------------------------------------------
+| ( Kirk => 'Captain', Spock => 'First Officer', McCoy => 'Doctor' ) | ( Spock => 'First Officer', McCoy => 'Doctor' )	         | False         |
+------------------------------------------------------------------------------------------------------------------------------------------- 
+| ()                                                                                                     | ()                                                                                | True          |
+-------------------------------------------------------------------------------------------------------------------------------------------
+| (Wallace => 1, Gromit => 2)                                                            | (Wallace => 2, Gromit => 1)                                      | False         |
+-------------------------------------------------------------------------------------------------------------------------------------------
+| (Wallace => 1, Gromit => 2)                                                            | (Wallace => 1, Gromit => 2, Shawn => 3)                 | False         | -------------------------------------------------------------------------------------------------------------------------------------------
+
+You get to decide and specify how users of your subroutine should call it.

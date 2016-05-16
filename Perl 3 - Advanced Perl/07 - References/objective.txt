@@ -1,0 +1,22 @@
+7. References
+
+Objective
+
+Create a program in your /p3homework folder named comp_arrays.pl. In it, write and test a subroutine to compare two arrays @first and @second and report if they are identical. Here are some examples of how it should behave:
+-----------------------------------------------------------------------
+| @first	                        | @second                              | Result      |
+===============================================
+| ('Wallace', 'Gromit')          | ('Wallace', 'Gromit', 'Shawn') | False       |
+-----------------------------------------------------------------------
+| (3, 4, 5)	                        | (5, 4, 3)                                | False       |
+-----------------------------------------------------------------------
+| ()                                      | ()                                          | True        |
+-----------------------------------------------------------------------
+| ('Kirk', 'Spock', 'McCoy') | ('Kirk', 'Spock')                    | False       |
+-----------------------------------------------------------------------
+| (1, 2, 3)                            | ('1', '2', '3')                            | True        |
+-----------------------------------------------------------------------
+
+Write your program to automatically compare six such example arrays.
+
+When you are done, hand in your perl script.

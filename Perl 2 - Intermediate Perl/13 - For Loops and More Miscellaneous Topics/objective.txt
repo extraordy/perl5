@@ -1,0 +1,24 @@
+13. For Loops and More Miscellaneous Topics
+
+Objective
+
+Copy this modified form of progress.pl and save it in your homework folder as progress2.pl:
+
+#!/usr/bin/perl
+use strict;
+use warnings;
+
+$| = 1;
+for ( 1 .. 100 )
+{
+ long_operation( $_ );
+ # Spin here
+}
+sub long_operation
+{
+ my $arg = shift;
+ print "Processing element $arg\n" unless $arg % 15;
+ sleep 1;
+}
+
+Replace the comment # Spin here with a call to a subroutine you write that takes the value of $_ from the for loop and then displays a "spinning" character made by switching between the characters '-', '\', '|', '/' on each call.

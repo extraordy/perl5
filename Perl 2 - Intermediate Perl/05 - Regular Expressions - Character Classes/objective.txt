@@ -1,0 +1,14 @@
+5. Regular Expressions: Character Classes
+
+Objective
+
+Put the following text into an __END__ block as test data for a program named phone_numbers.pl that prints lines matching either of the following two specifications for North American telephone number formats: +1 DDD-DDD-DDDD or (DDD) DDD-DDDD.
+
+	+3454 723-7483
+	+1 432-422-2342
+	(343) 348-4284
+	9847367289
+	(2322) 3423-34234
+	My number is (800) 998-9938, extension 7187
+	+2 823-2381-3732
+	+1 (352) 2315-8476

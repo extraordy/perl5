@@ -1,0 +1,27 @@
+2. Scalars and Arithmetic
+
+Objective
+
+For this project, you will calculate the total payment on a loan of $100,000 for 20 years at 7%.
+Create a new perl script named interest.pl with the following code:
+
+#!/usr/bin/perl
+use strict;
+use warnings;
+    
+my $principal = 100000;
+my $interest_rate = 7; # %
+my $term = 20; # Years
+# XXX
+print "Value of principal + interest after ", $term, " years = ", $total_paid, "\n";
+
+Your job is to replace the comment marked XXX with a statement that will cause the rest of the program to print the right answer.
+
+The formula for interest—the one we want you to use, anyway—is: C = P * (1 + R/100) ** T, where:
+
+C = total cost of loan (principal + interest)
+P = principal
+R = interest rate in percent
+T = term in years
+
+When you are finished, hand in interest.pl.

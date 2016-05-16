@@ -1,0 +1,10 @@
+4. Regular Expressions
+
+Objective
+
+Make a copy of reg_grep.pl named reg_grep2.pl and modify it to take two options, just like the Unix grep program:
+
+    -v negates the match; print only lines that do not match the regex.
+    -i makes it case-insensitive; match regardless of case.
+
+Either or both options can be present or not, in any order, but if present, must occur before the rest of the arguments. For example: ./reg_grep2.pl -v perl ./*.pl or ./reg_grep2.pl -i -v Test ./*.test.

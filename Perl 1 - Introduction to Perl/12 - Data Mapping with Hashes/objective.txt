@@ -1,0 +1,13 @@
+12. Data Mapping with Hashes
+
+Objective
+
+The program store_report.pl that you created in the lesson contains one item in the hash %sold that doesn't occur in the inventory. Modify the program so that, at the end, it prints out a line like:
+
+	*** Sold n of x, which were not in inventory
+
+for each such item, where n is the number sold and x is the item name.
+
+There will be one such line printed if you use the data as it currently is. Add five items to the %sold hash, so six lines will be printed.
+
+When you finish, hand in your program.

@@ -1,0 +1,23 @@
+8. Database Programming in Perl
+
+Objective
+
+Copy bank_mysql_statement.pl and MySQL_Common.pm from the /perl4 folder to /perl4homework/Project08 and modify bank_mysql_statement.pl so that it prints out the statement just for the account number that is entered on the command line:
+
+Expected Dialogue:
+
+cold:~/perl4homework/Project08$ ./bank_mysql_statement.pl
+Password: 
+Usage: ./project.pl account_number
+cold:~/perl4homework/Project08$ ./bank_mysql_statement.pl 12345
+No such account number
+cold:~/perl4homework/Project08$ ./bank_mysql_statement.pl 10001
+Password: 
+Account #: 10001
+Owner(s): Peter Scott, Grace Scott
+Date Type Amount Balance
+2011-04-25 12:12:44 debit 200 4800
+ 
+Hint: You can reuse the existing query on the accounts table; just add a WHERE clause on the account_number and pass in the number via a placeholder.
+
+When you finish, hand in bank_mysql_statement.pl and MySQL_Common.pm.

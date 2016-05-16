@@ -1,0 +1,41 @@
+7. Variable Behavior Overloading with Tieing
+
+Objective
+
+In your /perl4homework/Project07 folder, create tied_dir.pl as follows:
+
+#!/usr/local/bin/perl
+use strict;
+use warnings;
+
+use TiedDir;
+
+tie my @current, 'TiedDir', '.';
+print "Files in '.':\n";
+print "\t$_\n" for @current;
+Your job is to create the TiedDir class so that it emulates an array that returns the contents of the current folder. Running the above program should produce results like this (depending on the contents of your current directory):
+
+cold:~/perl4homework/Project07$ ./tied_dir.pl
+Files in '.':
+.
+..
+TiedDir.pm
+tied_dir.pl
+
+Here is a start on the TiedDir.pm file:
+
+package TiedDir;
+use strict;
+use warnings;
+
+sub # Replace this comment with the correct method name
+{
+ my ($class, $dir) = @_;
+
+ opendir my $dh, $dir or die "opendir $dir: $!";
+ bless [ sort readdir $dh ], $class;
+}
+
+1;
+
+Complete the module so that the code works. Hint: Run the program, observe the error, read the documentation for tied arrays in perldoc perltie, and repeat as necessary. When you finish, hand in your tied_dir.pl and TiedDir.pm files.

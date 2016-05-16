@@ -1,0 +1,12 @@
+5. Installing Modules from CPAN
+
+Objective
+
+Install the module DBI into ~/mylib. Hand in the list of commands you used to do this and the output of this command:
+
+perl ... -MDBI -le 'print $DBI::VERSION'
+Replace ... with the correct options to make the command work and include the complete command with your submission.
+
+Find where the total number of tests run is reported and turn in that number also.
+
+Create a /Project05 folder in your /perl4homework folder. Use the Unix/Linux script command (http://www.computerhope.com/unix/uscript.htm) to record your output in a text file, dbiresults.txt, in the project folder, and hand that file in.

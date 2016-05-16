@@ -1,0 +1,27 @@
+14. Directory Reading Functions
+
+Objective
+
+You're going to create and destroy a lot of files, so make a special lesson14_project folder under your homework folder for this exercise.
+
+	cold:~$ mkdir lesson14_project
+	cold:~$ cd lesson14_project
+
+Write a program in your /lesson14_project folder named alpha_bits.pl to:
+
+ - create the 676 files named "aa", "ab", ..."ba", "bb", ... through "zz" (hint: perldoc perlop; read more fully about the range operator) each containing contents equal to their uppercased name.
+ - print the contents of each of the files that has a letter q in their name (figure out what those files are as though you did not know you had just written them).
+ - delete those files and count and print the number of files left that have two letters in their name (see perldoc -f unlink).
+
+To run the program, type:
+
+	cold1:~/$ cd homeworkfolder/lesson14_project
+	cold1:~/$ homeworkfolder/lesson14_project$ ./alpha_bits.pl
+
+Finally, write a one-liner to change the contents of every remaining file to reverse the letters contained within them (you can assume there are only two characters in each file).
+
+You can submit the one-liner when you're done by putting it in a file named reverso.sh:
+
+#!/bin/sh
+perl -one-liner code goes here
+Submit alpha_bits.pl and reverso.sh.

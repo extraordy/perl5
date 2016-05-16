@@ -1,0 +1,12 @@
+10. Hashes of Hashes
+
+Objective
+
+Copy the last version of state.pl into your /p3homework folder and modify it as follows:
+
+It takes a mandatory argument, the name of the file containing the data.
+A provided data file, /software/Perl3/state_no_header.data, does not contain the header line.
+A separate provided data file, /software/Perl3/state_header.key, contains the header information, only the names are one per line instead of being on a single line separated by pipe symbols.
+There is a second mandatory argument, the abbreviation of a state. The program should output all the information it knows about that one state, without hard-coding the names of any of the attributes.
+There is a third argument that is optional, the name of an attribute. If present, the program will print only the value of that attribute for the specified state abbreviation.
+The program should die with a usage message if insufficient arguments are provided. It should die with an informative error if the key file is not found or the abbreviation is not found.

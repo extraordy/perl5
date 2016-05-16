@@ -1,0 +1,36 @@
+8. Grouping, Alternation, and Complete Parsing
+
+Objective
+
+Create a program named urls.pl that will parse the file /software/Perl2/urls.dat and report:
+
+ - The two most popular schemes (what comes before the first colon).
+ - The two most popular servers (what comes between the // and the next /), with the occurrence counts of each one. Only consider URLs with the schemes http, https, and ftp.
+
+Hand in urls.pl when you are done.
+
+urls.dat contents:
+
+	http://www.oreillyschool.com/
+	http://www.oreillyschool.com/search.php
+	http://www.oreillyschool.com/contact.php
+	http://www.oreillyschool.com/why/
+	http://www.oreillyschool.com/courses/perl1/
+	https://www.bankofamerica.com/index.jsp
+	https://www.airmiles.ca/servlet/ContentServer?pagename=Airmiles/Service/Login/Index&prefer_lang=E
+	https://www.amazon.com/gp/sign-in.html
+	ftp://ftp.cpan.org/
+	ftp://ftp.cpan.org/pub
+	ftp://ftp.cpan.org/usr
+	ftp://ftp.cpan.org/pub/misc
+	ftp://ftp.cpan.org/pub/unix
+	ftp://ftp.cpan.org/pub/CPAN
+	ftp://ftp.cpan.org/pub/CPAN/disclaimer.html
+	ftp://ftp.cpan.org/pub/CPAN/indices
+	ftp://ftp.cpan.org/pub/CPAN/doc
+	ftp://ftp.cpan.org/pub/CPAN/modules
+	http://www.weatheroffice.ec.gc.ca/forecast/city_e.html?bc-85&unit=i
+	news:comp.lang.perl.misc
+	news:comp.lang.perl.modules
+	mailto:trish@yahoo.com
+	mailto:scott@gmail.com

@@ -1,0 +1,47 @@
+9. The Arrow Operator and Multidimensional Arrays
+
+Objective
+
+Create a program in your /p3homework folder named chess.pl to perform some rudimentary operations on a chess board. Define a board, assign pieces to initial positions, and write a function that will move a piece from one position to another. There is a skeleton for the code below; note that the board definition follows the program. The actual meanings of the symbols are irrelevant since you are not required to verify that moves are legal.
+
+Note: You are not writing a program to play chess! Do not write any code to check that moves are legal, to check the identity of a piece, or even bother checking that given locations are on the board. (But feel free to try those things later on your own time.)
+
+Beginning code:
+
+#!/usr/bin/perl
+use strict;
+use warnings;
+
+# Store the board in a 2-D array called @board. 
+while (<DATA>) {
+# Read @board in here
+}
+
+# Execute a few moves and prints here to prove your code works.
+
+# Fill in the code for these two routines:
+
+sub move
+{
+ my ($bref, $from, $to) = @_;
+# This routine moves the piece at location $from in the board pointed
+# to by $bref to the location $to. (So afterwards, whatever was in
+# $from is now in $to and $from is blank.) 
+# You decide how to code a 2-D position in $from and $to.
+}
+
+sub print_board
+{
+# This routine prints the board which is passed to it. As long as it
+# looks recognizably like the input format that's fine.
+}
+
+__END__
+Br Bk Bb BQ BK Bb Bk Br
+Bp Bp Bp Bp Bp Bp Bp Bp
+-- -- -- -- -- -- -- --
+-- -- -- -- -- -- -- --
+-- -- -- -- -- -- -- --
+-- -- -- -- -- -- -- --
+Wp Wp Wp Wp Wp Wp Wp Wp
+Wr Wk Wb WK WQ Wb Wk Wr

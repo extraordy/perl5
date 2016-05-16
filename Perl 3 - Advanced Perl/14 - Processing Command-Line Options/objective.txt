@@ -1,0 +1,5 @@
+14. Processing Command-Line Options
+
+Objective
+
+Take the chess board assignment (chess.pl from lesson 9), save it in /p3homework as chess2.pl, and modify it to accept the coordinates of a move from the command line instead of hard-coded in the program. You choose how to represent and implement the argument. 

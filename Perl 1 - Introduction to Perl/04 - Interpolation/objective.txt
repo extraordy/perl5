@@ -1,0 +1,33 @@
+4. Interpolation
+
+Objective
+
+Create a new file named apples.pl with the following code:
+
+#!/usr/bin/perl
+use strict;
+use warnings;
+my $apples = 0;
+my $got = 'apples';
+# xxx
+print yyy
+
+Leave the # xxx comment in for now. Replace yyy with a double-quoted string that will cause the program to output
+
+	I have 0 apples
+
+Now change the 0 to a 1 in the initialization of $apples and rerun your program. See how it emits the grammatically incorrect:
+
+	I have 1 apples
+
+Now insert an if clause in place of the # xxx comment that will cause the program to print out:
+
+	I have 1 apple
+
+Write that if clause so that when you change the 1 in the initialization back to a 0, without making any other changes to the code, the program now prints out the correct:
+
+	I have 0 apples
+
+This should also be true for any number besides 1.
+
+When you finish, hand in apples.pl.

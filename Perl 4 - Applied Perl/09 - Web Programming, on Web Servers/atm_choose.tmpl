@@ -1,0 +1,39 @@
+<HTML>
+  <HEAD>
+    <TITLE>First Bank of O'Reilly</TITLE>
+  </HEAD>
+  <BODY>
+   <H2>First Bank of O'Reilly</H2>
+   <P>Automated Teller Machine</P>
+   <TABLE BORDER="1">
+    <TR><TD>Account number</TD><TD><TMPL_VAR NAME="account_number"></TD></TR>
+    <TR><TD>Owner(s)</TD><TD><TMPL_VAR NAME="owners"></TD></TR>
+    <TR><TD>Balance</TD><TD><TMPL_VAR NAME="Balance"></TD></TR>
+   </TABLE>
+   <BR>
+   
+   <!-- Lab 9, Objective 1 - Modified part 1
+   
+        The template needs to be altered, so that he transactions are displayed in their own table after the other account information.  
+        The table should have the following columns: Date, Type, Amount, Ending Balance. Each transaction should be displayed with those 
+        items broken out separately instead of concatenated together into a single line. -->
+        
+   <P>Transactions</P>
+   <TABLE BORDER="1"> 
+     <TR><TD>Date</TD><TD>Type</TD><TD>Amount</TD><TD>Ending Balance</TD></TR>  
+     
+     		<!-- If the "transactions" parameter has more elements, 
+     		     the template tool will generate an HTML table row 
+     		     for each of them because of the TMP_LOOP tag.  -->
+      
+    <TMPL_LOOP NAME="transactions">
+    
+     		<!-- The TMP_VAR tags indicate what elements of the 
+     		     "transactions" parameter have to be populated 
+     		     into individual HTM table cells column by column.  -->
+    
+     <TR><TD><TMPL_VAR NAME="date"></TD><TD><TMPL_VAR NAME="type"></TD><TD><TMPL_VAR NAME="amount"></TD><TD><TMPL_VAR NAME="ending_balance"></TD></TR>
+    </TMPL_LOOP>
+    </TABLE>
+  </BODY>
+</HTML>

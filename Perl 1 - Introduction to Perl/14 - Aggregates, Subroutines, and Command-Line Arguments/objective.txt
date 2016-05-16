@@ -1,0 +1,11 @@
+14. Aggregates, Subroutines, and Command-Line Arguments
+
+Objective
+
+To start, copy interleave.pl to a new file named interleave_homework.pl.
+
+This program can be made both shorter and faster by using a built-in function named splice that will remove a specified number of elements from the @_ array at once, rather than one at a time as shift does.
+
+Look up this function using perldoc -f and then rewrite your program to use it.
+
+When you finish, hand in interleave_homework.pl.

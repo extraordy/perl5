@@ -1,0 +1,39 @@
+<HTML>
+  <HEAD>
+    <TITLE>First Bank of O'Reilly</TITLE>
+  </HEAD>
+  <BODY>
+    <H2>First Bank of O'Reilly</H2>
+    <P>Automated Teller Machine</P>
+   <TABLE BORDER="1">
+    <TR><TD>Account number</TD><TD><TMPL_VAR NAME="account_number"></TD></TR>
+    <TR><TD>Owner(s)</TD><TD><TMPL_VAR NAME="owners"></TD></TR>
+    <TR><TD>Balance</TD><TD><TMPL_VAR NAME="Balance"></TD></TR>
+   </TABLE>
+   <TABLE BORDER="1">
+    <TR><TH>Date</TH><TH>What</TH><TH>Amount</TH><TH>Ending Balance</TH></TR>
+    <TMPL_LOOP NAME="transaction_loop">
+     <TR>
+      <TD><TMPL_VAR NAME="transaction_date"></TD><TD><TMPL_VAR NAME="type"></TD>
+      <TD><TMPL_VAR NAME="amount"></TD><TD><TMPL_VAR NAME="new_balance"></TD>
+     </TR>
+    </TMPL_LOOP>
+   </TABLE>
+
+   <FORM ACTION="atm_timed.cgi" METHOD="POST">
+    <INPUT TYPE="hidden" NAME="account_number" VALUE="<TMPL_VAR NAME=account_number>">
+    <H3>Set Action for Future Time</H3>
+    <TABLE>
+     <TR><TD> Time:</TD><TD> <INPUT NAME="time" TYPE="text"></TD></TR>
+     <TR><TD>Amount:</TD><TD> <INPUT NAME="amount" TYPE="text"></TD></TR>
+     <TR><TD>Type:</TD><TD>
+      <SELECT NAME="type">
+       <OPTION VALUE="credit">Credit</OPTION>
+       <OPTION VALUE="debit">Debit</OPTION>
+      </SELECT></TD></TR>
+    </TABLE>
+    <INPUT TYPE="submit" VALUE="Submit">
+   </FORM>
+
+  </BODY>
+</HTML>

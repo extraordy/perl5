@@ -1,0 +1,11 @@
+10. Web Programming, on Web Clients
+
+Objective
+
+You are going to scrape part of the O'Reilly School of Technology site, but so that we didn't break this lesson by changing the site, we have created a static mirror of the necessary parts of the site. You can explore this site in your browser. The URL to start from is http://perl4.oreillyschool.com/ost-mirror/. Using WWW::Mechanize, follow the link labelled 'Contact', then fill in just your name on the form on the next page (this is the first visible field), and submit the form.
+
+If you have done this correctly, the resulting page will contain an answer to the riddle: "Why is a camel like a lemon?" The answer will be between the tags <B>...</B> and there will be no other angle brackets on the page. Have your script print out the answer to the riddle.
+
+Create a program in your /perl4homework/Project10 folder named scraper.pl to answer the riddle.
+
+When you finish, hand in your scraper.pl program.

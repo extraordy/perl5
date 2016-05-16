@@ -1,0 +1,14 @@
+7. Regular Expressions: Anchors and Captures
+
+Objective
+
+Write a program named date_format.pl to scan one or more files (give one of them the name dates.txt) named on the command line for dates written in the format Month Day, YYYY (for example, February 12, 2011 or June 3, 2011) and print out the dates that it finds, reformatted as YYYY-MM-DD (for example, 2011-02-12).
+
+When you run the program from the command line, you'll see output like this:
+
+	1957-11-1
+	2012-3-12
+	2005-4-12
+	1932-1-22
+
+When you finish, submit date_format.pl and a dates.txt file containing at least one properly formatted date.

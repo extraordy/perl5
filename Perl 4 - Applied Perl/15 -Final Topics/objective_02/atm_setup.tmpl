@@ -1,0 +1,53 @@
+<HTML>
+  <HEAD>
+    <TITLE>First Bank of O'Reilly</TITLE>
+  </HEAD>
+  <BODY>
+    <H2>First Bank of O'Reilly</H2>
+    <P>Initial Account Setup</P>
+ 
+    <TMPL_UNLESS NAME="add_secondary">
+      <FORM ACTION="atm_setup.cgi" METHOD="POST">
+        <TABLE BORDER="1" CELLPADDING="10"><TR><TD>
+          <TABLE BORDER="0" CELLPADDING="10">
+            <TMPL_IF NAME="primary_failed">
+      	    <TR><TD COLSPAN="2" WIDTH="120">Customer has already been registered with a different password. Please try again!</TD></TR>
+            </TMPL_IF>    
+
+            <TR><TD><U><B>Primary Account Holder</B></U></TD><TD><INPUT TYPE="HIDDEN" NAME="owner" VALUE="primary"></TD></TR>                   
+            <TR><TD>Account number: </TD><TD><INPUT TYPE="HIDDEN" NAME="account_number" VALUE="<TMPL_VAR NAME="account_number">"><TMPL_VAR NAME="account_number"></TD></TR>                 
+            <TR><TD>Initial balance: </TD> <TD><INPUT TYPE="TEXT" NAME="init_balance" VALUE="<TMPL_VAR NAME="init_balance">"></TD></TR>
+            <TR><TD>First name: </TD> <TD><INPUT TYPE="TEXT" NAME="first_name" VALUE="<TMPL_VAR NAME="first_name">"></TD></TR>
+            <TR><TD>Last name: </TD> <TD><INPUT TYPE="TEXT" NAME="last_name" VALUE="<TMPL_VAR NAME="last_name">"></TD></TR>
+            <TR><TD>Email: </TD> <TD><INPUT TYPE="TEXT" NAME="email" VALUE="<TMPL_VAR NAME="email">"></TD></TR>            
+            <TR><TD>Password: </TD> <TD><INPUT TYPE="PASSWORD" NAME="password" VALUE="<TMPL_VAR NAME="password">"></TD></TR>
+            <TR><TD><INPUT TYPE="SUBMIT" NAME="submit" VALUE="Submit">&nbsp;<INPUT TYPE="SUBMIT" NAME="submit" VALUE="Quit"></TD><TD>&nbsp</TD></TR> 
+         </TABLE>         
+       </TD></TR>
+       </TABLE>
+
+      </FORM>
+    </TMPL_UNLESS>
+    <TMPL_IF NAME="add_secondary">
+      <FORM ACTION="atm_setup.cgi" METHOD="POST">
+        <TABLE BORDER="1" CELLPADDING="10"><TR><TD>    
+          <TABLE BORDER="0" CELLPADDING="10">          
+            <TMPL_IF NAME="secondary_failed">
+      	    <TR><TD COLSPAN="2" WIDTH="120">Customer has already been added or registered with a different password. Please try again!</TD></TR>
+            </TMPL_IF>    
+            <TR><TD><U><B>Secondary Account Holder</B></U></TD><TD><INPUT TYPE="HIDDEN" NAME="owner" VALUE="secondary"></TD></TR>          
+            <TR><TD>Account number: </TD><TD><INPUT TYPE="HIDDEN" NAME="account_number" VALUE="<TMPL_VAR NAME="account_number">"><TMPL_VAR NAME="account_number"></TD></TR>                             
+            <TR><TD>First name: </TD> <TD><INPUT TYPE="TEXT" NAME="first_name" VALUE="<TMPL_VAR NAME="first_name">"></TD></TR>
+            <TR><TD>Last name: </TD> <TD><INPUT TYPE="TEXT" NAME="last_name" VALUE="<TMPL_VAR NAME="last_name">"></TD></TR>
+            <TR><TD>Email: </TD> <TD><INPUT TYPE="TEXT" NAME="email" VALUE="<TMPL_VAR NAME="email">"></TD></TR>
+            <TR><TD>Password: </TD> <TD><INPUT TYPE="PASSWORD" NAME="password" VALUE="<TMPL_VAR NAME="password">"></TD></TR>
+ 
+            <TR><TD><INPUT TYPE="SUBMIT" NAME="submit" VALUE="Submit">&nbsp;<INPUT TYPE="SUBMIT" NAME="submit" VALUE="Quit"></TD><TD>&nbsp</TD></TR> 
+         </TABLE>
+       </TD></TR></TABLE>
+      </FORM>
+    </TMPL_IF>
+  </BODY>
+</HTML>
+
+ 

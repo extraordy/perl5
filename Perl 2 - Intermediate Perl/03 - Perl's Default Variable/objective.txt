@@ -1,0 +1,9 @@
+3. Perl's Defaults Variable
+
+Objective
+
+Copy word_counter.pl from the lesson and name the copy word_counter2.pl. Modify it to take a mandatory first argument that is a minimum number of characters that each word should have, and an optional second argument that is the name of a file. Die if there are no arguments. Use $_ where possible.
+
+Test your program using the /software/Perl2/lesson3project1.txt file.
+
+Submit word_counter2.pl when you are done.

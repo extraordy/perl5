@@ -1,0 +1,12 @@
+14. Portable Programming; Dates and Times
+
+Objective
+
+Write a program /perl4homework/Project14/dl_page.pl that forks a child process that waits until a given time and then downloads a web page to a local file. Use the web page http://perl4.oreillyschool.com/ost-mirror/ and save it to ost-mirror.html. Running your program should look like this:
+
+Expected Dialogue
+
+cold:~/perl4homework/Project14$ ./dl_page.pl 17:05
+Child will run in 145 seconds
+
+145 seconds (in this example 17:05 is 145 seconds away) from this point, the child process will run. Note that the server is in the United States Central time zone. Meanwhile, you could be doing other things. The child does not have to output anything to the terminal. You can expect that the time entered will be only a short time away (you want to be able to verify the operation while you are logged on) and do not have to worry about daylight savings time, leap seconds, month boundary crossings, or being in any other way completely precise about the time. Hint: The getstore method of LWP::Simple will save you a few lines.

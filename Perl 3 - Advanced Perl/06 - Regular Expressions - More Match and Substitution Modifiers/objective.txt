@@ -1,0 +1,16 @@
+6. Regular Expressions: More Match and Substitution Modifiers
+
+Objective
+
+Write a program in your /p3homework folder named spell.pl that will perform as a primitive spell checker. It should accept filenames from the command line or data from standard input in the usual way. Use /software/Perl3/quotes.txt file for testing. The program should print its input to standard output, but with "misspelled" words surrounded by square brackets. For example:
+
+Example run
+
+cold:~$ ./p3homework/spell.pl /software/Perl3/quotes.txt
+
+	Four score and [querty] years ago, our [fqthers] brought forth...
+	A book is always a dialogue with [othur] readers and otter books.
+
+The definition of a properly spelled "word" is: any consecutive sequence of one or more letters A through Z that is in the dictionary. Don't consider words like "don't"--this is not a perfect spelling checker--but feel free to improve it if you want!) The dictionary is /usr/share/dict/words and your checker should be case-insensitive.
+
+Note: You must form each line to be printed using the /e modifier on a single substitution. (There is a very brief and simple solution using this. Only one /e modifier is required.)

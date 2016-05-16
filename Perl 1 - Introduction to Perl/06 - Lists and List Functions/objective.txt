@@ -1,0 +1,8 @@
+6. Lists and List Functions
+
+Objective
+
+First, save a copy of store.pl as store_es.pl. Next, run perldoc -f index (from the Terminal) to learn about the index() function.
+Using this function, modify store_es.pl to only print lines where the item contains the string "es".
+
+When you finish, hand in your program.

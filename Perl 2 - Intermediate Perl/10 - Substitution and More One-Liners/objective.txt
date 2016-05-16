@@ -1,0 +1,27 @@
+10. Substitution and More One-Liners
+
+Objective
+
+Write a one-liner to replace all dates of the form MM/DD/YYYY with YYYY-MM-DD in all named files. Write some test data in a file in your homework folder named some_dates.txt as shown to test it on, where the dates are interspersed throughout the text:
+
+some_dates.txt contents:
+
+	The Amazing Johnathan (Jonathan Szeles) was born 09/09/1958.
+	Bono (Paul Hewson) was born 05/10/1960.
+	On 05/20/1946, Cher (Cherilyn Sarkisian LaPierre) was born.
+	Eminem (Marshall Mathers) was born 10/17/1972.
+	LL Cool J (James Todd Smith) was born 01/14/1968.
+	Moby (Richard Melville Hall) was born 09/11/1965.
+	Pele (Edson Arantes do Nascimento) was born 10/23/1940.
+	Pink was born 09/08/1979. Her real name is Alecia Beth Moore
+	Prince was born Prince Roger Nelson, on 06/07/1958.
+	Tiffany (Tiffany Renee Darwisch) was born 10/02/1971.
+
+Create a text file named date_convert.sh like this, including your one-liner:
+
+#!/bin/sh
+cat some_dates.txt | perl -one-liner code goes here
+
+(You can run this file from the shell to test it.)
+
+Submit date_convert.sh and some_dates.txt.

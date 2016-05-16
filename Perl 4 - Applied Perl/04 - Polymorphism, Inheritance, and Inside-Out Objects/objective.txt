@@ -1,0 +1,45 @@
+4. Polymorphism, Inheritance, and Inside-Out Objects
+
+Objective
+
+Copy the latest version of BankAccount.pm from your /perl4 folder to your /perl4homework/Project04 folder. Then, create the following version of SavingsAccount.pm in your perl4homework/Project04 folder:
+
+package SavingsAccount;
+use strict;
+use warnings;
+
+my $Interest_Rate = 0.015;
+use BankAccount;
+
+BEGIN{ our @ISA = qw(BankAccount) }
+
+sub add_interest
+{
+ my $self = shift;
+ my $pct = $Interest_Rate * 100;
+ $self->transact( "Interest at $pct%", $self->balance * $Interest_Rate );
+}
+
+1;
+
+Change it to provide a class method, set_interest_rate, that allows the caller to set the interest rate. Test it with this version of usebank.pl:
+
+#!/usr/local/bin/perl
+use strict;
+use warnings;
+
+use SavingsAccount;
+
+my $piggybank = SavingsAccount->new( balance => 5000 );
+SavingsAccount->set_interest_rate( 0.02 );
+$piggybank->add_interest;
+print $piggybank->balance, "\n";
+
+The output should be:
+
+Expected Output:
+
+cold:~/perl4homework/Project04$ ./usebank.pl
+5100
+
+When you finish, hand in your modified SavingsAccount.pm, along with usebank.pl and BankAccount.pm.

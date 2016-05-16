@@ -1,0 +1,5 @@
+2. Discovering Properties of Files
+
+Objective
+
+Create a program in your /p3homework folder named statcheck.pl that reports its own executable status. Verify it by running it before and after you chmod +x it. The program should work without modification even if someone renames it (Hints: perldoc -f -X; perldoc perlvar; and in order to run the program before you chmod +x it, use perl statcheck.pl).

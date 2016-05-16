@@ -1,0 +1,26 @@
+12. References to Subroutines
+
+Objective
+
+Copy the game dispatch.pl from the lesson into your /p3homework folder. Notice that the names of the subroutines are only ever used once, in the definition of the dispatch table. Now you want the word "slay" to be synonymous with "kill," so the subroutine that gets executed should do exactly the same, except that instead of printing "kill," it should print "slay." Your goal is to do this without copying the kill subroutine, but instead, create a closure over the particular verb. This is a sample dialog that should result:
+
+Expected Output:
+
+cold:~/p3homework$ ./dispatch.pl
+Command: take sword
+ Taken
+Command: kill troll 
+ Kill who with what?
+Command: kill troll with sword
+ Killed!
+Command: quit
+cold:~/p3homework$ ./dispatch.pl
+Command: take sword
+ Taken
+Command: slay frog with sword  
+ No frog to slay
+Command: slay troll with sword
+ Slayed!
+Command: quit
+
+It might help to know that in a double-quoted string, if you want to print a variable followed by letters that would be interpreted as part of the variable name, you can do it with braces: "${verb}ed!" Also, that the escape sequence \u in a double-quoted string uppercases the next letter: "\u$verb..."

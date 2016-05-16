@@ -1,0 +1,7 @@
+10. Perl's Contextual Behavior
+
+To start, copy the ascii_plus.pl to a new file named ascii_plus_time.pl. Next, change ascii_plus_time.pl to print out a line at the beginning announcing the current date and time using localtime(). Use the substr function (see perldoc -f substr) so your output looks like this:
+
+	Tue Aug 11 09:35
+
+When you finish, hand in ascii_plus_time.pl.

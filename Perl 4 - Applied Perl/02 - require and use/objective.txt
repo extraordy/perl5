@@ -1,0 +1,149 @@
+2. require and use
+
+Objective
+
+In your /perl4homework/Project02 folder, create the following two files:
+
+outstanding1.pl:
+
+#!/usr/local/bin/perl
+use strict;
+use warnings;
+my %account;
+<DATA>; <DATA>; # Skip first two lines
+while ( ! eof DATA )
+{
+ chomp ( my $owner = <DATA> );
+ chomp ( my $account_number = <DATA> );
+ chomp ( my $balance = <DATA> );
+ chomp ( my $credit_limit = <DATA> );
+ $account{$account_number} = { owner => $owner,
+ balance => $balance,
+ credit_limit => $credit_limit,
+ };
+}
+print "Done reading report, computing total outstanding:\n";
+my $total;
+for my $num ( keys %account )
+{
+ $total += $account{$num}{balance};
+}
+printf "\$%.2f\n", $total;
+__END__
+FIELDS: owner, account_number, balance, credit_limit
+# This data file syntax permits comments starting with a # sign
+Count Moneybags
+897454835
+3268956.00
+100000000
+Widow Bessie
+783231622
+21.50
+100
+
+deposit1.pl:
+
+#!/usr/local/bin/perl
+use strict;
+use warnings;
+my %account;
+<DATA>; # Skip header
+while ( ! eof DATA )
+{
+ chomp ( my $account_number = <DATA> );
+ chomp ( my $owner = <DATA> );
+ chomp ( my $balance = <DATA> );
+ chomp ( my $last_statement_date = <DATA> );
+ <DATA>; # Skip separator
+ $account{$account_number} = { owner => $owner,
+ balance => $balance,
+ last_statement_date => $last_statement_date,
+ };
+}
+print "Done reading report, computing total on deposit:\n";
+my $total;
+for my $num ( keys %account )
+{
+ $total += $account{$num}{balance};
+}
+printf "%.2f\n", $total;
+__END__
+FIELDS: account_number, owner, balance, last_statement_date
+736353423
+Lenny Landlord
+38670.40
+2011-03-02
+#
+663677908
+Marvin Mogul
+83910.20
+2011-03-05
+#
+
+Save and run those programs and record their output. Despite the fact that each of these programs is reading a different type of report, there is enough in common between the two report formats to be able to extract the job of reading it to a single subroutine stored in a separate file. Copy and modify each file as follows:
+
+outstanding2.pl:
+
+#!/usr/local/bin/perl
+use strict;
+use warnings;
+
+use Report;
+my %account = read_report( \*DATA );
+
+print "Done reading report, computing total outstanding:\n";
+my $total;
+for my $num ( keys %account )
+{
+ $total += $account{$num}{balance};
+}
+printf "\$%.2f\n", $total;
+
+__END__
+FIELDS: owner, account_number, balance, credit_limit
+# This data file syntax permits comments starting with a # sign
+Count Moneybags
+897454835
+3268956.00
+100000000
+Widow Bessie
+783231622
+21.50
+100
+
+deposit2.pl:
+
+#!/usr/local/bin/perl
+use strict;
+use warnings;
+
+use Report;
+my %account = read_report( \*DATA );
+
+print "Done reading report, computing total on deposit:\n";
+my $total;
+for my $num ( keys %account )
+{
+ $total += $account{$num}{balance};
+}
+
+printf "%.2f\n", $total;
+
+__END__
+FIELDS: account_number, owner, balance, last_statement_date
+736353423
+Lenny Landlord
+38670.40
+2011-03-02
+#
+663677908
+Marvin Mogul
+83910.20
+2011-03-05
+#
+
+Your job is now to provide a single file named Report.pm that will make both of these new programs produce the same results as the old ones. Note that the argument passed to the read_report() routine is a filehandle and can be shifted into a variable named, say, $fh, and used like a filehandle you obtained with open. In writing the routine you should observe what the two report formats have in common so you can come up with a single strategy that will work for reading both of them and return the required data structure.
+
+This homework is a little more challenging than most but it is exactly the sort of problem you will face in dealing with and improving legacy code, and by now you have the skills to do just this! Hint: Look at the information in the FIELDS line.
+
+When you finish, hand in the Report.pm, outstanding2.pl, and deposit2.pl files from your /perl4homework/Project02 folder.

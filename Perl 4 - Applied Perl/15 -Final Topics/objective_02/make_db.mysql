@@ -1,0 +1,56 @@
+DROP TABLE IF EXISTS account;
+CREATE TABLE IF NOT EXISTS account (
+       id              INTEGER AUTO_INCREMENT PRIMARY KEY,
+       account_number  INTEGER,
+       balance         DOUBLE
+);
+
+DROP TABLE IF EXISTS customer;
+CREATE TABLE IF NOT EXISTS customer (
+       account   INTEGER,         # References account
+       person    INTEGER          # References person
+);
+
+# ---------------------------------------------------------------
+# "person" table was altered adding "digest" and "email" columns
+# ---------------------------------------------------------------
+
+DROP TABLE IF EXISTS person;
+CREATE TABLE IF NOT EXISTS person (
+       id         INTEGER AUTO_INCREMENT PRIMARY KEY,
+       first_name TEXT,
+       last_name  TEXT,
+       digest     TEXT,
+       email      TEXT
+);
+
+DROP TABLE IF EXISTS transactions;
+CREATE TABLE IF NOT EXISTS transactions (
+       account            INTEGER,   # References account
+       single_transaction INTEGER    # References single_transaction
+);
+
+# -------------------------------------------------------------------
+# "single_transaction" table was altered adding "transfer_id" column
+# -------------------------------------------------------------------
+
+DROP TABLE IF EXISTS single_transaction;
+CREATE TABLE IF NOT EXISTS single_transaction (
+       id                  INTEGER AUTO_INCREMENT PRIMARY KEY,
+       amount              DOUBLE,
+       transaction_type    INTEGER,  # References transaction_type
+       previous_balance	   DOUBLE,
+       new_balance	   DOUBLE,
+       transaction_date    TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+       transfer_id         INTEGER,  # References transfer counterpart transaction
+);
+
+DROP TABLE IF EXISTS transaction_type;
+CREATE TABLE IF NOT EXISTS transaction_type (
+       id   INTEGER AUTO_INCREMENT PRIMARY KEY,
+       name TEXT
+);
+
+
+INSERT INTO transaction_type (name) VALUES ('credit'), ('debit');
+

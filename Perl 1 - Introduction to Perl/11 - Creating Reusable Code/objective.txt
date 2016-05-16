@@ -1,0 +1,9 @@
+11 Creating Reusable Code
+
+Objective
+
+Copy your ascii_plus_time.pl project to a new one named ascii_plus_sub.pl. Amend your ascii_plus_sub.pl so that the only code in the main program is:
+
+	init();
+
+and the rest of the program is contained within the init() subroutine.

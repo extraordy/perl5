@@ -1,0 +1,13 @@
+12. More on Numbers and Strings; More on Regular Expressions; More on Hashes
+
+Objective
+
+The Unix program od renders binary data in an understandable text form. You will write a program that emulates a subset of its behavior (although you will not print the running character count in the first column). The output should provide a representation on each line of output of 16 characters at a time from the input. Use the read function to read binary data, in a program named od.pl. It should take an optional flag -c that signifies that any character that can be printed (those with octal values in the range 040 through 0176 inclusive) should be printed as is. Other characters should be printed as their hexadecimal representations. Without the -c flag, all characters should be translated to hex (od defaults to octal representations, but your program can use hexadecimal, which is a little easier to read).
+
+Try it out on the binary image file regmatch.png, which is in the /software/Perl2 directory.
+
+Run your program like this:
+
+	cold:~/perl2$ ./od.pl /software/Perl2/regmatch.png
+
+When you are done, hand in your od.pl file.

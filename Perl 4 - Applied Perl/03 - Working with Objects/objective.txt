@@ -1,0 +1,38 @@
+3.  Working with Objects
+
+Objective
+
+Copy BankAccount.pm and usebank.pl from your /perl4 folder to your /perl4homework/Project03 folder. In the /perl4homework/Project03 folder, modify usebank.pl as follows:
+
+CODE TO EDIT:
+
+#!/usr/local/bin/perl
+use strict;
+use warnings;
+
+use BankAccount;
+
+my $personal_account = BankAccount->new( owner => 'me',
+ balance => 1000,
+ overdraft_limit => 500 );
+$personal_account->credit( 300 );
+$personal_account->debit( 100 );
+my $slush_fund = BankAccount->new( owner => 'you',
+ balance => 10000 );
+$slush_fund->transfer( 5000, $personal_account );
+print "New balance on my account = \$", $personal_account->balance, "\n";
+print $personal_account->statement;
+print $slush_fund->statement;
+
+Now, modify BankAccount.pm (in /perl4homework/Project03) to provide the statement routine such that running usebank.pl will generate this output:
+
+Expected Output:
+
+cold:~/perl4homework/Project03$ ./usebank.pl
+New balance on my account = $6200
+29-Mar-2011 credit 300
+29-Mar-2011 debit -100
+29-Mar-2011 Transfer from 10002 5000
+29-Mar-2011 Transfer to 10001 -5000
+
+There are tabs between the fields there. You can use strftime in the POSIX module to print the date. When you finish, hand in your modified BankAccount.pm and usebank.pl.

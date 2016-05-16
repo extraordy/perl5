@@ -1,0 +1,20 @@
+<HTML>
+  <HEAD>
+    <TITLE>First Bank of O'Reilly</TITLE>
+  </HEAD>
+  <BODY>
+    <H2>First Bank of O'Reilly</H2>
+    <P>Automated Teller Machine</P>
+    <FORM ACTION="atm_choose.cgi" METHOD="POST">
+      Account number:
+      <SELECT NAME="account_number">
+        <TMPL_LOOP NAME="account_loop">
+        <OPTION VALUE="<TMPL_VAR NAME=account_number>"><TMPL_VAR NAME="account_number">
+        </TMPL_LOOP>
+      </SELECT> <BR/>
+      <INPUT TYPE="SUBMIT">
+    </FORM>
+  </BODY>
+</HTML>
+
+ 

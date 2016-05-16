@@ -1,0 +1,49 @@
+1. Introduction: Packages
+
+Objective
+
+Create a /perl4homework folder for your homework projects, and create a /Project01 subfolder in it for this project. Copy the partial program below into the CodeRunner editor, save it in /perl4homework/Project01 as package_homework.pl, and do what the comments say:
+
+CODE TO COPY
+#!/usr/local/bin/perl
+use strict;
+use warnings;
+
+{
+ our @array = qw(Max Headroom);
+}
+
+sub first
+{
+ print "I am in first()\n";
+}
+
+package old;
+
+{
+ package new;
+
+ our $scalar = "Fred";
+}
+
+sub second
+{
+ print "I am in second()\n";
+}
+
+# Replace the following comments with one or more statements that perform what each comment says.
+# The requirement here is to demonstrate that you can use multiple
+# ways of accessing the package variables and subroutines wherever they exist.
+# Do not alter any code above this line.
+
+# Print @array by using 'package' and 'our'
+# Print @array by using an explicit package in the variable
+# Call first() by using 'package'
+# Call first() by using an explicit package in its name
+# Print $scalar by using 'package' and 'our'
+# Print $scalar by using an explicit package in the variable
+# Call second() by using 'package'
+# Call second() by using an explicit package in its name
+
+
+When you finish, hand in package_homework.pl.

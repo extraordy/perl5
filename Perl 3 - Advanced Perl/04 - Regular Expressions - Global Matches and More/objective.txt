@@ -1,0 +1,16 @@
+4. Regular Expressions: Global Matches and More
+
+Objective
+
+Write a program in your /p3homework folder named dollars.pl to read in one or more files named on the command line. Print out the input, but alter monetary figures first: if a number appears followed by a decimal point and exactly two more digits, put a dollar sign in front of it if there isn't one there already. Print the total amount of money seen. This includes any figures in the input that were already preceded by dollar signs even if they didn't include a decimal point (period). Use the file /software/Perl3/money.txt for input.
+
+Using money.txt for input; the result of running this program on it should look like this:
+
+cold:~$ ./p3homework/dollars.pl /software/Perl3/money.txt
+Jack gave me $50.00, which I added to the $47.50 that I already
+had, and the $102.50 that came from Mary's register, and the
+$2500.00 in donations, plus the $500 we got in bribes; the
+fact that Pi is about 3.14159 has nothing to do with this.
+Total = $3200.00
+
+When dollars.pl works to your satisfaction, submit it.

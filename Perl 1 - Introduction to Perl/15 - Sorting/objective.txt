@@ -1,0 +1,25 @@
+15. Sorting
+
+Objective
+
+Copy store_report.pl to a new file named store_report_sorted.pl.
+
+Modify store_report_sorted.pl so that instead of the sales numbers being internal to the program, they are supplied on the command line.
+
+When you finish with this, both of these commands should produce the same output:
+
+	./store_report.pl
+	./store_report_sorted.pl "White Peaches" 12 "Rainier Cherries" 20 Durien -1 "Spartan Apples" 24
+
+The output should look like this:
+
+	*** Sold 20 of Rainier Cherries, which were not in inventory
+	 1.45 120 California Avocados
+	 1.50 400 Cherry Tomatoes
+	10.50 11 Durien
+	 0.40 1476 Spartan Apples
+	 0.95 288 White Peaches
+
+Modify store_report_sorted.pl to print a message if if a sale would decrease inventory levels below zero.
+
+Hand in store_report_sorted.pl when you finish.

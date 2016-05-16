@@ -1,0 +1,35 @@
+9. Introduction to One-Liners
+
+Objective
+
+There is a file on your student machine (and all Unix/Linux machines) named /etc/passwd that contains information about the users of the machine. It consists of one line per user, with fields separated by colons:
+
+ -  User name
+ -  Unused ('x')
+ -  User ID
+ -  Group ID
+ -  Full name
+ -  Home directory
+ -  Login shell
+
+One line from this file will look like:
+
+	username:x:userid:groupid:fullname:homedir:shell
+
+Create a one-liner to count and print the number of each shell occurring in that file, sorted in descending order by count.
+
+When you are satisfied with your one-liner, create a text file named shells.sh like this, including your one-liner as shown:
+
+	#!/bin/sh
+	perl -one-liner code goes here
+
+You can run this file from the shell to test it.
+
+We'll ask for one-liners in this form for other projects. This enables the instructor to test your solution without needing to copy and paste it.
+
+The result from the one-liner should look something like this:
+
+	/usr/bin/false: 48
+	/var/empty/usr/bin/false: 2
+	/bin/sh: 1
+	/usr/sbin/uucico: 1

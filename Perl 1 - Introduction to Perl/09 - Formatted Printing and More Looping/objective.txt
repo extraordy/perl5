@@ -1,0 +1,11 @@
+9. Formatted Printing and More Looping
+
+Objective
+
+To start, copy the ascii_chart.pl to a new file named ascii_plus.pl. In ascii_plus.pl, change the while loop to a foreach loop that has the same effect. Also change ascii_plus.pl so that the output is of the form:
+
+	decimal number, hexadecimal equivalent, octal equivalent, binary equivalent, character
+
+The decimal number should be printed in a field width of 3, the hexadecimal in a field of 2, the octal in a field of 4, the binary in a field of 8, and the character in a field of 1, with a single space between each field.
+
+When you finish, hand in ascii_plus.pl.

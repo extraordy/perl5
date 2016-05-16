@@ -1,0 +1,32 @@
+5. grep () and map()
+
+Objective
+
+Write a program in your /p3homework folder named speller.pl that could form the basis of a spelling checker. Write a program that uses map and grep to populate a hash with a key for every word in the file /usr/share/dict/words, which is on your student machine and contains one word per line. Each key should be converted to lowercase. Ignore any line that does not consist solely of letters. Populate this hash with a single statement after opening a filehandle. For example, if the file /usr/share/dict/words consists of the lines
+
+	cat
+	Cat
+	dog
+	Scott
+	you're
+
+your hash %word should have the same contents as you would get from this statement:
+
+	my %word = ( cat => 1, dog => 1, scott => 1 );
+
+Start from this code:
+
+#!/usr/bin/perl
+use strict;
+use warnings;
+
+open my $fh, '<', '/usr/share/dict/words' or die "Couldn't open file: $!\n";
+my %word = ...;
+print "Verification: the following words should be in the hash:\n";
+print "$_: ", $word{$_} ? 'PASS' : 'FAIL', "\n" for qw(wolf schumpeter saltpeter);
+print "Verification: the following words should not be in the hash:\n";
+print "$_: ", $word{$_} ? 'FAIL' : 'PASS', "\n" for qw(wolfsmilk Schumpeter peter-penny);
+
+and replace ... with a single expression that produces the correct result. The only semicolons inside that expression should be inside map and/or grep blocks.
+
+(We know that you could do this in several statements and that might even be a clearer way to program the problem, but we want to test your understanding of the map and grep functions.)

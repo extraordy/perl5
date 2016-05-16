@@ -1,0 +1,35 @@
+1. Prerequisites, Review, and Slices
+
+Objective
+
+Write a one-liner that is the equivalent of the Unix factor program: it should print out all the prime factors of its input. A prime factor is an integer greater than one that is not divisible by any numbers other than itself.
+
+Create a text file named factor.sh in your /p3homework folder like this, including your one-liner:
+
+#!/bin/sh
+
+perl
+ -one-liner code goes here
+(You can run this file from the shell to test it.)
+
+Here are some examples of the results your one-liner should produce:
+
+cold:~$ perl -le '...' 7
+7
+cold:~$ perl -le '...' 12
+2
+2
+3
+cold:~$ perl -le '...' 69
+3
+23
+cold:~$ perl -le '...' 5544
+2
+2
+2
+3
+3
+7
+11
+
+Your job is to fill in the ....

@@ -1,0 +1,14 @@
+11. More Perl Flags; More Perl Operators
+
+Objective
+
+Run the program netstat on the terminal and observe the output. Write a one-liner to print out just the remote host (the non-whitespace characters preceding the last colon on the line) on lines 3 through 12, provided the line contains a colon. Feed the input using a pipe; that is, netstat | perl ....
+
+Create a text file named stats.sh like this, including your one-liner:
+
+#!/bin/sh
+netstat | perl -one-liner code goes here
+
+(You can run this file from the shell to test it.)
+
+Submit stats.sh when you finish.

@@ -1,0 +1,5 @@
+12. Sending Email
+
+Objective
+
+Copy your top_speakers.pl project for the previous lesson to /perl4homework/Project12, and extend it to email to you the entire list of speakers (not just the top three) and the number of talks they gave, sorted as before. Plain text mail is fine.

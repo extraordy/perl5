@@ -1,0 +1,25 @@
+3. Conditional Statements in Perl
+
+Objective
+
+Create a new script named evaluate.pl with the following code:
+
+#!/usr/bin/perl
+use strict;
+use warnings;
+
+my $principal = 100000;
+my $interest_rate = 7; # %
+my $term = 20; # Years
+my $total_paid = $principal * (1 + $interest_rate/100) ** $term;
+print "Value of principal + interest after ", $term, " years = ", $total_paid, "\n";
+
+Modify this program for printing loan payments as follows:
+
+ - Declare a variable $cash and initialize it to some number.
+ - Instead of printing out the total loan payment, test the value of $cash against the value of $total_paid to see whether there is enough cash to pay off the loan:
+ - If $cash is more than 10% larger than the value of $total_paid, print "Approved."
+ - If $cash is between 0% and 10% larger than $total_paid, print "Marginal."
+ - If $cash is less than $total_paid, print "Unacceptable."
+
+When you finish, hand in your program.

@@ -1,0 +1,22 @@
+7. Arrays and Array Functions
+
+Objective
+
+Create sanitizer.pl with the following code:
+
+#!/usr/bin/perl
+use strict;
+use warnings;
+
+my $name = "Charles Francis Xavier";
+$name = "Hiram K. Hackenbacker";
+$name = "James Moriarty";
+$name = "Samuel Finley Breese Morse";
+
+Next, add code after each assignment to $name that will print out the name in a "sanitized" form of "First M. Last"; that is, first name, space, middle initial, period, space, last name.
+
+If there is no middle name, print the letter X with no period following it. If there are multiple middle names, use the initial of the first one.
+
+Keep in mind that a general method for processing a name is required. In other words, the same method should work for all the $name assignments.
+
+When you finish, hand in your program.

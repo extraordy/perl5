@@ -1,0 +1,12 @@
+11. Parsing Web Pages
+
+Objective
+
+Create /perl4homework/Project11/top_speakers.pl, which parses the page http://perl4.oreillyschool.com/conf-mirror/conferences.oreillynet.com/speakers.html, which is a mirror of a 2002 O'Reilly Open Source conference speakers page. Extract the top three speakers by count of the number of sessions and/or tutorials they are presenting. When run, the output from your program should be:
+
+Expected Output:
+
+cold:~/perl4homework/Project11$ ./top_speakers.pl
+Matt Sergeant (6)
+Bruce Momjian (5)
+Rasmus Lerdorf (4)

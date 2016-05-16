@@ -1,0 +1,8 @@
+8. Your First Loop Statement
+
+Objective
+
+For this project, write a program named ascii_chart.pl that prints out an ASCII table for characters whose ordinal value is between 32 and 126, inclusive.
+The format should be one entry per line, consisting of the decimal number, a space, and the corresponding character.
+
+For more information, run perldoc -f chr.

@@ -1,0 +1,9 @@
+9. Web Programming, on Web Servers
+
+Objective
+
+Copy atm_choose.tmpl and MyDB.pm to /perl4homework/Project09 and modify them so that the transactions are displayed in their own table after the other account information. The table should have the following columns: Date, Type, Amount, Ending Balance. Each transaction should be displayed with those items broken out separately instead of concatenated together into a single line.
+
+You should be able to see your results by browsing to http://your_username.userworld.com/perl4homework/Project09/atm_choose.cgi?account_number=10001.
+
+When you finish, hand in atm_choose.tmpl, atm_choose.cgi, and MyDB.pm.
