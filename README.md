@@ -3,7 +3,7 @@ O'Reilly School Of Technology Perl Programming Certificate Objectives and Soluti
 
 The O’Reilly School of Technology is now closed (RIP - January 31, 2016), but I was among the last lucky ones who were able to finish their certificate program in time before the shutdown. This repository contains all of the course objectives and my associated  solutions.
 
-If you are interested in learning Perl 5, you can actually use the same curriculum we used as it's a public domain and is still available on the web: 
+If you are interested in learning Perl 5, you can actually use the same curriculum, as it is licensed under the Creative Commons Attributions-ShareAlike 3.0 Unported licence (briefly, you are free to share and adapt the course materials for any purpose, even commercially) and is still available on the web: : 
 
 Perl 1: Introduction to Perl - http://archive.oreilly.com/oreillyschool/courses/courses.html#course_id_128
 
