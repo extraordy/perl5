@@ -1,0 +1,1073 @@
+<html><!-- Copyright (c) 1998-2014 O'Reilly Media, Inc.
+			This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 Unported License.
+			See http://creativecommons.org/licenses/by-sa/3.0/legalcode for more information.
+            --><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"><link rel="stylesheet" type="text/css" href="../common/Lab.css"><script type="text/javascript" src="../common/Lab.js"></script><script language="javascript"></script><title>Prerequisites, Review, and Slices</title></head><body id="body"><a name="top"></a><div class="title">Prerequisites, Review, and Slices</div><div class="resize"><a href="Perl3-01.html#top" onclick="changeSize('smaller');" class="aS" title="Keep clicking to make fonts smaller">A</a><a href="Perl3-01.html#top" onclick="changeSize('larger');" class="aL" title="Keep clikcing to make fonts larger">A</a><a href="Perl3-01.html#top" onclick="lv()" class="lv" title="Adjust Page for High Contrast">HC</a><div id="fh"><p>Click on <span class="aS">A</span> to make all fonts on the page smaller.</p><p>Click on <span class="aL">A</span> to make all fonts on the page larger.</p><p>Click on <span class="lv">HC</span> to toggle high contrast mode. When you move your mouse over 
+                 some bold words in high contrast mode, related words are automatically highlighted. Text is shown
+                 in black and white. 
+             </p></div></div><hr>
+  <p>Welcome to the O'Reilly School of Technology's Perl 3 Advanced Perl course!</p>
+ 
+ 
+  <div class="outcomesTitle">Course Objectives</div><div class="outcomes">
+     <p> When you complete this course, you will be able to:</p>
+
+    <ul><li>demonstrate knowledge of Perl slices.</li><li>obtain useful info on files and on the operating system.</li><li>manage and manipulate data using grep() and map().</li><li>perform sleight-of-hand with references, hash references, and hashes of hashes.</li><li>structure and optimize data.</li><li>develop full-fledged Perl programs that employ exception-handling, multi-dimensional arrays, and regular expressions.</li><li>implement Perl one-liners using command-line options.</li><li>solve the Eight Queens Problem.</li></ul>
+
+  </div>
+  
+  <a name="h_01"></a><div class="heading">Introduction</div><div class="headingText">
+    
+    <p>If you completed 
+      OST's Perl 1 or Perl 2 courses, then we've already met. But in case you haven't, my name is 
+      Peter Scott, and I have been using and teaching Perl for over a dozen years. I'm the author of the books 
+      <i>Perl Debugged</i> and <i>Perl Medic</i>, as well as the DVD/video <i>Perl Fundamentals</i>. I've taught Perl 
+      in person to hundreds of people. I 
+      love Perl, and I sincerely want you to enjoy learning more about Perl from this course. 
+      We are always working to improve our courses to give students the best experience possible. 
+      And we rely on our students' help to reach that goal. I encourage you to let your instructor know if you see spots where the 
+      course could be improved, and also parts that you found particularly
+      effective (so we know not to mess with those bits). We always appreciate your feedback!</p>
+  </div>
+  
+  <p> In this course, written by well-known Perl trainer and author Peter Scott, you'll enter a new level of Perl expertise 
+    as you build upon skills learned in Perl 2.</p>
+ <a name="h_01"></a><div class="heading">Learning with O'Reilly School of Technology Courses</div><div class="headingText">  
+  <p>As with every O'Reilly School of Technology course, we'll take a <i>user-active</i> 
+    approach to learning. This means that you (the user) will be active! You'll learn by doing,  
+    building live programs, testing them and experimenting with them—hands-on!</p>
+  
+  <p>To learn a new skill or technology, you have to experiment. The more you experiment, the more 
+    you learn. Our system is designed to maximize experimentation and help you <i>learn to 
+      learn</i> a new skill.</p>
+  
+  <p>We'll program as much as possible to be sure that the principles sink in and stay with you.</p>
+  
+  <p>Each time we discuss a new concept, you'll put it into code and see what YOU can do with it.  
+   On occasion we'll even give you code that doesn't work, so you can see common mistakes and how 
+   to recover from them. Making mistakes is actually another good way to learn.</p>  
+    
+  <p>Above all, we want to help you to <i>learn to learn</i>. We give you the tools to take control 
+    of your own learning experience. </p>
+
+  <p>When you complete an OST course, you know the subject matter, <i>and</i> you know how to 
+    expand your knowledge, so you can handle changes like software and operating system updates.</p>
+   
+   <p>Here are some tips for using O'Reilly School of Technology courses effectively:</p>
+
+  <ul><li><b>Type the code.</b> Resist the temptation to cut and paste the example code we give you. 
+    Typing the code  
+      actually gives you a feel for the programming task. Then play around with the examples to find out what 
+      else you can make them do, and to check your understanding. It's highly
+      unlikely you'll break anything by experimentation. If you <i>do</i> break something, that's an indication to us that 
+      we need to improve our system!</li><li><b>Take your time.</b> Learning takes time. Rushing can have negative effects on your 
+      progress. Slow down and let your brain absorb the new information thoroughly. 
+      Taking your time helps to maintain a relaxed, positive approach. It also gives you the 
+      chance to try new things and learn more than you otherwise would if you blew 
+      through all of the coursework too quickly.</li><li><b>Experiment.</b> Wander from the path often and explore the possibilities. We can't 
+      anticipate all of your questions and ideas, so it's up to you to experiment and create on 
+      your own. Your instructor will help if you go completely off the rails.</li><li><b>Accept guidance, but don't depend on it.</b> Try to solve problems on your own. Going 
+      from misunderstanding to understanding is the best way to acquire a new skill. Part of what 
+      you're learning is problem solving. Of course, you can always contact your instructor 
+      for hints when you need them.</li><li><b>Use all available resources!</b> In real-life problem-solving, you aren't bound by false 
+      limitations; in OST courses, you are free to use any resources at your disposal to solve
+      problems you encounter: the Internet, reference books, and online help are all fair game.   
+      </li><li><b>Have fun!</b> Relax, keep practicing, and don't be afraid to make mistakes! 
+      Your instructor will keep you at it until you've 
+      mastered the skill. We want you to get that satisfied, "I'm so cool! I did it!"
+      feeling. And you'll have some projects to show off when you're done.</li></ul>
+  </div>   
+ <a name="h_01"></a><div class="heading">Lesson Format</div><div class="headingText">
+        
+    <p>We'll try out lots of examples in each lesson. We'll have you write code, 
+    look at code, and edit existing code. The code will be presented in boxes that will 
+    indicate what needs to be done to the code inside.</p>
+        
+    <p>Whenever you see white boxes like the one below, you'll <i>type</i> the contents into the editor window to try the example yourself. 
+      The CODE TO TYPE bar on top of the white box contains directions for you to follow:</p>
+        
+<div class="listingBox"><div class="listingTitle">CODE TO TYPE:</div><div class="listing"><pre>White boxes like this contain code for you to try out (type into a file to run).
+
+If you have already written some of the code, new code for you to add <ins>looks like this</ins>. 
+    
+If we want you to remove existing code, the code to remove <del>will look like this</del>.
+  
+<span class="gray">We may also include instructive comments that you don't need to type.</span>  
+</pre></div></div>
+   
+   <p>We may run programs and do some other activities in a terminal session in the operating system or other command-line environment. These will be shown 
+     like this:</p>
+   
+<div class="interactiveBox"><div class="interactiveTitle">INTERACTIVE SESSION:</div><div class="interactive"><pre>
+The plain black text that we present in these INTERACTIVE boxes is 
+provided by the system (not for you to type). The commands we want you to type <ins>look like this</ins>.
+</pre></div></div>   
+        
+  <p>Code and information presented in a gray OBSERVE box is for you to <i>inspect</i> and <i>absorb</i>. 
+  This information is often color-coded, and followed by text explaining the code in detail:</p>
+        
+<div class="observeBox"><div class="observeTitle">OBSERVE:</div><div class="observe"><pre>
+Gray "Observe" boxes like this contain <span class="darkred">information</span> (usually code specifics) for you to <i>observe</i>.
+</pre></div></div>
+
+   <p>The paragraph(s) that follow may provide addition details on <span class="darkred">information</span> that was 
+     highlighted in the Observe box.</p>
+   
+   <p>We'll also set especially pertinent information apart in "Note" boxes:</p>      
+   
+   <p><div class="c"><table class="noteBox fBox pBox "><tr><td class="noteTitle">Note</td><td class="note">Notes provide information that is useful, but not absolutely necessary for performing the tasks at hand.</td></tr></table></div> </p>
+   
+   <p><div class="c"><table class="noteBox fBox pBox "><tr><td class="noteTitle">Tip</td><td class="note">Tips provide information that might help make the tools easier for you to use, such as shortcut keys.</td></tr></table></div></p>
+   
+   <p><div class="c"><table class="noteBox fBox pBox "><tr><td class="noteTitle">WARNING</td><td class="note">Warnings provide information that can help prevent program crashes and data loss.</td></tr></table></div></p>
+        
+ </div>   
+ <a name="h_01"></a><div class="heading">The CodeRunner Screen</div><div class="headingText">
+    
+     <p>This course is presented in CodeRunner, OST's self-contained environment. We'll discuss the 
+         details later, but here's a quick overview of the various areas of the screen:</p>
+    
+     <p><div class="c"><img src="../common/images/CodeRunnerScreen.png"></div></p>
+     
+     <p>These videos explain how to use CodeRunner:</p>
+         
+     <p><a href="http://www.youtube.com/watch?v=45sATp529Mw" target="_blank">File Management Demo</a></p>
+     <p><a href="http://www.youtube.com/watch?v=SvbM6vPAG9k" target="_blank">Code Editor Demo</a></p>
+     <p><a href="http://www.youtube.com/watch?v=WmajY8bIXrA" target="_blank">Coursework Demo</a></p>
+
+ </div>
+    
+ <a name="h_02"></a><div class="heading">Prerequisites</div><div class="headingText">
+   
+    <p>To thrive in this course, you should have either taken our 
+     <a href="http://www.oreillyschool.com/courses/perl2/" target="_blank">Perl&nbsp;2</a> course or have 
+     acquired the knowledge imparted by that course some other way. That course has as prerequisite our 
+     <a href="http://www.oreillyschool.com/courses/perl1/" target="_blank">Perl&nbsp;1</a> course. We'll spend 
+     some time in this lesson reviewing those prerequisites. (Of course, we can't review them completely; it 
+     took 16 lessons in Perl&nbsp;1 and 15 lessons in Perl&nbsp;2 to cover them. But we'll give it our best 
+     shot.)</p>
+   
+    <p>In the next sections, we provide a detailed review of the CodeRunner environment you'll be using, and 
+      the topics covered in the Perl 1 and Perl 2 courses; we recommend going through both as a refresher, but 
+      if you've taken Perl 2 recently or otherwise feel you don't need the review, you can skip to the next 
+      section, <a href="Perl3-01.html#slices">Slices</a>.</p>
+      
+    <p>If you find as you review those prerequisites and the rest of this lesson that you're not sure you're 
+      ready for this course, don't worry—it happens. Don't give up, but don't try to struggle through 
+      the course if you're not sufficiently prepared. We're happy to transfer your registration to the Perl 2 
+      or Perl 1 course so you can get well-grounded in Perl. Just contact us at 
+      <a href="mailto:info@oreillyschool.com">info@oreillyschool.com</a>.</p>
+ 
+ </div>
+ <a name="h_03"></a><div class="heading">Review Topics</div><div class="headingText">
+
+    <p>Below is a list of topics you need have a grasp of now in order to go on and complete this course successfully. (You just need to know the 
+      basics of each topic—we'll 
+      develop these topics in more depth during this course.) There's a linked list provided in case you need 
+      to come back to these later:</p>
+   
+   <ul><li><a href="Perl3-01.html#regexcharacter">Regular Expressions: Character Classes</a></li><li><a href="Perl3-01.html#scalars">Scalars, Arrays, and Hashes</a></li><li><a href="Perl3-01.html#subroutines">Subroutines</a></li><li><a href="Perl3-01.html#context">Context</a></li><li><a href="Perl3-01.html#syntacticsugar">Syntactic Sugar</a></li><li><a href="Perl3-01.html#inputoutput">Input/Output</a></li><li><a href="Perl3-01.html#sorting">Sorting</a></li><li><a href="Perl3-01.html#defaultvariable">$_</a></li><li><a href="Perl3-01.html#regularexpressions">Regular Expressions</a></li><li><a href="Perl3-01.html#oneliners">One-Liners</a></li><li><a href="Perl3-01.html#directoryreading">Directory-Reading Functions</a></li><li><a href="Perl3-01.html#wrapup">Wrapping Up the Review</a></li></ul>
+
+  <a href="Perl3-01.html" name="regexcharacter"></a>  
+  <a name="s_01"></a><div id="s_01"><div class="subheading">Regex Character Classes</div><div class="subheadingText">
+    
+    <p>You must know how to craft basic regular expressions, but this does not extend 
+      to understanding lookbehind/lookahead assertions or embedded code in regexes:</p>
+    
+<div class="observeBox"><div class="observeTitle">OBSERVE:</div><div class="observe"><pre>
+if ( $line =~ /<span class="purple">[aeiou]</span>/ )
+{
+  print "Found a vowel";
+}    
+</pre></div></div>
+
+   <p>If you know what this code means, you know enough about regular expression character classes for this 
+     course.</p>
+   
+  </div></div>
+  <a href="Perl3-01.html" name="scalars"></a>
+  <a name="s_02"></a><div id="s_02"><div class="subheading">Scalars, Arrays, and Hashes</div><div class="subheadingText"> 
+     
+    <p>You know how to initialize, assign, and modify variables of these types. You 
+       are able to declare your variables 
+      with <span class="purple">my</span>, you <span class="purple">use strict</span> and <span class="purple">use warnings</span> in all 
+      programs, and you understand about scoping levels created by blocks delimited by curly braces ({}), 
+      whether they are blocks that are part of looping or conditional constructs, or just plain "naked" blocks. 
+      You can iterate through the contents of an array and a hash, interpolate variables in double-quoted 
+      strings, and use <span class="darkgreen">printf</span> for formatted printing. Let's verify those skills by 
+      doing!</p> 
+    
+    <p>For this first example, we'll demonstrate in detail, how to create and run a program in CodeRunner. After this, 
+      we'll just show you the code to type and say "Save and run it" when we want you to do this.</p>
+    
+    <p>First, create a <b>/perl3</b> folder for your files for this course. In the upper-left corner of the CodeRunner 
+      window, select the <b>Home</b> folder, right-click it, and then select <b>New folder...</b>:</p>
+      
+    <p><div class="c"><img src="images/coderunner/NewFolder.png"></div></p>
+      
+    <p>Replace the default folder name (untitled) with <b>perl3</b> and press <b>Enter</b>:</p>
+
+    <p><div class="c"><img src="images/coderunner/NewFolderPerl3.png"></div></p>
+    
+    <p>Take note of the editor window at the bottom of the CodeRunner window:</p>
+
+    <p><div class="c"><img src="images/coderunner/CodeRunnerEditorWindow.png"></div></p>
+    
+   <p>Now, select <b>Perl</b> in the <b>Syntax</b> drop-down menu:</p>
+      
+   <p><div class="c"> <img src="images/coderunner/perlmode.GIF"></div></p>
+      
+    <p>You'll see the <img src="images/coderunner/checksyntax.JPG"> icon on the left side of the 
+      toolbar.</p> 
+      
+    <p>In <b>review3.pl</b> type (don't just cut and paste!) all the code you see below so it looks like this:</p>
+ 
+    
+         
+<div class="listingBox"><div class="listingTitle">CODE TO TYPE:</div><div class="listing"><pre>#!/usr/bin/perl
+use strict;
+use warnings;
+
+my $CD_LENGTH = 80;
+my $song_count = 3;
+my $index = 1;
+my %song_length = ("Fixing a Hole" =&gt; 2 + 2/60, "Lovely Rita" =&gt; 2 + 4/60, "A Day in the Life" =&gt; 5 + 33/60);
+print "I have $song_count MP3 files.\nTheir lengths in minutes are:\n";
+my $total_length;
+foreach my $title ( keys %song_length )
+{
+  printf "#%2d: %-30s %5.2f\n", $index++, $title, $song_length{$title};
+  $total_length += $song_length{$title};
+}
+if ( $total_length &gt; $CD_LENGTH )
+{
+  print "I can't fit all of these on a CD. Something needs to be removed.\n";
+}
+else
+{
+  print "I can fit all of these on one CD!\n";
+}
+</pre></div></div>
+   
+    <p>Click the <img src="images/coderunner/checksyntax.JPG"> icon. A <b>Results</b> window appears, showing 
+      that there are no compile-time errors in the program:</p>
+    
+    <p><div class="c"><img src="images/coderunner/ResultsReview3.png"></div></p>
+    
+    <p>Click <b>Close</b> (<b>Preview</b> won't work in this version of CodeRunner).</p>
+    
+    <p>To run the program, open a terminal session by clicking the <b>Terminal</b> button:</p>
+    
+    <p><div class="c"><img src="images/coderunner/TerminalIcon.png"></div></p>
+    
+    <p>You're prompted for a login name and password:</p>
+    
+    <p><div class="c"><img src="images/coderunner/TerminalLogin.png"></div></p>
+    
+    <p>Enter your O'Reilly School of Technology username and password. When you enter the correct information, 
+      you see a successful login and a "cold" prompt:</p>
+    
+    <p><div class="c"><img src="images/coderunner/TerminalSuccessfulLogin.png"></div></p>
+    
+    <p>Now, we'll run the program and see the results; use the Unix command <b>cd perl3</b> to change to the 
+      <b>/perl3</b> folder and then type the program name preceded by <b>./</b>, as shown:</p>
+
+    <p><div class="c"><img src="images/coderunner/RunningReview3.png"></div></p>
+    
+    <p>From now on, when we want you to save and run a program, instead of repeating all of this information, 
+      we'll instruct you to "<img src="images/coderunner/checksyntax.JPG"> and run it."</p>
+    
+  </div></div>
+  <a href="Perl3-01.html" name="subroutines"></a>
+  <a name="s_03"></a><div id="s_03"><div class="subheading">Subroutines</div><div class="subheadingText">
+     
+    <p>You know how to declare and call subroutines, how to pass arbitrary arguments and return lists of 
+      values. Modify <b>review3.pl</b> by adding the <ins>blue</ins> code and deleting the <del>red</del> code as shown:</p>
+
+<div class="listingBox"><div class="listingTitle">CODE TO TYPE:</div><div class="listing"><pre>
+#!/usr/bin/perl
+use strict;
+use warnings;
+
+my $CD_LENGTH = 80;
+my $song_count = 3;
+my $index = 1;
+
+my %song_length = ("Fixing a Hole" =&gt; 2 + 2/60, "Lovely Rita" =&gt; 2 + 4/60, "A Day in the Life" =&gt; 5 + 33/60);
+print "I have $song_count MP3 files.\nTheir lengths in minutes are:\n";
+<del>my $total_length;</del>
+foreach my $title ( keys %song_length )
+{
+  printf "#%2d: %-30s %5.2f\n", $index++, $title, $song_length{$title};
+  <del>$total_length += $song_length{$title};</del>
+}
+<del>if ( $total_length &gt; $CD_LENGTH )</del>
+<ins>if ( total_length( %song_length ) &gt; $CD_LENGTH )</ins>
+{
+  print "I can't fit all of these on a CD. Something needs to be removed.\n";
+}
+else
+{
+  print "I can fit all of these on one CD!\n";
+}
+       
+<ins>sub total_length
+{
+  my %media = @_;
+
+  my $total = 0;
+  foreach my $length ( values %media )
+  {
+    $total += $length;
+  }
+  return $total;
+}</ins>
+</pre></div></div>
+    
+    <p><img src="images/coderunner/checksyntax.JPG"> and run it. If you're not already in 
+      your /perl3 folder, use <b>cd perl3</b> to change to it:</p>
+    
+<div class="interactiveBox"><div class="interactiveTitle">INTERACTIVE SESSION:</div><div class="interactive"><pre>
+cold:~/perl3$ <ins>./review3.pl</ins>
+I have 3 MP3 files.
+Their lengths in minutes are:
+# 1: A Day in the Life 5.55
+# 2: Lovely Rita 2.07
+# 3: Fixing a Hole 2.03
+I can fit all of these on one CD!
+cold:~/perl3$~$
+</pre></div></div>
+    <p> You'll see the same results.</p>
+
+  </div></div>         
+  <a href="Perl3-01.html" name="context"></a>
+  <a name="s_04"></a><div id="s_04"><div class="subheading">Context</div><div class="subheadingText">  
+ 
+    <p>You understand the difference between scalar and list context (bonus points if you also know about 
+      boolean and void contexts!). You know that context propagates through subroutine calls all the way down. 
+      And you know what an array evaluates to in scalar and list contexts:</p>
+      
+    <p>Modify <b>review3.pl</b> by adding the <ins>blue</ins> code and deleting the <del>red</del> code as shown:</p>
+      
+<div class="listingBox"><div class="listingTitle">CODE TO TYPE:</div><div class="listing"><pre>
+#!/usr/bin/perl
+use strict;
+use warnings;
+
+my $CD_LENGTH = 80;
+<del>my $song_count = 3;</del>
+my $index = 1;
+
+my %song_length = ("Fixing a Hole" =&gt; 2 + 2/60, "Lovely Rita" =&gt; 2 + 4/60, "A Day in the Life" =&gt; 5 + 33/60);
+<ins>my @songs = keys %song_length;</ins>
+<del>print "I have $song_count MP3 files.\nTheir lengths in minutes are:\n";</del>
+<ins>print "I have " . @songs . " MP3 files.\nTheir lengths in minutes are:\n";</ins>
+foreach my $title ( keys %song_length )
+{
+  printf "#%2d: %-30s %5.2f\n", $index++, $title, $song_length{$title};
+}
+if ( total_length( %song_length ) &gt; $CD_LENGTH )
+{
+  print "I can't fit all of these on a CD. Something needs to be removed.\n";
+}
+else
+{
+  print "I can fit all of these on one CD!\n";
+}
+
+sub total_length
+{
+  my %media = @_;
+
+  my $total = 0;
+  foreach my $length ( values %media )
+  {
+    $total += $length;
+  }
+  return $total;
+} 
+</pre></div></div>
+   
+    <p><img src="images/coderunner/checksyntax.JPG"> and run it:</p>
+    
+<div class="interactiveBox"><div class="interactiveTitle">INTERACTIVE SESSION:</div><div class="interactive"><pre>
+cold:~/perl3$ <ins>./review3.pl</ins>
+I have 3 MP3 files.
+Their lengths in minutes are:
+# 1: A Day in the Life 5.55
+# 2: Lovely Rita 2.07
+# 3: Fixing a Hole 2.03
+I can fit all of these on one CD!
+cold:~/perl3$
+</pre></div></div>
+    
+    <p>You'll see the same results as before.</p>
+
+  </div></div>   
+  <a href="Perl3-01.html" name="syntacticsugar"></a>
+  <a name="s_05"></a><div id="s_05"><div class="subheading">Syntactic Sugar</div><div class="subheadingText">  
+   
+    <p>You know about the postfixed conditional forms and the low-precedence logical operators: </p>
+   
+<div class="observeBox"><div class="observeTitle">OBSERVE:</div><div class="observe"><pre>
+push @errors, $message <span class="purple">if length $message</span>;
+@errors and die "Errors encountered: @errors\n";
+</pre></div></div>
+    
+    <p>Here, <span class="purple">if</span> the <span class="purple">length</span> of <span class="purple">$message</span> is not 
+      zero, <b>$message</b> is pushed onto the array @errors.</p>
+     
+    <p>Modify <span class="darkred">review3.pl</span> so that it takes the length of a CD as a program argument.
+      Add the <ins>blue</ins> code as shown:</p>
+    
+<div class="listingBox"><div class="listingTitle">CODE TO TYPE:</div><div class="listing"><pre>
+#!/usr/bin/perl
+use strict;
+use warnings;
+
+my $CD_LENGTH = <ins>( shift or die "Usage: $0 &lt;length in minutes&gt;\n" )</ins>;
+my $index = 1;
+
+my %song_length = ("Fixing a Hole" =&gt; 2 + 2/60, "Lovely Rita" =&gt; 2 + 4/60, "A Day in the Life" =&gt; 5 + 33/60);
+my @songs = keys %song_length;
+print "I have " . @songs . " MP3 files.\nTheir lengths in minutes are:\n";
+foreach my $title ( keys %song_length )
+{
+  printf "#%2d: %-30s %5.2f\n", $index++, $title, $song_length{$title};
+}
+if ( total_length( %song_length ) &gt; $CD_LENGTH )
+{
+  print "I can't fit all of these on a CD. Something needs to be removed.\n";
+}
+else
+{
+  print "I can fit all of these on one CD!\n";
+}
+
+sub total_length
+{
+  my %media = @_;
+
+  my $total = 0;
+  foreach my $length ( values %media )
+  {
+    $total += $length;
+  }
+  return $total;
+} 
+</pre></div></div>
+    
+    <p><img src="images/coderunner/checksyntax.JPG"> and run it as shown:</p>
+    
+<div class="interactiveBox"><div class="interactiveTitle">INTERACTIVE SESSION:</div><div class="interactive"><pre>
+cold:~/perl3$ <ins>./review3.pl</ins>
+Usage: ./review3.pl &lt;length in minutes&gt;
+cold:~/perl3$ <ins>./review3.pl 80</ins>
+I have 3 MP3 files.
+Their lengths in minutes are:
+# 1: A Day in the Life           5.55
+# 2: Lovely Rita                 2.07
+# 3: Fixing a Hole               2.03
+I can fit all of these on one CD!
+cold:~/perl3$ <ins>./review3.pl 5</ins>
+I can't fit all of these on a CD. Something needs to be removed.
+cold:~/perl3$ 
+</pre></div></div>
+    
+    <p>Now it returns an error if you don't provide an argument. (Also note that if the total minutes of the songs is greater 
+      than the number in the passed argment, we DO hit the other side of the if/else code.)</p>
+ 
+  </div></div>    
+  <a href="Perl3-01.html" name="inputoutput"></a>
+  <a name="s_06"></a><div id="s_06"><div class="subheading">Input/Output</div><div class="subheadingText">  
+   
+    <p>You know how to open a filehandle for reading or writing, how to read from an input filehandle with 
+      the &lt;&gt; ("readline") operator, and how print to an output file handle. You also know about the 
+      filehandle-less version of &lt;&gt; that opens files named on the command line or standard input, and 
+      the <b>DATA</b> filehandle that reads from the program file itself:</p>
+   
+<div class="observeBox"><div class="observeTitle">OBSERVE: </div><div class="observe"><pre>
+open my $fh, '&lt;', $filename or die "Can't open $filename: $!\n";
+while ( &lt;$fh&gt; ) )
+{
+  chomp;
+  if ( s/\A&lt;// )
+  {
+    push @old_file_lines, $_;
+  }
+  elsif ( s/\A&gt;// )
+  {
+    push @new_file_lines, $_;
+  }  
+}
+</pre></div></div>
+   
+  </div></div>
+  <a href="Perl3-01.html" name="sorting"></a>
+  <a name="s_07"></a><div id="s_07"><div class="subheading">Sorting</div><div class="subheadingText">
+    
+    <p>You can sort strings:</p>
+    
+<div class="observeBox"><div class="observeTitle">OBSERVE:</div><div class="observe"><pre>
+print "$_: $count{$_}\n" for <span class="purple">sort</span> keys %count;
+</pre></div></div>
+        
+    Adding the keyword <span class="purple">sort</span> causes the output to be sorted in 
+      order of the keys in %count.
+    
+    <p>Modify <b>review3.pl</b> as shown:</p>
+    
+<div class="listingBox"><div class="listingTitle">CODE TO TYPE:</div><div class="listing"><pre>
+#!/usr/bin/perl
+use strict;
+use warnings;
+
+my $CD_LENGTH = ( shift or die "Usage: $0 &lt;length in minutes&gt;\n" );
+my $index = 1;
+
+<del>my %song_length = ("Fixing a Hole" =&gt; 2 + 2/60, "Lovely Rita" =&gt; 2 + 4/60, "A Day in the Life" =&gt; 5 + 33/60);</del>
+  
+<ins>my %song_length;
+while ( defined( my $line = &lt;DATA&gt; ) )
+{
+  my $title   = substr $line, 0, 17;
+  my $minutes = substr $line, 18, 2;
+  my $seconds = substr $line, 20, 2;
+  $song_length{$title} = $minutes + $seconds / 60;
+}
+</ins>my @songs = keys %song_length;
+print "I have " . @songs . " MP3 files.\nTheir lengths in minutes are:\n";
+foreach my $title ( <ins>sort</ins> keys %song_length )
+{
+  printf "#%2d: %-30s %5.2f\n", $index++, $title, $song_length{$title};
+}
+if ( total_length( %song_length ) &gt; $CD_LENGTH )
+{
+  print "I can't fit all of these on a CD. Something needs to be removed.\n";
+}
+else
+{
+  print "I can fit all of these on one CD!\n";
+}
+
+sub total_length
+{
+  my %media = @_;
+
+  my $total = 0;
+  foreach my $length ( values %media )
+  {
+    $total += $length;
+  }
+  return $total;
+}<ins>
+__END__
+Fixing a Hole     2 2
+Lovely Rita       2 4
+A Day in the Life 5 33</ins>
+</pre></div></div>
+    
+    <p><img src="images/coderunner/checksyntax.JPG"> and run it:</p>
+    
+<div class="interactiveBox"><div class="interactiveTitle">INTERACTIVE SESSION:</div><div class="interactive"><pre>
+cold:~/perl3$ <ins>./review3.pl 80</ins>
+I have 3 MP3 files.
+Their lengths in minutes are:
+# 1: A Day in the Life           5.55
+# 2: Fixing a Hole               2.03
+# 3: Lovely Rita                 2.07
+I can fit all of these on one CD!
+cold:~/perl3$ 
+</pre></div></div>
+    <p>Now our program gets its data from a text block at 
+      the end of the program, and the output is sorted.  </p>
+  </div></div>        
+  <a href="Perl3-01.html" name="defaultvariable"></a>
+  <a name="s_08"></a><div id="s_08"><div class="subheading">$_</div><div class="subheadingText">  
+   
+    <p>You know about Perl's "default" variable, <b>$_</b>, and many of the operators and functions
+      that use it without mentioning it:</p>
+    
+<div class="observeBox"><div class="observeTitle">OBSERVE: Generic usage of $_</div><div class="observe"><pre>
+foreach ( @items )
+{
+  if ( defined &amp;&amp; length )
+  {
+    print;
+  }
+}
+</pre></div></div>
+    
+    
+    
+  </div></div>
+  <a href="Perl3-01.html" name="regularexpressions"></a>
+  <a name="s_09"></a><div id="s_09"><div class="subheading">Regular Expressions</div><div class="subheadingText"> 
+   
+    <p>You know how to determine whether text matches a regular expression, how to save parts of a match in the 
+      variables <b>$1</b>, <b>$2</b>, and so on, and you know how to use the substitution operator to change whatever 
+      matches, into something else. You know about character classes, quantifiers, and anchors:</p>
+<a href="Perl3-01.html" name="observe_good"></a>    
+<div class="observeBox"><div class="observeTitle">OBSERVE: Generic regex usage</div><div class="observe"><pre>
+if ( $line =~ m/<span class="darkred">\b</span><span class="darkgreen">(</span><span class="darkblue">\d{5}</span><span class="darkgreen">)</span><span class="darkred">\b</span>/ )
+{
+  print "Found a zip code: <span class="purple">$1</span>\n";
+}
+else
+{
+  $line =~ s/<span class="orange">\d+</span>/<span class="green">NOTAZIP</span>/ and print "Replaced digits\n";
+}  
+</pre></div></div>   
+    
+    <p><span class="darkred">\b</span> matches a word boundary before and after the parenthetical group <span class="darkgreen">(<span class="darkblue">\d{5}</span>)</span>. 
+      <span class="darkblue">\d{5}</span> matches against any 5 digits. Anything that matches the regex within the 
+      parentheses <span class="darkgreen">(</span><span class="darkblue">\d{5}</span><span class="darkgreen">)</span> is stored in 
+      the <span class="purple">$1</span> variable, and so is printed in the "Found a zip code" statement.</p>
+    
+    <p>If the regex does not find the specified match, the substitution after the "else" occurs, where 
+      <span class="orange">\d+</span> matches one or more digits and replaces them with <span class="green">NOTAZIP</span>.</p>
+    
+    <p>Modify <b>review3.pl</b> as shown:</p>
+    
+<div class="listingBox"><div class="listingTitle">CODE TO TYPE:</div><div class="listing"><pre>
+#!/usr/bin/perl
+use strict;
+use warnings;
+
+my $CD_LENGTH = ( shift or die "Usage: $0 &lt;length in minutes&gt;\n" );
+my $index = 1;
+
+my %song_length;
+<del>while ( defined( my $line = &lt;DATA&gt; ) )</del>
+<ins>while ( &lt;DATA&gt; )</ins>
+{
+  <del>my $title   = substr $line, 0, 17;</del>
+  <ins>/(.*)\s+(\d+)'\s*(\d+)"/ or next;</ins>
+  <del>my $minutes = substr $line, 18, 2;</del>
+  <ins>my ($title, $minutes, $seconds) = ($1, $2, $3);</ins>
+  <del>my $seconds = substr $line, 20, 2;</del>  
+  $song_length{$title} = $minutes + $seconds / 60;
+}
+my @songs = keys %song_length;
+print "I have " . @songs . " MP3 files.\nTheir lengths in minutes are:\n";
+foreach my $title ( sort keys %song_length )
+{
+  printf "#%2d: %-30s %5.2f\n", $index++, $title, $song_length{$title};
+}
+if ( total_length( %song_length ) &gt; $CD_LENGTH )
+{
+  print "I can't fit all of these on a CD. Something needs to be removed.\n";
+}
+else
+{
+  print "I can fit all of these on one CD!\n";
+}
+
+sub total_length
+{
+  my %media = @_;
+
+  my $total = 0;
+  foreach my $length ( values %media )
+  {
+    $total += $length;
+  }
+  return $total;
+}
+__END__
+<del>Fixing a Hole     2 2</del>
+<ins>Fixing a Hole     2' 2"
+</ins><del>Lovely Rita       2 4
+</del><ins>Lovely Rita       2' 4"
+</ins><del>A Day in the Life     5 33
+</del><ins>A Day in the Life     5' 33"
+</ins>
+</pre></div></div>
+    
+    <p> Note how it uses the <b>'</b> (single quotation mark) and <b>"</b> (double quotation mark) characters as 
+      markers to help interpret the data in the regular expression. 
+      <img src="images/coderunner/checksyntax.JPG"> and run it with the parameter "80" as shown:</p>
+    
+<div class="interactiveBox"><div class="interactiveTitle">INTERACTIVE SESSION:</div><div class="interactive"><pre>
+cold:~/perl3$ <ins>./review3.pl 80</ins>
+I have 3 MP3 files.
+Their lengths in minutes are:
+# 1: A Day in the Life          5.55
+# 2: Fixing a Hole              2.03
+# 3: Lovely Rita                2.07
+I can fit all of these on one CD!
+cold:~/perl3$
+</pre></div></div>
+    
+  </div></div>
+  <a href="Perl3-01.html" name="oneliners"></a>
+  <a name="s_10"></a><div id="s_10"><div class="subheading">One-Liners</div><div class="subheadingText">  
+    
+    <p>You know how to run Perl code from the command line with the <b>-e</b> flag. You also know about the 
+      <b>-l</b>, <b>-n</b>, <b>-p</b>, and <b>-i</b> flags, and <b>BEGIN</b> and <b>END</b> blocks:</p>
+    
+<div class="observeBox"><div class="observeTitle">OBSERVE: Generic one-liners</div><div class="observe"><pre>
+<b>perl -pi.bak -e 's[(\d{2})/(\d{2})/(\d{2})][20$3-$1-$2]'</b>
+<b>perl -nle 'length &gt; $max and $max = length; END{ print "Longest line is $max" }' *.pl</b>
+</pre></div></div>
+    
+    <p>At the command line, type the command below as shown and see what output you get:</p>
+    
+<div class="interactiveBox"><div class="interactiveTitle">INTERACTIVE SESSION:</div><div class="interactive"><pre>
+cold:~$ <ins>perl -le 'print "Today is " . localtime()'</ins>
+cold:~$ <ins>perl -nle '$count++; END{ print "File is $count lines long" }' review3.pl</ins>
+</pre></div></div>
+  
+  </div></div>    
+  <a href="Perl3-01.html" name="directoryreading"></a>
+  <a name="s_11"></a><div id="s_11"><div class="subheading">Directory-Reading Functions</div><div class="subheadingText">
+    
+    <p>You know how to use <span class="darkgreen">opendir()</span> and <span class="darkgreen">readdir()</span> to read a 
+      directory; you also know how to use <span class="darkgreen">glob()</span> to expand a path specification using 
+      wildcards to do much the same thing:</p>
+    
+<div class="observeBox"><div class="observeTitle">OBSERVE: Reading directory information with Perl functions and glob</div><div class="observe"><pre>
+opendir my $dh, "/etc" or die "Can't opendir /etc: $!\n";
+print "$_\n" while readdir $dh;
+
+<b>perl -le 'print for glob "/etc/*.*"'</b></pre></div></div>
+    
+  </div></div>
+  <a href="Perl3-01.html" name="wrapup"></a>
+  <a name="s_12"></a><div id="s_12"><div class="subheading">Wrapping Up the Review</div><div class="subheadingText">
+   
+    <p>Now let's look at some of those features at work in an example program that parses a web server log 
+      file and provides an interactive menu for choosing various reports. Create a new file called <b>log.pl</b> 
+      in your <b>/perl3</b> folder and type in the code below as shown:</p>
+    
+<div class="listingBox"><div class="listingTitle">CODE TO TYPE:</div><div class="listing"><pre>#!/usr/bin/perl
+use strict;
+use warnings;
+
+@ARGV or die "Usage: $0 log [...]\n";
+
+my (%remote, %method, %path, %status, %length);
+my $count;
+while ( &lt;&gt; )
+{
+  next unless /\A(\S+)[^"]+"([A-Z]+)\s+(\S+)[^"]+"\s+(\d+)\s+(\d+)/;
+  $remote{$1}++;
+  $method{$2}++;
+  $path{$3}++;
+  $status{$4}++;
+  $length{$5}++;
+  $count++;
+}
+
+print "Parsed $count records out of $. total\n";
+for ( my ($what, $count) = prompt(); $what ne 'q'; ($what, $count) = prompt() )
+{
+  my @top = top( $count, $what eq 'r' ? %remote
+                       : $what eq 'm' ? %method
+                       : $what eq 'p' ? %path
+                       : $what eq 's' ? %status
+                       :                %length
+               );
+  print "Top $count:\n";
+  print "$top[0]: $top[1]\n" and splice @top, 0, 2 while @top;
+}
+
+sub prompt
+{
+  {
+    print "(q)uit or (r)emote/(m)ethod/(p)ath/(s)tatus/(l)ength &lt;count&gt;: ";
+    chomp( $_ = &lt;STDIN&gt; );
+    /\A(?:(q)|([rmpsl])\s+(\d+))\z/i or redo;
+    return defined $1 ? lc $1 : (lc $2, $3);
+  }
+}
+
+sub top
+{
+  my ($count, %data) = @_;
+
+  my @keys = sort { $data{$b} &lt;=&gt; $data{$a} } keys %data;
+
+  my @top;
+  while ( my $key = shift @keys)
+  {
+    push @top, $key, $data{$key};
+    last if @top == 2 * $count;
+  }
+  return @top;
+  }
+</pre></div></div>
+   
+    <p>The file <b>currentlog</b>, located in your course materials, contains actual web server log entries 
+      from one of my sites. Use it as a sample input to this program. Run it in the terminal window as shown:</p>
+
+<div class="interactiveBox"><div class="interactiveTitle">INTERACTIVE SESSION:</div><div class="interactive"><pre>
+cold:~/perl3$ <ins>./log.pl /software/Perl3/currentlog</ins>
+Parsed 1861 records out of 2012 total
+(q)uit or (r)emote/(m)ethod/(p)ath/(s)tatus/(l)ength &lt;count&gt;: <ins>r 5</ins>
+Top 5:
+91-65-217-18-dynip.superkabel.de: 55
+b3091216.crawl.yahoo.net: 51
+220.181.94.221: 48
+abts-north-static-218.125.160.122.airtelbroadband.in: 47
+sticker01.yandex.ru: 43
+(q)uit or (r)emote/(m)ethod/(p)ath/(s)tatus/(l)ength &lt;count&gt;: <ins>m 2</ins>
+Top 2:
+GET: 1857
+HEAD: 4
+(q)uit or (r)emote/(m)ethod/(p)ath/(s)tatus/(l)ength &lt;count&gt;: <ins>p 8</ins>
+Top 8:
+/robots.txt: 210
+/: 183
+/gradient.php.jpg: 92
+/global.css: 61
+/layout.css: 61
+/graphics/toplogo.jpg: 56
+/graphics/company-name.jpg: 53
+/graphics/nav_images/nav_off_06.gif: 53
+(q)uit or (r)emote/(m)ethod/(p)ath/(s)tatus/(l)ength &lt;count&gt;: <ins>q</ins>
+cold:~/perl3$
+</pre></div></div>
+   
+    <p>This program provides a menu of choices. You can type <b>q</b> to quit, or type letter
+      <b>r</b>, <b>m</b>, <b>p</b>, <b>s</b>, or <b>l</b>, followed by a number. That number determines how many of
+      the values that occur most frequently and their corresponding attributes will displayed. (For each hit, the log file contains  
+      the remote host, the type of HTTP method—usually GET—the path 
+      component of the URL, the status code of the response, and the length of content returned.)</p>
+  
+    <p>Our program demonstrates all of these Perl features:</p>
+    
+    <ul><li>Pragmas for ensuring safer development and execution</li><li>Accessing command line arguments</li><li>Low-precedence logical operators used to control flow</li><li>Postfixed conditional statements</li><li>Reading from files listed on the command line</li><li>The postincrement operator</li><li>Interpolation within double-quoted strings</li><li>The special variable containing the number of lines last read from input</li><li>The trinary/ternary/hook operator</li><li>Array used in a scalar context</li><li>Regular expression beginning and end of line anchors</li><li>Regular expression match capturing</li><li>Regular expression alternation</li><li>Regular expression character classes: digits, white space</li><li>Subroutines</li><li>Sorting numerically and in descending order</li><li>Array modification operators</li><li>Changing the flow of control within loops</li><li>Naked blocks</li></ul>
+   
+    <p>...and more!  Can you locate and understand each feature within the code?</p>
+  
+  </div></div>
+ </div>
+ 
+  <a href="Perl3-01.html" name="slices"></a>
+ <a name="h_04"></a><div class="heading">Slices</div><div class="headingText">
+
+   <p>If you kept up with that <i>extensive</i> review, I think you're ready to tackle our first new topic!
+     We'll keep it short so we don't burn you out in lesson one. We've covered a lot!</p>
+  
+   <p>Our new topic: <b>slices</b>. A slice is just what it sounds like; part of some kind of aggregate (like 
+     an array or hash) or list. <b>Slicing</b> is a way to select a part of one of those collections:</p>
+  
+   <p><div class="c"><img src="images/lessonImages/slices.png"></div></p>
+  
+   <p>The list slice doesn't obey quite the same rules as other lists do, but we'll get to that in a minute. First let's 
+     go over the syntax for a 
+     slice. Because a slice is a collection of multiple things, the syntax starts with an 
+     <b>@</b>:</p>
+  
+  <div class="c"><table class="tbl" border=""><tr><th>Slice</th><th>Form</th><th>Example</th></tr><tr><td>Array Slice</td><td>@<i>array</i>[<i>list of indices</i>]</td><td>@fruit[1,3..5]</td></tr><tr><td>Hash Slice</td><td>@<i>hash</i>{<i>list of keys</i>}</td><td>@month{'Jan', 'Mar', 'Apr'}</td></tr></table></div> 
+  
+   <p>The best way to get a feel for how this works is with an example. Create a new file called <b>slice.pl</b> in your 
+     <b>/perl3</b> folder and type in the code below as shown:</p>
+  
+<div class="listingBox"><div class="listingTitle">CODE TO TYPE:</div><div class="listing"><pre>#!/usr/bin/perl
+use strict;
+use warnings;
+
+my @chars = 'a' .. 'z';
+my @indices;
+push @indices, rand @chars for 1 .. shift || 10;
+print $chars[$_], ', ' for @indices;
+print "\n";
+
+my @beasts = qw(cat hound frog cuckoo);
+my @noises = qw(miao bay ribbit cuckoo);
+
+my %sound;
+{
+  my @noises_copy = @noises;
+  for my $beast ( @beasts )
+  {
+    $sound{$beast} = shift @noises_copy;
+  }
+}
+print "A $_ $sound{$_}s\n" for keys %sound;
+
+my @parts = localtime;
+printf "The time is %02d:%02d:%02d\n", $parts[2], $parts[1], $parts[0];
+</pre></div></div>
+
+   <p><img src="images/coderunner/checksyntax.JPG"> and run it as shown:</p>
+   
+<div class="interactiveBox"><div class="interactiveTitle">INTERACTIVE SESSION:</div><div class="interactive"><pre>
+cold:~/perl3$ <ins>./slice.pl</ins>
+e, u, d, c, b, b, c, e, z, l,
+A cuckoo cuckoos
+A cat miaos
+A frog ribbits
+A hound bays
+The time is 13:32:46
+cold:~/perl3$
+</pre></div></div>
+   <p>It takes an optional argument, the number of random letters to print (the default is 10).</p>
+  
+   <p>(Of course, the actual letters printed will be different each time you run it.) This program prints random letters from the 
+     <b>@chars</b> array. The <b>@indices</b> array consists of numbers that point to elements in the 
+     <b>@chars</b>&nbsp;array. 
+     It also populates a hash called <b>%sound</b>, from the contents of the <b>@beasts</b> and <b>@sounds</b> arrays. 
+     (In this program we defined those arrays statically, so we could have 
+     defined the hash instead, but for now just go with it as it is.)</p>
+  
+   <p>Now we'll modify the program so it uses slices. Add the <ins>blue</ins> code and delete the <del>red</del> code as shown:</p>
+
+<div class="listingBox"><div class="listingTitle">CODE TO TYPE:</div><div class="listing"><pre>
+#!/usr/bin/perl
+use strict;
+use warnings;
+
+my @chars = 'a' .. 'z';
+my @indices;
+push @indices, rand @chars for 1 .. shift || 10;
+<del>print $chars[$_], ', ' for @indices;
+print "\n";</del>
+<ins>print join( ', ' =&gt; @chars[ @indices ] ), "\n";</ins>
+
+my @beasts = qw(cat hound frog cuckoo);
+my @noises = qw(miao bay ribbit cuckoo);
+
+my %sound;
+<del>{
+  my @noises_copy = @noises;
+  for my $beast ( @beasts )
+  {
+    $sound{$beast} = shift @noises_copy;
+  }
+}</del>
+<ins>@sound{ @beasts } = @noises;</ins>
+print "A $_ $sound{$_}s\n" for keys %sound;
+
+my @parts = localtime;
+<del>printf "The time is %02d:%02d:%02d\n", $parts[2], $parts[1], $parts[0];</del>
+<ins>printf "The time is %02d:%02d:%02d\n", @parts[2,1,0];</ins>
+</pre></div></div>
+  
+   <p><img src="images/coderunner/checksyntax.JPG"> and run it. The program <i>works</i> the same way as before, 
+     but we've changed it to use a <b>@chars[ @indices ]</b> <i>array slice</i> first, then a <b>@sound{ @beasts }</b>
+     <i>hash slice:</i>, and finally, a <b>@parts[2,1,0]</b> array slice.</p>
+  
+   <p>When you use an array slice, it is as if you had typed the list of all of the
+     corresponding elements of the array at that point. In other words, typing <b>@parts[2,1,0]</b> is exactly like typing
+     <b>($parts[2], $parts[1], $parts[0])</b>.</p>
+    
+   <p>In the case of a non-literal list of indices—for example, <b>@chars[ @indices ]</b>—the 
+     principle is the same, but you can't identify the equivalent list until the 
+     program is run.</p>
+  
+   <p>When you use a hash slice, it is as if you had typed the list of all of the
+     corresponding elements of the hash at that point.  In other words <b>@sound{ @beasts }</b> is exactly like typing
+    <b>($sound{ $beasts[0] }, $sound{ $beasts[1] }, ... $sound{ $beasts[ $#beasts ] } )</b>.</p>
+  
+   <p>This equivalence means that you can use <b>slices</b> in <b>lvalue</b> context just like we did with 
+     <b>@sound{ @beasts }</b> in the example above.</p>
+  
+   <p>Now let's try out the list slice! Modify your code as shown:</p>
+  
+<div class="listingBox"><div class="listingTitle">CODE TO TYPE:</div><div class="listing"><pre>
+#!/usr/bin/perl
+use strict;
+use warnings;
+
+my @chars = 'a' .. 'z';
+my @indices;
+push @indices, rand @chars for 1 .. shift || 10;
+print join( ', ' =&gt; @chars[ @indices ] ), "\n";
+
+
+my @beasts = qw(cat hound frog cuckoo);
+my @noises = qw(miao bay ribbit cuckoo);
+
+my %sound;
+@sound{ @beasts } = @noises;
+print "A $_ $sound{$_}s\n" for keys %sound;
+
+<del>my @parts = localtime;
+printf "The time is %02d:%02d:%02d\n", @parts[2,1,0];</del>
+<ins>my ($hr, $min, $sec) = (localtime)[2,1,0];
+printf "The time is %02d:%02d:%02d\n", $hr, $min, $sec;</ins>
+</pre></div></div>
+  
+   <p><img src="images/coderunner/checksyntax.JPG"> and run it. Now it's clear that we are
+     extracting the hour, minute, and second components from <b>localtime</b>. (If you're unfamiliar with any of this, take a look at 
+     <b>perldoc -f localtime</b>.) And we've done it with a list
+     slice: the syntax doesn't use an <b>@</b> symbol, it just has a bracketed list of indices following
+     a list (in parentheses). So here, <b>localtime</b> is being called in list context.</p>
+  
+   <p>Pop quiz!  What's the difference between <b>$array[3]</b> and <b>@array[3]</b>? Ponder for a moment...good. The 
+     first one, <b>$array[3]</b>, is a <i>scalar</i>. The second one, <b>@array[3]</b>, is a <i>list</i>. It just happens to be a list of 
+     one element, but it's still a list, because it's a slice, which is equivalent to a list. A lot of Perl 
+     programmers get sloppy with their array notation and write a list when their intention is a scalar. 
+     If you did that and enabled warnings (as you always do, right?) you'd get a warning. Usually this won't make a 
+     difference—but once in a while it will. Let's create a new program called <b>bad_slice.pl</b> and see. Type the code below as shown:</p>
+  
+<div class="listingBox"><div class="listingTitle">CODE TO TYPE:</div><div class="listing"><pre>#!/usr/bin/perl
+use strict;
+# use warnings;
+
+my @array;
+$array[0] = localtime;
+print "\$array[0] = $array[0]\n";
+@array[0] = localtime;
+print "\$array[0] = $array[0]\n";
+</pre></div></div>
+  
+   <p><img src="images/coderunner/checksyntax.JPG"> and run it as shown:</p>
+  
+<div class="interactiveBox"><div class="interactiveTitle">INTERACTIVE SESSION:</div><div class="interactive"><pre>
+cold:~/perl3$ <ins>./bad_slice.pl</ins>
+$array[0] = Thu Sep 16 14:05:06 2010
+$array[0] = 6
+cold:~/perl3$
+</pre></div></div>
+  
+   <p>What happened here? The first line displays the value of <b>localtime</b> in a 
+     scalar context; the second line displays the value of <b>localtime</b> in a 
+     <i>list</i> context; so the line <b>@array[0] = localtime;</b> is equivalent to the code 
+     <b>($array[0]) = ( <i>seconds, minutes, hours,</i> ...)</b>.</p>
+  
+   <p>Now you can see that <b>$array[0]</b> will be set to the first element of that 
+     list—the number of seconds—and every other element of the list returned by 
+     <b>localtime</b> will be ignored! </p>
+  
+   <p>Okay, now uncomment the <b>use warnings</b> line. Rerun the program and you'll get output like 
+     this:</p>
+  
+<div class="observeBox"><div class="observeTitle">OBSERVE:</div><div class="observe"><pre>
+Scalar value @array[0] better written as $array[0] at ./perl3/bad_slice.pl line 8.
+$array[0] = Thu Sep 16 14:07:52 2010
+$array[0] = 52
+</pre></div></div>
+  
+   <p>That's just one reason we always put <b>use warnings</b> in our code.</p>
+  
+   <p>Most Perl programmers don't know about the hash slice. They're missing out! But not you.</p>
+  
+   <p>And one more thing—don't confuse a <i>slice</i> with the built-in function <i>splice</i>. 
+     They may sound similar, but that's about all they have in common. </p>
+   
+   <p>Alright then, you're off and running! See you in the next lesson!</p>
+   
+  <br><br><br><br>
+  
+   <p>Make sure you complete the homework from your syllabus (do the quiz <i>before</i> the project):</p>
+   
+   <p><div class="c"><img src="images/coderunner/GettingToHomework1.png"></div></p>
+   <p><div class="c"><img src="images/coderunner/GettingToHomework2.png"></div></p>
+ 
+ </div>
+<div class="footer"><div id="timeSurvey"></div>				
+				Copyright © 1998-2014 O'Reilly Media, Inc.<br><img src="https://courses.oreillyschool.com/common/cclicense.png"><br>
+				This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 Unported License.<br>
+				See <a href="http://creativecommons.org/licenses/by-sa/3.0/legalcode">http://creativecommons.org/licenses/by-sa/3.0/legalcode</a> 
+				for more information.
+				</div><iframe id="t" width="1" height="1" border="0" style="display:none"></iframe><script language="javascript">bodyLoaded();</script><script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+  ga('create', 'UA-44720547-1', 'oreillyschool.com');
+  ga('send', 'pageview');
+</script></body></html>

@@ -1,0 +1,410 @@
+<html><!-- Copyright (c) 1998-2014 O'Reilly Media, Inc.
+			This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 Unported License.
+			See http://creativecommons.org/licenses/by-sa/3.0/legalcode for more information.
+            --><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"><link rel="stylesheet" type="text/css" href="../common/Lab.css"><script type="text/javascript" src="../common/Lab.js"></script><script language="javascript"></script><title>Lists and List Functions</title></head><body id="body"><a name="top"></a><div class="title">Lists and List Functions</div><div class="resize"><a href="Perl1-06.html#top" onclick="changeSize('smaller');" class="aS" title="Keep clicking to make fonts smaller">A</a><a href="Perl1-06.html#top" onclick="changeSize('larger');" class="aL" title="Keep clikcing to make fonts larger">A</a><a href="Perl1-06.html#top" onclick="lv()" class="lv" title="Adjust Page for High Contrast">HC</a><div id="fh"><p>Click on <span class="aS">A</span> to make all fonts on the page smaller.</p><p>Click on <span class="aL">A</span> to make all fonts on the page larger.</p><p>Click on <span class="lv">HC</span> to toggle high contrast mode. When you move your mouse over 
+                 some bold words in high contrast mode, related words are automatically highlighted. Text is shown
+                 in black and white. 
+             </p></div></div><hr>
+ 
+ <div class="goalTitle">Lesson Objectives</div><div class="goals">
+  
+  
+  When you complete this lesson, you will be able to:
+  
+  <ul><li>differentiate between lists and scalars.</li><li>use various list functions.</li></ul>
+ </div><hr>
+ 
+  <div class="c"><p>"Enough organization, enough lists, and I think we can control the uncontrollable."<br>
+   -John Mankiewicz</p></div>
+  
+  <p>Most people run their lives using lists, like shopping lists, calendars, address books, even lists of 
+   the lists they've made!</p>
+  
+  <a name="h_01"></a><div class="heading">Lists</div><div class="headingText">
+   
+   <p>Perl has lists, too. You've been using them for a while. In this lesson, you're going to 
+    get to know and understand them a lot better.</p>
+   
+   <p>There's an important distinction to make about lists: they are <i>not</i> variables like scalars are. 
+   Lists hold data, but they don't have <i>names</i>. You can store a list in a variable (not a scalar, 
+   but a different kind of variable. We'll see how to do that in the next 
+    lesson). But a list itself is an ordered set of scalar <i>values</i> flying around between 
+    different parts of your program.</p>
+   
+   <p>A list shows up in your program in these ways:</p>
+   
+   <ul><li>When you assign something to a series of scalars between parentheses separated by commas:<br>
+     <br>
+     <div class="c"> (<span class="darkred">$first_name</span>, <span class="darkred">$middle_initial</span>, <span class="darkred">$last_name</span>) = ...</div><br>
+   
+     The set of scalars there is the list. Whatever is on the right side of the equals sign 
+     will be expected to produce a list that can be assigned to those scalars.<br><br><br>
+    </li><li>When you pass arguments to a function that expects a list (most of them do), like 
+     <span class="darkgreen">print</span>:<br><br>
+     <div class="c"><span class="darkgreen">print</span> <span class="darkred">$first_name</span>, " ", <span class="darkred">$middle_initial</span>, ". ", 
+      <span class="darkred">$last_name</span>;</div><br>
+     The parentheses are optional in this case.  
+    </li></ul>
+   <br><br>
+   <p>There's more to the whole notion of functions <i>expecting</i> a list, but for now let's keep building on the stuff we know.
+   (We have an entire lesson dedicated to the intricacies of lists later.)</p>
+   
+   <p>We can <i>declare</i> more than one variable at a time in a list:</p>
+   
+   <div class="c"><p>my (<span class="darkred">$x</span>, <span class="green">$y</span>, <span class="darkblue">$z</span>);</p></div>
+   
+   <p>We can <i>assign</i> values to more than one variable at a time in a 
+    list:</p>
+   
+   <div class="c"><p>(<span class="darkred">$x</span>, <span class="green">$y</span>, <span class="darkblue">$z</span>) = (<span class="darkred">17</span>, <span class="green">24</span>, 
+    <span class="darkblue">42</span>);</p></div>
+   
+   <p>We can <i>initialize</i> (declare and assign at the same time) in a list:</p>
+   
+   <div class="c"><p>my (<span class="darkred">$x</span>, <span class="green">$y</span>, <span class="darkblue">$z</span>) = (<span class="darkred">17</span>, <span class="green">24</span>, 
+    <span class="darkblue">42</span>);</p></div>
+   <p>
+    The contents to the right side of the equals sign in the last two examples are also lists. They contain <i>literal</i> 
+    elements—that's the technical term for the values specified at that point in the program, not coming from a 
+    variable.</p>
+   
+   <p>Let's check out an example to see what happens when the number of things on the 
+    left side is different from the number of things right side of the equals sign. Create a new file called 
+    <b>list_test.pl</b>as shown:</p>
+
+<div class="listingBox"><div class="listingTitle">CODE TO TYPE:</div><div class="listing"><pre><ins>#!/usr/bin/perl
+use strict;
+use warnings;
+ 
+my ($a, $b, $c, $d);
+($a, $b) = (17, 24, 42);  # Too few targets
+print "\$a = $a, \$b = $b\n";
+($a, $b, $c, $d) = (17, 24, 42);   # Too many targets
+print "\$a = $a, \$b = $b, \$c = $c, \$d = $d\n";
+</ins></pre></div></div>
+   
+   <p><img src="images/coderunner/checksyntax.JPG"> and run it. </p>
+   
+<div class="interactiveBox"><div class="interactiveTitle">INTERACTIVE TERMINAL SESSION:</div><div class="interactive"><pre>cold:~$ <ins>cd perl1</ins> 
+cold:~/perl1$ <ins>./list_test.pl</ins>
+$a = 17, $b = 24
+Use of uninitialized value $d in concatenation (.) or string at line 9.
+$a = 17, $b = 24, $c = 42, $d =    
+cold:~/perl1$ 
+</pre></div></div>
+   
+   <p>What happened? Ponder and absorb.</p>
+   
+  </div>
+  <a name="h_02"></a><div class="heading">split()</div><div class="headingText">
+   
+   <p>There are two functions that convert between a string and a list.  Let's start with 
+    <span class="darkgreen">split()</span>. Create a file called <b>store.pl</b> as shown:</p>
+   
+<div class="listingBox"><div class="listingTitle">CODE TO TYPE:</div><div class="listing"><pre><ins>#!/usr/bin/perl
+use strict;
+use warnings;
+
+# Grocery store inventory:
+my $lines = &lt;&lt;'END_OF_REPORT';
+0.95  300   Peaches
+1.45  120   Avocados
+5.50   10   Durien
+0.40  700   Apples
+END_OF_REPORT
+
+my ($line1, $line2, $line3, $line4) = split "\n", $lines;
+my ($cost, $quantity, $item) = split " ", $line1;  
+print "Total value of $item on hand = \$", $cost * $quantity, "\n";
+($cost, $quantity, $item) = split " ", $line2;  
+print "Total value of $item on hand = \$", $cost * $quantity, "\n";
+($cost, $quantity, $item) = split " ", $line3;  
+print "Total value of $item on hand = \$", $cost * $quantity, "\n";
+($cost, $quantity, $item) = split " ", $line4;  
+print "Total value of $item on hand = \$", $cost * $quantity, "\n";
+</ins></pre></div></div>
+
+   <p><img src="images/coderunner/checksyntax.JPG"> and run it. </p>
+   
+<div class="interactiveBox"><div class="interactiveTitle">INTERACTIVE TERMINAL SESSION:</div><div class="interactive"><pre>cold:~/perl1$ <ins>./store.pl</ins>
+Total value of Peaches on hand = $285
+Total value of Avocados on hand = $174
+Total value of Durien on hand = $55
+Total value of Apples on hand = $280    
+cold:~/perl1$ 
+</pre></div></div>
+
+   <p><span class="darkgreen">split()</span> works by splitting the <i>second</i> 
+    argument wherever it sees an instance of the <i>first</i> argument, and returning the <i>list</i> 
+    of strings that it finds.
+   (By the way, when I'm writing about a function, often I'll put parentheses after it like I just did, to help
+    you realize that I'm talking about a function.  It doesn't mean anything about whether or not parentheses
+    are required - you'll see I used none in the code above.)</p>
+   
+   <p>Here's a graphical representation:</p>
+   
+   <p><div class="c"><img src="images/split.png"></div></p>
+   
+   <p>The first argument—first a newline, then a space, in the above example—is <i>not</i> 
+    included in the resulting strings. Instead, <span class="darkgreen">split()</span> returns the things in 
+    between. Also, <span class="darkgreen">split()</span> does not modify the argument you pass it—even 
+    though Perl programmers may refer to those strings as having been being split, the original string has not actually changed. </p>
+   
+   <p>Also, when using <span class="darkgreen">split()</span>, the string you use to execute a split 
+    (the first argument) does not have to be a single character. If, however, that string is a 
+    single space (like we used in our example above), then Perl will split its second argument wherever it sees <i>any number</i> of 
+    consecutive spaces or tab characters as the string. That's the reason  
+    splitting the grocery store lines on a single space worked, even though there were multiple 
+    spaces between the items in the string.</p>
+   
+   <p>Let's try one last example using <span class="darkblue">split()</span>; change <b>store.pl</b> as shown:</p>
+ 
+<div class="listingBox"><div class="listingTitle">CODE TO TYPE:</div><div class="listing"><pre>#!/usr/bin/perl
+use strict;
+use warnings;
+
+# Grocery store inventory:
+my $lines = &lt;&lt;'END_OF_REPORT';<ins>
+0.95  300   White Peaches
+1.45  120   California Avocados
+5.50   10   Durien
+0.40  700   Spartan Apples</ins>
+END_OF_REPORT
+
+my ($line1, $line2, $line3, $line4) = split "\n", $lines;
+my ($cost, $quantity, $item) = split " ", $line1;  
+print "Total value of $item on hand = \$", $cost * $quantity, "\n";
+($cost, $quantity, $item) = split " ", $line2;  
+print "Total value of $item on hand = \$", $cost * $quantity, "\n";
+($cost, $quantity, $item) = split " ", $line3;  
+print "Total value of $item on hand = \$", $cost * $quantity, "\n";
+($cost, $quantity, $item) = split " ", $line4;  
+print "Total value of $item on hand = \$", $cost * $quantity, "\n";
+</pre></div></div> 
+   
+   <p><img src="images/coderunner/checksyntax.JPG"> and run it. </p>
+   
+<div class="interactiveBox"><div class="interactiveTitle">INTERACTIVE TERMINAL SESSION:</div><div class="interactive"><pre>cold:~/perl1$ <ins>./store.pl</ins>
+Total value of White on hand = $285
+Total value of California on hand = $174
+Total value of Durien on hand = $55
+Total value of Spartan on hand = $280    
+cold:~/perl1$ 
+</pre></div></div>
+   
+   <p>This output isn't very useful, 
+    is it? Do you understand why you got it? (Hint: Take a look at the last example of lists you created.) So, 
+    how can we fix it? There's a third, optional argument for <span class="darkgreen">split()</span> that tells 
+    Perl to stop splitting after it reaches a specified number of fields.</p> 
+    
+   <p>Modify <b>store.pl</b> again as shown:</p>
+     
+<div class="listingBox"><div class="listingTitle">CODE TO EDIT:</div><div class="listing"><pre>#!/usr/bin/perl
+use strict;
+use warnings;
+
+# Grocery store inventory:
+my $lines = &lt;&lt;'END_OF_REPORT';
+0.95  300   White Peaches
+1.45  120   California Avocados
+5.50   10   Durien
+0.40  700   Spartan Apples
+END_OF_REPORT
+
+my ($line1, $line2, $line3, $line4) = split "\n", $lines;
+my ($cost, $quantity, $item) = split " ", $line1<ins>, 3</ins>;  
+print "Total value of $item on hand = \$", $cost * $quantity, "\n";
+($cost, $quantity, $item) = split " ", $line2<ins>, 3</ins>;  
+print "Total value of $item on hand = \$", $cost * $quantity, "\n";
+($cost, $quantity, $item) = split " ", $line3<ins>, 3</ins>;  
+print "Total value of $item on hand = \$", $cost * $quantity, "\n";
+($cost, $quantity, $item) = split " ", $line4<ins>, 3</ins>;  
+print "Total value of $item on hand = \$", $cost * $quantity, "\n";
+</pre></div></div>   
+   
+   <p><img src="images/coderunner/checksyntax.JPG"> and run it. </p>
+   
+<div class="interactiveBox"><div class="interactiveTitle">INTERACTIVE TERMINAL SESSION:</div><div class="interactive"><pre>cold:~/perl1$ <ins>./store.pl</ins>
+Total value of White Peaches on hand = $285
+Total value of California Avocados on hand = $174
+Total value of Durien on hand = $55
+Total value of Spartan Apples on hand = $280
+cold:~/perl1$ 
+</pre></div></div>
+   
+   <p>We cannot interpolate an <i>expression</i> inside a string and expect it to expand. Modify your code as shown:</p>
+
+<div class="listingBox"><div class="listingTitle">CODE TO EDIT:</div><div class="listing"><pre>#!/usr/bin/perl
+use strict;
+use warnings;
+
+# Grocery store inventory:
+my $lines = &lt;&lt;'END_OF_REPORT';
+0.95  300   White Peaches
+1.45  120   California Avocados
+5.50   10   Durien
+0.40  700   Spartan Apples
+END_OF_REPORT
+
+my ($line1, $line2, $line3, $line4) = split "\n", $lines;
+my ($cost, $quantity, $item) = split " ", $line1, 3; 
+print "Total value of $item on hand = <del>\$", </del>$cost * $quantity<del>, "</del>\n";
+($cost, $quantity, $item) = split " ", $line2, 3;
+print "Total value of $item on hand = \$", $cost * $quantity, "\n";
+($cost, $quantity, $item) = split " ", $line3, 3;  
+print "Total value of $item on hand = \$", $cost * $quantity, "\n";
+($cost, $quantity, $item) = split " ", $line4, 3;
+print "Total value of $item on hand = \$", $cost * $quantity, "\n";
+</pre></div></div>   
+   
+   <p><img src="images/coderunner/checksyntax.JPG"> and run it.
+    See what happened?</p>
+   
+    <p>Also note that once we have 
+    declared a variable, we do not declare it again. Let's find out what 
+    happens if we try adding <b>my</b> in front of any of the lines that assign to 
+    the list <b>($cost, $quantity, $item)</b>. Modify your code as shown:
+   </p>
+
+<div class="listingBox"><div class="listingTitle">CODE TO EDIT:</div><div class="listing"><pre>#!/usr/bin/perl
+use strict;
+use warnings;
+
+# Grocery store inventory:
+my $lines = &lt;&lt;'END_OF_REPORT';
+0.95  300   White Peaches
+1.45  120   California Avocados
+5.50   10   Durien
+0.40  700   Spartan Apples
+END_OF_REPORT
+
+my ($line1, $line2, $line3, $line4) = split "\n", $lines;
+my ($cost, $quantity, $item) = split " ", $line1, 3; 
+print "Total value of $item on hand = <ins>\$", </ins>$cost * $quantity<ins>, "</ins>\n";
+<ins>my</ins> ($cost, $quantity, $item) = split " ", $line2, 3;
+print "Total value of $item on hand = \$", $cost * $quantity, "\n";
+($cost, $quantity, $item) = split " ", $line3, 3;  
+print "Total value of $item on hand = \$", $cost * $quantity, "\n";
+($cost, $quantity, $item) = split " ", $line4, 3;
+print "Total value of $item on hand = \$", $cost * $quantity, "\n";
+</pre></div></div>   
+   
+   <p><img src="images/coderunner/checksyntax.JPG"> and run it.
+    What error messages do you see? 
+    (By the way, if you're a tad annoyed by the duplication of that code doing the same thing four 
+    times, you should be! But let it go for now; we'll show 
+    how to deal with that later in the course.)</p>
+  
+  </div>
+  <a name="h_03"></a><div class="heading">join()</div><div class="headingText">
+   
+   <p><span class="darkgreen">join()</span> is the <i>converse</i> of <span class="darkgreen">split()</span>. 
+    The first argument we'll <span class="darkgreen">join()</span> is a string that Perl will place in 
+    between each of the remaining arguments (if any of them are numbers, they'll be "stringified" 
+    first), returning the resulting string. The joining string is not placed before the first argument, 
+    or after the last argument, it is only in between arguments.</p>
+      
+   <p>Here's a graphical representation:</p>
+   
+   <p><div class="c"><img src="images/join.png"></div></p>
+   
+   <p>Let's modify our grocery store example so that after it splits the lines, it subtracts some 
+    sales and then prints out the result using <span class="darkgreen">join()</span>.</p>
+   
+   <p>Create a file called <b>store_join.pl</b> as shown:</p>
+   
+<div class="listingBox"><div class="listingTitle">CODE TO TYPE:</div><div class="listing"><pre><ins>#!/usr/bin/perl
+use strict;
+use warnings;
+
+my $lines = &lt;&lt;'END_OF_REPORT';
+0.95  300   White Peaches
+1.45  120   California Avocados
+5.50   10   Durien
+0.40  700   Spartan Apples
+END_OF_REPORT
+
+my ($peaches_sold, $avocados_sold, $durien_sold, $apples_sold) = (12, 6, -1, 24);  # One durien returned... too smelly
+my ($line1, $line2, $line3, $line4) = split "\n", $lines;
+my ($cost, $quantity, $item) = split " ", $line1, 3;
+$quantity -= $peaches_sold;
+$line1 = join " ", $cost, $quantity, $item;
+print "$line1\n";
+($cost, $quantity, $item) = split " ", $line2, 3; 
+$quantity -= $avocados_sold;
+$line2 = join " ", $cost, $quantity, $item;
+print "$line2\n";($cost, $quantity, $item) = split " ", $line3, 3;
+$quantity -= $durien_sold;
+$line3 = join " ", $cost, $quantity, $item;
+print "$line3\n";
+($cost, $quantity, $item) = split " ", $line4, 3;
+$quantity -= $apples_sold;
+$line4 = join " ", $cost, $quantity, $item;
+print "$line4\n";
+</ins></pre></div></div>   
+   
+   <p><img src="images/coderunner/checksyntax.JPG"> and run it. </p>
+   
+<div class="interactiveBox"><div class="interactiveTitle">INTERACTIVE TERMINAL SESSION:</div><div class="interactive"><pre>cold:~/perl1$ <ins>./store_join.pl</ins>
+0.95 288 White Peaches
+1.45 114 California Avocados
+5.50 11 Durien
+0.40 676 Spartan Apples    
+cold:~/perl1$ 
+</pre></div></div>
+   
+   <p>The lines that are produced aren't quite the same as the ones that 
+    were entered. The numbers are different and there is only one space between each item, 
+    because that's what we told <span class="darkgreen">join()</span> to do. 
+    Because that output can be parsed by the same program, the number of spaces usually doesn't 
+    matter. If, however, some other (less tolerant) program expects the lines to be composed of 
+    fixed-width fields, then we'd have a problem (one that we will learn to solve later).</p>
+   
+   <p>Incidentally, a list can have <i>zero</i> or more things in it. 
+   Here's what a list with nothing in it looks like:</p>
+   
+   <p><div class="c"><b>()</b></div></p>
+   
+   <p>And a list with only one thing in it looks like this:</p>
+   
+   <p><div class="c"><b>("thing")</b></div></p>
+  </div><br>
+   <a name="h_04"></a><div class="heading">Binary Operator Shortcut</div><div class="headingText">
+   <p>One final bit of instruction for you in this lesson—you see that <span class="darkblue">-=</span> in the program?  
+   That's a handy Perl shortcut to use when you want to apply a <i>binary</i> operator (an operator that takes two 
+    arguments, one on each side—like <span class="darkblue">+</span>, or <span class="darkblue">*</span>) and then have the variable on 
+    the left side of the operator be assigned the result of the calculation; in other 
+    words and code: </p><br>
+   <p><div class="c"><span class="darkred">$variable</span> <i>OP</i>= <i>EXPRESSION</i></div></p><br>
+   
+   <p>is the same as writing:</p><br>
+   
+   <p><div class="c"><span class="darkred">$variable</span> = <span class="darkred">$variable</span> <i>OP</i> <i>EXPRESSION</i></div></p><br>
+   
+   <p>where <i>OP</i> is any binary operator, and <i>EXPRESSION</i> is any expression. So:</p><br>
+   
+   <p><div class="c"><span class="darkred">$quantity</span> -= <span class="darkred">$peaches_sold</span></div></p><br>
+   
+   <p>is the same as:</p><br>
+   
+   <p><div class="c"><span class="darkred">$quantity</span> = <span class="darkred">$quantity</span> - <span class="darkred">$peaches_sold</span></div></p><br>
+   
+   <p>This shortcut saves us time when programming and makes our code very readable.</p>
+   
+  </div>
+ 
+ <p>Looking great so far! In the next lesson we'll learn about arrays!  See you there!</p>
+  
+<div class="footer"><div id="timeSurvey"></div>				
+				Copyright © 1998-2014 O'Reilly Media, Inc.<br><img src="https://courses.oreillyschool.com/common/cclicense.png"><br>
+				This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 Unported License.<br>
+				See <a href="http://creativecommons.org/licenses/by-sa/3.0/legalcode">http://creativecommons.org/licenses/by-sa/3.0/legalcode</a> 
+				for more information.
+				</div><iframe id="t" width="1" height="1" border="0" style="display:none"></iframe><script language="javascript">bodyLoaded();</script><script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+  ga('create', 'UA-44720547-1', 'oreillyschool.com');
+  ga('send', 'pageview');
+</script></body></html>

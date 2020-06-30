@@ -1,0 +1,60 @@
+<html>
+   <!-- Copyright (c) 1998-2014 O'Reilly Media, Inc. Unauthorized use is strictly
+                prohibited. None of this code or content can by copied without the express written
+                permission from O'Reilly Media, Inc. -->
+   <head>
+      <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+      <link rel="stylesheet" type="text/css" href="http://archive.oreilly.com/oreillyschool/courses/Perl2/common/Lab.css">
+      <title>Regular Expressions: Anchors and Captures - Quiz 1</title>
+   </head>
+   <body id="body">
+      <h2>Regular Expressions: Anchors and Captures - Quiz 1</h2> 
+      
+      
+      
+      
+      <p>What is the difference between <b>/[A-Z]+\d+/</b> and <b>/[A-Z]+ \d+/</b>?</p>
+      
+      
+      <p>What is the difference between <b>/[A-Z]+ \d+/</b> and <b>/[A-Z]+\s+\d+/</b>?</p>
+      
+        
+      
+      
+      <p>The space matches literally, so the second regex requires exactly one space whereas the first one requires none. The third
+         regex requires at least one whitespace character of any kind, but more are permissible.
+      </p>
+      
+      
+      <p><b>Grading Criteria:</b> Student should be able to explain the differences between ' ' and \s in a regular expression.</p>
+      
+      
+      
+      
+      
+      
+      <ol>
+         <li>Use the <b>\b</b> anchor to construct a regex that matches <b>rap</b>, but not <b>scrape, trap, or rappel</b>.</li>
+         <li>What is the operator that will return true only if a regex does <i>not</i> match? (Hint: <b>perldoc perlop</b>, 
+            "Binding operators"). 
+         </li>
+      </ol>
+      
+      
+      
+      
+      <ol>
+         <li>/\brap\b/</li>
+         <li>!~</li>
+      </ol>
+      
+      
+      <p><b>Grading Criteria:</b> Student should demonstrate their further knowledge of regular expressions based on the topics 
+         covered in the lesson.
+      </p>
+      
+      
+      
+      
+   </body>
+</html>

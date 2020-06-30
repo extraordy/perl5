@@ -1,0 +1,348 @@
+<html><!-- Copyright (c) 1998-2014 O'Reilly Media, Inc.
+			This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 Unported License.
+			See http://creativecommons.org/licenses/by-sa/3.0/legalcode for more information.
+            --><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"><link rel="stylesheet" type="text/css" href="../common/Lab.css"><script type="text/javascript" src="../common/Lab.js"></script><script language="javascript"></script><title>Strings and String Conditionals</title></head><body id="body"><a name="top"></a><div class="title">Strings and String Conditionals</div><div class="resize"><a href="Perl1-05.html#top" onclick="changeSize('smaller');" class="aS" title="Keep clicking to make fonts smaller">A</a><a href="Perl1-05.html#top" onclick="changeSize('larger');" class="aL" title="Keep clikcing to make fonts larger">A</a><a href="Perl1-05.html#top" onclick="lv()" class="lv" title="Adjust Page for High Contrast">HC</a><div id="fh"><p>Click on <span class="aS">A</span> to make all fonts on the page smaller.</p><p>Click on <span class="aL">A</span> to make all fonts on the page larger.</p><p>Click on <span class="lv">HC</span> to toggle high contrast mode. When you move your mouse over 
+                 some bold words in high contrast mode, related words are automatically highlighted. Text is shown
+                 in black and white. 
+             </p></div></div><hr>
+ 
+ <div class="goalTitle">Lesson Objectives</div><div class="goals">
+  
+  
+  When you complete this lesson, you will be able to:
+  
+  <ul><li>use strings to manipulate text.</li><li>use separate operators to compare strings.</li><li>translate numbers into strings and strings into numbers.</li></ul>
+ </div><hr>
+ 
+ <a name="h_01"></a><div class="heading">String Conditions and String Functions</div><div class="headingText">
+  
+  <p>Welcome back! In this lesson, you'll learn about using strings in Perl to manipulate text. </p>
+
+  <a name="s_01"></a><div id="s_01"><div class="subheading">String Conditions</div><div class="subheadingText">
+ 
+   <p>We've already compared numeric quantities in Perl. Here's a quick 
+    refresher:</p>
+ 
+   <div class="c"><table class="tbl"><tr><th>Operator</th><th>Example</th><th>Meaning</th></tr><tr><td>==</td><td>$x == $y</td><td> $x equals $y</td></tr><tr><td>!=</td><td>$x != $y</td><td>$x does not equal $y</td></tr><tr><td>&lt;</td><td>$x &lt; $y</td><td>$x is less than $y</td></tr><tr><td>&gt;</td><td>$x &gt; $y</td><td>$x is greater than $y</td></tr><tr><td>&lt;=</td><td>$x &lt;= $y</td><td>$x is less than or equal to $y</td></tr><tr><td>&gt;=</td><td>$x &gt;= $y</td><td>$x is greater than or equal to $y</td></tr></table></div>
+ 
+   <p>There are equivalent operators for testing strings:</p>
+  
+   <div class="c"><table class="tbl"><tr><th>Operator</th><th>Example</th><th>Meaning</th></tr><tr><td>eq</td><td>$x eq $y</td><td> $x equals $y</td></tr><tr><td>ne</td><td>$x ne $y</td><td>$x does not equal $y</td></tr></table></div>
+ 
+   <p>Some additional numeric equivalent operators in Perl are:
+    <b>lt</b>, <b>gt</b>, <b>le</b>, and <b>ge</b>. I didn't include them in the table above though, 
+    because you will almost never use them—in nearly 20 years of Perl programming I have used each of them 
+    maybe once. (We use different operators for sorting, but we'll get to 
+    them later.)</p>
+ 
+   <p>The other Perl operators you've met so far are composed of 
+    punctuation characters or symbols like <b>&lt;</b>. These (and other) operators are composed of letters and so you should leave white 
+    space around them. This makes it easier for people to read and avoids the possibility of syntax errors, such as you'd get if you wrote this 
+    code: <b>$xeq$y</b>. Perl would look for a variable <b>$xeq</b>. 
+    (Perl reads to find the next complete variable name, even if that 
+    variable doesn't exist), and that variable would then be followed by another variable 
+    <b>$y</b>, which cannot follow a variable in Perl's <i>grammar</i> 
+    (the language that describes the rules that apply to Perl programs).</p>
+ 
+   <p>Why do we need separate operators to compare strings in 
+    Perl? Since a scalar can contain either a string or a number, and Perl knows which type of item is stored in the 
+    scalar, wouldn't one set of operators do? Then we could just let Perl figure 
+    out whether to compare things numerically or lexicographically, right?</p>
+ 
+   <p>These are all really good questions—the kind that keep language designers awake nights. Here's why we need two sets of 
+    operators. Suppose <span class="darkred">$x</span> was a string and <span class="darkred">$y</span> was a number, and we were using a generic operator 
+    to compare them. Would Perl compare them numerically, or lexicographically?</p>
+   
+   <p>Perl helps by "coercing" (translating) numbers into strings and vice-versa. If  
+    a number is stored in a scalar and you're applying a string operator or function to it, Perl will turn the number 
+    into a string first. That string will yield the same result as if you printed the 
+    scalar (because <b>print</b> is a string function). Numbers get printed—and 
+    stringified—in a specific format (truncated after a certain number of digits, trailing 
+    zeroes after a decimal point suppressed, and such). And if a string is stored in a scalar and 
+    you use a numeric operator or function on it, Perl turns it 
+    into a number first. Now every number can be turned into a string. But not every string 
+    can be turned into a number. The string <span class="orange">"123"</span> can be turned into the 
+    number <span class="orange">123</span>. The string <span class="orange">"-42.87248233449873687634904095912249135"</span> 
+    can be turned into a number, but we lose the digits that Perl 
+    doesn't have the precision to store.</p>
+ 
+   <p>But what should Perl do with the string 
+    <span class="orange">"petunia"</span> when asked to turn it into a number? Perl has some helpful rules in this kind of situation. 
+    It reads a string and as long as it 
+    finds characters that are legally part of a number, it keeps going. If it has to give up before 
+    the end of the string, it returns whatever it found up to that point, and if <b>use warnings</b> is turned on, 
+    it gives a warning. 
+    So the string <span class="orange">"21 Jump Street"</span> 
+    evaluates as the number <span class="orange">21</span> with a warning. If Perl doesn't read <i>any</i> legal 
+    numeric characters, then it returns <b>undef</b> which, when treated as a number, 
+    <i>evaluates as zero</i>. So <span class="orange">"petunia" + 42</span> will evaluate to <span class="orange">42</span>, 
+    with a warning <b>argument "petunia" isn't numeric in addition</b> (so long as <b>use warnings</b> is on).  
+    It's important to turn on <b>use warnings</b>, otherwise you'd have no 
+    idea that you were trying to add a number to a flower!</p>
+ 
+   <p>So even though Perl lets us store a number in a scalar and later store a string in the same 
+    scalar, it's important that we know the type of item we expect to be stored in any variable when we 
+    prepare to perform a comparison on it. Perl's coercion rules help us read values from somewhere else, 
+    when they are always read as strings, 
+    without having to waste time converting elements that we know are numbers.</p>
+ 
+   <p>Let's do a straightforward string comparison example so you get the hang of it. 
+    Create the file called <b>fruit_check.pl</b> as shown:</p>
+ 
+<div class="listingBox"><div class="listingTitle">CODE TO TYPE:</div><div class="listing"><pre><ins>#!/usr/bin/perl
+use strict;
+use warnings;
+
+my $fruit;
+$fruit = 'apple';
+
+if ( $fruit eq 'lemon' || $fruit eq 'orange' || $fruit eq 'lime' )
+{
+  print "Citrus... juicy!\n";
+}
+elsif ( $fruit eq 'strawberry' || $fruit eq 'raspberry' || $fruit eq 'blackberry' || $fruit eq 'loganberry' )
+{
+  print "Berry...\n";
+  if ( $fruit ne 'loganberry' )
+  {
+    print "pie!\n";
+  }
+}
+else
+{
+  print "Some other kind of fruit!\n";
+}</ins>
+</pre></div></div>
+ 
+   <p><img src="images/coderunner/checksyntax.JPG"> and run it.</p>
+   
+<div class="interactiveBox"><div class="interactiveTitle">INTERACTIVE TERMINAL SESSION:</div><div class="interactive"><pre>cold:~$ <ins>cd perl1</ins>
+cold:~/perl1$ <ins>./fruit_check.pl</ins>
+Some other kind of fruit!    
+cold:~/perl1$ 
+</pre></div></div>
+   
+   <p>Experiment with the program by assigning the <span class="darkred">$fruit</span> variable to a string
+    other than <span class="darkblue">'apple'</span>.  Use some of 
+    the other fruits mentioned in the program.  We used the <span class="darkblue">||</span> operator to mean "or" 
+    in a logical expression, and the <span class="darkblue">eq</span> and <span class="darkblue">ne</span> operators to compare 
+    strings.</p>
+   
+  </div></div>
+  <a name="s_02"></a><div id="s_02"><div class="subheading">String Functions and Operators</div><div class="subheadingText">
+ 
+   <p>In Perl, we can join strings together, make them 
+    uppercase and lowercase, find out how long they are—the list goes on...</p>
+ 
+   <p>The function <span class="darkgreen">lc()</span> makes strings lowercase. The function <span class="darkgreen">uc()</span> makes 
+    strings uppercase. These functions are really useful when you want to compare strings without regard to case. 
+    Modify <b>fruit_check.pl</b> as shown:</p>
+ 
+<div class="listingBox"><div class="listingTitle">CODE TO EDIT:</div><div class="listing"><pre>#!/usr/bin/perl
+use strict;
+use warnings;
+
+my $fruit;
+<ins>$fruit = 'Orange';</ins>
+
+if ( $fruit eq 'lemon' || $fruit eq 'orange' || $fruit eq 'lime' )
+{
+  print "Citrus... juicy!\n";
+}
+elsif ( $fruit eq 'strawberry' || $fruit eq 'raspberry'
+     || $fruit eq 'blackberry' || $fruit eq 'loganberry' )
+{
+  print "Berry...\n";
+  if ( $fruit ne 'loganberry' )
+  {
+    print "pie!\n";
+  }
+}
+else
+{
+  print "Some other kind of fruit!\n";
+}
+</pre></div></div>
+ 
+   <p><img src="images/coderunner/checksyntax.JPG"> and run it.</p>
+   
+<div class="interactiveBox"><div class="interactiveTitle">INTERACTIVE TERMINAL SESSION:</div><div class="interactive"><pre>cold:~/perl1$ <ins>./fruit_check.pl</ins>
+Some other kind of fruit!    
+cold:~/perl1$ 
+</pre></div></div>
+ 
+   <p>Oops! <span class="orange">'Orange'</span> is the same as <span class="orange">'orange'</span> for 
+    <i>our</i> purposes, but if we want a computer to think they're equivalent, we have to explain 
+    it. Modify the program as shown:</p>
+   
+<div class="listingBox"><div class="listingTitle">CODE TO TYPE:</div><div class="listing"><pre>#!/usr/bin/perl
+use strict;
+use warnings;
+
+my $fruit;
+$fruit = 'Orange';
+
+<ins>my $fruit_lc = lc( $fruit );
+if ( $fruit_lc eq 'lemon' || $fruit_lc eq 'orange' || $fruit_lc eq 'lime' )
+</ins>{
+  print "Citrus... juicy!\n";
+}
+<ins>elsif ( $fruit_lc eq 'strawberry' || $fruit_lc eq 'raspberry' 
+     || $fruit_lc eq 'blackberry' || $fruit_lc eq 'loganberry' )
+</ins>{
+  print "Berry...\n";
+<ins>  if ( $fruit_lc ne 'loganberry' )
+</ins>  {
+    print "pie!\n";
+  }
+}
+else
+{
+  print "Some other kind of fruit!\n";
+}
+</pre></div></div>
+ 
+   <p><img src="images/coderunner/checksyntax.JPG"> and run it. </p>
+ 
+<div class="interactiveBox"><div class="interactiveTitle">INTERACTIVE TERMINAL SESSION:</div><div class="interactive"><pre>cold:~/perl1$ <ins>./fruit_check.pl</ins>
+Citrus... juicy!    
+cold:~/perl1$ 
+</pre></div></div>
+ 
+   <p>Do you see how that works? By 
+    creating <span class="darkblue">$fruit_lc</span> as a lowercase version of <span class="darkblue">$fruit</span>, we can compare it to any lowercase 
+    string, such as <span class="orange">'orange'</span>. (It would have worked equally well to use 
+    <b>uc()</b> and compare to <span class="orange">'ORANGE'</span>; just make sure you're 
+    consistent!)</p>
+ 
+   <p>We didn't use <b>$fruit = lc( $fruit )</b> just in case we want to use the
+    <i>original</i> version of <span class="darkred">$fruit</span> to do something else later, like print out in an error message.</p>
+ 
+   <p>Now let's see how to <i>concatenate</i> strings. Concatenation is a technical term that means "join 
+    together." You already know one way to join two strings—say <b>$x</b> and <b>$y</b>—together:
+    interpolation (<b>"$x$y"</b>). So why do we have another way of doing it?  Well, Perl is all 
+    about choice—remember the Perl maxim, "There's more than one way to do it." Sometimes, concatenation 
+    makes code easier to read and/or more logical than interpolation. Here's how we'd concatenate 
+    <b>$x</b> and <b>$y</b>:</p>
+ 
+   <div class="c"><p><b>$x . $y</b></p></div> 
+ 
+   <p>See that dot in between <b>$x</b> and <b>$y</b>? That's the concatenation operator. The result 
+    of the expression above is the two variables (stringified if one of them is a 
+    number) joined together.</p>
+ 
+   <p>Here's a great reason to use the concatenation operator. Say you're constructing a really long 
+    string to print as part of a report: </p>
+
+   <div class="observeBox"><div class="observeTitle">OBSERVE:</div><div class="observe"><pre>
+<span class="darkred">$title</span> = <span class="orange">"Observations on the Mating Habits of $bird with Special Reference to Nesting Behavior Documented in $country"</span>;
+</pre></div></div>
+ 
+   <p>That's a very wide line, longer than most best practices of 72 characters, and far too long if 
+    you're using it in a magazine article, for instance. The concatenation operator comes to the 
+    rescue:</p>
+   
+   <div class="observeBox"><div class="observeTitle">OBSERVE:</div><div class="observe"><pre>
+<span class="darkred">$title</span> = <span class="orange">"Observations on the Mating Habits of $bird"</span>
+        . <span class="orange">" with Special Reference to Nesting Behavior"</span>
+        . <span class="orange">" Documented in $country"</span>;
+</pre></div></div>
+ 
+   <p>Now we can break the line up any way we please. </p>
+ 
+   <p>Okay, now suppose we're printing <b>$title</b> in a report and we need to know whether it will fit on 
+    the output line. How can we tell, when the value of <b>$bird</b> could be anything from 
+    "Auk" to "Himalayan Golden Backed Three-Toed Woodpecker"? This is where the 
+    <b>length</b> function comes in handy. It tells us how many characters are in a 
+    string:</p>
+ 
+   <div class="c"><p><b>length</b>( "Auk" ) == 3   # True!</p></div> 
+ 
+   <table class="noteBox pBox "><tr><td class="noteTitle">WARNING</td><td class="note">For the purposes of our discussions in this course, we're dealing only with characters 
+    in the ASCII set and therefore "character" is synonymous with "byte."  That is not true when 
+    dealing with Unicode—an extended character set capable of expressing just about every character 
+    in just about every language—but that's outside the scope of this course.</td></tr></table>
+ 
+   <p>Here's another way we might use the length function. It can check to see whether a variable 
+    looks like a US zip code. Create <b>zip_check.pl</b> and enter the code as shown:</p>
+ 
+<div class="listingBox"><div class="listingTitle">CODE TO TYPE:</div><div class="listing"><pre><ins>#!/usr/bin/perl
+use strict;
+use warnings;
+
+my $zip;
+$zip = "98362";
+
+if ( length( $zip ) == 5 )
+{
+  print "$zip could be a standard zip code\n";
+}
+elsif ( length( $zip ) == 9 || length( $zip ) == 10 )  # May have hyphen between parts
+{
+  print "$zip could be a ZIP+4 code\n"; 
+}
+else
+{
+  die "$zip is not a zip code\n";
+}</ins>
+</pre></div></div>
+ 
+   <p><img src="images/coderunner/checksyntax.JPG"> and run it. </p>
+   
+<div class="interactiveBox"><div class="interactiveTitle">INTERACTIVE TERMINAL SESSION:</div><div class="interactive"><pre>cold:~/perl1$ <ins>./zip_check.pl</ins>
+98362 could be a standard zip code    
+cold:~/perl1$ 
+</pre></div></div>
+ 
+   <p>Try setting <span class="darkblue">$zip</span> to 
+    <b>"4077"</b>, <b>"12345-1234"</b>, and <b>"hedgehogs"</b> and rerun it after each change. You can 
+    see that the check isn't perfect, but it's a start.</p> 
+  
+   <p>We put the zip code in a string, now let's see what happens when you change it to a number, for instance 
+    <b>95472</b> (O'Reilly's west coast office zip code). 
+    Now try the number <b>04401</b> (the zip code for Bangor, Maine). Look closely at the output.  
+    What's odd about it? Try the number <b>02138</b> (O'Reilly's east coast office zip code). Remember—don't 
+    put quotes around a number!
+    What happens?</p>
+ 
+   <p>You've just learned how to input numbers in a different <i>radix</i> or <i>base</i>—in this case, 
+    <i>octal</i> (base 8). For more information, check out <b>perldoc perldata</b> or 
+    <a href="http://perldoc.perl.org/perldata.html" target="_blank">http://perldoc.perl.org/perldata.html</a>, particularly the section titled "Scalar value 
+    constructors." Try changing <span class="darkblue">$zip</span> to numbers like <b>0xface0ff</b> and 
+    <b>0b11001001</b>—again (remember, in Perl there are no quotation marks around numbers). See what gets printed 
+    and make sure you understand the reasons behind it. Then, 
+    put quotation marks around those values—<b>"0xface0ff"</b> and <b>"0b11001001"</b>—and see what happens. 
+    Change those values until you're confident that you understand the difference between a string and a 
+    number.</p>
+  
+  </div></div>
+  <a name="s_03"></a><div id="s_03"><div class="subheading">You Know Things About Strings</div><div class="subheadingText">
+   
+   <p>I'm feeling confident in your progress so far. Good job! 
+   It may feel like we're learning Perl slowly—and indeed we are taking baby steps—but by 
+   taking time to understand the fundamentals, we'll have a strong 
+    foundation to build upon. When people don't learn these fundamentals well, they end up writing only 
+    "cargo cult code"—code assembled by copying and pasting from other people's examples, 
+    then hoping for the best.</p>
+ 
+   <p>Look up "cargo cult code" in <a href="http://en.wikipedia.org/wiki/Cargo_cult_programming" target="_blank">Wikipedia</a>, to read more about the kind of programmer you will not be!</p>
+  
+  </div></div>
+  
+  <p>See you in the next lesson!</p>
+
+  
+ </div>
+<div class="footer"><div id="timeSurvey"></div>				
+				Copyright © 1998-2014 O'Reilly Media, Inc.<br><img src="https://courses.oreillyschool.com/common/cclicense.png"><br>
+				This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 Unported License.<br>
+				See <a href="http://creativecommons.org/licenses/by-sa/3.0/legalcode">http://creativecommons.org/licenses/by-sa/3.0/legalcode</a> 
+				for more information.
+				</div><iframe id="t" width="1" height="1" border="0" style="display:none"></iframe><script language="javascript">bodyLoaded();</script><script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+  ga('create', 'UA-44720547-1', 'oreillyschool.com');
+  ga('send', 'pageview');
+</script></body></html>

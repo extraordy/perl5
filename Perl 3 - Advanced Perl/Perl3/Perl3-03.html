@@ -1,0 +1,609 @@
+<html><!-- Copyright (c) 1998-2014 O'Reilly Media, Inc.
+			This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 Unported License.
+			See http://creativecommons.org/licenses/by-sa/3.0/legalcode for more information.
+            --><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"><link rel="stylesheet" type="text/css" href="../common/Lab.css"><script type="text/javascript" src="../common/Lab.js"></script><script language="javascript"></script><title>Interacting With the System</title></head><body id="body"><a name="top"></a><div class="title">Interacting With the System</div><div class="resize"><a href="Perl3-03.html#top" onclick="changeSize('smaller');" class="aS" title="Keep clicking to make fonts smaller">A</a><a href="Perl3-03.html#top" onclick="changeSize('larger');" class="aL" title="Keep clikcing to make fonts larger">A</a><a href="Perl3-03.html#top" onclick="lv()" class="lv" title="Adjust Page for High Contrast">HC</a><div id="fh"><p>Click on <span class="aS">A</span> to make all fonts on the page smaller.</p><p>Click on <span class="aL">A</span> to make all fonts on the page larger.</p><p>Click on <span class="lv">HC</span> to toggle high contrast mode. When you move your mouse over 
+                 some bold words in high contrast mode, related words are automatically highlighted. Text is shown
+                 in black and white. 
+             </p></div></div><hr>
+ 
+ <div class="goalTitle">Lesson Objectives</div><div class="goals"> 
+  
+  When you complete this lesson, you will be able to:
+  <ul><li>access <a href="Perl3-03.html#environment">the process environment</a>.</li><li>use <a href="Perl3-03.html#systemcommand">the system Command</a>.</li><li>use <a href="Perl3-03.html#exec">exec</a>.</li><li>use <a href="Perl3-03.html#backticks">backticks</a> to capture whatever that 
+    program sends to standard output and put it in a scalar or array.</li><li>use <a href="Perl3-03.html#pipedopens">Piped Opens</a> to open a pipe to or from a program, and read 
+    from or write to that pipe from Perl.</li></ul>
+ </div><hr>
+
+ <p>Welcome back! In this lesson we'll learn ways that your Perl 
+  program interacts with the system, by accessing the process environment 
+  and by running external programs. </p>
+ 
+
+ 
+ <a href="Perl3-03.html" name="environment"></a>
+ <a name="h_01"></a><div class="heading">The Environment</div><div class="headingText">
+   
+  <p>Every process that runs has an available <i>environment</i>. The environment contains a number 
+   of <i>variables</i> that are places to store information. You can access the list of variables contained in an environment
+   on Unix with the 
+   <b>env</b> command, and on Windows with the <b>set</b> command. Try the <b>env</b> command on our system.
+   At your <b>cold:~$</b> prompt, type the command below as shown:</p>
+   
+<div class="interactiveBox"><div class="interactiveTitle">INTERACTIVE SESSION:</div><div class="interactive"><pre>
+cold:~$ <ins>env</ins>
+</pre></div></div>
+   
+   <p>You'll see output that looks like this:</p>
+
+<div class="observeBox"><div class="observeTitle">OBSERVE:</div><div class="observe"><pre>
+PATH=/usr/local/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin:/usr/X11R6/bin
+SECURITYSESSIONID=174015b0
+HOME=/Users/peter
+SHELL=/bin/tcsh
+USER=peter
+__CF_USER_TEXT_ENCODING=0x1F5:0:0
+DISPLAY=:0.0
+MANPATH=/usr/share/man:/usr/local/share/man:/usr/X11R6/man
+HOSTTYPE=powermac
+VENDOR=apple
+OSTYPE=darwin
+MACHTYPE=powerpc
+SHLVL=2
+PWD=/Users/peter
+LOGNAME=peter
+GROUP=peter
+HOST=marvin.local
+TERM=vt100
+WINDOWID=8388624
+</pre></div></div>
+   
+   <p>The output you get could be a lot different from the output you see in
+    the box above, because I ran my command on a
+    Mac (<b>env</b> is useful for discovering which kind of system you're running).</p>
+   
+   <p>The output is a series of lines in this format: <i>variable=value</i>. The <i>variable</i> is the name of 
+    a variable, the <i>value</i> is the content of that variable. You can use any one of these pairs of <i>variable=value</i> pairs 
+    at the command line, much 
+    like a Perl variable:</p>
+   
+<div class="interactiveBox"><div class="interactiveTitle">INTERACTIVE SESSION:</div><div class="interactive"><pre>
+cold:~$ <ins>echo $TERM</ins>
+xterm
+</pre></div></div>
+   
+   <p>And you can change or create environment variables yourself, like this:</p>
+   
+<div class="interactiveBox"><div class="interactiveTitle">INTERACTIVE SESSION:</div><div class="interactive"><pre>
+cold:~$ <ins>export FOOD=chocolate</ins>
+cold:~$ <ins>echo $FOOD</ins>
+chocolate
+</pre></div></div>
+    
+  <p>Most of the time, environment variables are used to pass information to <i>child processes</i>. Initially, we set an 
+   environment variable at the command line (like <b>FOOD</b> above). The child processes are all of the 
+   programs that you invoke from the same shell (terminal window)—in our classes, those 
+   are usually Perl programs. The variables that are there already were set by various scripts that are 
+   configured to run every time you start a shell or log in to the system.</p>
+   
+  <p>Environment variables are <i>inherited</i> by child processes. If, after 
+   entering the command above, you were to start a child shell, and then run <b>env</b>, you'd see that it already had the variable 
+   <b>FOOD</b> set to <b>chocolate</b>.</p>
+     
+  <p>But enough about shell commands—we're here to learn how to work in <i>Perl! </i>
+   Perl has a special hash that is mapped to the environment. It's called <b>%ENV</b>. Each 
+   key is a variable name. If you change an entry in the hash, Perl changes the environment; this is one of 
+   the "magic" variables in Perl.</p>
+   
+  <p>Let's try it out. Type the one-liner below as shown:</p>
+   
+<div class="interactiveBox"><div class="interactiveTitle">INTERACTIVE SESSION:</div><div class="interactive"><pre>
+cold:~$ <ins>perl -le 'print "$_ = $ENV{$_}" for sort keys %ENV'</ins>
+</pre></div></div>
+   
+  <p>You get more or less the same environment variables you got from <b>env</b> in the shell. 
+   (Any differences are the results of the shell setting or changing variables as it started a new child process to 
+   run Perl.)</p>
+   
+  <p>A common mistake programmers make is attempting to change the environment of a <i>parent</i> process. 
+   It's impossible to do this from Perl or <i>any other</i> programming language. Try it: </p>
+  
+<div class="interactiveBox"><div class="interactiveTitle">INTERACTIVE SESSION:</div><div class="interactive"><pre>
+cold:~$ <ins>perl -e '$ENV{FOOD} = "Vanilla"'</ins>
+cold:~$ <ins>env | sort</ins>
+</pre></div></div>
+   
+  <p>Notice that <b>FOOD</b> is still set to <b>chocolate</b> from our previous entry in the output (which 
+   we piped through <b>sort</b> to make it easier to search).
+   
+  That's how the environment works. When you use it in a Perl program, 
+   most of the time you'll be reading a variable that was set by a parent process. (Once in a while you'll 
+   set a variable that will be read by a child process—more on that later in the lesson).</p>
+   
+  <p>An environment variable of special note is <b>PATH</b>. This variable contains a  
+   ordered list of paths to search for programs that are not found in the 
+   current directory and are run without specifying an absolute or relative path. So, when you type <b>ls</b>, for 
+   example, at the command line, your shell looks through each of the directories named in <b>PATH</b> until 
+   it finds one that contains the executable file <b>ls</b>, at which point it runs that file. We can use Perl to 
+   tell us where it located that program! Run this one-liner:</p>
+   
+<div class="interactiveBox"><div class="interactiveTitle">INTERACTIVE SESSION:</div><div class="interactive"><pre>
+cold:~$ <ins>perl -le 'my $prog = shift or die; print $_, -x "$_/$prog" ? " &lt;-- HERE" : "" for split /:/, $ENV{PATH}' ls</ins>
+</pre></div></div>
+   
+  <p>Your output will look something like this:</p>
+   
+<div class="observeBox"><div class="observeTitle">OBSERVE:</div><div class="observe"><pre>
+/usr/kerberos/bin
+/usr/local/bin
+/bin &lt;-- HERE
+/usr/bin
+/usr/X11R6/bin
+/usr/local/java/bin
+/users/pscott/bin
+</pre></div></div>
+   
+  <p>Congratulations!  You've just invented a streamlined version of the system utility <b>whereis</b>.
+   Now try running that one-liner a few more times, each time replacing <b>ls</b> with one of the programs here:</p>
+   
+  <ul><li>jdb</li><li>php</li><li>perl</li><li>sclient</li></ul>
+   
+  <p>You could of course write that one-liner out as a program in a file, particularly if you wanted to 
+   call it again (although in its present form it could easily be assigned to a shell alias). If you find it 
+   more concise than you would like, I encourage you to rewrite it as a program. It is important that you 
+   understand all the code we create, whether it's in the form of a program or a one-liner. Sometimes you 
+   need to read a one-liner very carefully to understand it, but that's an important skill too, because
+   one-liners are a common use of Perl and it's vital that you are comfortable both with reading and writing 
+   them.</p>   
+  
+  <p>You can see that some programs exist in more than one directory—that's handy to know; maybe the 
+   programs are different. When you just type the name of the program at the command prompt, you'll only ever 
+   execute the <i>first</i> one in your path.</p>
+
+  <p><div class="c"><table class="noteBox fBox pBox "><tr><td class="noteTitle">Note</td><td class="note">The term "path" has several different meanings in the Unix world; this could cause confusion. 
+   The context helps you to figure out which meaning is intended. Sometimes path refers to 
+   the address of a file, such as <b>/etc/passwd</b>, <b>public_html/images/squirrel472.jpg</b>,
+   <b>../sibling/cousin.txt</b>, or <b>todo.list</b>. The first path example, <b>/etc/passwd</b>, is an <i>absolute</i> path, 
+   because it refers to the same file regardless of your current directory. The next 
+   two examples, <b>public_html/images/squirrel472.jpg</b> and
+   <b>../sibling/cousin.txt</b>, are 
+   <i>relative</i> paths, which are found by starting from the current directory. The last address in the 
+   list, <b>todo.list</b>, refers to a file in the current directory; it is the same as the relative path <b>./todo.list</b>. 
+   Generally, we refer to the last component (like <b>cousin.txt</b>) as a <i>filename</i>, but it is also a 
+   (degenerate) case of a "path."<br><br>
+   
+   We've introduced the environment variable PATH, or in Perl, <b>$ENV{PATH}</b>. In this context, path refers 
+   to an ordered set of directories to search whenever the name of a program is typed at the command line 
+   without a directory as part of the name. In this case, the bare file name refers 
+   to a file in the current directory only if the '<b>.</b>' (period) is present in PATH and the file does not occur in a directory named 
+   earlier in PATH.</td></tr></table></div></p>
+  
+ </div>
+ <a href="Perl3-03.html" name="systemcommand"></a>
+ <a name="h_02"></a><div class="heading">The system Command</div><div class="headingText">
+   
+  <p>Now let's see how we can run a separate program from a Perl program. Some programmers do this far too 
+   much. For instance, they run the Unix <b>date</b> program from Perl and parse the result to get the date, 
+   instead of doing it more efficiently from directly inside Perl with the <span class="darkgreen">localtime()</span> 
+   function. In general, whenever you think you need to run an external program to execute a task, 
+   consider whether there is a way to do it from Perl itself. There are modules available to perform 
+   just about any task conceivable. </p>
+   
+  <p>Our first examples of the <span class="darkgreen">system()</span> function can be done in pure Perl, but 
+   we'll set that aside for this lesson. Suppose that your program used a lot of time to create an 
+   entire directory tree of temporary files under <b>/tmp/myprog</b>, and you want to remove all of them.  
+   Rather than going through all of the subdirectories that might have been created (and rather than use the 
+   <b>File::Path module</b>, which provides the <span class="darkgreen">remove_tree()</span> function for this purpose), 
+   we'll call on the recursive flag of the system's <b>rm</b> command to do it for us. Check it out:</p>
+   
+<div class="observeBox"><div class="observeTitle">OBSERVE: system</div><div class="observe"><pre>
+system "rm -r /tmp/myprog";
+</pre></div></div>
+  
+  <p>You could use parentheses around the arguments, but most programmers don't.
+   When you run <span class="darkgreen">system()</span> (<i>command</i>), the information that <i>command</i> sends to standard 
+   output and standard error will appear on your terminal (unless you've already redirected those streams). 
+   Similarly, if the command gets data from standard input, the command retrieves that data from the same 
+   source that standard input is currently using.</p>
+   
+  <p>Let's try to use the <span class="darkgreen">system()</span> function in a
+    program. Create <b>edit.pl</b> in your <b>/perl3</b> folder as shown:</p>
+   
+<div class="listingBox"><div class="listingTitle">CODE TO TYPE:</div><div class="listing"><pre>#!/usr/bin/perl
+use strict;
+use warnings;
+
+my $temp_file = "$ENV{'HOME'}/.edit.pl.$$";
+unlink $temp_file; # In case I left one lying around
+
+my $date = localtime;
+{
+  open my $fh, '&gt;', $temp_file or die "open $temp_file: $!\n";
+  print {$fh} &lt;&lt;"END_OF_TEXT";
+This file was written on $date by $0.
+Here's your chance to customize it!
+END_OF_TEXT
+}
+
+print "Stand by to edit!\n";
+system "vi $temp_file";
+
+print "Contents of $temp_file are now:\n";
+{
+  open my $fh, '&lt;', $temp_file or die "open $temp_file: $!\n";
+  print while &lt;$fh&gt;;
+}
+unlink $temp_file;
+</pre></div></div>
+   
+  <p><img src="images/coderunner/checksyntax.JPG"> and run it. This program brings you to the <b>vi</b> 
+   editor so you can edit the temporary file that was created. Here are a few tips for accessing and editing in the <b>vi</b>
+   editor:</p>
+   
+   <ul><li>To get into insert mode, type <b>i</b>.</li><li>To get out of insert mode, press the <b>Esc</b> key.</li><li>To save and close the file, press <b>:</b> and then type <b>x</b>. </li></ul>
+   <p>You can use the <span class="darkgreen">system()</span> function in 
+   the same way to allow your users to edit and customize output files in the middle of a program, for example, to 
+   customize a report before it is emailed.</p> 
+   <p>Programmers usually set the environment 
+   variable <b>EDITOR</b> globally to contain the program name of their favorite editor on the system.</p>
+  <p>Okay. Let's go ahead and edit the file. Run the command below as shown:</p>
+   
+<div class="interactiveBox"><div class="interactiveTitle">INTERACTIVE SESSION:</div><div class="interactive"><pre>
+cold:~$ <ins>cd perl3</ins>
+cold:~/perl3$ <ins>export EDITOR=emacs</ins>
+</pre></div></div>
+ 
+  <p><div class="c"><table class="noteBox fBox pBox "><tr><td class="noteTitle">Note</td><td class="note">When you close and restart the terminal session, the variable will change back to its 
+   default.</td></tr></table></div></p>
+  
+  <p>Now change your program to recognize the EDITOR variable. Add the <ins>blue</ins> code and delete the <del>red</del> code 
+   as shown:</p>
+   
+<div class="listingBox"><div class="listingTitle">CODE TO TYPE:</div><div class="listing"><pre>
+#!/usr/bin/perl
+use strict;
+use warnings;
+
+my $temp_file = "$ENV{HOME}/.edit.pl.$$";
+unlink $temp_file; # In case I left one lying around
+
+my $date = localtime;
+{
+  open my $fh, '&gt;', $temp_file or die "open $temp_file: $!\n";
+  print {$fh} &lt;&lt;"END_OF_TEXT";
+This file was written on $date by $0.
+Here's your chance to customize it!
+END_OF_TEXT
+}
+
+print "Stand by to edit!\n";
+<del>system "vi $temp_file";</del>
+<ins>my $editor = $ENV{EDITOR} || 'vi';
+system "$editor $temp_file";</ins>
+
+print "Contents of $temp_file are now:\n";
+{
+  open my $fh, '&lt;', $temp_file or die "open $temp_file: $!\n";
+  print while &lt;$fh&gt;;
+}
+unlink $temp_file;  
+</pre></div></div>
+   
+  <p><img src="images/coderunner/checksyntax.JPG"> and run it. The file opens in emacs. Add some text,
+   and save the change by pressing <b>Ctrl+x</b> and then <b>Ctrl+s</b>. Exit emacs by pressing <b>Ctrl+x</b> 
+   and then <b>Ctrl+c</b>.</p> 
+   
+  <p>The <span class="darkgreen">system()</span> function has rules about whether it passes its argument to the
+   shell for interpretation. If there is only one argument and it contains shell metacharacters—characters
+   that the shell interprets in a particular way—then it will be run through a shell. A common use of this 
+   feature is to run a command and ignore its output. Create <b>grep.pl</b> in your <b>/perl3</b> folder as 
+   shown:</p>
+
+<div class="listingBox"><div class="listingTitle">CODE TO TYPE:</div><div class="listing"><pre>#!/usr/bin/perl
+use strict;
+use warnings;
+
+my $string = shift or die "Usage: $0 string [file]\n";
+my $file   = shift || $0;
+system "grep $string $file";
+print "$string ", $? == 0 ? "was" : "wasn't", " found in $file\n";
+</pre></div></div>
+   
+  <p><img src="images/coderunner/checksyntax.JPG"> and run it as shown (changing to your <b>/perl3</b> 
+   folder if necessary):</p>
+   
+<div class="interactiveBox"><div class="interactiveTitle">INTERACTIVE SESSION:</div><div class="interactive"><pre>
+cold:~/perl3$ <ins>./grep.pl</ins>
+Usage: ./grep.pl string [file]
+cold:~/perl3$ <ins>./grep.pl perl</ins>
+#!/usr/bin/perl
+perl was found in ./perl3/grep.pl
+cold:~/perl3$ <ins>./grep.pl qqq</ins>
+qqq wasn't found in ./grep.pl
+</pre></div></div>
+   
+  <p>Our program uses another feature of Perl to find out the <i>exit status</i> of the <b>grep</b> 
+   program: the special variable <b>$?</b>, which contains the exit status of the last program to be run 
+   via <span class="darkgreen">system()</span>. By convention, programs exit with a code of zero to indicate success. 
+   <b>grep</b> exits with a non-zero code when it doesn't find the search expression in the text it's 
+   searching. (In this program, the default file being searched is the program itself.) We're being a little bit lazy here 
+   in using <b>grep</b> to tell us whether a certain string (or regular expression) is contained in a file, 
+   rather than writing the equivalent Perl code for that purpose. It's also less than elegant; 
+   <b>grep</b> prints out the lines that match, and they get 
+   in the way. You can provide <b>grep</b> with an option that allows it to suppress those lines, but let's pretend we don't know 
+   about it for now. Instead, we'll redirect that output to <b>/dev/null</b> so we don't see it. Modify your code as shown:</p>
+  
+<div class="listingBox"><div class="listingTitle">CODE TO TYPE:</div><div class="listing"><pre>
+#!/usr/bin/perl
+use strict;
+use warnings;
+
+my $string = shift or die "Usage: $0 string [file]\n";
+my $file   = shift || $0;
+system "grep $string $file <ins>&gt;/dev/null 2&gt;&amp;1</ins>";
+print "$string ", $? == 0 ? "was" : "wasn't", " found in $file\n";
+   </pre></div></div>
+   
+  <p><img src="images/coderunner/checksyntax.JPG"> and run it again with the same inputs:</p>
+    
+<div class="interactiveBox"><div class="interactiveTitle">INTERACTIVE SESSION:</div><div class="interactive"><pre>
+cold:~/perl3$ <ins>./grep.pl perl</ins>
+perl was found in ./grep.pl
+cold:~/perl3$ <ins>./grep.pl qqq</ins>
+qqq wasn't found in ./grep.pl
+</pre></div></div>
+    
+  <p>Here we redirect both standard output and standard error to <b>/dev/null</b>. This is standard Bourne
+   shell syntax. Because the metacharacters <b>&amp;</b> and <b>&gt;</b> 
+   are in the string passed to <span class="darkgreen">system()</span>, Perl passes the command through the 
+   shell so those characters get interpreted according to your instructions.</p>
+  
+ </div>
+ <a href="Perl3-03.html" name="exec"></a>
+ <a name="h_03"></a><div class="heading">exec</div><div class="headingText">
+   
+  <p>The <span class="darkgreen">exec()</span> function is closely related to <span class="darkgreen">system()</span>. The two functions operate
+   identically except that <span class="darkgreen">exec()</span> causes the current process to be <i>replaced</i> by the one being invoked. 
+   Think of <span class="darkgreen">exec()</span> <span class="red">@args</span> as a shorthand for this: </p>
+   
+<div class="observeBox"><div class="observeTitle">OBSERVE:</div><div class="observe"><pre>
+system @args;
+exit;
+</pre></div></div>
+   
+  <p>...except <span class="darkgreen">exec</span> <span class="red">@args</span> 
+   is more efficient with memory. We can use <span class="darkgreen">exec</span> <span class="red">@args</span> to run the <b>perldoc</b> program to 
+   format and output help text embedded in <i>our own program</i>, for when the user wants help. Let's give that a try. Create
+   a new file and call it <b>help.pl</b>, then type in the code below:</p>
+   
+<div class="listingBox"><div class="listingTitle">CODE TO TYPE:</div><div class="listing"><pre>#!/usr/bin/perl
+use strict;
+use warnings;
+
+if ( @ARGV &amp;&amp; shift eq '-h' )
+{
+  exec "perldoc -t $0";
+}
+
+print "I guess you don't need any help...\n";
+
+__END__
+
+=head1 NAME
+
+help.pl - Demonstration of perldoc
+
+=head1 SYNOPSIS
+
+./help.pl
+
+=head1 DESCRIPTION
+
+This program runs C&lt;exec&gt; to invoke perldoc on I&lt;ourselves&gt;.
+
+=cut
+</pre></div></div>
+   
+  <p><img src="images/coderunner/checksyntax.JPG"> and run it as shown:</p>
+ 
+<div class="interactiveBox"><div class="interactiveTitle">INTERACTIVE SESSION:</div><div class="interactive"><pre>
+cold:~/perl3$ <ins>./help.pl</ins>
+I guess you don't need any help...
+cold:~/perl3$ <ins>./help.pl -h</ins>
+NAME
+    help.pl - Demonstration of perldoc
+
+SYNOPSIS
+    ./help.pl
+
+DESCRIPTION
+    This program runs "exec" to invoke perldoc on *ourselves*.
+/tmp/LAWyNHwdun (END)
+</pre></div></div>
+   
+  <p>Press <b>Q</b> to end the program and return to the command prompt. <b>perldoc</b> reads the 
+   documentation that is embedded in the program after the <b>__END__</b> line (which prevents parsing by 
+   <i>Perl</i>). It is in a format called <b>POD</b> (Plain Old Documentation, a highly technical term), which <b>perldoc</b> 
+   understands. An in-depth discussion of POD syntax is outside the scope of this course (you can read about it in 
+   <a href="http://perldoc.perl.org/perlpod.html" target="_blank">http://perldoc.perl.org/perlpod.html</a>), but I'm using POD here anyway, because it's a pretty cool use of 
+   <span class="darkgreen">exec()</span>.</p>
+  
+ </div>
+ <a href="Perl3-03.html" name="backticks"></a>
+ <a name="h_04"></a><div class="heading">Backticks</div><div class="headingText">
+  
+  <p><span class="darkgreen">system()</span> and <span class="darkgreen">exec()</span> have worked well for us so far, but suppose
+   we want to get at the <i>output</i> of a program. We need something that will capture whatever that 
+   program sends to standard output and put it in a scalar or array. Perl's <b>backticks</b> are one 
+   way we can do that. Take a look:</p>
+   
+<div class="observeBox"><div class="observeTitle">OBSERVE:</div><div class="observe"><pre>
+$output = `program`;  # Scalar context
+@output = `program`;  # List context
+</pre></div></div>
+   
+  <p>In scalar context, the entire output to standard output is returned in a single string. In list context, 
+   the entire output is returned as a list of strings, one for each line. Let's do an example that uses 
+   backticks. Create <b>ps.pl</b> as shown:</p>
+   
+<div class="listingBox"><div class="listingTitle">CODE TO TYPE:</div><div class="listing"><pre>#!/usr/bin/perl
+use strict;
+use warnings;
+
+my %pid_count;
+for ( `ps -elf` )
+{
+  my $ppid = (split)[4];
+  next if $ppid eq 'PPID';  # Header line
+  $pid_count{$ppid}++;
+}
+
+print "Most popular parent process:\n";
+for ( sort { $pid_count{$b} &lt;=&gt; $pid_count{$a} } keys %pid_count )
+{
+  print "\t$_ ($pid_count{$_} instances)\n";
+  last;
+}
+</pre></div></div>
+   
+  <p><img src="images/coderunner/checksyntax.JPG"> and run it as shown here:</p>
+   
+<div class="interactiveBox"><div class="interactiveTitle">INTERACTIVE SESSION:</div><div class="interactive"><pre>
+cold:~/perl3$ <ins>./ps.pl</ins>
+Most popular parent process:
+        2 (42 instances)
+</pre></div></div>
+   
+  <p>Our code reports on the most popular parent process id listed in the output from the <b>ps</b> program (to see 
+   what that process id looks like, run <b>ps -elf</b> at the command line). It finds that entry 
+   by sorting the whole list in descending order and then exiting the loop after printing the first entry.
+   (We used a list slice on the return from <span class="darkgreen">split</span> to extract only the fifth 
+   element of each line.) </p>
+  
+ </div>
+ <a href="Perl3-03.html" name="pipedopens"></a>
+ <a name="h_05"></a><div class="heading">Piped Opens</div><div class="headingText">
+   
+  <p>You can use the <span class="darkgreen">open</span> function to open a pipe to or from a program, and read 
+   from or write to that pipe from Perl. Let's start with an example that reads the lines that are output by the 
+   program <b>last</b>, a standard Unix program that reports the time of a user's last login. It generates output 
+   that looks like this:</p>
+   
+<div class="observeBox"><div class="observeTitle">OBSERVE:</div><div class="observe"><pre>
+peter    pts/0        192.168.1.3      Mon Sep 16 20:17   still logged in   
+peter    pts/1        pepe             Mon Sep  6 14:41 - 14:54  (00:12)    
+peter    pts/0        192.168.1.3      Mon Sep  6 12:44 - 14:56  (02:12)    
+steve    pts/1        pepe             Mon Sep  6 09:13 - 09:38  (00:24)    
+peter    pts/0        192.168.1.3      Mon Sep  6 06:47 - 09:27  (02:40)    
+steve    pts/0        192.168.1.3      Mon Sep  6 05:57 - 06:41  (00:44)    
+reboot   system boot  2.6.27.24-170.2. Tue May  4 08:05         (42+10:05)  
+[... more similar lines...]
+</pre></div></div>
+   
+  <p>The first word on each line is the username, eventually followed by the date. Now suppose we want a 
+   program that prints the first line listed by <b>last</b> for each distinct username; in other words, shows 
+   us the last time each user known to the <b>last</b> program logged on. Create <span class="darkred">last.pl</span> 
+   as shown:</p>
+   
+<div class="listingBox"><div class="listingTitle">CODE TO TYPE:</div><div class="listing"><pre>#!/usr/bin/perl
+use strict;
+use warnings;
+
+open my $fh, '-|', "last" or die "Can't open pipe: $!\n";
+my %seen;
+while ( &lt;$fh&gt; )
+{
+  next unless /\A(\S+).*\s((?:[A-Z][a-z]{2} ){2}[ \d]\d \d\d:\d\d)/;
+  print "$1 - $2\n" unless $seen{$1}++;
+}
+</pre></div></div>
+   
+  <p><img src="images/coderunner/checksyntax.JPG"> and run it. The output will look something like 
+   this:</p>
+   
+<div class="observeBox"><div class="observeTitle">OBSERVE:</div><div class="observe"><pre>
+peter - Mon Sep  6 20:17
+tim - Sat Sep  4 18:11
+cam - Mon Aug 16 15:48
+svn - Wed Jul  7 19:27
+steve - Thu May 20 14:36
+reboot - Tue May  4 08:05
+</pre></div></div>
+   
+  <p>The form of the <i>piped open</i> for input from a program is:</p>
+
+<div class="observeBox"><div class="observeTitle">OBSERVE:</div><div class="observe"><pre>
+open <span class="purple">filehandle</span>, <span class="darkblue">'-|'</span>, <span class="darkred">program</span>
+</pre></div></div>
+   
+  <p>Take a look at the mode <span class="darkblue">'-|'</span> here where we have previously had <span class="darkgreen">open</span> 
+   modes of &lt;, or &gt;, or &gt;&gt;.  Using the <b>-|</b> mode, <span class="darkred">program</span> will be run and its 
+   standard output will be connected to <span class="purple">filehandle</span>. </p>
+   
+  <p>Using the <b>-|</b> mode you can
+   start reading output as soon as it becomes 
+   available. With backticks, you have to wait for the program to finish running before you can get <i>any</i> of the 
+   output.</p>
+   
+  <p>The regular expression here is worth studying too. We can't just <span class="darkgreen">split</span> 
+   the line on white space, because sometimes the second column contains a space ("system boot"). We could
+   unpack the fixed-width columns, but instead we craft a regular expression to
+   match the date and time.  See if you can figure out how it works!</p>
+   
+  <p>You can also open a pipe <i>to</i> a program, so that whatever you write on that filehandle goes to the
+    standard input of the program. The form for that looks  like this:</p>
+   
+<div class="observeBox"><div class="observeTitle">OBSERVE:</div><div class="observe"><pre>
+open <i>filehandle</i>, '|-', <i>program</i>
+</pre></div></div>
+   
+  <p>Let's try an example! Create <span class="darkred">od.pl</span> as shown:</p>
+   
+<div class="listingBox"><div class="listingTitle">CODE TO TYPE:</div><div class="listing"><pre>#!/usr/bin/perl
+use strict;
+use warnings;
+
+open my $fh, '|-', 'od -c' or die "open: $!\n";
+print {$fh} "Hello world! \e \a \b \r \n";
+close $fh;
+</pre></div></div>
+   
+  <p><img src="images/coderunner/checksyntax.JPG"> and run it as shown here:</p>
+   
+<div class="interactiveBox"><div class="interactiveTitle">INTERACTIVE SESSION:</div><div class="interactive"><pre>
+cold:~/perl3$ <ins>./od.pl</ins>
+0000000   H   e   l   l   o       w   o   r   l   d   !     033      \a
+0000020      \b      \r      \n
+0000026
+</pre></div></div>
+   
+  <p>This is a basic example of a piped open for output. We sent a fixed string to the <b>od</b>
+   program, which is designed to display data that may contain unprintable characters in a form that shows 
+   their octal code or other representation. Here, the printable characters have been rendered 
+   explicitly; the <b>od</b> program knows symbolic forms for all of the digraphs I used except for the <b>\e</b> 
+   for the ESCAPE character.</p>
+   
+  <p><div class="c"><table class="noteBox fBox pBox "><tr><td class="noteTitle">Note</td><td class="note"> You cannot open a pipe to a program for <i>both</i> reading and writing. (In other words, there 
+   is no <b>-|-</b> mode.)</td></tr></table></div></p>
+  
+  <p>The special variable <span class="red">$?</span> is also set to the exit status of a program that is run
+   via backticks or a piped open.</p>
+  
+  <p>Phew! That was a pretty long lesson, but worth the trip. Now that you have a handle on ways to access the process environment 
+   and by run external programs, you're ready to take on regular expressions! We'll do that in the next lesson! See you in there...</p>
+ </div>
+ 
+   <p>Don't forget to go back to the syllabus to complete the homework.</p>
+   
+<div class="footer"><div id="timeSurvey"></div>				
+				Copyright © 1998-2014 O'Reilly Media, Inc.<br><img src="https://courses.oreillyschool.com/common/cclicense.png"><br>
+				This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 Unported License.<br>
+				See <a href="http://creativecommons.org/licenses/by-sa/3.0/legalcode">http://creativecommons.org/licenses/by-sa/3.0/legalcode</a> 
+				for more information.
+				</div><iframe id="t" width="1" height="1" border="0" style="display:none"></iframe><script language="javascript">bodyLoaded();</script><script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+  ga('create', 'UA-44720547-1', 'oreillyschool.com');
+  ga('send', 'pageview');
+</script></body></html>

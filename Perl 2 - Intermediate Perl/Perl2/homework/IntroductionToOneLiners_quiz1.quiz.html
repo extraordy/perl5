@@ -1,0 +1,63 @@
+<html>
+   <!-- Copyright (c) 1998-2014 O'Reilly Media, Inc. Unauthorized use is strictly
+                prohibited. None of this code or content can by copied without the express written
+                permission from O'Reilly Media, Inc. -->
+   <head>
+      <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+      <link rel="stylesheet" type="text/css" href="http://archive.oreilly.com/oreillyschool/courses/Perl2/common/Lab.css">
+      <title>Introduction to One-Liners - Quiz 1</title>
+   </head>
+   <body id="body">
+      <h2>Introduction to One-Liners - Quiz 1</h2> 
+      
+      
+      
+      
+      <p><b>perl -le 'print 42'</b> works; <b>perl -el 'print 42'</b> does not. Why?</p>
+      
+        
+      
+      
+      <p>Perl sees 'l' as the argument to the -e flag in the second case and executes that code. Due to the absence of the string and
+         warnings pragma, no error is emitted, and the code does nothing.
+      </p>
+      
+      
+      <p><b>Grading Criteria:</b> Student should demonstrate knowledge of properly using arguments for running perl on the command line.</p>
+      
+      
+      
+      
+      
+      
+      <p><b>perl -le 'print 'Hello, Sailor!?''</b> does not work. Why? Which of the following Perl operators would let you get 
+         the intended effect:
+      </p>
+      
+      
+      <ul>
+         <li>qq</li>
+         <li>qw</li>
+         <li>qx</li>
+         <li>q</li>
+         <li>qr</li>
+      </ul>
+      
+      
+      <p>(Hint: <b>perldoc perlop</b>)</p>
+      
+      
+      
+      
+      <p>The single quotes cause the shell to change what it interprets vs. what it passes to Perl. The q{} operator has the same effect
+         as single quoting.
+      </p>
+      
+      
+      <p><b>Grading Criteria:</b> Student should demonstrate knowledge of when to use the appropriate quote-like operator.</p>
+      
+      
+      
+      
+   </body>
+</html>

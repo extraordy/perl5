@@ -1,0 +1,801 @@
+<html><!-- Copyright (c) 1998-2014 O'Reilly Media, Inc.
+			This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 Unported License.
+			See http://creativecommons.org/licenses/by-sa/3.0/legalcode for more information.
+            --><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"><link rel="stylesheet" type="text/css" href="../common/Lab.css"><script type="text/javascript" src="../common/Lab.js"></script><script language="javascript"></script><title>require and use</title></head><body id="body"><a name="top"></a><div class="title">require and use</div><div class="resize"><a href="Perl4-02.html#top" onclick="changeSize('smaller');" class="aS" title="Keep clicking to make fonts smaller">A</a><a href="Perl4-02.html#top" onclick="changeSize('larger');" class="aL" title="Keep clikcing to make fonts larger">A</a><a href="Perl4-02.html#top" onclick="lv()" class="lv" title="Adjust Page for High Contrast">HC</a><div id="fh"><p>Click on <span class="aS">A</span> to make all fonts on the page smaller.</p><p>Click on <span class="aL">A</span> to make all fonts on the page larger.</p><p>Click on <span class="lv">HC</span> to toggle high contrast mode. When you move your mouse over 
+                 some bold words in high contrast mode, related words are automatically highlighted. Text is shown
+                 in black and white. 
+             </p></div></div><hr>
+ 
+ <div class="goalTitle">Lesson Objectives</div><div class="goals">
+  
+  
+  When you complete this lesson, you will be able to:
+  <ul><li>use <a href="Perl4-02.html#filetestoperators">File Test Operators</a>.</li><li>use <a href="Perl4-02.html#statfunction">the stat Function</a>.</li></ul>
+ </div><hr>
+ 
+ <p><div class="c">"A computer shall not waste your time or require you to do more work than is strictly necessary."<br>
+  -Jef Raskin</div></p>
+ 
+ 
+ <p>Welcome back! In this lesson we're going to learn how to split a Perl program across multiple files. 
+  Why would you want to do that? Mostly because you've written some code that can be <i>reused</i>, and rather 
+  than copying and pasting it into every script, it usually makes more sense to maintain it in 
+  only one place and then reference that place from those other scripts. (An important—perhaps the most 
+  important—principle in good software development is known as <b>DRY</b>: <b>D</b>on't <b>R</b>epeat <b>Y</b>ourself. 
+  The more duplication you eliminate from your code, the better and more maintainable it becomes.)</p>
+ 
+ <p><div class="c"><img src="images/lessonImages/photoshop-textures-cracked-earth-2p.jpg" width="400">
+ <br>Think DRY!</div></p>
+ 
+ 
+ <p>At the beginning of each of the remaining lessons, we'll provide a linked list of the headings that the lesson contains, so you can 
+  refer back to the major topics for review if you need to later. This lesson covers these topics:</p>
+ 
+ <ul><li><a href="Perl4-02.html#require">require</a></li><li><a href="Perl4-02.html#use">use</a></li></ul>
+ 
+ <a href="Perl4-02.html" name="require"></a>
+ <a name="h_01"></a><div class="heading">require</div><div class="headingText">
+  <a name="s_01"></a><div id="s_01"><div class="subheading"></div><div class="subheadingText">
+   
+   <p>The basic operation we'll use to accomplish our goal of splitting Perl programs across multiple files is
+    <span class="purple">require</span>. (<span class="purple">require</span> calls a 
+    lower-level function called <span class="purple">do</span>. You can look it up with <b>perldoc -f do</b>, if you feel the need.) </p>
+    <p> The <span class="purple">require</span> statement comes 
+    in several forms
+   
+   Let's say for this application that you're creating a calendar of events. (Ordinarily the calendar would 
+    be stored in its own file, but for our purposes now, we'll just store the sample data after the source code.) 
+    You have (wisely) decided to store the 
+    date and time of each event as the <i>Unix time</i>, or the number of seconds past the <i>epoch</i> of 
+    January 1, 1970, 00:00:00. This is a single number that can be passed around to several functions that accept 
+    it, such as localtime, which will give us the opportunity to format the date for human consumption. (Go ahead and take a 
+    look at <b>perldoc -f localtime</b> to refresh your memory.)</p>
+ 
+   <p>Create <b>require.pl</b> in your <b>/perl4</b> folder as shown:</p>
+   
+
+<div class="listingBox"><div class="listingTitle">CODE TO ENTER:</div><div class="listing"><pre>#!/usr/local/bin/perl
+use strict;
+use warnings;
+
+while ( &lt;DATA&gt; )
+{
+  chomp;
+  my ($epoch, $event) = split /\s+/, $_, 2;
+  my (undef, $min, $hour, $mday, $mon, $year) = localtime $epoch;
+  my $i = 0;
+  my %month_name = map { ++$i, $_ }
+                       qw(Jan Feb Mar Apr May Jun Jul Aug Sep Oct Nov Dec);
+  printf "%02d-%s-%d %02d:%02d %s\n", $mday, $month_name{$mon},
+         $year, $hour, $min, $event;
+}
+
+__END__
+1310070000 Birthday party
+1324825260 Open Xmas presents
+1309822200 Barbecue potluck
+1302714600 Return library book
+</pre></div></div>
+   
+   <p><img src="images/coderunner/checksyntax.png"> and run it. You'll see:</p>
+   
+<div class="interactiveBox"><div class="interactiveTitle">INTERACTIVE CONSOLE SESSION:</div><div class="interactive"><pre>cold:~$ <ins>cd perl4</ins>
+cold:~/perl4$ <ins>./require.pl</ins>
+07-Jun-111 13:20 Birthday party
+25-Nov-111 07:01 Open Xmas presents
+04-Jun-111 16:30 Barbecue potluck
+13-Mar-111 10:10 Return library book
+</pre></div></div>
+   
+   <p>Oops. Our result reflects a couple of common mistakes made with localtime: the number of the 
+    month returned starts at 0 for January instead of 1, and the year has 1900 subtracted from it. Let's fix 
+    those problems now. Edit <b>require.pl</b> as shown:</p>
+   
+
+<div class="listingBox"><div class="listingTitle">CODE TO EDIT:</div><div class="listing"><pre>#!/usr/local/bin/perl
+use strict;
+use warnings;
+
+while ( &lt;DATA&gt; )
+{
+  chomp;
+  my ($epoch, $event) = split /\s+/, $_, 2;
+  my (undef, $min, $hour, $mday, $mon, $year) = localtime $epoch;
+<ins>  $mon++;
+  $year += 1900;</ins>
+  my $i = 0;
+  my %month_name = map { ++$i, $_ }
+                       qw(Jan Feb Mar Apr May Jun Jul Aug Sep Oct Nov Dec);
+  printf "%02d-%s-%d %02d:%02d %s\n", $mday, $month_name{$mon},
+         $year, $hour, $min, $event;
+}
+
+__END__
+1310070000 Birthday party
+1324825260 Open Xmas presents
+1309822200 Barbecue potluck
+1302714600 Return library book
+</pre></div></div>
+   
+   <p><img src="images/coderunner/checksyntax.png"> and run it again and you should see the correct output:</p>
+   
+<div class="interactiveBox"><div class="interactiveTitle">INTERACTIVE TERMINAL SESSION:</div><div class="interactive"><pre>cold:~/perl4$ <ins>./require.pl</ins>
+07-Jul-2011 13:20 Birthday party
+25-Dec-2011 07:01 Open Xmas presents
+04-Jul-2011 16:30 Barbecue potluck
+13-Apr-2011 10:10 Return library book
+</pre></div></div>
+   
+   <p>That took longer than we would have liked, yet the program is somewhat restrictive; it allows only 
+    one format for the date, and if, when we expand this program later, we have any call to display the date 
+    again, we'll have a lot of copying and pasting to do. Remember <b>DRY</b>! So let's encapsulate our hard-won 
+    knowledge in a subroutine. Edit <b>require.pl</b> as shown::</p>
+   
+
+<div class="listingBox"><div class="listingTitle">CODE TO EDIT:</div><div class="listing"><pre>#!/usr/local/bin/perl
+use strict;
+use warnings;
+
+while ( &lt;DATA&gt; )
+{
+  chomp;
+  my ($epoch, $event) = split /\s+/, $_, 2;
+<ins>  print date_string( $epoch, '%d-%b-%y' ), " $event\n";
+}
+
+sub date_string
+{
+  my ($epoch, $format) = @_;
+
+  $format or warn "Using default format\n" and $format = "%d-%b-%y";
+  my @names = qw(S M H d m y w Y I);
+  my %part  = map { shift @names, $_ } localtime $epoch;</ins>
+  <del>my (undef, $min, $hour, $mday, $mon, $year) = localtime $epoch;
+  $mon++;
+  $year += 1900;</del>
+  my $i = 0;
+  my %month_name = map { ++$i, $_ }
+                       qw(Jan Feb Mar Apr May Jun Jul Aug Sep Oct Nov Dec);
+  <del>printf "%02d-%s-%d %02d:%02d %s\n", $mday, $month_name{$mon},
+         $year, $hour, $min, $event;</del>
+<ins>  $part{m}++;
+  $part{b} = $month_name{ $part{m} };
+  $part{y} += 1900;
+  $_ = sprintf "%02d", $_ for @part{ qw(S M H d m) };
+  $format =~ s/%([SMHdmywb])/$part{$1}/g;
+  return $format;
+</ins>}
+
+__END__
+1310070000 Birthday party
+1324825260 Open Xmas presents
+1309822200 Barbecue potluck
+1302714600 Return library book
+   </pre></div></div>
+   
+   <p><img src="images/coderunner/checksyntax.png"> and run it again, and you should see:</p>
+   
+<div class="interactiveBox"><div class="interactiveTitle">INTERACTIVE TERMINAL SESSION:</div><div class="interactive"><pre>cold:~/perl4$ <ins>./require.pl</ins>
+07-Jul-2011 Birthday party
+25-Dec-2011 Open Xmas presents
+04-Jul-2011 Barbecue potluck
+13-Apr-2011 Return library book
+</pre></div></div>
+   
+   <p>Here's how we did it:</p>
+   
+<div class="observeBox"><div class="observeTitle">OBSERVE: require.pl and the date_string subroutine</div><div class="observe"><pre>
+  print date_string( $epoch, '<span class="purple">%d-%b-%y</span>' ), " $event\n"; 
+
+sub date_string
+{
+  my ($epoch, <span class="purple">$format</span>) = @_;
+
+  $format or warn "Using default format\n" and $format = "<span class="purple">%d-%b-%y</span>";
+  my @names = qw(<span class="darkblue">S</span> M H d m y w Y I);
+  my %part  = map { shift @names, $_ } <span class="darkgreen">localtime</span> $epoch;
+  my $i = 0;
+  my %month_name = map { ++$i, $_ }
+                       qw(Jan Feb Mar Apr May Jun Jul Aug Sep Oct Nov Dec);
+  $part{m}++;
+  <span class="darkred">$part{b}</span> = $month_name{ $part{m} };
+  $part{y} += 1900;
+  $_ = sprintf "%02d", $_ for @part{ qw(<span class="darkblue">S</span> M H d m) };
+  <span class="purple">$format</span> =~ s/%([SMHdmywb])/$part{$1}/g;
+  return <span class="purple">$format</span>;
+} 
+</pre></div></div>
+   
+   <p>Small changes to the program yield the date and time in many different possible combinations by 
+    changing the specification string currently set to <span class="purple">'%d-%b-%y'</span>. That argument is parsed by 
+    the <b>date_string</b> subroutine and used to determine how to format the date/time. Can you see how we built up a 
+    hash with keys equal to each of the possible letters in the format string and values equal to the 
+    corresponding value from <span class="darkgreen">localtime</span>? So $part{<span class="darkblue">S</span>}, for example, gets  
+    set to the seconds value. And <span class="darkred">$part{b}</span> gets set to the abbreviated month name, so that 
+    <span class="purple">%b</span> in the format string would get changed to, say, "Mar," by the substitution 
+    near the end of <b>date_string</b>.</p>
+   
+   <p>(Our choice of format letters and the % character to introduce them is not entirely accidental. Look
+    at the manual page for the <i>Unix system function</i> strftime by typing <b>man strftime</b> at your 
+    shell prompt. Perl provides a way for you to call this function yourself through its <span class="blue">POSIX</span>
+    module; type <b>perldoc POSIX</b> and search for 'strftime' in the output. You would, of course, be far 
+    better off using that function than trying to extend our example here for production code.)</p>
+   
+   <p>But now, suppose we have other programs that want to do the same work as <b>date_string</b>. It might seem most efficient 
+    to copy and paste the code, but with Perl, we want to practice <i>intelligent</i> lazinesss—it's a virtue by Perl's 
+    standards (see <a href="http://threevirtues.com/" target="_blank">http://threevirtues.com/</a>). Cutting and pasting here 
+    would mean that if we ever wanted to change the <b>date_string</b> function, we'd have to do it in all the places we'd pasted 
+    it, one by one. So, in order to maximize laziness and deal with the same change only once, let's put it into a file of its own. 
+    Create <b>date_lib.pl</b>:</p>
+   
+
+<div class="listingBox"><div class="listingTitle">CODE TO ENTER:</div><div class="listing"><pre>sub date_string
+{
+  my ($epoch, $format) = @_;
+
+  $format or warn "Using default format\n" and $format = "%d-%b-%y";
+  my @names = qw(S M H d m y w Y I);
+  my %part  = map { shift @names, $_ } localtime $epoch;
+  my $i = 0;
+  my %month_name = map { ++$i, $_ }
+                       qw(Jan Feb Mar Apr May Jun Jul Aug Sep Oct Nov Dec);
+
+  $part{m}++;
+  $part{b} = $month_name{ $part{m} };
+  $part{y} += 1900;
+  $_ = sprintf "%02d", $_ for @part{ qw(S M H d m) };
+  $format =~ s/%([SMHdmywb])/$part{$1}/g;
+  return $format;
+}
+</pre></div></div>
+   
+   <p>Now change <span class="darkred">require.pl</span> to load that file as shown:</p>
+   
+
+<div class="listingBox"><div class="listingTitle">CODE TO EDIT:</div><div class="listing"><pre>#!/usr/local/bin/perl
+use strict;
+use warnings;
+
+<ins>require 'date_lib.pl';</ins>
+
+while ( &lt;DATA&gt; )
+{
+  chomp;
+  my ($epoch, $event) = split /\s+/, $_, 2;
+  print date_string( $epoch, '%d-%b-%y' ), " $event\n";
+}
+<del>
+sub date_string
+{
+  my ($epoch, $format) = @_;
+
+  $format or warn "Using default format\n" and $format = "%d-%b-%y";
+  my @names = qw(S M H d m y w Y I);
+  my %part  = map { shift @names, $_ } localtime $epoch;
+  my $i = 0;
+  my %month_name = map { ++$i, $_ }
+                       qw(Jan Feb Mar Apr May Jun Jul Aug Sep Oct Nov Dec);
+
+  $part{m}++;
+  $part{b} = $month_name{ $part{m} };
+  $part{y} += 1900;
+  $_ = sprintf "%02d", $_ for @part{ qw(S M H d m) };
+  $format =~ s/%([SMHdmywb])/$part{$1}/g;
+  return $format;
+}
+</del>
+__END__
+1310070000 Birthday party
+1324825260 Open Xmas presents
+1309822200 Barbecue potluck
+1302714600 Return library book
+</pre></div></div>
+   
+   <p><img src="images/coderunner/save.gif"> Save both files and run <b>require.pl</b>. You'll see this:</p>
+   
+   <div class="interactiveBox"><div class="interactiveTitle">INTERACTIVE TERMINAL SESSION:</div><div class="interactive"><pre>cold:~/perl4$ <ins>./require.pl</ins>
+date_lib.pl did not return a true value at ./require4.pl line 5.
+</pre></div></div>
+   
+   <p>Oops. The <span class="darkgreen">require</span> function requires (no pun intended) that the file it's told to
+    fetch (and compile) end with a true expression, and ours doesn't—it only contains a subroutine
+    definition. This requirement is a way of catching require-d files that have problems. Fix 
+    <b>date_lib.pl</b> by editing it as shown here:</p>
+   
+
+<div class="listingBox"><div class="listingTitle">CODE TO EDIT:</div><div class="listing"><pre>sub date_string
+{
+  my ($epoch, $format) = @_;
+
+  $format or warn "Using default format\n" and $format = "%d-%b-%y";
+  my @names = qw(S M H d m y w Y I);
+  my %part  = map { shift @names, $_ } localtime $epoch;
+  my $i = 0;
+  my %month_name = map { ++$i, $_ }
+                       qw(Jan Feb Mar Apr May Jun Jul Aug Sep Oct Nov Dec);
+
+  $part{m}++;
+  $part{b} = $month_name{ $part{m} };
+  $part{y} += 1900;
+  $_ = sprintf "%02d", $_ for @part{ qw(S M H d m) };
+  $format =~ s/%([SMHdmywb])/$part{$1}/g;
+  return $format;
+}<ins>
+1;</ins>  
+</pre></div></div>
+   
+   <p>Any true value would do, but the universal tradition is to use <span class="orange">1</span>. Save that library and 
+    run the program, and you'll see the same output you got the last time it ran successfully.</p>
+  
+  </div></div>
+  <a name="s_02"></a><div id="s_02"><div class="subheading">Code Reuse</div><div class="subheadingText">
+   
+   <p>Now let's see how we can reuse the code in <b>date_lib.pl</b>. Create <b>another.pl</b> by typing the code below as shown:</p>
+     
+
+<div class="listingBox"><div class="listingTitle">CODE TO TYPE:</div><div class="listing"><pre>#!/usr/local/bin/perl
+use strict;
+use warnings;
+
+require 'date_lib.pl';
+
+my $to_subtract = shift || 10_000;
+print "$to_subtract seconds ago, the time was ",
+      date_string( time - $to_subtract, '%H:%M:%S' ), "\n";
+</pre></div></div>
+     
+   <p><img src="images/coderunner/checksyntax.png"> and run that program, with or without an argument. You'll 
+       get a result similar to this:</p>
+     
+   <div class="interactiveBox"><div class="interactiveTitle">INTERACTIVE TERMINAL SESSION:</div><div class="interactive"><pre>cold:~/perl4$ <ins>./another.pl 3600</ins>
+3600 seconds ago, the time was 19:52:10
+</pre></div></div>
+     
+   <p>There's nothing special about the filename extension <b>.pl</b> that we used for the require-d file. It 
+    could just as easily have been something else or no extension at all. There is a loose convention of using 
+    <b>.pl</b> to mean "Perl Library," and if you know where to look in the Perl distribution, you'll find some 
+    files ending in <b>.pl</b> that are included with it, but feel free to ignore the convention if you want, 
+    especially if you want to use <b>.pl</b> as an extension on your programs and to draw a distinction between 
+    programs and require-d files. It's only necessary that the filename in the <b>require</b> statement match
+    the name of the file itself.</p>
+ 
+  </div></div>
+  <a name="s_03"></a><div id="s_03"><div class="subheading">@INC</div><div class="subheadingText">
+   
+   <p>Let's keep going! Modify <span class="darkred">require.pl</span> as shown:</p>
+     
+
+<div class="listingBox"><div class="listingTitle">CODE TO EDIT:</div><div class="listing"><pre>#!/usr/local/bin/perl
+use strict;
+use warnings;
+
+require '<ins>../tmp/</ins>date_lib.pl';
+
+while ( &lt;DATA&gt; )
+{
+  chomp;
+  my ($epoch, $event) = split /\s+/, $_, 2;
+  print date_string( $epoch, '%d-%b-%y' ), " $event\n";
+}
+
+__END__
+1310070000 Birthday party
+1324825260 Open Xmas presents
+1309822200 Barbecue potluck
+1302714600 Return library book
+</pre></div></div>
+     
+   <p>And move <b>date_lib.pl</b> to <b>/tmp</b> (you may need to create the tmp folder first):</p>
+     
+<div class="interactiveBox"><div class="interactiveTitle">INTERACTIVE TERMINAL SESSION: command to run</div><div class="interactive"><pre>cold:~/perl4$ <ins>mv date_lib.pl ../tmp</ins>
+</pre></div></div>
+     
+   <p><img src="images/coderunner/checksyntax.png"> and run require.pl again; it should work correctly. 
+    So now you've seen how you can have a full path as part of the <b>require</b> argument and that it will be used. 
+    Go ahead and modify <b>require.pl</b> again:</p>
+     
+
+<div class="listingBox"><div class="listingTitle">CODE TO EDIT:</div><div class="listing"><pre>#!/usr/local/bin/perl
+use strict;
+use warnings;
+
+require '<del>../tmp/</del>date_lib.pl';
+
+while ( &lt;DATA&gt; )
+{
+  chomp;
+  my ($epoch, $event) = split /\s+/, $_, 2;
+  print date_string( $epoch, '%d-%b-%y' ), " $event\n";
+}
+
+__END__
+1310070000 Birthday party
+1324825260 Open Xmas presents
+1309822200 Barbecue potluck
+1302714600 Return library book
+</pre></div></div>
+     
+   <p>But <i>don't</i> move <b>date_lib.pl</b> yet! Save and run that program, and you'll see something like this:</p>
+     
+   <div class="interactiveBox"><div class="interactiveTitle">INTERACTIVE TERMINAL SESSION:</div><div class="interactive"><pre>cold:~/perl4$ <ins>./require.pl</ins>
+Can't locate date_lib.pl in @INC (@INC contains: /usr/local/encap/perl-5.10.1/lib/5.10.1/i686-linux 
+/usr/local/encap/perl-5.10.1/lib/5.10.1 /usr/local/encap/perl-5.10.1/lib/site_perl/5.10.1/i686-linux /usr/local/encap/perl-5.10.1/lib/site_perl/5.10.1 .) at ./require.pl line 5.
+</pre></div></div>
+     
+   <p>So what's going on here?  Perl is looking through a list of directories specified by a special array 
+    <b>@INC</b> that is initialized to a list of directories belonging to the system's Perl installation, 
+    plus the current directory (see the <b>.</b> at the end of the list for the current directory?). If it had 
+    found <b>date_lib.pl</b> in any one of them, it would have used it—but it didn't. But we can change 
+    <b>@INC</b>! Let's do that now. Modify your code as shown:</p>
+   
+
+<div class="listingBox"><div class="listingTitle">CODE TO EDIT:</div><div class="listing"><pre>#!/usr/local/bin/perl
+use strict;
+use warnings;
+
+<ins>push @INC, "../tmp";</ins>
+require 'date_lib.pl';
+
+while ( &lt;DATA&gt; )
+{
+  chomp;
+  my ($epoch, $event) = split /\s+/, $_, 2;
+  print date_string( $epoch, '%d-%b-%y' ), " $event\n";
+}
+
+__END__
+1310070000 Birthday party
+1324825260 Open Xmas presents
+1309822200 Barbecue potluck
+1302714600 Return library book</pre></div></div> 
+  
+   <p><img src="images/coderunner/checksyntax.png"> and run it and you'll get the usual correct output, even 
+    though <b>date_lib.pl</b> is still not in the current directory. This is because <b>@INC</b> now contains the 
+    <b>/tmp</b> directory in addition to the other directories.</p>
+  
+   <p><b>@INC</b> is a <b>search path</b> for require-d files. It allows Perl to get at files that are
+    part of the Perl installation (either ones that came with Perl or were downloaded and installed later)
+    from any program, regardless of that program's location.  When you don't specify an actual path in a
+    <b>require</b> argument, Perl looks through the directories in <b>@INC</b>, in order, until it finds one 
+    containing the file specified by that argument.</p>
+   
+   <p>Make sure to move <span class="darkred">date_lib.pl</span> back so you don't lose it:</p>
+   
+   <div class="interactiveBox"><div class="interactiveTitle">INTERACTIVE TERMINAL SESSION:</div><div class="interactive"><pre>cold:~/perl4$ <ins>mv ../tmp/date_lib.pl .</ins></pre></div></div>
+  
+   <p>And if you run <b>require.pl</b> again you'll find that it still works. That's because <b>require.pl</b> now finds
+    <b>date_lib.pl</b> in the current directory, <b>.</b>, because that directory remains in the <b>@INC</b> 
+    search path.</p>
+  
+  </div></div>
+  
+  <p><b>require</b> has many uses in Perl programs, but there is a slightly more complicated command 
+   that's <i>based upon</i> <span class="darkgreen">require</span> that you'll use more often. We'll learn about 
+   that next!</p>
+  
+ </div>
+ <a href="Perl4-02.html" name="use"></a>
+ <a name="h_02"></a><div class="heading">use</div><div class="headingText">
+   
+   <p>We've been using the <b>use</b> statement since our very first lesson; you put <span class="purple">use strict</span> 
+    and <span class="purple">use warnings</span> in every Perl program, but so far I've only explained the results of 
+    those statements, not the part of the Perl language they are exercising.</p>
+   
+   <p>Let's go over that now.</p>
+   
+   <p><b>use</b> is like <b>require</b>, only it gets executed at <i>compilation</i> time. (It also calls a 
+    special <b>import</b> subroutine that we'll look at in detail in a later lesson.)</p>
+   
+  <a name="s_01"></a><div id="s_01"><div class="subheading">Compilation Time and BEGIN Blocks</div><div class="subheadingText">
+   
+   <p>We met BEGIN blocks once before, in <b>Intermediate Perl,</b> as a way of executing code to be run in a 
+    one-liner with the <b>-n</b> or <b>-p</b> flags before the implicit loop. This happens because
+    BEGIN blocks are run when Perl compiles the code. This will make more sense after you try this next example. 
+    Create <span class="darkred">begintest.pl</span> by typing the code below as shown:</p>
+
+   
+<div class="listingBox"><div class="listingTitle">CODE TO EDIT:</div><div class="listing"><pre>#!/usr/local/bin/perl
+use strict;
+use warnings;
+
+print "You requested a testimonial for John Smith, who can always be found\n";
+print "hard at work in his cubicle.  He works independently, without\n";
+print "wasting company time on frivolous activities.  John never\n";
+print "thinks twice about assisting his colleagues, and always\n";
+print "finishes his assignments on time.  Often he takes lengthy\n";
+print "measures to complete his tasks, sometimes skipping coffee\n";
+print "breaks. John is a dedicated person who has absolutely no\n";
+print "vanity in spite of his high accomplishments and profound\n";
+print "knowledge in his field.  I strongly believe that John can be\n";
+print "categorized as a high-caliber employee, the type that cannot be\n";
+print "dispensed with.  Consequently, I recommend that John be\n";
+print "promoted to executive management, and a proposal will be\n";
+print "executed as soon as possible.\n";
+</pre></div></div>
+    
+   <p><img src="images/coderunner/checksyntax.png"> and run it; you'll see the predictable output. Now, edit 
+    it as follows:</p>
+   
+   
+<div class="listingBox"><div class="listingTitle">CODE TO EDIT:</div><div class="listing"><pre>#!/usr/local/bin/perl
+use strict;
+use warnings;
+
+<ins>BEGIN{ </ins>print "You requested a testimonial for John Smith, who can always be found\n";<ins> }</ins>
+print "hard at work in his cubicle.  He works independently, without\n";
+<ins>BEGIN{ </ins>print "wasting company time on frivolous activities.  John never\n";<ins> }</ins>
+print "thinks twice about assisting his colleagues, and always\n";
+<ins>BEGIN{ </ins>print "finishes his assignments on time.  Often he takes lengthy\n";<ins> }</ins>
+print "measures to complete his tasks, sometimes skipping coffee\n";
+<ins>BEGIN{ </ins>print "breaks. John is a dedicated person who has absolutely no\n";<ins> }</ins>
+print "vanity in spite of his high accomplishments and profound\n";
+<ins>BEGIN{ </ins>print "knowledge in his field.  I strongly believe that John can be\n";<ins> }</ins>
+print "categorized as a high-caliber employee, the type that cannot be\n";
+<ins>BEGIN{ </ins>print "dispensed with.  Consequently, I recommend that John be\n";<ins> }</ins>
+print "promoted to executive management, and a proposal will be\n";
+<ins>BEGIN{ </ins>print "executed as soon as possible.\n";<ins> }</ins></pre></div></div>
+    
+   <p><img src="images/coderunner/checksyntax.png"> and run <i>that</i> program, and see what it says 
+    about John Smith!</p>
+   
+   <p>When Perl runs your program, first it reads all of the code and <i>compiles</i> it to an internal, 
+    efficient code. Unlike in languages like C and Java, Perl doesn't 
+    output that code for you to save into an executable. (It's not really possible either, for a variety 
+    of esoteric reasons; but Perl generates that code so incredibly fast that it doesn't matter.) Then Perl 
+    executes that internal code.</p>
+   
+   <p>This is why Perl allows <i>forward references</i> (calls to subroutines that haven't been defined yet). 
+    Perl doesn't try to execute those calls until it's read the whole program, by which time, of course, it's 
+    seen and compiled the subroutines being called. Putting code in a BEGIN block tells Perl to run it as soon 
+    as it's been compiled, even before any more code has been read. Take a look at what happens if you introduce a syntax 
+    error. Modify your code as shown: </p>
+   
+   
+   <div class="listingBox"><div class="listingTitle">CODE TO EDIT:</div><div class="listing"><pre>#!/usr/local/bin/perl
+use strict;
+use warnings;
+
+BEGIN{ print "You requested a testimonial for John Smith, who can always be found\n"; }
+print "hard at work in his cubicle.  He works independently, without\n";
+BEGIN{ print "wasting company time on frivolous activities.  John never\n"; }
+print "thinks twice about assisting his colleagues, and always\n";
+<ins>
+-.+.-
+</ins>
+BEGIN{ print "finishes his assignments on time.  Often he takes lengthy\n"; }
+print "measures to complete his tasks, sometimes skipping coffee\n";
+BEGIN{ print "breaks. John is a dedicated person who has absolutely no\n"; }
+print "vanity in spite of his high accomplishments and profound\n";
+BEGIN{ print "knowledge in his field.  I strongly believe that John can be\n"; }
+print "categorized as a high-caliber employee, the type that cannot be\n";
+BEGIN{ print "dispensed with.  Consequently, I recommend that John be\n"; }
+print "promoted to executive management, and a proposal will be\n";
+BEGIN{ print "executed as soon as possible.\n"; }</pre></div></div>
+   
+   <p><img src="images/coderunner/save.gif"> and run that program, and you'll see the syntax error message, 
+    but look what comes out before that:</p>
+   
+   <div class="interactiveBox"><div class="interactiveTitle">INTERACTIVE TERMINAL SESSION:</div><div class="interactive"><pre>cold:~/perl4$ <ins>./begintest.pl</ins>
+You requested a testimonial for John Smith, who can always be found
+wasting company time on frivolous activities.  John never
+syntax error at ./begintest.pl line 10, near "-."
+BEGIN not safe after errors--compilation aborted at ./begintest.pl line 14.
+</pre></div></div>
+   
+   <p>Because <b>require</b> is executed at <i>run-time</i>, code contained in the require-d file will not 
+    be compiled until then. So that's a problem for forward references! Let's see this in action. Create 
+    <b>forward.pl</b> as shown:</p>
+   
+   
+<div class="listingBox"><div class="listingTitle">CODE TO ENTER:</div><div class="listing"><pre>#!/usr/local/bin/perl
+use strict;
+use warnings;
+
+require 'date_lib.pl';
+my $today = date_string time, '%d-%b-%y';
+print "$today\n";
+</pre></div></div>
+   
+   <p><img src="images/coderunner/save.gif"> and run that program and you won't get very far:</p>
+   
+   <div class="interactiveBox"><div class="interactiveTitle">INTERACTIVE TERMINAL SESSION:</div><div class="interactive"><pre>cold:~/perl4$ <ins>./forward.pl</ins>
+syntax error at ./forward.pl line 6, near "date_string time"
+Execution of ./forward.pl aborted due to compilation errors.
+</pre></div></div>
+   
+   <p><table class="noteBox fBox pBox "><tr><td class="noteTitle">Note</td><td class="note">We called <span class="blue">date_string</span> <i>without parentheses</i>. As a matter of 
+    convention, I recommend you always put parentheses around arguments to your own subroutines, but you can 
+    leave them out—<i>under certain circumstances</i>.</td></tr></table></p> 
+   
+   <p>Now edit <b>forward.pl</b> as shown:</p>
+   
+   
+<div class="listingBox"><div class="listingTitle">CODE TO EDIT:</div><div class="listing"><pre>#!/usr/local/bin/perl
+use strict;
+use warnings;
+
+<ins>BEGIN { </ins>require 'date_lib.pl'; <ins>}</ins>
+my $today = date_string time, '%d-%b-%y';
+print "$today\n";</pre></div></div>
+   
+   <p><img src="images/coderunner/save.gif"> and run it. You'll see today's date printed. Perl can compile a 
+     call that is not within parentheses, to a user-defined subroutine <i>if</i> it has already seen the subroutine definition 
+    by that point. When you run the <i>first</i> version of <b>forward.pl</b>, this is the sequence of events that takes place:</p>
+   
+   <ol><li>Perl compiles the <b>require</b> statement.</li><li>Perl compiles the call to <b>date_string</b>.</li><li>Perl throws a syntax error because it hasn't seen the definition of <b>date_string</b> and therefore 
+     cannot tell how many arguments it might take.</li></ol>
+   
+   <p>Here, in contrast, is the sequence of events that occur when you run the <i>second</i> version of <b>forward.pl</b>:</p>
+   
+   <ol><li>Perl compiles the <b>require</b> statement.</li><li>Because Perl is in a BEGIN block, it executes what it has just compiled.</li><li>Perl reads in <b>date_lib.pl</b> and compiles the code there.</li><li>At this point Perl would execute the code it read from <b>date_lib.pl</b>; however, there is nothing to 
+     execute; it's all subroutine definition.</li><li>Perl compiles the call to <b>date_string</b>. Since it has seen the definition of <b>date_string</b>, 
+     it knows how to compile it. </li><li>Perl compiles the rest of the program and executes it.</li></ol>
+  
+  </div></div>
+  <a name="s_02"></a><div id="s_02"><div class="subheading">Barewords and the .pm Extension</div><div class="subheadingText">
+   
+   <p>Now let's make a small change to <span class="darkred">forward.pl</span>. Modify your code as shown: </p>
+   
+   
+<div class="listingBox"><div class="listingTitle">CODE TO EDIT:</div><div class="listing"><pre>#!/usr/local/bin/perl
+use strict;
+use warnings;
+
+BEGIN { require <del>'date_lib.pl'</del> <ins>DateLib</ins>; }
+my $today = date_string time, '%d-%b-%y';
+print "$today\n";
+</pre></div></div>
+   
+   <p>Save and run that program, and you will see output that starts like this:</p>
+   
+   <div class="interactiveBox"><div class="interactiveTitle">INTERACTIVE TERMINAL SESSION:</div><div class="interactive"><pre>cold:~/perl4$ <ins>./forward.pl</ins>
+Can't locate DateLib.pm in @INC (@INC contains: ...
+</pre></div></div>
+      
+   <p>You'll notice two things: (1) We are feeding a <i>bareword</i> (that's official Perl terminology) to 
+    <b>require</b> instead of a string; (2) Perl does something special with it, looking for a file whose name 
+    ends in <b>.pm</b>.</p>
+   
+   <p>This is a special property of <b>require</b>: when its argument is a bareword, it looks for a file 
+    with the same name as the bareword, but with <b>.pm</b> on the end. This is the only 
+    time that filename extensions are truly important to Perl.</p>
+   
+   <p>The <b>pm</b> stands for "Perl Module," and <i>modules</i> are what it's all about in this course! We'll get 
+    into the specific definition of a module later. </p>
+   
+   <p>For now, let's give Perl what it's looking for by copying <b>date_lib.pl</b> to <b>DateLib.pm</b>: </p>
+   
+   <div class="interactiveBox"><div class="interactiveTitle">INTERACTIVE TERMINAL SESSION:</div><div class="interactive"><pre>cold:~/perl4$ <ins>cp date_lib.pl DateLib.pm</ins></pre></div></div>
+   
+   <p>Now run <b>forward.pl</b> again and see that it works the same way it did before.</p>
+   
+  </div></div>
+  <a name="s_03"></a><div id="s_03"><div class="subheading">use</div><div class="subheadingText">
+    
+   <p>Okay, now modify <b>forward.pl</b> again:</p>
+    
+   
+<div class="listingBox"><div class="listingTitle">CODE TO EDIT:</div><div class="listing"><pre>#!/usr/local/bin/perl
+use strict;
+use warnings;
+
+<ins>use </ins><del>BEGIN { require</del> DateLib; <del>}</del>
+my $today = date_string time, '%d-%b-%y';
+print "$today\n";</pre></div></div>
+    
+   <p><img src="images/coderunner/save.gif"> and run that program; lo and behold, it works just like it did 
+    before. We have demonstrated that <b>use</b> is the same as <b>require</b>, with these exceptions:</p>
+    
+   <ul><li><b>use</b> <i>only</i> accepts barewords.</li><li><b>use</b> happens at <i>compile</i> time.</li><li><b>use</b> calls an <b>import</b> subroutine <i>if one is defined in the package of the same name as the 
+     bareword</i>.</li></ul>
+   
+   <p>We can demonstrate that last point by modifying <b>DateLib.pm</b> as shown:</p>
+    
+
+<div class="listingBox"><div class="listingTitle">CODE TO EDIT:</div><div class="listing"><pre><ins>sub DateLib::import
+{
+  print "Hello from import!\n";
+}
+</ins>
+sub date_string
+{
+  my ($epoch, $format) = @_;
+
+  $format or warn "Using default format\n" and $format = "%d-%b-%y";
+  my @names = qw(S M H d m y w Y I);
+  my %part  = map { shift @names, $_ } localtime $epoch;
+  my $i = 0;
+  my %month_name = map { ++$i, $_ }
+                       qw(Jan Feb Mar Apr May Jun Jul Aug Sep Oct Nov Dec);
+
+  $part{m}++;
+  $part{b} = $month_name{ $part{m} };
+  $part{y} += 1900;
+  $_ = sprintf "%02d", $_ for @part{ qw(S M H d m) };
+  $format =~ s/%([SMHdmywb])/$part{$1}/g;
+  return $format;
+}
+
+1;
+</pre></div></div>
+ 
+   
+       
+   <p><img src="images/coderunner/save.gif"> Save that file and run <b>forward.pl</b>, and you'll see 
+     output that starts like this: </p>
+    
+   <div class="interactiveBox"><div class="interactiveTitle">INTERACTIVE TERMINAL SESSION:</div><div class="interactive"><pre>cold:~/perl4$ <ins>./forward.pl</ins>
+Hello from import!
+</pre></div></div>
+    
+   <p>That may seem like an odd feature, but we will learn later why it's there.</p>
+   
+  </div></div>
+  <a name="s_04"></a><div id="s_04"><div class="subheading">Packages and Paths</div><div class="subheadingText">
+    
+   <p>Modify <b>forward.pl</b> once more:</p>
+   
+   
+<div class="listingBox"><div class="listingTitle">CODE TO EDIT:</div><div class="listing"><pre>#!/usr/local/bin/perl
+use strict;
+use warnings;
+
+use <ins>MyCode::</ins>DateLib;
+
+my $today = date_string time, '%d-%b-%y';
+print "$today\n";
+</pre></div></div>
+    
+   <p><img src="images/coderunner/save.gif"> Save and run that program, and—not surprisingly—you'll 
+    get an error. It starts like this:</p>
+
+   <div class="interactiveBox"><div class="interactiveTitle">INTERACTIVE TERMINAL SESSION:</div><div class="interactive"><pre>cold:~/perl4$ <ins>./forward.pl</ins>
+Can't locate MyCode/DateLib.pm in @INC...
+</pre></div></div>
+    
+   <p>Perl interprets the <b>::</b> inside a <b>use</b> argument as a <i>directory separator</i>. You can 
+    satisfy Perl's requirement though: </p>
+    
+<div class="interactiveBox"><div class="interactiveTitle">INTERACTIVE TERMINAL SESSION:</div><div class="interactive"><pre>cold:~/perl4$ <ins>mkdir MyCode</ins>
+cold:~/perl4$ <ins>mv DateLib.pm MyCode</ins>
+</pre></div></div>
+    
+   <p>Now run <b>forward.pl</b> and you'll see that:</p>
+    
+   <ol><li>it works! It has located <b>DateLib.pm</b> in the MyCode directory.</li><li>it does <i>not</i> print "Hello from import!"</li></ol>
+   
+   <p>This is because the <b>import</b> subroutine is now defined in the wrong package: it's still 
+    defined as <b>DateLib::import</b>, but the argument to <b>use</b> causes Perl to look for 
+    <b>MyCode::DateLib::import</b>.</p>
+    
+   <p>You can have as many sets of <b>::</b> as you want inside of a <b>use</b> argument, and they will get 
+    turned into directory separators (slashes on our system and most others) for the purpose of locating the 
+    <b>.pm</b> file inside <b>@INC</b>. Remember, the current directory (<b>.</b>) is in <b>@INC</b>.</p>
+   
+  </div></div>
+  
+  <p><table class="noteBox fBox pBox "><tr><td class="noteTitle">Note</td><td class="note"> The scope of <b>use strict</b> and <b>use warnings</b> is <i>lexical</i> and so it does not 
+   extend to files included via <b>require</b> and <b>use</b>. So <i>each</i> file should contain those 
+   pragmas. Before you go on, go back and edit <b>date_lib.pl</b> and <b>DateLib.pm</b> and insert those lines 
+   at the beginning and make doing that a habit.</td></tr></table></p>
+   
+  <p>Good work! You've learned a <i>lot</i> in this lesson about how to move code to other files and find it again. We'll 
+   be putting it to good use in the next lesson! See you soon...</p>
+   
+ </div>
+ 
+   <p>Once you finish the lesson, go back to the syllabus to complete the homework.</p>
+
+<div class="footer"><div id="timeSurvey"></div>				
+				Copyright © 1998-2014 O'Reilly Media, Inc.<br><img src="https://courses.oreillyschool.com/common/cclicense.png"><br>
+				This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 Unported License.<br>
+				See <a href="http://creativecommons.org/licenses/by-sa/3.0/legalcode">http://creativecommons.org/licenses/by-sa/3.0/legalcode</a> 
+				for more information.
+				</div><iframe id="t" width="1" height="1" border="0" style="display:none"></iframe><script language="javascript">bodyLoaded();</script><script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+  ga('create', 'UA-44720547-1', 'oreillyschool.com');
+  ga('send', 'pageview');
+</script></body></html>

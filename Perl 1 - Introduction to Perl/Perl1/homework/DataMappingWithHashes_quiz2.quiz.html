@@ -1,0 +1,67 @@
+<html>
+   <!-- Copyright (c) 1998-2014 O'Reilly Media, Inc. Unauthorized use is strictly
+                prohibited. None of this code or content can by copied without the express written
+                permission from O'Reilly Media, Inc. -->
+   <head>
+      <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+      <link rel="stylesheet" type="text/css" href="http://archive.oreilly.com/oreillyschool/courses/Perl1/common/Lab.css">
+      <title>Data Mapping with Hashes - Quiz 2</title>
+   </head>
+   <body id="body">
+      <h2>Data Mapping with Hashes - Quiz 2</h2> 
+      
+      
+      
+      
+      <p>How many times did the code in the lesson report that the word "love" appeared in the Beatles' song?</p>
+      
+      
+      <p>Count them by hand. Did you get the same number?</p>
+      
+      
+      <p>What function would you use to make sure that you counted every occurrence of "love" regardless of case?</p>
+      
+        
+      
+      
+      <p>Code found 18; hand count is 24 due to case and commas ('Love,' nq 'love').</p>
+      
+      
+      <p>lc or uc can be used to alter the case of the string. substr can be used to trim a string down to just 4 characters 
+         (getting rid of the ',' in 'Love,'. Remember, we have not covered regex yet.
+      </p>
+      
+      
+      <p>Alternate answer: This code doesn't exclude commas when splitting strings, so "love," isn't included in the matches, so 18
+         
+         unless you count 'Love' as well or include commas, then 20 or 24 is OK.
+      </p>
+      
+      
+      <p>To make sure to count every occurrence of "love" regardless of case, you'd use lc() or uc().</p>
+      
+      
+      <p>Some students ask about how to get rid of the punctuation and get an accurate count. While there are very brief and concise
+         
+         ways to do this at an advanced level, there is one procedure that you can present using the functions already introduced:
+      </p> 
+      
+      
+      <div class="observeBox">
+         <div class="observeTitle">Observe:</div>
+         <div class="observe"><pre>my $text = '....';
+my (@words) = split /\W+/, lc $text;
+my %count;
+for my $word ( @words ) {
+$count{$word}++ ;
+}</pre></div>
+      </div>
+      
+      
+      <p><b>Grading Criteria:</b> Student should demonstrate understating of existing string manipulation functions.</p>
+      
+      
+      
+      
+   </body>
+</html>

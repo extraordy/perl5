@@ -1,0 +1,664 @@
+<html><!-- Copyright (c) 1998-2014 O'Reilly Media, Inc.
+			This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 Unported License.
+			See http://creativecommons.org/licenses/by-sa/3.0/legalcode for more information.
+            --><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"><link rel="stylesheet" type="text/css" href="../common/Lab.css"><script type="text/javascript" src="../common/Lab.js"></script><script language="javascript"></script><title>Regular Expressions: More Match and Substitution Modifiers</title></head><body id="body"><a name="top"></a><div class="title">Regular Expressions: More Match and Substitution Modifiers</div><div class="resize"><a href="Perl3-06.html#top" onclick="changeSize('smaller');" class="aS" title="Keep clicking to make fonts smaller">A</a><a href="Perl3-06.html#top" onclick="changeSize('larger');" class="aL" title="Keep clikcing to make fonts larger">A</a><a href="Perl3-06.html#top" onclick="lv()" class="lv" title="Adjust Page for High Contrast">HC</a><div id="fh"><p>Click on <span class="aS">A</span> to make all fonts on the page smaller.</p><p>Click on <span class="aL">A</span> to make all fonts on the page larger.</p><p>Click on <span class="lv">HC</span> to toggle high contrast mode. When you move your mouse over 
+                 some bold words in high contrast mode, related words are automatically highlighted. Text is shown
+                 in black and white. 
+             </p></div></div><hr>
+ <div class="goalTitle">Lesson Objectives</div><div class="goals"> 
+  When you complete this lesson, you will be able to:
+  <ul><li>use <a href="Perl3-06.html#m_modifier">the /m Modifier</a>.</li><li>use <a href="Perl3-06.html#s_modifier">the /s Modifier</a>.</li><li>use <a href="Perl3-06.html#x_modifier">the /x Modifier</a>.</li><li>use <a href="Perl3-06.html#e_modifier">the /e Modifier</a>.</li></ul>
+ </div><hr>
+
+ <p>Welcome back! In this lesson, we'll cover a few more modifiers that you can place 
+  on the match (<span class="blue">m//</span>) and substitution (<span class="blue">s///</span>) operators.</p>
+
+ <p>Let's dive right in!</p>
+ <a href="Perl3-06.html" name="m_modifier"></a>
+ <a name="h_01"></a><div class="heading">The /m Modifier</div><div class="headingText">
+   
+  <p>I'd like to introduce two new anchors to you: <b>^</b> and <b>$</b>. The <b>/m</b> modifier allows you 
+   to use those anchors to represent the beginning and end of a line, respectively. Let's try 
+   a quick example. Go to your editor and in your <b>/perl3</b> folder, 
+   create 
+   <b>multimatch.pl</b> as shown:</p>
+   
+<div class="listingBox"><div class="listingTitle">CODE TO TYPE:</div><div class="listing"><pre>#!/usr/bin/perl
+use strict;
+use warnings;
+
+$_ = join '', &lt;DATA&gt;;
+
+print "Words not followed by punctuation at the end of the line:\n";
+print "\t$_\n" for /(\w+)$/mg;
+
+print "Second words of lines started by the word 'Now':\n";
+print "\t$_\n" for /^Now\s+(\w+)/mg;
+
+print "Words followed by a period at the end of the line:\n";
+print "\t$_\n" for /(\w+)\.$/mg;
+
+__END__
+Now is the winter of our discontent
+Made glorious summer by this sun of York;
+And all the clouds that lour'd upon our house
+In the deep bosom of the ocean buried.
+Now are our brows bound with victorious wreaths;
+Our bruised arms hung up for monuments;
+Our stern alarums changed to merry meetings,
+Our dreadful marches to delightful measures.
+</pre></div></div>
+   
+  <p><img src="images/coderunner/checksyntax.JPG"> and run it as shown:</p>
+  
+<div class="interactiveBox"><div class="interactiveTitle">INTERACTIVE SESSION:</div><div class="interactive"><pre>code:~$ <ins>cd perl3</ins>
+cold:~/perl3$ <ins>./multimatch.pl</ins>
+Words not followed by punctuation at the end of the line:
+        discontent
+        house
+Second words of lines started by the word 'Now':
+        is
+        are
+Words followed by a period at the end of the line:
+        buried
+        measures
+</pre></div></div>
+   
+  <p>Let's look at these anchors in detail to see how they work. First, we'll make a small 
+   modification to the <b>multimatch.pl</b> program, and remove the <b>/m</b> modifier: </p>
+  
+<div class="listingBox"><div class="listingTitle">CODE TO TYPE:</div><div class="listing"><pre>#!/usr/bin/perl
+use strict;
+use warnings;
+
+$_ = join '', &lt;DATA&gt;;
+
+print "Words not followed by punctuation at the end of the line:\n";
+print "\t$_\n" for /(\w+)$/<del>m</del>g;
+
+print "Second words of lines started by the word 'Now':\n";
+print "\t$_\n" for /^Now\s+(\w+)/<del>m</del>g;
+
+print "Words followed by a period at the end of the line:\n";
+print "\t$_\n" for /(\w+)\.$/<del>m</del>g;
+
+__END__
+Now is the winter of our discontent
+Made glorious summer by this sun of York;
+And all the clouds that lour'd upon our house
+In the deep bosom of the ocean buried.
+Now are our brows bound with victorious wreaths;
+Our bruised arms hung up for monuments;
+Our stern alarums changed to merry meetings,
+Our dreadful marches to delightful measures.
+</pre></div></div> 
+   
+  <p><img src="images/coderunner/checksyntax.JPG"> and run it as shown:</p>
+  
+<div class="interactiveBox"><div class="interactiveTitle">INTERACTIVE SESSION:</div><div class="interactive"><pre>cold:~/perl3$ <ins>./multimatch.pl</ins>
+Words not followed by punctuation at the end of the line:
+Second words of lines started by the word 'Now':
+        is
+Words followed by a period at the end of the line:
+        measures
+</pre></div></div>
+   
+  <p>So that's how <b>^</b> and <b>$</b> behave <i>without</i> the <b>/m</b> modifier (I showed you right 
+   away because I <i>knew</i> that would be one of your first questions!): they match at the beginning and end 
+   of the <i>string</i>, not each line. To help remember what <b>/m</b> does, think of it as standing for "multiline" mode.</p>
+   
+  <p>I can guess what you're thinking: "Now hold on a minute, Perl already has anchors for the beginning and end of the
+   string: <b>\A</b> and <b>\z</b>, respectively. I know that Perl's motto is, 'There's more than one way to do 
+   it,' but isn't this going too far?"</p>
+   
+  <p>Well, you're partly right. There's a lot of subtle information we're about to cover here, just go with it. 
+   If you 
+   read much Perl code written by others, you'll run into frequent use of the <b>^</b> and <b>$</b> 
+   anchors to indicate the beginning and end of strings. When Larry Wall designed Perl, he wanted to create a 
+   regex language that felt familiar
+   to programmers. The <b>\A</b> and <b>\z</b> anchors didn't exist yet, so he used the <b>^</b> and <b>$</b> anchors, 
+   which were already established in existing regular expression tools.</p>
+   
+  <p>But <b>^</b> and <b>$</b> are not the best choices for this syntax. The <b>^</b> symbol already has an 
+   inordinate number of meanings in a regular expression; and the <b>$</b> symbol looks like it belongs at the 
+   beginning of a scalar. Also, the <b>$</b> anchor doesn't <i>quite</i> mean "match at end of string." 
+   In fact, it means, "match at end of string <i>or</i> before an end-of-line that is followed by end of 
+   string."  Try this one-liner and you'll see the difference: </p>
+   
+<div class="interactiveBox"><div class="interactiveTitle">INTERACTIVE SESSION:</div><div class="interactive"><pre>cold:~/perl3$ <ins>perl -le '$_="kumquat\n"; print "\$ matches" if /t$/; print "\\z does not match" unless /t\z/'</ins>
+$ matches
+\z does not match
+</pre></div></div>
+   
+  <p><b>$</b> is equivalent to the regex subexpression <b>(?:\n\z|\z)</b>. And just for 
+   symmetry, the <b>\Z</b> anchor was introduced to mean the same thing.  Extend your previous one-liner 
+   as shown:</p>
+   
+<div class="interactiveBox"><div class="interactiveTitle">INTERACTIVE SESSION:</div><div class="interactive"><pre>cold:~/perl3$ perl -le '$_="kumquat\n"; print "\$ matches" if /t$/; print "\\z does not match" unless /t\z/<ins>; print "But \\Z *does* match" if /t\Z/</ins>'
+$ matches
+\z does not match
+But \Z *does* match</pre></div></div>
+   
+  <p>At first glance, it may seem confusing to have an anchor that matches either end of string or before a 
+   newline followed by end of string. But in fact, it's actually really useful. Most 
+   programmers forget that the anchor may match before a newline, because they will often read a line into a 
+   scalar and not <span class="darkgreen">chomp()</span> it, so the newline on the end isn't important to them.
+   Having <b>$</b> match before that newline means <span class="darkgreen">chomp()</span> is optional.</p>
+   
+  <p>We are left with these best practices:</p>
+   
+  <ol><li>For matching beginning and end of string, use <b>\A</b> and <b>\z</b> respectively.</li><li>For matching the end of string <i>or</i> before a newline followed by end of string, use <b>\Z</b>.</li><li>Much code that you encounter will use <b>^</b> and <b>$</b> instead of <b>\A</b> and 
+    <b>\Z</b> respectively; that's okay. </li><li>If you want to match the beginning of a <i>line,</i> use the <b>^</b> anchor with the <b>/m</b> 
+    modifier.</li><li>If you want to match the end of a <i>line,</i> use the <b>$</b> anchor with the <b>/m</b> modifier.</li></ol>
+      
+  <p>Go ahead and read over the <b>multimatch.pl</b> example we started and make sure you can follow it. 
+   Note in particular how we used the <b>/g</b> flag to get a list of everything matching 
+   in the capturing parentheses. </p>
+   
+  <p>Now let's try a Perl one-liner. Type the command below as shown:</p>
+   
+<div class="interactiveBox"><div class="interactiveTitle">INTERACTIVE SESSION:</div><div class="interactive"><pre>cold:~/perl3$ <ins>perl -0ne 'print "$_\n" for /^(\w+)$/mg' *</ins>
+<i>(output will vary ...)</i>
+cold:~/perl3$ <ins>cd ..</ins>
+cold:~/perl3$ 
+</pre></div></div>
+   
+  <p>That will print out all the lines in all the files in the current directory that consist <i>solely</i>
+   of word characters. You'll see the line <b>__END__</b> from <b>multimatch.pl</b>. 
+   How does it work?</p>
+   
+  <p>The <b>-0</b> command-line flag to Perl (that's a zero, not a letter "Oh," by the way) works similarly to the 
+   <b>join '',...</b> in <b>multimatch.pl</b> to read the whole data section into a single string. 
+   It tells Perl that its <i>input record separator</i> is no longer <b>\n</b>, but instead the 
+   <i>null character</i> (the character with ASCII value 0). That character doesn't occur at all in any of the 
+   files in the current directory, so 
+   the <b>-n</b> flag results in each entire file being read in to <b>$_</b> in a single string.</p> 
+  
+  <p>When we print a match, we need to enter <b>\n</b> explicitly, because we didn't use the 
+   <b>-l</b> flag to add a newline to <span class="darkgreen">print()</span> statements. Why not? Because <b>-l</b> 
+   actually adds the <i>input record separator</i> to the end of <span class="darkgreen">print()</span> statements. 
+   Ordinarily that would be a newline, but not this time.</p>
+   
+  <p>The <b>-0</b> flag can do even more than I've shown here; see <a href="http://perldoc.perl.org/perlrun.html" target="_blank">perldoc perlrun</a> for details.</p>
+   
+    
+  <p><div class="c"><table class="noteBox fBox pBox "><tr><td class="noteTitle">Note</td><td class="note"> You may have gathered by now that Perl one-liners can be really powerful. They can also 
+   be really cryptic. I am introducing them frequently now to inspire you to 
+   create them yourself to solve real problems. It may take you a while to 
+   craft a one-liner to solve a problem initially, and you may wonder if it's worth all the effort. It is. When 
+   you become familiar 
+   with command-line flags such as <b>-0</b>, regular expressions, and the match and 
+   substitution operators, you'll be able to write the one-liners you need just about as fast
+   as you can type. This will really increase your 
+   productivity!</td></tr></table></div></p>
+ 
+ </div>
+ <a href="Perl3-06.html" name="s_modifier"></a>
+ <a name="h_02"></a><div class="heading">The /s Modifier</div><div class="headingText">
+   
+  <p>The <b>/m</b> modifier is similar to the <b>/s</b> modifier. You can think of <b>/s</b> as  
+   "single line" in that it changes the meaning of the character class shortcut <b>.</b> (the period symbol) so that it  
+   matches <i>any</i> character. Normally <b>.</b> is synonymous with 
+   <b>[^\n]</b>; that is, "match any character <i>except</i> the newline." When parsing text containing several lines, 
+   it is very common to want to contain a match to within a single line. Let's try an example. Create 
+   <b>report_parse.pl</b> in your <b>/perl3</b> folder as shown:</p>
+   
+<div class="listingBox"><div class="listingTitle">CODE TO TYPE:</div><div class="listing"><pre>#!/usr/bin/perl
+use strict;
+use warnings;
+
+$_ = join '', &lt;DATA&gt;;
+
+print "Date: Total collected\n";
+while ( /^([\d-]+).* ([\d.]+)/mg )
+{
+  print "$1: $2\n";
+}
+
+__END__
+Date Principal donors Attendance Total collected
+2010-09-23 Fred Flintstone, Daffy Duck 20 1700.00
+2010-09-24 Bugs Bunny, Marvin the Martian, Gossamer 170 2500.00
+2010-09-25 Pepe le Pew, Atom Ant, Foghorn Leghorn 410 8100.00
+2010-09-26 Snagglepuss 7 12.50
+</pre></div></div>
+ 
+  <p><img src="images/coderunner/checksyntax.JPG"> and run it as shown:</p>
+
+<div class="interactiveBox"><div class="interactiveTitle">INTERACTIVE SESSION:</div><div class="interactive"><pre>cold:~/perl3$ <ins>./report_parse.pl</ins>
+Date: Total collected
+2010-09-23: 1700.00
+2010-09-24: 2500.00
+2010-09-25: 8100.00
+2010-09-26: 12.50
+cold:~/perl3$
+</pre></div></div>
+    
+  <p>If <b>.</b> matched any character <i>including</i> newline, that regex would have a significant problem; 
+   the greedy <b>*</b> would match everything from <b>Fred</b> up to the <b>12.50</b> in 
+   the <i>last</i> line.</p>
+  
+  <p>Before we go any further, let me clarify a couple of things. First, when solving real problems, you're 
+   not likely to have the actual data for the problem in the file itself. But in our course, 
+   we put data in files in many examples to save 
+   you from having to create or copy separate data files. You use the <b>&lt;&gt;</b> operator to read 
+   from files named on the command line.</p>
+  
+  <p>Second, this program reads multiple lines into <b>$_</b> in one pass and then uses a regex to parse 
+   <b>$_</b>, one line at a time. That's not very efficient. Imagine that instead of having the line assign to 
+   <b>$_</b>, you were handed a variable containing the multiline report from some source outside of your 
+   control.</p>
+    
+  <p>So when is the right time to use <b>/s</b>? <i>Not</i> using <b>/s</b> is useful when parsing line-oriented input because <b>.</b> 
+   can't "run off the end of the line." But what about when you're parsing something that <i>isn't</i> line oriented, like HTML 
+   (and this is again subject to the earlier caveat about parsing HTML in general)? This is where /s can be useful. A newline can 
+   occur anywhere there's white space. But you need to parse it by matching beginning and ending tags, and there may be other 
+   intervening tags you'll want to ignore. Let's try an example. Create <b>parse_courses.pl</b> in your <b>/perl3</b> folder as shown:</p>
+  
+<div class="listingBox"><div class="listingTitle">CODE TO TYPE:</div><div class="listing"><pre>#!/usr/bin/perl
+use strict;
+use warnings;
+
+$_ = join '', &lt;DATA&gt;;
+
+my ($base) = /BASE\s+HREF="(.*?)"/ or die "Expecting a BASE";
+while ( /&lt;A\s+HREF="(.*?)"&gt;(?:\s*&lt;.*?&gt;\s*)*(.*?)\s*&lt;/gs )
+{
+  my ($text, $url) = ($2, $1);
+  $text =~ s/\n/ /g;
+  print "$text: $base$url\n";
+}
+
+__END__
+&lt;HTML&gt;
+&lt;HEAD&gt;
+&lt;BASE HREF="http://www.oreillyschool.com/" /&gt;
+&lt;/HEAD&gt;
+&lt;BODY&gt;
+&lt;A HREF="courses/"&gt;
+&lt;B&gt;Course Listing&lt;/B&gt;
+&lt;/A&gt;
+&lt;A
+HREF="courses/perl1/"&gt;&lt;I&gt;Introduction to
+Perl&lt;/I&gt;
+&lt;/A&gt;&lt;A HREF="courses/perl2/"&gt;Intermediate Perl&lt;/A&gt;&lt;A HREF="courses/perl3/"&gt;Advanced Perl
+&lt;/A&gt;&lt;A HREF="courses/perl4/"&gt;&lt;DIV ID="Tantalize"&gt;Future Perl
+course&lt;/DIV&gt;&lt;/A&gt;
+&lt;/BODY&gt;
+&lt;/HTML&gt;
+</pre></div></div>
+   
+  <p><img src="images/coderunner/checksyntax.JPG"> and run it as shown:</p>
+
+<div class="interactiveBox"><div class="interactiveTitle">INTERACTIVE SESSION:</div><div class="interactive"><pre>cold:~/perl3$ <ins>./parse_courses.pl</ins>
+Course Listing: http://www.oreillyschool.com/courses/
+Introduction to Perl: http://www.oreillyschool.com/courses/perl1/
+Intermediate Perl: http://www.oreillyschool.com/courses/perl2/
+Advanced Perl: http://www.oreillyschool.com/courses/perl3/
+Future Perl course: http://www.oreillyschool.com/courses/perl4/
+</pre></div></div>
+  
+  <p>Can you see the impact <b>/s</b> had on your code? Try taking it out:</p>
+  
+<div class="listingBox"><div class="listingTitle">CODE TO TYPE:</div><div class="listing"><pre>#!/usr/bin/perl
+use strict;
+use warnings;
+
+$_ = join '', &lt;DATA&gt;;
+
+my ($base) = /BASE\s+HREF="(.*?)"/ or die "Expecting a BASE";
+while ( /&lt;A\s+HREF="(.*?)"&gt;(?:\s*&lt;.*?&gt;\s*)*(.*?)\s*&lt;/g<del>s</del> )
+{
+  my ($text, $url) = ($2, $1);
+  $text =~ s/\n/ /g;
+  print "$text: $base$url\n";
+}
+
+__END__
+&lt;HTML&gt;
+&lt;HEAD&gt;
+&lt;BASE HREF="http://www.oreillyschool.com/" /&gt;
+&lt;/HEAD&gt;
+&lt;BODY&gt;
+&lt;A HREF="courses/"&gt;
+&lt;B&gt;Course Listing&lt;/B&gt;
+&lt;/A&gt;
+&lt;A
+HREF="courses/perl1/"&gt;&lt;I&gt;Introduction to
+Perl&lt;/I&gt;
+&lt;/A&gt;&lt;A HREF="courses/perl2/"&gt;Intermediate Perl&lt;/A&gt;&lt;A HREF="courses/perl3/"&gt;Advanced Perl
+&lt;/A&gt;&lt;A HREF="courses/perl4/"&gt;&lt;DIV ID="Tantalize"&gt;Future Perl
+course&lt;/DIV&gt;&lt;/A&gt;
+&lt;/BODY&gt;
+&lt;/HTML&gt;
+</pre></div></div>
+   
+  <p><img src="images/coderunner/checksyntax.JPG"> and run it as shown:</p>
+   
+<div class="interactiveBox"><div class="interactiveTitle">INTERACTIVE SESSION:</div><div class="interactive"><pre>cold:~/perl3$ <ins>./parse_courses.pl</ins>
+Course Listing: http://www.oreillyschool.com/courses/
+: http://www.oreillyschool.com/courses/perl1/
+Intermediate Perl: http://www.oreillyschool.com/courses/perl2/
+Advanced Perl: http://www.oreillyschool.com/courses/perl3/
+: http://www.oreillyschool.com/courses/perl4/
+</pre></div></div>
+  
+  <p>Can you see why that is happening now that <b>.</b> can no longer match a newline?</p> 
+  
+  <p><div class="c"><table class="noteBox fBox pBox "><tr><td class="noteTitle">Note</td><td class="note">For the sake of pretty output, we take the additional step of turning all newlines in the text 
+   portion of a URL into spaces, just as a browser would.</td></tr></table></div></p>
+
+  <p>Our example gave us some ugly HTML! Usually it is best to parse text line by line, but when the 
+   tokens you're looking for may be split across lines, you have no choice but to parse the entire document. 
+   This also gives you the freedom to make multiple passes through the data (as we did here with an 
+   initial scan) to find the value in the &lt;BASE&gt; tag.</p>
+   
+  <p>Let's take a closer look at that regex. To help with that, we'll  
+   introduce another helpful modifier.</p>
+  
+ </div>
+ <a href="Perl3-06.html" name="x_modifier"></a>
+ <a name="h_03"></a><div class="heading">The /x Modifier</div><div class="headingText">
+   
+  <p>The <b>/x</b> modifier will come as a welcome relief if you have been going cross-eyed looking at dense 
+   regular expressions to mentally parse every character in them. The <b>/x</b> modifier allows you to embed comments in your 
+   regexes, and it also makes white space insignificant. This means that you will be able to format and 
+   comment regexes just like regular program code—of course regexes <i>are</i> code. </p>
+    
+  <p>Let's use the <b>/x</b> modifier on our previous example. Modify that program as shown: </p>
+  
+<div class="listingBox"><div class="listingTitle">CODE TO TYPE:</div><div class="listing"><pre>
+#!/usr/bin/perl
+use strict;
+use warnings;
+
+$_ = join '', &lt;DATA&gt;;
+
+my ($base) = /BASE\s+HREF="(.*?)"/ or die "Expecting a BASE";
+<del>while ( /&lt;A\s+HREF="(.*?)"&gt;(?:\s*&lt;.*?&gt;\s*)*(.*?)\s*&lt;/g )</del>
+<ins>while ( /&lt;A\s+           # Anchor tag
+         HREF="(.*?)"    # Save the target in $1 (assume quoted)
+         &gt;               # Assume tag ends here
+         (?:\s*          # Grab any white space around...
+            &lt;.*?&gt;        # ... any tags around the text...
+            \s*          # ... with optional white space after
+          )*             # Those tags are optional
+          (.*?)          # And now save text in $2
+          \s*            # Ignoring any trailing white space
+          &lt;              # Terminated by beginning of the "A" tag
+         /gsx )</ins>
+{
+  my ($text, $url) = ($2, $1);
+  $text =~ s/\n/ /g;
+  print "$text: $base$url\n";
+}
+
+__END__
+&lt;HTML&gt;
+&lt;HEAD&gt;
+&lt;BASE HREF="http://www.oreillyschool.com/" /&gt;
+&lt;/HEAD&gt;
+&lt;BODY&gt;
+&lt;A HREF="courses/"&gt;
+&lt;B&gt;Course Listing&lt;/B&gt;
+&lt;/A&gt;
+&lt;A
+HREF="courses/perl1/"&gt;&lt;I&gt;Introduction to
+Perl&lt;/I&gt;
+&lt;/A&gt;&lt;A HREF="courses/perl2/"&gt;Intermediate Perl&lt;/A&gt;&lt;A HREF="courses/perl3/"&gt;Advanced Perl
+&lt;/A&gt;&lt;A HREF="courses/perl4/"&gt;&lt;DIV ID="Tantalize"&gt;Future Perl
+course&lt;/DIV&gt;&lt;/A&gt;
+&lt;/BODY&gt;
+&lt;/HTML&gt;
+</pre></div></div>
+    
+  <p><img src="images/coderunner/checksyntax.JPG"> and run it. You'll get the same results as before. We 
+   haven't changed the meaning of our code at all; all we've done is add comments. Yes, comments inside a regular 
+   expression. Now you can see what the regex is doing more clearly, and spot 
+   potential bugs and improvements.</p>
+    
+  <p><b>/x</b> means that newlines, spaces, and tabs lose their literal match meaning and are instead ignored, so 
+   we can use them for indentation and breaking the regex across multiple lines. If we had had any literal 
+   spaces in the regex, we would have had to replace them, typically with <b>\s</b>. If 
+   we wanted to match just a space character, we would have had to replace them with a backslashed space character. (Newlines and tabs can 
+   be matched with <b>\n</b> and <b>\t</b> respectively.)</p>
+    
+  <p><b>/x</b> also means that a <b>#</b> sign and anything after it on the same line are ignored, so if you 
+   wanted to match a literal <b>#</b> sign, you'd have to backslash it too.</p>
+  
+  <p>Some programmers believe that <b>/x</b> is so useful that they include it in 
+   <i>every</i> regex they write.  You can use it on everything you write from now on if you like; we will use 
+   it specifically where we feel it helps.</p>
+    
+  <p><div class="c"><table class="noteBox fBox pBox "><tr><td class="noteTitle">Note</td><td class="note">You can combine the modifiers <b>/m</b> and <b>/s</b>, as <b>/ms</b> (or <b>/sm</b>), 
+   and get the effects of both at the same time. Damian Conway goes so far as to recommend in his book <a href="http://shop.oreilly.com/product/9780596001735.do" target="_blank">Perl 
+    Best Practices</a> (O'Reilly Media, 2005) that you should put <b>/msx</b> on <i>every</i> regular 
+   expression. That's advice you may want to take. This is one of those areas where equally competent 
+   people can have differing opinions, and you can take one of several equally valid approaches depending on 
+   what works best for you.</td></tr></table></div></p>
+  
+ </div>
+ <a href="Perl3-06.html" name="e_modifier"></a>
+ <a name="h_04"></a><div class="heading">The /e Modifier</div><div class="headingText">
+   
+  <p>The <b>/e</b> modifier is different from all the others that we've seen so far in that it can only be 
+   used on the <i>substitution</i> operator, because it does not affect the interpretation of the regular 
+   expression, but instead affects the interpretation of the replacement string.</p>
+   
+  <p>The <b>/e</b> stands for <i>evaluate</i>; it causes the replacement string to be compiled and 
+   executed as Perl code. This can take some getting used to, so let's start by using a one-liner 
+   without the <b>/e</b> modifier. Type the command as shown:</p>
+ 
+<div class="interactiveBox"><div class="interactiveTitle">INTERACTIVE SESSION:</div><div class="interactive"><pre>cold:~/perl3$ <ins>perl -wle '$_="pot"; print; s/o/"i"/; print'</ins>
+pot
+p"i"t
+</pre></div></div>
+ 
+  <p>Now add the <b>/e</b> modifier:</p>
+ 
+<div class="interactiveBox"><div class="interactiveTitle">INTERACTIVE SESSION:</div><div class="interactive"><pre>cold:~/perl3$ perl -wle '$_="pot"; print; s/o/"i"/<ins>e</ins>; print'
+pot
+pit
+</pre></div></div>
+ 
+  <p>When the code <b>"i"</b> is evaluated as Perl, it is interpreted as 
+   a double-quoted string with a value of <b>i</b>, so that gets used as the replacement 
+   string. </p>
+ 
+  <p>Of course the real power of <b>/e</b> is exercised when we use it to substitute a string that varies 
+   according to what was matched.  Create <b>incr.pl</b> in your <b>/perl3</b> folder as shown: </p>
+ 
+<div class="listingBox"><div class="listingTitle">CODE TO TYPE:</div><div class="listing"><pre>#!/usr/bin/perl
+use strict;
+use warnings;
+
+while ( &lt;DATA&gt; )
+{
+  s/(\d+)/$1 + 1/ge;
+  print;
+}
+
+__END__
+Sing a song of 6 pence, a pocket full of rye; 4 and 20 blackbirds, baked in a pie.
+1969: Apollo 11 returns from the Moon after travelling 828743 nautical miles.
+The first five values of Ackermann's function for n=1 are 2, 3, 5, 13, and 65533.
+</pre></div></div>
+   
+  <p><img src="images/coderunner/checksyntax.JPG"> and run it:</p>
+
+<div class="interactiveBox"><div class="interactiveTitle">INTERACTIVE SESSION:</div><div class="interactive"><pre>cold:~/perl3$ <ins>./incr.pl</ins>
+Sing a song of 7 pence, a pocket full of rye; 5 and 21 blackbirds, baked in a pie.
+1970: Apollo 12 returns from the Moon after travelling 828744 nautical miles.
+The first five values of Ackermann's function for n=2 are 3, 4, 6, 14, and 65534.
+</pre></div></div>
+ 
+  <p><b>/e</b> gives you the power to change a part of the text; as long as it can be computed, you can change it. Since 
+   we're bold and adventurous types, let's do change the text to something complicated!  
+   Create <b>eval.pl</b> in your <b>/perl3</b> folder as shown:</p>
+
+<div class="listingBox"><div class="listingTitle">CODE TO TYPE:</div><div class="listing"><pre>#!/usr/bin/perl
+use strict;
+use warnings;
+
+while ( &lt;DATA&gt; )
+{
+  s!(http://.*?)(\s|$)!visit($1).$2!ge or next;
+  print;
+}
+
+sub visit
+{
+  my $url = shift;
+
+  my $content = `curl -s $url 2&gt;&amp;1`;
+  $? and return "[$url: Couldn't fetch]";
+  return "[$url: " . length($content) . " bytes]";
+}
+
+__END__
+Today I visited http://www.oreillyschool.com/ and logged in to
+my courses, then I hopped over to http://www.cnn.com/ for some general news,
+and http://www.perlbuzz.com/ for the latest cool news about Perl.
+Then I tried the address http://xyz.liklkvsj.xx/ that someone I didn't
+know emailed me about, but I couldn't reach it.
+</pre></div></div>
+ 
+  <p><img src="images/coderunner/checksyntax.JPG"> and run it:</p>
+
+<div class="interactiveBox"><div class="interactiveTitle">INTERACTIVE SESSION:</div><div class="interactive"><pre>cold:~/perl3$ <ins>./eval.pl</ins>
+Today I visited [http://www.oreillyschool.com/: 11137 bytes] and logged in to
+my courses, then I hopped over to [http://www.cnn.com/: 97819 bytes] for some general news,
+and [http://www.perlbuzz.com/: 59278 bytes] for the latest cool news about Perl.
+Then I tried the address [http://xyz.liklkvsj.xx/: Couldn't fetch] that someone I didn't
+</pre></div></div>
+ 
+  <p>This program prints out its data section with its URLs replaced by a small block that includes the URL 
+   and its length, or an error message. Let's walk through it together and see how it works:</p>
+ 
+<div class="observeBox"><div class="observeTitle">OBSERVE:</div><div class="observe"><pre>
+s!<span class="green">(</span><span class="darkblue">http://</span>://.*?<span class="green">)</span><span class="red">(</span><span class="darkgreen">\s</span><span class="purple">|</span><span class="darkred">$</span><span class="red">)</span>!
+</pre></div></div>
+ 
+  <p>We look for URLs that begin with <span class="darkblue">http://</span> and, by using the parentheses 
+   <span class="green">()</span>, save them into <b>$1</b>. URLs can include all sorts of characters, so we say that ours ends 
+   when we see either a whitespace character (<span class="darkgreen">\s</span>), or (<span class="purple">|</span>) the end of 
+   the line (<span class="darkred">$</span>). By using the second set of parentheses <span class="red">()</span>, we save that into 
+   <b>$2</b>.</p>
+ 
+<div class="observeBox"><div class="observeTitle">OBSERVE:</div><div class="observe"><pre>
+!<span class="blue">visit(</span><span class="darkblue">$1</span><span class="blue">)</span>.<span class="red">$2</span>!ge
+</pre></div></div>
+ 
+  <p>Our replacement string starts with the result of calling the subroutine <span class="blue">visit()</span>, passing the 
+   URL we saved (<span class="darkblue">$1</span>). We put back the whitespace character we matched from <span class="red">$2</span>, so we don't delete any 
+   spaces. (There is a feature of regular expressions outside the scope of this course called "lookahead"
+   that allows you to match something without consuming it; you can read about it in <a href="http://perldoc.perl.org/perlre.html" target="_blank">perldoc perlre</a>.</p>
+ 
+<div class="observeBox"><div class="observeTitle">OBSERVE:</div><div class="observe"><pre>
+or next;
+</pre></div></div>
+ 
+  <p>Just to remind you of the result of a substitution, we won't print any lines that don't match.</p>
+ 
+<div class="observeBox"><div class="observeTitle">OBSERVE:</div><div class="observe"><pre>
+`curl -s $url 2&gt;&amp;1`
+</pre></div></div>
+ 
+  <p>The <b>-s</b> flag to <b>curl</b> tells it not to output statistics. The <b>2&gt;&amp;1</b> construct 
+   tells the shell invoked by the backticks to redirect any errors from <b>curl</b> to standard output so they 
+   will go into <b>$content</b>. It is common to add to commands executed with 
+   backticks. If you don't do that, anything the external command sends to standard error will go wherever 
+   standard error is set—most likely the terminal. The intention of backticks is to intercept whatever the 
+   program outputs, and usually, we want that to include errors as well. </p>
+ 
+<div class="observeBox"><div class="observeTitle">OBSERVE:</div><div class="observe"><pre>
+<span class="red">$?</span> and return
+</pre></div></div>
+
+  <p>The special variable <span class="red">$?</span> is set by Perl to the exit status of the command that was last executed
+    by <span class="darkgreen">system</span> or backticks. A successful program will have an exit code of zero. We will
+    assume that any other code returned by <b>curl</b> means that it was not able to retrieve the URL.</p>
+ 
+  <p>Isn't that cool?  And here's something even cooler. Create <b>double_eval.pl</b> in your 
+   <b>/perl3</b> folder as shown:</p>
+ 
+<div class="listingBox"><div class="listingTitle">CODE TO TYPE:</div><div class="listing"><pre>#!/usr/bin/perl
+use strict;
+use warnings;
+
+$_ = join '', &lt;DATA&gt;;
+s/([\d+*\/-]+)\s*=/qq{"$1 = " . ($1)}/eeg;
+print;
+
+__END__
+1+2/4= and 42**3 =
+ and 12-3/4 =
+</pre></div></div>
+ 
+  <p><img src="images/coderunner/checksyntax.JPG"> and run it:</p>
+
+<div class="interactiveBox"><div class="interactiveTitle">INTERACTIVE SESSION:</div><div class="interactive"><pre>cold:~/perl3$ <ins>./double_eval.pl</ins>
+1+2/4 = 1.5 and 42**3 = 74088
+ and 12-3/4 = 11.25
+</pre></div></div>
+ 
+  <p>Wow! This program outputs the result of arithmetic expressions in the text itself! But why is the 
+   <b>/e</b> modifier repeated? What happens if you leave it off? Try it! Modify your code as shown:</p>
+
+<div class="listingBox"><div class="listingTitle">CODE TO TYPE:</div><div class="listing"><pre>
+#!/usr/bin/perl
+use strict;
+use warnings;
+
+$_ = join '', &lt;DATA&gt;;
+s/([\d+*\/-]+)\s*=/qq{"$1 = " . ($1)}/<del>e</del>eg;
+print;
+
+__END__
+1+2/4= and 42**3 =
+ and 12-3/4 =
+</pre></div></div>
+ 
+  <p><img src="images/coderunner/checksyntax.JPG"> and run it:</p>
+
+<div class="interactiveBox"><div class="interactiveTitle">INTERACTIVE SESSION:</div><div class="interactive"><pre>cold:~/perl3$ <ins>./double_eval.pl</ins>
+"1+2/4 = " . (1+2/4) and "42**3 = " . (42**3)
+ and "12-3/4 = " . (12-3/4)
+</pre></div></div>
+ 
+  <p>That's not so good, is it. The problem here is that we want Perl to do the work of evaluating the 
+   expression itself. So once we have captured the expression into a scalar, using <b>/e</b> to output 
+   that scalar has the effect you see above. We want Perl to evaluate the expression <i>again</i>, and we are allowed to repeat
+   the <b>/e</b> modifier to get that effect.</p>
+ 
+  <p>But if we're going to evaluate the replacement string again, then our replacement string needs to be
+   <i>code that generates code</i>. Here's how it works: Take an expression like <b>1+2/4</b>. That 
+   gets saved into <span class="red">$1</span>. The replacement string is <b>qq{"$1 = " . ($1)}</b>. The <i>first</i> 
+   <b>/e</b> modifier means that the replacement string (including the quotation marks), gets evaluated, yielding the result 
+   <b>"1+2/4 = " . (1+2/4)</b>. The <i>second</i> <b>/e</b> modifier 
+   means that the previous result gets evaluated, yielding the result <b>1+2/4 = 1.5</b>.</p>
+ 
+  <p>By working backwards from the result you want, you can write these kinds of double-<b>/e</b> 
+   substitutions yourself. They don't come up often as practical solutions, but when they do, they are 
+   incredibly useful.</p>
+  
+  <p>You're making great progress. Feel free to direct any questions you may have to your instructor. Keep up the good work and 
+   see you in the next lesson!</p>
+ 
+ </div>
+
+ <p>Once you finish the lesson, go back to the syllabus to complete the homework.</p>
+ 
+<div class="footer"><div id="timeSurvey"></div>				
+				Copyright © 1998-2014 O'Reilly Media, Inc.<br><img src="https://courses.oreillyschool.com/common/cclicense.png"><br>
+				This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 Unported License.<br>
+				See <a href="http://creativecommons.org/licenses/by-sa/3.0/legalcode">http://creativecommons.org/licenses/by-sa/3.0/legalcode</a> 
+				for more information.
+				</div><iframe id="t" width="1" height="1" border="0" style="display:none"></iframe><script language="javascript">bodyLoaded();</script><script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+  ga('create', 'UA-44720547-1', 'oreillyschool.com');
+  ga('send', 'pageview');
+</script></body></html>

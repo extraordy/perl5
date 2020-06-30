@@ -1,0 +1,580 @@
+<html><!-- Copyright (c) 1998-2014 O'Reilly Media, Inc.
+			This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 Unported License.
+			See http://creativecommons.org/licenses/by-sa/3.0/legalcode for more information.
+            --><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"><link rel="stylesheet" type="text/css" href="../common/Lab.css"><script type="text/javascript" src="../common/Lab.js"></script><script language="javascript"></script><title>Introduction to One-Liners</title></head><body id="body"><a name="top"></a><div class="title">Introduction to One-Liners</div><div class="resize"><a href="Perl2-09.html#top" onclick="changeSize('smaller');" class="aS" title="Keep clicking to make fonts smaller">A</a><a href="Perl2-09.html#top" onclick="changeSize('larger');" class="aL" title="Keep clikcing to make fonts larger">A</a><a href="Perl2-09.html#top" onclick="lv()" class="lv" title="Adjust Page for High Contrast">HC</a><div id="fh"><p>Click on <span class="aS">A</span> to make all fonts on the page smaller.</p><p>Click on <span class="aL">A</span> to make all fonts on the page larger.</p><p>Click on <span class="lv">HC</span> to toggle high contrast mode. When you move your mouse over 
+                 some bold words in high contrast mode, related words are automatically highlighted. Text is shown
+                 in black and white. 
+             </p></div></div><hr>
+ 
+ <div class="goalTitle">Lesson Objectives</div><div class="goals">
+  
+  
+  When you complete this lesson, you will be able to:
+  
+  <ul><li>experience the power of one-liners.</li></ul>
+ </div><hr>
+ 
+  <p>"Right now I'm having amnesia and deja vu at the same time. I think I've forgotten this before." 
+   -Steven Wright</p>
+  
+  <a name="h_01"></a><div class="heading">Perl at the Command Line</div><div class="headingText">
+   
+   <p>Picture this scene: It's five minutes before the company van pool is about to leave and your officemate 
+    comes to you in a panic. "Help!" he says, "I have these text files and I need to extract last year's 
+    sales data from them for tomorrow morning's management meeting. I need the data tonight so I can draw up my 
+    conclusions. Can you stay late and write a program that will retrieve my data and email the program to me at home later?" 
+    You study the file format sheet he's given you for a few seconds, and then reply casually, "No." But as 
+    he starts to bristle, you say, "I don't need to write a program or miss my ride home. One moment, please." 
+    Then, at a shell window, you change to the directory containing the text files and type a single command 
+    taking up the width of the terminal that baffles your colleague. A second later, you show him the output 
+    and pipe it into an email message to him. As you leave for the van pool with a minute to spare, he is 
+    left looking at the screen in shock.</p>
+   
+   <p>That scenario is the power and possibility of the Perl one-liner, and if you think it's an exaggeration, 
+    I myself have been on the programmer's end of that transaction many times. In this lesson, we'll learn
+    how to run Perl code without ever having to write a program. In fact, we won't write a single 
+    program during this lesson!</p>
+   
+   <p>The relevant documentation for his lesson is <b>perldoc perlrun</b>. You might want to take a look at it 
+    now. Until now, we've only invoked Perl by writing a program, making it executable, and running it; the 
+    <b>#!</b> line at the beginning tells the operating system to run the program by passing it as input to another
+    program called <b>perl</b>. Perl's path is on the <b>#!</b> line (except on the Windows operating system, where 
+    the <b>.pl</b> file extension does the same job).</p>
+   
+   <p>But we can execute Perl code at the command line without writing a program. Because this code 
+    is provided in a single line (the only place you type <b>&lt;RETURN&gt;</b> is once at the end), we call 
+    it a <i>one-liner</i>. There are many short one-liners that perform identically to whole, specialized 
+    programs. You can find entire web pages dedicated to lists of useful one-liners. </p>
+    
+   <p>Open a new terminal where you can type commands at the cold~$ prompt.</p>
+   
+   <p>The usual Unix utilities are available, like <b>ls</b>, <b>chmod</b>, and so forth. You can also 
+    type <b>perl</b>, but if you do that without any arguments, it'll wait for you to type a 
+    program at the terminal, but nothing will happen (aside from the reporting of syntax errors) until you 
+    press <b>Ctrl-D</b> (signifying end-of-file) at the beginning of a line. There are all kinds 
+    of options we can pass to <b>perl</b> to change that behavior.</p>
+   
+   <p><div class="c"><table class="noteBox fBox pBox "><tr><td class="noteTitle">Note</td><td class="note"> The name of the program you run is <b>perl</b>, not <b>Perl</b>. Whenever I refer to the 
+    program itself, I'll use a lowercase <b>p</b>. When I'm talking about the
+    language, I'll continue to use an uppercase <b>P</b>.</td></tr></table></div></p>
+   
+   <p>Go ahead and check the version of Perl. Type the code below in the Unix window as shown:</p>
+    
+<div class="interactiveBox"><div class="interactiveTitle">INTERACTIVE TERMINAL SESSION:</div><div class="interactive"><pre>cold:~$ <ins>perl -v</ins>
+
+This is perl, v5.10.1 (*) built for x86_64-linux-thread-multi
+
+Copyright 1987-2009, Larry Wall
+
+Perl may be copied only under the terms of either the Artistic License or the
+GNU General Public License, which may be found in the Perl 5 source kit.
+
+Complete documentation for Perl, including FAQ lists, should be found on
+this system using "man perl" or "perldoc perl". If you have access to the
+Internet, point your browser at http://www.perl.org/, the Perl Home Page.
+
+cold:~$ 
+</pre></div></div>
+   
+   <p>That code reported on the version of Perl you're running.  If you'd like to see a <i>lot</i> more
+    detail, use an uppercase V instead. Whenever you see a one-liner like that in this lesson, type it at 
+    the command line to see what happens, and then experiment with changing it.</p>
+   
+  </div>
+  <a name="h_02"></a><div class="heading">The -e Flag</div><div class="headingText">
+   
+   <p>Now let's see how we can execute code from the command line. This is done with the <b>-e</b> (<b>e</b>xecute) option.
+    Type the code below in the Unix window as shown:</p>
+   
+<div class="interactiveBox"><div class="interactiveTitle">INTERACTIVE TERMINAL SESSION:</div><div class="interactive"><pre>cold:~$ <ins>perl -e</ins>                                                                                                                                                                   
+No code specified for -e.
+cold:~$ 
+</pre></div></div>
+   
+   <p>That gives us an error. We have to provide code to execute! I guess Perl can't read our minds. Okay then,
+    type the code below in the Unix window as shown:</p>
+   
+<div class="interactiveBox"><div class="interactiveTitle">INTERACTIVE TERMINAL SESSION:</div><div class="interactive"><pre>cold:~$ <ins>perl -e 'print "Hello, world!"'</ins>                                                                                                                                           
+Hello, world!cold:~$ 
+</pre></div></div>
+   
+   <p>I think you already know how to fix that output.</p>
+   
+   <p>Because we're entering this command to a shell (the program that printed the prompt), we need to 
+    surround the Perl code with single quotation marks. That protects nearly all of the shell metacharacters 
+    that we may have put in the 
+    Perl code from being interpreted by the shell. The text that may still cause 
+    problems will be determined by the shell we're using. <b>!</b> is the character that most often needs to be 
+    backslashed in Perl code entered this way. But even then, that depends on what follows the <b>!</b>. Try 
+    this example. Type the code below in the Unix window as shown:</p>
+   
+<div class="interactiveBox"><div class="interactiveTitle">INTERACTIVE TERMINAL SESSION:</div><div class="interactive"><pre>cold:~$ <ins>perl -e 'print "Hello, world!\n"'</ins>
+Hello, world!
+cold:~$ 
+</pre></div></div>
+   
+   <p>See? No problem at all! And we added the newline (<b>\n</b>) just as we would in a program. But Perl 
+    supplies a handy option to save us from typing 
+    <span class="orange">\n</span> at the end of a <span class="darkgreen">print</span> statement. It's the <b>-l</b> (that's a 
+    lowercase <span class="blue"><b>l</b></span> for "<span class="blue"><b>l</b></span>ine feed") option. Type the code below in the Unix window as shown: </p>
+   
+<div class="interactiveBox"><div class="interactiveTitle">INTERACTIVE TERMINAL SESSION:</div><div class="interactive"><pre>cold:~$ <ins>perl -le 'print "Hello, world!"'</ins>                                                                                                                                          
+Hello, world!
+cold:~$ 
+</pre></div></div>
+   
+   <p>Run that, and you'll see Perl inserts a newline after <span class="orange">Hello, world!</span>. The <b>-l</b>
+    flag causes Perl to behave as if every <span class="darkgreen">print</span> statement has an extra final 
+    <span class="orange">"\n"</span> argument.</p>
+   
+   <p>I've combined the two flags <b>-l</b> and <b>-e</b> into one option in the customary Unix way. Typing
+    <b>-le</b> is identical to typing <b>-l -e</b>.</p>
+
+   <p>If you don't have a calculator handy, you can use Perl instead. 
+    Type the code below in the Unix window as shown:</p>
+      
+<div class="interactiveBox"><div class="interactiveTitle">INTERACTIVE TERMINAL SESSION:</div><div class="interactive"><pre>cold:~$ <ins>perl -le 'print 1/sqrt(1 - 0.9**2)' # Relativistic time dilation factor at nine-tenths the speed of light</ins>                                                                 
+2.29415733870562
+cold:~$ 
+</pre></div></div>
+   
+   <p>Using Perl as a calculator lets you assign variables as well. Type the code below in the Unix window as shown:</p>
+   
+<div class="interactiveBox"><div class="interactiveTitle">INTERACTIVE TERMINAL SESSION:</div><div class="interactive"><pre>cold:~$ <ins># Relativistic time dilation factor at 100,000 km/h:</ins>                                                                                                                      
+cold:~$ <ins>perl -le '$c = 3E8; $v = 100_000*1E3/3600; print 1/sqrt(1 - ($v/$c) **2)'</ins>
+1.00000000428669
+cold:~$ 
+</pre></div></div>
+   
+   <p>Something about that code looks wrong. Where is the <span class="purple">my</span> keyword 
+    that declares <span class="red">$c</span> and <span class="red">$v</span>? Hmm. Well, is anything else missing? Yes: <span class="darkred">use strict</span> and 
+    <span class="darkred">use warnings</span>. But this isn't the way we've learned to write Perl. 
+    What's going on?</p>
+   
+   <p>The <span class="darkred">use strict</span> pragma (compiler directive) causes Perl to require variables to be 
+    declared with <span class="purple">my</span>; this is essential when writing programs to protect against accidental 
+    typos. A one-liner is short enough that we don't have to worry about typos. So we don't need to 
+    <span class="darkred">use strict</span> and therefore don't have to declare our variables with <span class="purple">my</span>, 
+    which helps keep the one-liners shorter and more readable.</p>
+   
+   <p><div class="c"><table class="noteBox fBox pBox "><tr><td class="noteTitle">Note</td><td class="note"> Let me reiterate: You can leave out <span class="darkred">use strict</span> and 
+    <span class="darkred">use warnings</span> and <span class="purple">my</span> from one-liners, but <i>not</i> from programs. 
+    You'll encounter programs written by other folks who have left them out, 
+    which causes all kinds of problems. Don't be that programmer.</td></tr></table></div></p>
+     
+  </div>
+  <a name="h_03"></a><div class="heading">The -n Flag</div><div class="headingText">
+   
+   <p>I think you're ready to experience the real power of one-liners. The perl program can take some options that
+    cause it to behave as if code is present, when it actually isn't. For instance, 
+    <b>while (&lt;&gt;)</b> is "magic" code. When it is inside Perl, <b>while (&lt;&gt;)</b> expands to about a dozen lines that shift 
+    filenames off <span class="red">@ARGV</span>, open them, read a line into <span class="red">$_</span>, and then test it to see if the line is defined.</p>
+   
+   <p>The <b>-n</b> flag is "magic" also. It causes Perl to assume that the code you provide is 
+    surrounded by a loop reading from inputs. If you type <b>perl -n -e '<i>code</i>'</b>, it is roughly 
+    equivalent to this program:</p>
+   
+<div class="observeBox"><div class="observeTitle">OBSERVE: -n equivalent</div><div class="observe"><pre>
+while ( &lt;&gt; )
+{
+  <i>code</i>
+}
+</pre></div></div>
+   
+   <p>That magic readline operator is going to expect you to provide filenames on the command line 
+    or it will read from standard input. So the filenames have to follow the code you provide using 
+    <b>-e</b>. (Technically, you can pass the arguments to <b>perl</b> in any order, and you could 
+    follow the <b>-e <i>code</i></b> option with another option such as <b>-n</b>. But it is a universal 
+    convention that <b>-e</b> is the last option provided to perl, and it makes one-liners easier to read.)</p>
+   
+   <p>We can (sort of) translate one of our last lesson's examples into this new format.
+    Remember <span class="darkred">grep.pl</span>? Try it as a one-liner (changing the matching character to "z" in order to 
+    get less output). Type the code below into the Unix window as shown:</p>
+   
+<div class="interactiveBox"><div class="interactiveTitle">INTERACTIVE TERMINAL SESSION:</div><div class="interactive"><pre>cold:~$ <ins>cd perl2</ins>
+cold:~/perl2$ <ins>perl -ne 'print if /\bz\w/' ./*.pl</ins>
+20500 is the zip code of the White House
+My zip is _98362_    my ($city, $state, $zip) = ($1, $2, $3);
+    printf "City: %-20s; State: $state; Zip: $zip\n", $city;
+    my ($city, $state, $zip) = ($1, $2, $3);
+    printf "City: %-20s; State: $state; Zip: $zip\n", $city;
+20500 is the zip code of the White House
+  print "'$line' contains a zip code\n"
+$text = "I have two tomatoes and one zucchini";
+  print "'$line' contains a zip code\n"
+  /(\d{5}(?:-\d{4})?)/ and print "Found zip: $1\n";
+my $zip;
+$zip = "98362";
+if ( length( $zip ) != 5 )
+  die "$zip isn't a standard zip code\n";
+elsif ( length( $zip ) != 9 &amp;&amp; length( $zip ) != 10 )  # May have hyphen between parts
+  die "$zip isn't a ZIP+4 code\n"; 
+  print "$zip could be a zip code\n";
+cold:~/perl2$ 
+</pre></div></div>
+   
+   <p>In this version we put the actual regex in explicitly instead of using 
+    <span class="orange">/$regex/</span>. But think about it; where would <span class="red">$regex</span> 
+    come from if we had not entered the regex implicitly? 
+    The command line, right? And that's where our entire program is to begin with!</p>
+   
+   <p>Now try adding in the <b>-l</b> flag as well. Type the code below in the Unix window as shown:</p>
+   
+<div class="interactiveBox"><div class="interactiveTitle">INTERACTIVE TERMINAL SESSION:</div><div class="interactive"><pre>cold:~/perl2$ <ins>perl -nle 'print if /\bz\w/' ./*.pl</ins>                                                                                                                                    
+20500 is the zip code of the White House
+My zip is _98362_
+    my ($city, $state, $zip) = ($1, $2, $3);
+    printf "City: %-20s; State: $state; Zip: $zip\n", $city;
+    my ($city, $state, $zip) = ($1, $2, $3);
+    printf "City: %-20s; State: $state; Zip: $zip\n", $city;
+20500 is the zip code of the White House
+  print "'$line' contains a zip code\n"
+$text = "I have two tomatoes and one zucchini";
+  print "'$line' contains a zip code\n"
+  /(\d{5}(?:-\d{4})?)/ and print "Found zip: $1\n";
+my $zip;
+$zip = "98362";
+if ( length( $zip ) != 5 )
+  die "$zip isn't a standard zip code\n";
+elsif ( length( $zip ) != 9 &amp;&amp; length( $zip ) != 10 )  # May have hyphen between parts
+  die "$zip isn't a ZIP+4 code\n"; 
+  print "$zip could be a zip code\n";
+cold:~/perl2$ 
+</pre></div></div>
+   
+   <p>Now wait just a minute! Why did that produce the same output? If the <b>-l</b> flag causes 
+    <span class="darkgreen">print()</span> to add a newline to the end of what it prints, shouldn't we see a 
+    blank line between every line of output?</p>
+   
+   <p>Let's back up a minute and think about why the output looked right when we had just the <b>-n</b> and <b>-e</b> 
+    flags. Perl read each line into <span class="red">$_</span> and—if it matched the regex—printed it. 
+    The readline operator left the trailing <span class="orange">\n</span> in <span class="red">$_</span> and 
+    <span class="darkgreen">print()</span> printed it.</p>
+   
+   <p>So why isn't there an extra newline with <b>-l</b>?  Because in addition 
+    to attaching the newline to the end of <span class="darkgreen">print()</span> statements, the <b>-l</b> flag performs an 
+    <i>implicit</i> <span class="darkgreen">chomp</span> on lines read in through the magic <b>&lt;&gt;</b> readline 
+    operator.</p>
+   
+   <p>That feature of <b>-l</b> may not have made a difference in this example, but it will come in handy often in the future, 
+    so when we use the <b>-n</b> flag, we'll also use the <b>-l</b> flag. You'll use the <b>-nle</b> 
+   flag combination often.</p>
+   
+   <p>That's a nice example, but we already have the <b>grep</b> program on our system. (Unless you're 
+    on Windows, in which case Perl can save you from having to get the Unix utilities.)  Let's get Perl to do 
+    something that we don't have a common program to do. Suppose you have text files containing stock inventory 
+    reports that have lines that look like this: </p>
+
+<div class="observeBox"><div class="observeTitle">OBSERVE: stock report</div><div class="observe"><pre>
+Item    Quantity        Unit Price
+Direhorse Reins         21   199
+Ikran Saddle    12      341
+Thanator Shield 41      99
+Fan Lizard Reflectors   350     15
+Sturmbeest Corral       1       32000
+</pre></div></div>
+
+   <p>The fields are separated by tabs. If we were dumping the first line in Perl format, it would look like this: 
+    <span class="orange">"Item\tQuantity\tUnit Price\n"</span>. Tab-separated value format is a good choice for 
+    human-readable text files like this because it is easy to parse, does not require fixed-width fields, and 
+    permits spaces in field values. Use <span class="blue"><b>wget</b></span> to copy the stock_report file to your /perl folder.
+    Type the code below in the Unix window as shown:</p>
+   
+<div class="interactiveBox"><div class="interactiveTitle">INTERACTIVE TERMINAL SESSION:</div><div class="interactive"><pre>cold:~/perl2$ <ins>wget "http://courses.oreillyschool.com/Perl2/stock_report"</ins>
+--07:42:48--  http://courses.oreillyschool.com/Perl2/stock_report
+           =&gt; `stock_report'
+Resolving www.oreillyschool.com... 63.171.219.110
+Connecting to www.oreillyschool.com|63.171.219.110|:80... connected.
+HTTP request sent, awaiting response... 200 OK
+Length: 148 [text/plain]
+
+100%[======================================================================================================================================&gt;] 148           --.--K/s             
+
+07:42:48 (5.65 MB/s) - `stock_report' saved [148/148]
+
+cold:~/perl2$ 
+</pre></div></div>
+   
+   <p>Now, let's say that you want to compute the total value of each item in inventory, obtained by 
+    multiplying the unit cost by the quantity on hand. You could run a one-liner. Type the code below in the Unix 
+    window as shown:</p>
+   
+<div class="interactiveBox"><div class="interactiveTitle">INTERACTIVE TERMINAL SESSION:</div><div class="interactive"><pre>cold:~/perl2$ <ins>perl -nle '/(.*)\t(\d+)\t(\d+)/ and print "$1: ", $2*$3' ./stock_report</ins>
+Direhorse Reins: 4179
+Ikran Saddle: 4092
+Thanator Shield: 4059
+Fan Lizard Reflectors: 5250
+Sturmbeest Corral: 32000
+cold:~/perl2$ 
+</pre></div></div>
+   
+   <p>We make sure the match succeeds before using <span class="red">$1</span> and friends; we don't just multiply the 
+    second field by the third blindly, because that effort would be foiled at the first line. 
+    Sometimes people write code to omit the first line because it's a header, but that approach fails when the 
+    header line is either missing or duplicated later. Our approach avoids those problems by only processing 
+    valid lines. </p>
+   
+   <p>Take a look at the regular expression and make sure you understand how it works for this input data. The 
+    <span class="orange">.*</span> will initially match the whole line, then it will backtrack as far as the last tab 
+    character in search of a match. Then it will backtrack again to the previous tab character, 
+    so that it can match one or more digits after that, followed by a tab, which is followed by one 
+    or more digits. There is no need for anything more specific in this regex, which will not match the 
+    header line because the second and third fields are not composed of digits.</p>
+   
+   <p>Mastering the 
+    one-liner can make the scenario I described at the beginning of this lesson a reality. 
+    Now, <i>that's</i> capability worth the price of admission! And there's more to come!</p>
+  
+  </div>
+  <a name="h_04"></a><div class="heading">BEGIN and END blocks</div><div class="headingText">
+   
+   <p>Suppose instead of printing the total value of <i>each</i> item in inventory, we want to print the 
+    total value of <i>all</i> items in inventory. We would still use <b>-n</b> to loop over all 
+    lines of input, adding the value to a running total; we'd also want to print the total.
+    But how can we do that when all the code we put in the <b>-e</b> argument 
+    is executed inside the implicit <span class="purple">while</span> block generated by <b>-n</b>?</p>
+   
+   <p>The answer lies in a special capability of Perl called the <b>END</b> block. The <b>END</b> block declares a special 
+    subroutine (but without the word <span class="purple">sub</span>) that Perl will execute on your behalf when all 
+    other code has finished and the program is about to exit. Run the one-liner below in the Unix window as shown:</p>
+   
+<div class="interactiveBox"><div class="interactiveTitle">INTERACTIVE SESSION:</div><div class="interactive"><pre>cold:~/perl2$ <ins>perl -nle '/\t(\d+)\t(\d+)/ and $total += $1*$2; END{ print "Total: $total" }' ./stock_report</ins>                                                                          
+Total: 45401
+cold:~/perl2$ 
+</pre></div></div>
+   
+   <p>The block of code following <b>END</b> will execute after all other code has finished, which means that 
+    the <span class="purple">while</span> loop will have finished executing, and so the <b>END</b> block will 
+    be executed only once.</p>
+   
+   <p>The variable <span class="red">$total</span> isn't declared with <span class="purple">my</span>, but that's okay, because
+    we don't have <span class="darkred">use strict</span>. We just have to make sure that we type <span class="red">$total</span>
+    correctly both times. Since the output will be zero if we get it wrong, that shouldn't be difficult.</p>
+   
+   <p>Notice that <i>this</i> regex neither matches, nor captures the first field. It doesn't have  
+    to because as long as we match the two tab characters, we will capture the second and third fields that 
+    we want. </p>
+   
+   <p>There is a counterpart to <b>END</b> called <b>BEGIN</b>, which declares code to be run before all 
+    other code starts. As is the case with <b>END</b>, <b>BEGIN</b> will be run only once, even if we specify the <b>-n</b> flag, because it 
+    is run before the <span class="purple">while</span> loop <i>starts</i>.</p>
+   
+   <p>Now, suppose we want to write a one-liner that really works just like our <span class="darkred">grep.pl</span>
+    program, and take the regex as the first argument on the command line. Type the code below in the Unix window as shown:</p>
+   
+<div class="interactiveBox"><div class="interactiveTitle">INTERACTIVE TERMINAL SESSION:</div><div class="interactive"><pre>cold:~/perl2$ <ins>perl -ne 'BEGIN{ $regex = shift } print if /$regex/' '\bz\w' ./*.pl</ins>
+20500 is the zip code of the White House
+My zip is _98362_
+  my ($city, $state, $zip) = ($1, $2, $3);
+  printf "City: %-20s; State: $state; Zip: $zip\n", $city;
+  my ($city, $state, $zip) = ($1, $2, $3);
+  printf "City: %-20s; State: $state; Zip: $zip\n", $city;
+20500 is the zip code of the White House
+ print "'$line' contains a zip code\n"
+$text = "I have two tomatoes and one zucchini";
+ print "'$line' contains a zip code\n"
+ /(\d{5}(?:-\d{4})?)/ and print "Found zip: $1\n";
+my $zip;
+$zip = "98362";
+if ( length( $zip ) != 5 )
+   die "$zip isn't a standard zip code\n";
+elsif ( length( $zip ) != 9 &amp;&amp; length( $zip ) != 10 ) # May have hyphen between parts
+  die "$zip isn't a ZIP+4 code\n";
+print "$zip could be a zip code\n"; 
+cold:~/perl2$ 
+</pre></div></div>
+   
+   <p>Do you understand how that works? There are many other uses for a <b>BEGIN</b> block in a one-liner, 
+    such as opening an output file used to print calculations from within the implicit 
+    <span class="purple">while</span> loop.</p>
+   
+   <p>Now I'd like to introduce quite possibly the most useful one-liner you will ever see. I have used variations 
+    of it countless times. Ladies and gentlemen—the <i>concordance</i> one-liner! A one-liner for producing a count of items seen 
+    in the input, by 
+    counting them in a hash.  (In my examples below I use a hash named <span class="red">%h</span>, but there's
+    nothing special about that name whatsoever, and you could use a hash of any name you want.)
+    It usually contains an <b>END</b> block of the 
+    form: <b>END{ print "$_: $h{$_}" foreach keys %h }</b>. It can use the postfixed 
+    <span class="purple">foreach</span>, but any of the following forms may be used instead:</p>
+   
+<div class="observeBox"><div class="observeTitle">OBSERVE: END block variations</div><div class="observe"><pre>
+END{ print "$_: $h{$_}" foreach sort keys %h }
+END{ print "$_: $h{$_}" foreach sort { $h{$a} cmp $h{$b} } keys %h }
+END{ print "$_: $h{$_}" foreach sort { $a &lt;=&gt; $b } keys %h }
+END{ print "$_: $h{$_}" foreach sort { $h{$b} cmp $h{$a} } keys %h }
+END{ print "$_: $h{$_}" foreach sort { $h{$a} &lt;=&gt; $h{$b} } keys %h }
+END{ print "$_: $h{$_}" foreach sort { $h{$b} &lt;=&gt; $h{$a} } keys %h }
+END{ print "$_: $h{$_}" foreach keys %h }
+</pre></div></div>
+
+   <p>Take a look at those variations. They represent various ways of printing a list sorted "asciibetically" or 
+    numerically, either by key or by value from the hash. Can you assign the correct description to each 
+    block? </p>
+   
+   <p>The way we populate <span class="red">%h</span> varies, but whatever way we choose, it's going to happen inside the 
+    implicit <span class="purple">while</span> loop from the <b>-n</b> flag. Here's an example; say we have a lengthy input 
+    file containing IP addresses of machines that have attempted to connect to our machine at given times. The 
+    file starts like this:</p>
+   
+<div class="observeBox"><div class="observeTitle">OBSERVE: connection report</div><div class="observe"><pre>
+Time Address
+00:12:58 29.77.211.85
+00:15:48 253.173.225.68
+00:18:17 156.79.243.123
+00:21:10 36.134.160.68
+</pre></div></div>
+   
+   <p>A single space character separates the fields. You have been asked to find out which addresses have 
+    attempted the most connections, and how many attempts have been made.  Use <b>wget</b> to copy the 
+    <span class="darkred">connections</span> file 
+    into your /perl2 directory. Type the code below in the Unix window as shown:</p>
+
+<div class="interactiveBox"><div class="interactiveTitle">INTERACTIVE SESSION:</div><div class="interactive"><pre>cold:~/perl2$ <ins>wget "http://courses.oreillyschool.com/Perl2/connections"</ins>
+--08:32:47--  http://courses.oreillyschool.com/Perl2/connections
+           =&gt; `connections'
+Resolving www.oreillyschool.com... 63.171.219.110
+Connecting to www.oreillyschool.com|63.171.219.110|:80... connected.
+HTTP request sent, awaiting response... 200 OK
+Length: 3,879 (3.8K) [text/plain]
+
+100%[======================================================================================================================================&gt;] 3,879         --.--K/s             
+
+08:32:47 (49.99 MB/s) - `connections' saved [3879/3879]
+cold:~/perl2$ 
+</pre></div></div>        
+    
+   <p>Then, type this one-liner into the Unix window as shown:</p>
+   
+<div class="interactiveBox"><div class="interactiveTitle">INTERACTIVE TERMINAL SESSION:</div><div class="interactive"><pre>cold:~/perl2$ <ins>perl -nle '/ (\d.*)/ and $h{$1}++; END{ print "$_: $h{$_}" foreach sort { $h{$b} &lt;=&gt; $h{$a} } keys %h }' ./connections</ins>
+<i>(some output removed for the sake of brevity; your output will differ)</i>
+130.247.245.62: 1
+22.127.4.96: 1
+47.68.249.66: 1
+91.68.249.66: 1
+159.150.244.67: 1
+7.3.203.82: 1
+28.171.37.72: 1
+190.199.46.207: 1
+72.243.168.209: 1
+178.124.131.63: 1
+27.9.161.165: 1
+cold:~/perl2$ 
+</pre></div></div>
+   
+   <p>Wow. Now, to help management read this (because invariably their response to that report will be, "Too much
+    information! I just want to see the top offenders"), let's pipe it through the Unix <b>head</b> command 
+    (of course, you don't need to type the entire line again; just press the up arrow key, then press the 
+    <b>End</b> key to move the cursor to the end of the line, and type the additional code as shown:</p>
+   
+<div class="interactiveBox"><div class="interactiveTitle">INTERACTIVE TERMINAL SESSION:</div><div class="interactive"><pre>cold:~/perl2$ perl -nle '/ (\d.*)/ and $h{$1}++; END{ print "$_: $h{$_}" foreach sort { $h{$b} &lt;=&gt; $h{$a} } keys %h }' ./connections<ins> | head -5</ins>
+cold:~/perl2$ 
+</pre></div></div>
+   
+   <p><span class="darkred">head</span> is a program that just prints out the first few lines of its input, in this
+    case, the first five lines (because of the <b>-5</b> argument).</p> 
+   
+   <p>Let's dissect this one-liner. It's the longest one we've written to date, so I'll turn it into the 
+    equivalent program for the purpose of understanding it:</p>
+   
+<div class="observeBox"><div class="observeTitle">Program Equivalent</div><div class="observe"><pre>
+while ( &lt;&gt; )
+{
+  / (<span class="orange">\d</span><span class="darkblue">.*</span>)/ and $h{<span class="darkred">$1</span>}<span class="green">++</span>;
+}
+
+foreach ( sort { $h{$b} &lt;=&gt; $h{$a} } keys <span class="red">%h</span> } )
+{
+  print "$_: $h{$_}";
+}
+</pre></div></div>
+   
+   <p>Let's look at the regex first. Remember that spaces match literally inside regexes, so that leading 
+    space (between the first "/" and the "(") forces the parentheses to capture after the end of the first 
+    field (the timestamp); the <span class="orange">\d</span> at the start of the capture group means the heading line 
+    ("Time Address") won't match. We're matching a space followed by a digit and then as many more characters
+    as exist in the line (<span class="darkblue">.*</span>).</p>
+   
+   <p>The parentheses around <span class="orange">\d</span><span class="darkblue">.*</span> mean that the input that matches that 
+    part (the IP address) will be saved in <span class="darkred">$1</span>. We use that as a key in a hash 
+    <span class="red">%h</span>—<i>we have not declared that hash;</i> again, you don't need to declare variables in one-liners 
+    (there's no <span class="purple">use strict</span> statement).</p>
+   
+   <p>We postincrement the hash value $h{<span class="darkred">$1</span>} with <span class="green">++</span>. Perl will create each 
+    hash entry the first time we reference it, so the first time we capture any particular address in 
+    <span class="darkred">$1</span>, this statement will attempt to increment the corresponding hash entry, find that 
+    it's not in the hash, automatically create it with a value of undef, and then increment it, turning the 
+    value into 1. This all occurs inside the while loop (which is explicit in the equivalent program but 
+    <i>implicit in the one-liner)</i>.</p>
+   
+   <p>Then, at the end of the program, we loop over all of the keys of the hash, sorted by descending numerical 
+    order of the corresponding value (the number of times each IP address was seen), printing out the IP address 
+    and the number of times we saw it.</p>
+   
+   <p>Just so you understand that there's nothing sacred about the name <span class="red">%h</span>, try it again with
+    a hash <span class="red">%d</span>:</p>
+   
+<div class="interactiveBox"><div class="interactiveTitle">INTERACTIVE TERMINAL SESSION:</div><div class="interactive"><pre><ins>cold:~/perl2$ perl -nle '/ (\d.*)/ and $d{$1}++; END{ print "$_: $d{$_}" foreach sort { $d{$b} &lt;=&gt; $d{$a} } keys %d }' ./connections | head -5</ins>
+cold:~/perl2$ 
+</pre></div></div>
+   
+   <p>The point here is that in typing a one-liner, we tend to use one-letter variable names to keep the lines 
+    short. </p>
+   
+   <p>I get asked for that kind of information all the time, and using a one-liner like that, I am able to 
+    provide it. You're looking at seriously useful Perl code for solving real-world problems 
+    quickly; learn it, live it, love it!</p>
+  
+  <p>The principal value of the one-liner is as a one-off piece of code that you literally type just once. 
+   You might find yourself saving a one-liner in a shell alias, but that would be about the extent of 
+   reuse.</p>
+    
+  <p>The possible uses of the match operator are endless. I used one a few minutes ago while starting the 
+   next lesson. I had stored my code examples in subdirectories named <span class="orange">Lesson1</span>, 
+   <span class="orange">Lesson2</span>...<span class="orange">Lesson9</span>, and was about to create 
+   <span class="orange">Lesson10</span> when I realized that the directories wouldn't sort in the order I wanted when I 
+   did an <span class="blue">ls</span> in the parent directory.  The solution was to rename those directories to 
+   <span class="orange">Lesson01</span>, <span class="orange">Lesson02</span>...<span class="orange">Lesson09</span>. But that's nine 
+   <span class="blue">mv</span> commands to type—so tedious! Instead, I enlisted the help of Perl's 
+   <span class="darkgreen">rename</span> function and typed this: </p>
+  
+<div class="observeBox"><div class="observeTitle">OBSERVE: rename pipeline</div><div class="observe"><pre>
+<span class="blue">ls</span> | perl <span class="darkblue">-n</span><span class="darkred">l</span>e '/(<span class="orange">Lesson</span>)(\d)/ and <span class="purple">rename</span> $_, "${1}0$2"'
+</pre></div></div>
+  
+  <p>The <span class="blue">ls</span> command produces a list of every file in the current directory (I could do this 
+   from within Perl, but this is a simpler approach), and because <b>stdout</b> is a pipe, it will have one file per 
+   line.  Perl's <span class="darkblue">-n</span> flag processes that list one file at a time, and the 
+   <span class="darkred">-l</span> flag autochomps each line. The match operator looks for files of the form 
+   <span class="orange">Lesson</span> followed by a digit (there might be other files in the directory), and when it 
+   matches, <span class="purple">rename</span>s the file to the same name with a zero inserted before the digit. Be aware 
+   that this would <i>not</i> have worked if I had executed it <i>after</i> creating the
+   <span class="orange">Lesson10</span> directory. (Why? And how would you fix it?)</p>
+    
+  <p>Oh, and I snuck something new in there (more is more!). I needed to construct a string that contained the variable 
+   <span class="red">$1</span> followed by the digit 0 and then the variable <span class="red">$2</span>. But if I just typed 
+   <span class="orange">"$10$2"</span>, Perl would think I was referring to the variable <span class="red">$10</span>. Of course, I 
+   could use the concatenation operator to get around this: <span class="red">$1</span> . <span class="orange">'0'</span> . 
+   <span class="red">$2</span>. But instead I used an alternative syntax for Perl variable names that tells Perl exactly 
+   where the variable name begins and ends—with the curly brackets. So, you can write strings like 
+   <span class="orange">"I have $count ${fruit}s"</span> to get a result like <span class="orange">"I have 4 apples"</span>.</p>
+  
+  <p>You're really getting the hang of this stuff now, huh? Good job! 
+   After you've finish your assignments, I'll see you in the next lesson...</p>
+  
+  </div>
+ <br><br><br><br> 
+ <p>Once you finish this lesson, go back to the syllabus page by clicking on the page tab above and do
+  the assignments.</p>
+<div class="footer"><div id="timeSurvey"></div>				
+				Copyright © 1998-2014 O'Reilly Media, Inc.<br><img src="https://courses.oreillyschool.com/common/cclicense.png"><br>
+				This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 Unported License.<br>
+				See <a href="http://creativecommons.org/licenses/by-sa/3.0/legalcode">http://creativecommons.org/licenses/by-sa/3.0/legalcode</a> 
+				for more information.
+				</div><iframe id="t" width="1" height="1" border="0" style="display:none"></iframe><script language="javascript">bodyLoaded();</script><script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+  ga('create', 'UA-44720547-1', 'oreillyschool.com');
+  ga('send', 'pageview');
+</script></body></html>

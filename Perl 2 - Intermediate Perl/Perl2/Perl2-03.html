@@ -1,0 +1,401 @@
+<html><!-- Copyright (c) 1998-2014 O'Reilly Media, Inc.
+			This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 Unported License.
+			See http://creativecommons.org/licenses/by-sa/3.0/legalcode for more information.
+            --><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"><link rel="stylesheet" type="text/css" href="../common/Lab.css"><script type="text/javascript" src="../common/Lab.js"></script><script language="javascript"></script><title>Perl's Default Variable</title></head><body id="body"><a name="top"></a><div class="title">Perl's Default Variable</div><div class="resize"><a href="Perl2-03.html#top" onclick="changeSize('smaller');" class="aS" title="Keep clicking to make fonts smaller">A</a><a href="Perl2-03.html#top" onclick="changeSize('larger');" class="aL" title="Keep clikcing to make fonts larger">A</a><a href="Perl2-03.html#top" onclick="lv()" class="lv" title="Adjust Page for High Contrast">HC</a><div id="fh"><p>Click on <span class="aS">A</span> to make all fonts on the page smaller.</p><p>Click on <span class="aL">A</span> to make all fonts on the page larger.</p><p>Click on <span class="lv">HC</span> to toggle high contrast mode. When you move your mouse over 
+                 some bold words in high contrast mode, related words are automatically highlighted. Text is shown
+                 in black and white. 
+             </p></div></div><hr>
+ 
+ <div class="goalTitle">Lesson Objectives</div><div class="goals">
+  
+  
+  When you complete this lesson, you will be able to:
+  
+  <ul><li>use a <i>default</i> variable.</li><li>determine whether a value is defined before you test its 
+    length.</li><li>use the <i>predefined</i> filehandles.</li></ul>
+ </div><hr>
+ 
+ <a name="h_01"></a><div class="heading">The Wonderful World of $_</div><div class="headingText">
+   
+   <p>This morning, I had cereal for breakfast. First I got the cereal out, then I put the cereal in a bowl, 
+    then I added milk to the cereal, and then I put some fruit on top of the cereal. Finally, I ate the 
+    cereal.</p>
+   
+   <p>What's wrong with that paragraph? It needlessly repeats the word "cereal" everywhere, as though it were
+    an advertisement crafted by the Council on Carbohydrates. People don't talk like that. We'd be more likely 
+    to say something like "This morning, I had cereal for breakfast. First I got it out, then I put it in a 
+    bowl, then I added milk, and then I put some fruit on top. Finally, I ate it." In other words, we use the 
+    <i>pronoun</i> "it" to avoid repeating something that's understood, and sometimes we can even leave out 
+    the pronoun as well, where the context makes clear what we're referring to. </p>
+   
+   <p>Perl has something similar to the pronoun "it"—a <i>default</i> variable that is the implied target of many 
+    operators and built-in functions in Perl. If you do not specify a variable, 
+    the functions and operators are executed on the default variable. That variable is <b>$_</b>, 
+    and it is the single most important 
+    variable in Perl. You <i>must</i> know explicitly which operators and functions use $_; do not 
+    assume or guess. We'll go over the 
+    most common uses of <b>$_</b> in this course.</p>
+  
+  <p>Let's get started by taking a look at some examples of those operators that commonly use <b>$_</b>:</p>
+   
+  <p><b>print()</b>: The default thing to print is <b>$_</b>:</p>
+   
+<div class="observeBox"><div class="observeTitle">OBSERVE: print and $_</div><div class="observe"><pre>
+print;
+print {$fh};
+</pre></div></div>
+   
+  <p>The first statement above will print whatever is in <b>$_</b> to the currently selected filehandle (by default, 
+   standard output). The second statement prints whatever is in <b>$_</b> to the filehandle <b>$fh</b>.</p>
+   
+   <p><b>foreach()</b>: The default loop variable in foreach() statements is <span class="darkblue">$_</span>:</p>
+   
+<div class="observeBox"><div class="observeTitle">OBSERVE: foreach and $_</div><div class="observe"><pre>
+foreach ( @fruit )
+{
+  # Do something with <span class="darkblue">$_</span>
+}
+</pre></div></div>
+   
+   <p>Technically, this is not the same as <b>foreach my $_ ( @fruit )</b> because you can't say
+    <b>my $_</b>—the variable does not belong to you, it belongs to Perl. But you can think of it 
+    that way. (Alright, in the 
+    very latest versions of Perl you <i>can</i> say <b>my $_</b>, but don't do it until you know a whole lot 
+    more about variables—for now just trust me on that.)</p>
+   
+  <p>To illustrate what you can expect in terms of the scoping of <b>$_</b> as the implicit variable in a 
+   foreach loop, create <b>foreach.pl</b>. Type the code below as shown:</p>
+   
+<div class="listingBox"><div class="listingTitle">CODE TO TYPE:</div><div class="listing"><pre><ins>#!/usr/bin/perl
+use strict;
+use warnings;
+
+$_ = "Outer\n";
+
+print;
+
+foreach ( "  Inner1\n", "  Inner2\n", "  Inner3\n" )
+{
+  print;
+}
+
+print;</ins></pre></div></div>
+   
+  <p><img src="images/coderunner/checksyntax.JPG"> and run it.</p>
+  <p> The output illustrates that the 
+    previous ("Outer") value of <b>$_</b> was restored after the loop.</p>
+   
+   <p><b>defined() and length()</b>: Two of the functions that operate on a single scalar 
+    and use <b>$_</b> by default. </p>
+  
+  <p>It's not uncommon to use them both in a single 
+    expression. Suppose you want to know whether a variable (let's say, $input) is not the empty 
+    string. You might start out by writing <b>stringtest.pl</b> as shown:</p>
+   
+<div class="listingBox"><div class="listingTitle">CODE TO TYPE: stringtest.pl</div><div class="listing"><pre>
+#!/usr/bin/perl
+use strict;
+use warnings;
+
+my $input = '';
+if ( $input ) 
+{
+  print "\$input is not the empty string\n";
+}   
+else
+{
+  print "\$input is the empty string\n";
+}
+</pre></div></div>
+   
+   <p>But that's no good, because the string "0" has a positive length (of one), yet it is false. Modify 
+    <b>stringtest.pl</b> as shown:</p>
+   
+<div class="listingBox"><div class="listingTitle">CODE TO TYPE: stringtest.pl</div><div class="listing"><pre>
+#!/usr/bin/perl
+use strict;
+use warnings;
+
+my $input = '<ins>0</ins>';
+if ( $input ) 
+{
+  print "\$input is not the empty string\n";
+}   
+else
+{
+  print "\$input is the empty string\n";
+}
+</pre></div></div>
+   
+  <p>Whoops. So next you might try this modification to your <b>stringtest.pl</b> code:</p>
+   
+<div class="listingBox"><div class="listingTitle">CODE TO TYPE: stringtest.pl</div><div class="listing"><pre>
+#!/usr/bin/perl
+use strict;
+use warnings;
+
+my $input = '0';
+if ( <ins>length </ins>$input ) 
+{
+  print "\$input is not the empty string\n";
+}   
+else
+{
+  print "\$input is the empty string\n";
+}
+</pre></div></div>
+   
+   <p>Hmm. It's still not enough, because it's possible that <span class="darkblue">$input</span> has never 
+    been initialized and 
+    still contains <span class="darkred">undef</span>. Okay then, modify <b>stringtest.pl</b> as shown:</p>
+  
+   <div class="listingBox"><div class="listingTitle">CODE TO TYPE: stringtest.pl</div><div class="listing"><pre>
+#!/usr/bin/perl
+use strict;
+use warnings;
+
+my $input<del> = '0'</del>;
+if ( length $input ) 
+{
+  print "\$input is not the empty string\n";
+}   
+else
+{
+  print "\$input is the empty string\n";
+}
+</pre></div></div>
+   
+    <p>That time you got a warning "Use of uninitialized value $input in 
+    length." You don't want any warnings, so you need to test to determine whether the value is defined before you test its 
+    length. You can do that by modifying your code as shown:</p>
+   
+   <div class="listingBox"><div class="listingTitle">CODE TO TYPE: stringtest.pl</div><div class="listing"><pre>
+#!/usr/bin/perl
+use strict;
+use warnings;
+
+my $input;
+if ( <ins>defined( $input ) &amp;&amp; length( $input )</ins><del>length $input</del> ) 
+{
+  print "\$input is not the empty string\n";
+}   
+else
+{
+  print "\$input is the empty string\n";
+}
+</pre></div></div>
+
+   <p>(This time we added parentheses for readability, but it works just the same without them.)</p>
+   
+   <p>If the variable you're testing is <span class="darkblue">$_</span>, you can write this:</p>
+   
+<div class="observeBox"><div class="observeTitle">OBSERVE: testing $_</div><div class="observe"><pre>
+if ( defined &amp;&amp; length )
+{
+  do_something();
+}
+</pre></div></div>
+   
+   <p>The alternative postfixed conditional form of that would be:</p>
+   
+<div class="observeBox"><div class="observeTitle">OBSERVE: testing $_</div><div class="observe"><pre>
+do_something() if defined &amp;&amp; length;
+defined &amp;&amp; length and do_something();
+</pre></div></div>
+ 
+  </div>
+  <a name="h_02"></a><div class="heading">More Postfixed Modifiers</div><div class="headingText">
+   
+   <p>Now that we've been introduced to <span class="darkblue">$_</span> and the postfixed conditionals, 
+    let's talk about a new 
+    postfixed statement modifier: <b>foreach</b>. Here's its general form:</p>
+   
+<div class="observeBox"><div class="observeTitle">OBSERVE: postfixed foreach</div><div class="observe"><pre>
+<i>statement</i> foreach <i>list</i>;
+</pre></div></div>
+   
+   <p>You don't need curly brackets or parentheses around the list. <i>But</i> you cannot
+    specify a loop variable; it is forced to be $_. Let's start out with a quick example. Modify 
+    <b>foreach.pl</b> as shown:</p>
+   
+<div class="listingBox"><div class="listingTitle">CODE TO EDIT: foreach.pl</div><div class="listing"><pre>
+#!/usr/bin/perl
+use strict;
+use warnings;
+
+$_ = "Outer\n";
+
+print;
+
+<del>foreach ( "  Inner1\n", "  Inner2\n", "  Inner3\n" )
+{
+  print;
+}</del>
+<ins>print foreach "  Inner1\n", "  Inner2\n", "  Inner3\n";</ins>
+    
+print;
+</pre></div></div>
+   
+   <p><img src="images/coderunner/checksyntax.JPG"> and run it.</p>
+   <p>You get the same result. Like the 
+    postfixed conditionals, this statement is <i>syntactic sugar</i> for the statement we had earlier that contained 
+    the curly braces and parentheses. You don't have to use this form of <b>foreach</b>; you can always 
+    stick to the longer one if you want, even when there's only one statement in the block. Here's 
+    another example:</p>
+   
+<div class="observeBox"><div class="observeTitle">OBSERVE: postfixed foreach</div><div class="observe"><pre>
+print "$_: $count{$_}\n" foreach <span class="darkgreen">sort</span> <span class="darkred">keys</span> %count;
+</pre></div></div>
+   
+
+   <p>That one is so common that it's an idiom in its own right, and you'll use it in a program
+   later in this lesson. The most common thing to want to do with a 
+   hash is to dump it out in some predictable ordering so you can look at its contents. You'll likely use a 
+   line like that frequently (if only during development) so you can verify the contents of a hash. (The 
+   predictability comes from using <span class="darkgreen">sort</span> on the list of keys, which are otherwise 
+   returned in an effectively random order from <span class="darkred">keys</span>.)</p>
+   
+   <p>While we're learning the postfixed <b>foreach</b>, let's also look at the postfixed <b>while</b>. Its 
+    general form is: </p>
+   
+<div class="observeBox"><div class="observeTitle">OBSERVE: postfixed while</div><div class="observe"><pre>
+<i>statement</i> while <i>condition</i>;
+</pre></div></div>
+   
+   <p>Again, no braces, and no parentheses necessary around the condition. As you might have guessed, 
+    this also is syntactic sugar for the longer form. There is also a 
+    postfixed <b>until</b>:</p>
+   
+<div class="observeBox"><div class="observeTitle">OBSERVE: postfixed until</div><div class="observe"><pre>
+<i>statement</i> until <i>condition</i>;
+</pre></div></div>
+   
+   <p>Let's look at an example that copies the standard input to the standard output, prefixed 
+    with line numbers. Create <b>number.pl</b> as shown:</p>
+   
+<div class="listingBox"><div class="listingTitle">CODE TO TYPE:</div><div class="listing"><pre><ins>#!/usr/bin/perl
+use strict;
+use warnings;
+
+my $line;
+my $count = 1;
+printf "%5d %s", $count++, $line while defined( $line = &lt;STDIN&gt; ); </ins>
+</pre></div></div>
+   
+   <p><img src="images/coderunner/checksyntax.JPG"> and run it.  Now type the code below 
+    into the Unix Window that's running <b>number.pl</b>:</p>
+   
+<div class="interactiveBox"><div class="interactiveTitle">INTERACTIVE TERMINAL SESSION</div><div class="interactive"><pre>cold:~$ <ins>cd perl2</ins>
+cold:~/perl2$ <ins>./number.pl &lt; ./number.pl</ins>
+</pre></div></div>
+   
+   <p>Most programs of this type (a text <i>filter</i>) use <b>&lt;&gt;</b> to read input, 
+    but now I want to introduce you to a new, <i>predefined</i>, filehandle: <b>STDIN</b>. Perl sets this up for 
+    you, open to the standard input, so you can read from it. You may wonder why it's a word instead of a 
+    scalar, like, for example, $STDIN? It's because STDIN originates from a much earlier version of Perl that didn't 
+    have filehandles in scalars. When filehandles in scalars were introduced, the Perl maintainers 
+    decided to keep the old name of <b>STDIN</b> around so as not to break older programs. 
+    They also decided not to introduce new scalar variables like $STDIN, because doing so might break 
+    older programs that used that variable for something else.</p>
+   
+   <p>There are two predefined output filehandles, named <b>STDOUT</b> and <b>STDERR</b>, opened to the 
+    standard output and standard error streams respectively.</p>
+   
+   <p>Let's wrap this up with one more example. First, copy the file <a href="gettysburg.txt" target="_blank">gettysburg</a>  
+    to your current directory. This contains the text of Lincoln's <i>Gettysburg Address</i>, and it will be 
+    interesting input to the program we are about to write. Then, create <b>word_counter.pl</b> by typing the code below as shown:
+   </p>
+   
+<div class="listingBox"><div class="listingTitle">CODE TO TYPE: word_counter.pl</div><div class="listing"><pre><ins>#!/usr/bin/perl
+use strict;
+use warnings;
+
+my %count;
+while ( $_ = &lt;&gt; )   # See note below
+{
+  my @words = split;
+  $count{$_}++ foreach @words;
+}
+
+print "$_: $count{$_}\n" foreach sort keys %count;
+</ins></pre></div></div>
+   
+   <p><img src="images/coderunner/checksyntax.JPG"> and run it in the terminal window as shown below:</p>
+   
+<div class="interactiveBox"><div class="interactiveTitle">INTERACTIVE TERMINAL SESSION</div><div class="interactive"><pre>cold:~/perl2$ <ins>./word_counter.pl ./gettysburg.txt</ins>
+</pre></div></div>
+   
+   <p><table class="noteBox fBox pBox "><tr><td class="noteTitle">Note</td><td class="note">This program explicitly assigns to $_ in the <b>while</b> condition. Don't start using that idiom 
+    in your own programs! Within a few lessons, you'll see how to replace that with a much better 
+    alternative.</td></tr></table></p>
+  
+   <p>The program counts the number of occurrences of every word in the files named on the command line. You 
+    can run it on any text file; <i>The Gettysburg Address</i> just happens to provide a data set that's interesting 
+    and not too big for our purposes.</p>
+   
+   <p>Another new element in this example is that there are <i>no</i> arguments to 
+    the <span class="darkgreen">split</span> function. The second argument (what to split) defaults to, you guessed 
+    it, $_. And the first argument (the token to split on) defaults to white space. So this makes a decent 
+    first approximation of a word finder. You wouldn't want to use it in any application that took a 
+    linguistic view of the concept of "word," because it does nothing to eliminate punctuation, for 
+    example.</p>
+   
+   <p>And if you think <i>that</i> program was succinct, it can be made even shorter by
+    eliminating a temporary variable. Modify your code as shown:</p>
+ 
+<div class="listingBox"><div class="listingTitle">CODE TO EDIT: word_counter.pl</div><div class="listing"><pre>#!/usr/bin/perl
+use strict;
+use warnings;
+
+my %count;
+while ( $_ = &lt;&gt; )   # See note above
+{
+<del>  my @words = split;
+  $count{$_}++ foreach @words;</del>
+<ins>  $count{$_}++ foreach split;</ins>
+}
+
+print "$_: $count{$_}\n" foreach sort keys %count;
+</pre></div></div>
+   
+   <p><img src="images/coderunner/checksyntax.JPG"> and run it in the terminal window as shown:</p>
+   
+<div class="interactiveBox"><div class="interactiveTitle">INTERACTIVE TERMINAL SESSION</div><div class="interactive"><pre>cold:~/perl2$ <ins>./word_counter.pl ./gettysburg.txt</ins>
+</pre></div></div>
+
+   <p>You'll see the same results.</p>
+   
+  </div>
+  
+  <p>Some programmers don't like <b>$_</b> because they believe that every variable in a program should be visible 
+   and explicit. And certainly if you're using <b>$_</b>, the big advantage in doing so <i>is</i> gained by using it 
+   implicitly (in functions and operators that use it as a default). That makes for code that is more readable 
+   by virtue of its succinctness (think back to the paragraph about cereal). It defeats the usefulness of 
+   <b>$_</b> to mention it explicitly, over and over. Still, you usually can't avoid mentioning it here 
+   and there. A good rule of thumb is that the number of implicit uses of <b>$_</b> in a section of code 
+   should exceed the number of explicit uses. </p>
+  
+  <p>If you don't like the idea of <b>$_</b> to begin with, then you don't need to use it. But because 
+   <b>$_</b> is a very <i>Perlish</i> notion (based on patterns of natural language), you <i>do</i> need to 
+   understand it because you will encounter it in virtually every Perl program ever written. And 
+   we will be using it a lot throughout the rest of this course! If you think I'm joking about how Perlish 
+   <b>$_</b> is, check out this T-shirt design the Portland Perl Mongers considered for 2010:</p>
+  
+  <p><div class="c"><img src="images/lessonImages/PDX-shirt.png" width="350" height="319"></div></p>
+ <br><br><br><br>
+  <p>Once you finish the lesson, go back to the syllabus page by clicking on the page tab above and do the 
+   assignments. Good work so far. See you in the next lesson!</p>
+ 
+<div class="footer"><div id="timeSurvey"></div>				
+				Copyright © 1998-2014 O'Reilly Media, Inc.<br><img src="https://courses.oreillyschool.com/common/cclicense.png"><br>
+				This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 Unported License.<br>
+				See <a href="http://creativecommons.org/licenses/by-sa/3.0/legalcode">http://creativecommons.org/licenses/by-sa/3.0/legalcode</a> 
+				for more information.
+				</div><iframe id="t" width="1" height="1" border="0" style="display:none"></iframe><script language="javascript">bodyLoaded();</script><script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+  ga('create', 'UA-44720547-1', 'oreillyschool.com');
+  ga('send', 'pageview');
+</script></body></html>

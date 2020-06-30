@@ -1,0 +1,514 @@
+<html><!-- Copyright (c) 1998-2014 O'Reilly Media, Inc.
+			This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 Unported License.
+			See http://creativecommons.org/licenses/by-sa/3.0/legalcode for more information.
+            --><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"><link rel="stylesheet" type="text/css" href="../common/Lab.css"><script type="text/javascript" src="../common/Lab.js"></script><script language="javascript"></script><title>More Perl Flags; More Perl Operators</title></head><body id="body"><a name="top"></a><div class="title">More Perl Flags; More Perl Operators</div><div class="resize"><a href="Perl2-11.html#top" onclick="changeSize('smaller');" class="aS" title="Keep clicking to make fonts smaller">A</a><a href="Perl2-11.html#top" onclick="changeSize('larger');" class="aL" title="Keep clikcing to make fonts larger">A</a><a href="Perl2-11.html#top" onclick="lv()" class="lv" title="Adjust Page for High Contrast">HC</a><div id="fh"><p>Click on <span class="aS">A</span> to make all fonts on the page smaller.</p><p>Click on <span class="aL">A</span> to make all fonts on the page larger.</p><p>Click on <span class="lv">HC</span> to toggle high contrast mode. When you move your mouse over 
+                 some bold words in high contrast mode, related words are automatically highlighted. Text is shown
+                 in black and white. 
+             </p></div></div><hr>
+  
+  <div class="goalTitle">Lesson Objectives</div><div class="goals">
+    
+    
+    When you complete this lesson, you will be able to:
+    
+    <ul><li>use <a href="Perl2-11.html#w_flag">the -w Flag</a>.</li><li>use <a href="Perl2-11.html#mstrict_flag">the -Mstrict Flag</a>.</li><li>use <a href="Perl2-11.html#c_flag">the -c Flag</a>.</li><li>use <a href="Perl2-11.html#trinary_operator">the Trinary Operator</a>.</li><li>use <a href="Perl2-11.html#scalar_range">the Scalar Range Operator</a>.</li></ul>
+  </div><hr>
+ 
+ 
+ 
+  
+ <a href="Perl2-11.html" name="w_flag"></a>
+ <a name="h_01"></a><div class="heading">The -w Flag</div><div class="headingText">
+   
+   <p>If you get ambitious with the <b>-e</b> flag, you'll appreciate the benefits of turning on warnings. 
+    Instead of having to type <span class="darkred">use warnings</span> at the beginning of the <b>-e</b> argument, 
+    you can include <b>-w</b> in the list of perl flags.</p>   
+   
+   <p>A handy use of <b>-e</b> is to test out some feature of Perl quickly, before using it in a program 
+    you're developing. Suppose that you want to perform host name to IP address resolution and you 
+    think you heard somewhere 
+    that Perl has the <span class="darkgreen">gethostbyname</span> function. You confirm this with <b>perldoc -f 
+      gethostbyname</b>, and see the basic syntax for using it. But you want to be sure you're using it properly before you 
+     put it in your program, and the documentation you see describes over a dozen other
+     functions at the same time. A quick and dirty one-liner is a perfect tool to make sure you're using the function the right way. 
+    Since whatever you learn is going to be used in a real program, you may want to make sure that warnings are 
+    enabled in your one-liner as well. No problem! Even a typo that results in a nonexistent host 
+    is easier to diagnose with <b>-w</b>. Type the code below in the Unix window as shown:</p>
+  
+<div class="interactiveBox"><div class="interactiveTitle">INTERACTIVE TERMINAL SESSION:</div><div class="interactive"><pre>cold:~$ <ins>perl -MSocket -le 'print inet_ntoa scalar gethostbyname "www.perl.org"'</ins>
+cold:~$ <ins>perl -MSocket -le 'print inet_ntoa scalar gethostbyname "www.perl.orc"'</ins>
+Bad arg length for Socket::inet_ntoa, length is 0, should be 4 at -e line 1.
+cold:~$ 
+</pre></div></div>
+  
+   <p>Now try it with <b>-w</b>. Type the code below in the Unix window as shown:</p>
+  
+<div class="interactiveBox"><div class="interactiveTitle">INTERACTIVE TERMINAL SESSION:</div><div class="interactive"><pre>cold:~$ perl -MSocket -<ins>w</ins>le 'print inet_ntoa scalar gethostbyname "www.perl.org"'
+cold:~$ perl -MSocket -<ins>w</ins>le 'print inet_ntoa scalar gethostbyname "www.perl.orc"'
+Use of uninitialized value in subroutine entry at -e line 1.
+Bad arg length for Socket::inet_ntoa, length is 0, should be 4 at -e line 1.
+cold:~$ 
+</pre></div></div>
+  
+  <p>This tells us that we should check the return from <span class="darkgreen">gethostbyname</span> before deciding 
+   whether to pass it to <span class="darkgreen">inet_ntoa</span>. This is in agreement with the documentation. So we 
+   come up with this version:</p>
+  
+<div class="interactiveBox"><div class="interactiveTitle">INTERACTIVE TERMINAL SESSION:</div><div class="interactive"><pre>cold:~$ <ins>perl -MSocket -wle '$packed_addr = gethostbyname "www.perl.org"; defined $packed_addr and print inet_ntoa $packed_addr'</ins>
+</pre></div></div>
+  
+  <p>It's almost ready to paste into a program. We'd just need to add in <span class="purple">my</span> to get it 
+   to work with <span class="darkred">use strict</span>. Which brings us to our next topic...</p>
+  
+   </div>
+ <a href="Perl2-11.html" name="mstrict_flag"></a>
+ <a name="h_02"></a><div class="heading">The -Mstrict Flag</div><div class="headingText">
+   
+   <p>So you've seen that <b>-w</b> invokes <span class="darkred">use warnings</span> in a one-liner;
+    now what about <span class="darkred">use strict</span>? There isn't a single letter flag that gives you the same 
+    capability. But you can use the <b>-M</b> flag, which is equivalent to <span class="darkred">use</span>, and 
+    pass <b>strict</b> as an argument, giving you this:</p>
+
+<div class="observeBox"><div class="observeTitle">OBSERVE: -Mstrict</div><div class="observe"><pre>
+<b>perl -Mstrict ...</b>
+</pre></div></div>
+   
+   <p>Now the code passed to <b>-e</b> must pass strictness checks as well.</p>
+   
+   <p>Since <b>-M</b> is a flag that means <span class="darkred">use</span>, <b>-Mwarnings</b> should be the 
+     equivalent of <span class="darkred">use warnings</span>. The 
+    <b>-w</b> flag dates back to the earliest version of Perl, preceding the introduction of the 
+    <span class="darkred">use</span> statement. Its effect is technically slightly different from that produced by 
+    <span class="darkred">use warnings</span>, but the difference is not relevant until you get much further along 
+    with Perl programming. For now, just know that in this course you're learning the best practices.</p>
+  
+  </div>
+ <a href="Perl2-11.html" name="c_flag"></a>
+ <a name="h_03"></a><div class="heading">The -c Flag</div><div class="headingText">
+   
+   <p>Sometimes you want to find out whether a program <i>compiles</i> correctly without actually running it. </p>
+   
+   <p>We can do that. Open the <span class="darkred">reg_capture3.pl</span> you created in an earlier lesson and modify it 
+    as shown:</p>
+   
+<div class="listingBox"><div class="listingTitle">CODE TO TYPE: reg_capture3.pl</div><div class="listing"><pre>#!/usr/bin/perl
+use strict;
+use warnings;
+
+use Socket;
+
+while ( <del>my $line = </del>&lt;DATA&gt; )
+{
+  chomp<del> $line</del>;
+  if ( /(\S+)\s+is\s+(\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})/ )
+  {
+    my ($name, $ip) = ($1, $2);
+    my $cname = gethostbyaddr( inet_aton( $ip ), AF_INET );
+    print "$name -&gt; $ip -&gt; $cname\n";
+  }
+                       ( $line =~ /(\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})\s+is\s+(\S+)/ )
+  <del>elsif</del><ins>elseif</ins> ( $line =~ /(\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})\s+is\s+(\S+)/ )
+  {
+    my ($ip, $name) = ($1, $2);
+    my $lookup;
+    if ( defined( $lookup = gethostbyname( $name ) ) )
+    {
+      $lookup = inet_ntoa( $lookup );
+    }
+    else
+    {
+      $lookup = "Couldn't resolve!";
+    }
+    print "$ip -&gt; $name -&gt; $lookup\n";
+  }
+  else
+  {
+    print "No match for '<del>$line</del><ins>$_</ins>'\n";
+  }
+}
+__END__
+www.oreillyschool.com is 63.171.219.89
+This line won't match
+208.201.239.101 is www.perl.com
+157.166.226.25 is cnn.com
+</pre></div></div>
+   
+   <p><img src="images/coderunner/save.gif"> and run it. Type the code in the Unix window 
+     as shown:</p>
+   
+<div class="interactiveBox"><div class="interactiveTitle">INTERACTIVE TERMINAL SESSION:</div><div class="interactive"><pre>cold:~$ <ins>cd perl2</ins>
+cold:~/perl2$  <ins>perl -c ./reg_capture3.pl</ins>
+elseif should be elsif at ./reg_capture3.pl line 16.
+Global symbol "$line" requires explicit package name at ./reg_capture3.pl line 16.
+syntax error at ./reg_capture3.pl line 17, near ")
+{"
+Can't use global $1 in "my" at ./reg_capture3.pl line 18, near "($1"
+syntax error at ./reg_capture3.pl line 30, near "else"
+./reg_capture3.pl had compilation errors.
+cold:~/perl2$ 
+</pre></div></div>
+   
+   <p>This example illustrates how fast one error can cascade into many.  
+     Start by tackling the first error from compiling or running a program, fix it, then compile or run again. 
+     Later errors may be caused by the first one. In this case, 
+    Perl identifies the problem on the first line. Let's fix the code:</p>
+      
+<div class="listingBox"><div class="listingTitle">CODE TO EDIT: reg_capture3.pl</div><div class="listing"><pre>
+#!/usr/bin/perl
+use strict;
+use warnings;
+
+use Socket;
+
+while ( &lt;DATA&gt; )
+{
+  chomp;
+  if ( /(\S+)\s+is\s+(\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})/ )
+  {
+    my ($name, $ip) = ($1, $2);
+    my $cname = gethostbyaddr( inet_aton( $ip ), AF_INET );
+    print "$name -&gt; $ip -&gt; $cname\n";
+  }
+  <del>elseif</del><ins>elsif</ins> ( <del>$line =</del> /(\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})\s+is\s+(\S+)/ )
+  {
+    my ($ip, $name) = ($1, $2);
+    my $lookup;
+    if ( defined( $lookup = gethostbyname( $name ) ) )
+    {
+      $lookup = inet_ntoa( $lookup );
+    }
+    else
+    {
+      $lookup = "Couldn't resolve!";
+    }
+    print "$ip -&gt; $name -&gt; $lookup\n";
+  }
+  else
+  {
+    print "No match for '$_'\n";
+  }
+}
+__END__
+www.oreillyschool.com is 63.171.219.89
+This line won't match
+208.201.239.101 is www.perl.com
+157.166.226.25 is cnn.com
+</pre></div></div>
+   
+   <p>Rerun the <b>perl -c</b> command. Now the syntax is okay, but perl doesn't run the
+    program. There might still be errors in the code that are only found at runtime.</p>
+   
+   <p>If the program includes a <span class="darkred">use strict</span> directive, <b>-c</b> will cause the program to 
+    be compiled with strictness checking enabled; there is no need to add <b>-Mstrict</b>.</p>
+   
+  </div>
+ <a href="Perl2-11.html" name="trinary_operator"></a>
+ <a name="h_04"></a><div class="heading">The Trinary Operator</div><div class="headingText">
+   
+   <p>Cast your mind back to the <a href="http://courses.oreillyschool.com/Perl2/Perl2-04.html" target="_blank">Regular Expressions</a> lesson (I know, it seems so long ago with everything that we've learned since  
+     then!), and open <span class="darkred">reg_literal2.pl</span> again for this lesson:</p>
+   
+<div class="observeBox"><div class="observeTitle">OBSERVE: reg_literal2.pl</div><div class="observe"><pre>
+#!/usr/bin/perl
+use strict;
+use warnings;
+
+foreach my $text ( qw(Matt bats the ball at Atticus) )
+{
+  print qq{"$text" };
+  if ( $text =~ /at/ )
+  {
+    print "matches";
+  }
+  else
+  {
+    print "does not match";
+  }
+  print " /at/\n";
+}
+</pre></div></div>
+   
+   <p>I want you to be <i>dissatisfied</i> any time you have code that doesn't 
+    look beautiful or map cleanly to the solution you've devised for a problem. When we translate the solution 
+    to a problem from its inception in our minds, into a computer language, some of its original elegance is always lost. 
+    Ideally, we'll use a language and write our programs such that degradation is minimized. One way we'll know that we
+    have not translated our vision cleanly is by the presence of repetitive code.</p>
+   
+   <p>If we apply that philosophical tangent to the program we're working on now, it would go something like this: The
+    <span class="purple">if...else</span> statement in our program is unsatisfying for some reason. The repetition of the 
+    <span class="darkgreen">print</span> statement may be a clue. The loop contents are: "Print 
+    <span class="red">$text</span>, followed by "matches" or "doesn't match" depending on whether the regex matched, 
+    followed by the closing text."  When we wrote our program, the only syntax we had available to us was the 
+    <span class="purple">if...else</span> statement, so we had to compromise.</p>
+   
+   <p>But Perl incorporates an operator that can help improve our existing code. It has various names: 
+    trinary operator, ternary operator, hook operator, tertiary operator. That's a lot of 
+    verbiage for one operator; here's what it looks like:</p>
+   
+<div class="observeBox"><div class="observeTitle">OBSERVE: Trinary Operator</div><div class="observe"><pre>
+<i>condition</i> ? <i>true_result</i> : <i>false_result</i>
+</pre></div></div>
+   
+   <p>The value of this expression is <i>true_result</i> if <i>condition</i> is true, and <i>false_result</i> 
+    if <i>condition</i> is false.  It works in scalar context and also list context:</p>
+   
+<div class="observeBox"><div class="observeTitle">OBSERVE: Trinary Operator Examples</div><div class="observe"><pre>
+$sign = $number &lt; 0 ? '-' : '+';
+
+<span class="red">@tokens</span> = /(\w+)\s+(\w+)/ ? ($1, $2) : <span class="red">@DEFAULT_TOKENS</span>;
+</pre></div></div>
+   
+   <p>In the second line, the regex is matching against <span class="red">$_</span>; if it succeeds, the two capturing 
+    groups get put into <span class="red">@tokens</span>, otherwise <span class="red">@tokens</span> is assigned from 
+    <span class="red">@DEFAULT_TOKENS</span>.</p>
+   
+   <p>Those examples both involve assignments, but the trinary operator shows up just as often as part 
+    of a larger expression. Modify <span class="darkred">reg_literal2.pl</span> as shown:</p>
+   
+<div class="listingBox"><div class="listingTitle">CODE TO EDIT: reg_literal2.pl</div><div class="listing"><pre>
+#!/usr/bin/perl
+use strict;
+use warnings;
+
+foreach my $text ( qw(Matt bats the ball at Atticus) )
+{
+  <del>print qq{"$text" }, 
+  $text =~ /at/ )
+  {
+    print "matches";
+  }
+  else
+  {
+    print "does not match";
+  }
+  print " /at/\n";</del><ins>
+  print qq{"$text" }, $text =~ /at/ ? "matches" : "does not match", " /at/\n";</ins>
+}  
+</pre></div></div>
+   
+   <p><img src="images/coderunner/checksyntax.JPG"> and run it. Now <i>that</i> is some serious code 
+    streamlining!</p>
+   
+   <p>The trinary operator is often helpful in one-liners. Let's modify one from earlier in this lesson. 
+     Type the code below in the Unix window as shown:</p>
+   
+<div class="interactiveBox"><div class="interactiveTitle">INTERACTIVE TERMINAL SESSION:</div><div class="interactive"><pre>cold:~/perl2$ <ins>perl -MSocket -wle '$packed_addr = gethostbyname shift; print defined $packed_addr ? inet_ntoa $packed_addr : "unknown host"' www.perl.orc</ins>
+unknown host
+code:~/perl2$
+</pre></div></div>
+   
+   <p>Now fix the typo in the host name. You can just use the up arrow key to repeat the code and then edit it as shown:</p>
+   
+<div class="interactiveBox"><div class="interactiveTitle">INTERACTIVE TERMINAL SESSION:</div><div class="interactive"><pre>cold:~/perl2$ perl -MSocket -wle '$packed_addr = gethostbyname shift; print defined $packed_addr ? inet_ntoa $packed_addr : "unknown host"' www.perl.or<del>c</del><ins>g</ins>
+207.171.7.63
+cold:~/perl2$ 
+</pre></div></div>
+   
+   <p>Now it prints an IP address. This example also illustrates how you can shift a parameter to the input list 
+    in <span class="red">@ARGV</span> in a one-liner; the command line arguments to the <b>-e</b> code come after the 
+    <b>-e</b> code, and we get at them by referencing <span class="red">@ARGV</span> or by calling 
+    <span class="darkgreen">shift</span> outside of a subroutine. </p>
+   
+  <a name="s_01"></a><div id="s_01"><div class="subheading">Nesting the Trinary Operator</div><div class="subheadingText">
+   
+   <p>The precedence of the trinary operator is such that it can be nested without parentheses to provide 
+    the functional equivalent of an <span class="purple">if...else</span> block, with an arbitrary number of
+    <span class="purple">elsif</span> clauses. Format this carefully to make sure it's readable. Let's revisit a 
+    familiar example from the first O'Reilly School Perl course. Create <span class="darkred">bmi2.pl</span> as 
+    shown:</p>
+   
+<div class="listingBox"><div class="listingTitle">CODE TO TYPE: bmi2.pl</div><div class="listing"><pre><ins>#!/usr/bin/perl
+use strict;
+use warnings;
+
+die "Usage: $0 height (inches) weight (pounds)\n" unless @ARGV == 2;
+
+my ($height, $weight) = @ARGV;
+my $bmi = $weight * 703 / $height ** 2;
+
+print $bmi &lt; 18.5 ? "Underweight"
+    : $bmi &lt; 24.9 ? "Normal"
+    : $bmi &lt; 29.9 ? "Overweight"
+    :               "Obese",
+    "\n";</ins>
+</pre></div></div>
+   
+   <p>The formatting makes all the difference in readability here. If that clause were written in 
+    a single line, you'd have a much harder time understanding or verifying its operation:</p>
+   
+<div class="observeBox"><div class="observeTitle">OBSERVE: Bad formatting</div><div class="observe"><pre>
+print $bmi &lt; 18.5 ? "Underweight" : $bmi &lt; 24.9 ? "Normal" : $bmi &lt; 29.9 ? "Overweight" : "Obese", "\n";
+</pre></div></div>
+  
+  </div></div>
+  <a name="s_02"></a><div id="s_02"><div class="subheading">The Trinary Operator as Lvalue</div><div class="subheadingText">
+   
+   <p>This modest little operator, unlike its counterpart in some other languages, can even be used as an 
+     <b>lvalue</b> in Perl. To see how, create <span class="darkred">lvalue_trinary.pl</span> as shown:</p>
+   
+<div class="listingBox"><div class="listingTitle">CODE TO TYPE: lvalue_trinary.pl</div><div class="listing"><pre><ins>#!/usr/bin/perl
+use strict;
+use warnings;
+
+my ($schnauzer, $mackerel) = (7, 12);
+my $species = 'fish';
+my %current_count = ( mammal =&gt; 1001, fish =&gt; 7269 );
+if ( $species eq 'mammal' )
+{
+  $schnauzer += $current_count{$species};
+}
+else
+{
+  $mackerel += $current_count{$species};
+}
+
+print "$schnauzer, $mackerel\n";</ins>
+</pre></div></div>
+   
+    <p><img src="images/coderunner/checksyntax.JPG"> and run it.  Now change it to use the <b>lvalue</b> trinary 
+    operator:</p>
+   
+<div class="listingBox"><div class="listingTitle">CODE TO EDIT: lvalue_trinary.pl</div><div class="listing"><pre>
+#!/usr/bin/perl
+use strict;
+use warnings;
+
+my ($schnauzer, $mackerel) = (7, 12);
+my $species = 'fish';
+my %current_count = ( mammal =&gt; 1001, fish =&gt; 7269 );
+<ins>( $species eq 'mammal' ? $schnauzer : $mackerel ) += $current_count{$species};</ins>
+<del>if ( $species eq 'mammal' )
+{
+  $schnauzer += $current_count{$species};
+}
+else
+{
+  $mackerel += $current_count{$species};
+}</del>
+print "$schnauzer, $mackerel\n";
+</pre></div></div>
+   
+    <p><img src="images/coderunner/checksyntax.JPG"> and run it again. See how much more readable and 
+    natural that is? </p>
+
+   <p>The trinary operator may remind you of the <span class="purple">if...(then)...else</span> block. Perl won't stop
+    you from using it instead of such a block, but it is really bad style to use the trinary operator in void 
+    context, that is, where you are not using its result, but for control flow. That 
+    could confuse your readers.</p>
+  
+  </div></div>
+ </div>
+ <a href="Perl2-11.html" name="scalar_range"></a>
+ <a name="h_05"></a><div class="heading">The Scalar Range Operator</div><div class="headingText">
+   
+  <p>Remember the humble range operator <span class="blue">..</span> that produces a list of consecutive increasing 
+   numbers?: </p>
+   
+<div class="observeBox"><div class="observeTitle">Range Operator</div><div class="observe"><pre>
+@small_integers = 1 <span class="blue">..</span> 99;   # Numbers 1 thru 99 inclusive
+</pre></div></div>
+   
+  <p>When I introduced it, I only showed its effect in <i>list</i> context. But in <i>scalar</i> context, the 
+   range operator has positively magical behavior. It acquires a memory of its <i>state</i>; in this case, it 
+   has two states and is therefore a <i>bistable flip-flop</i>. Specifically, every time it is evaluated (and 
+   by "it" I mean "this instance in the code of the scalar range operator, not one somewhere else, even if it 
+   has the same arguments; this operator is only meaningful inside a loop) in the initial 
+   state, Perl evaluates just the expression on the left side, until that expression returns true; after that, 
+   the range operator evaluates only its right hand side 
+   and returns true until the right hand side becomes true, after which it returns false again.</p>
+   
+  <p>That's a lot to take in—let's try an example. Create 
+   <span class="darkred">scalar_range.pl</span> as shown:</p>
+   
+<div class="listingBox"><div class="listingTitle">CODE TO TYPE: scalar_range.pl</div><div class="listing"><pre><ins>#!/usr/bin/perl
+use strict;
+use warnings;
+
+while ( &lt;DATA&gt; )
+{
+  if ( /\A\Z/ .. /\A\.\Z/ )
+  {
+    print "Body line: $_";
+  }
+  else
+  {
+    print "Other line: $_";
+  }
+}
+
+__END__
+From: Peter Scott &lt;peter@psdt.com&gt;
+To: Scott Gray &lt;scott@oreilly.com&gt;
+Subject: Perl 2, Lesson 11
+
+Hi Scott.  I just uploaded Lesson 11 of the
+Intermediate Perl series.  The students are
+really going to love the new one-liner capabilities!
+.
+Junk that's not part of the message...</ins>
+</pre></div></div>
+   
+   <p><img src="images/coderunner/checksyntax.JPG"> and run it.  The specification for email messages is 
+   that the body text comes after the first blank line; here we'll also pretend that a line containing just 
+   a period ends the email message and anything following that is not part of the message.</p>
+   
+  <p>You can see the effect of the flip-flop here. The expressions left and right of the operator are both regular
+   expressions operating by default on <span class="red">$_</span>. Until the expression on the left becomes true, the operator will 
+   return false; the left-side regex (<span class="orange">/\A\Z/</span>) is true when we reach a line that contains 
+   nothing between the beginning of the string and the end of the string, which may be preceded by a newline 
+   character (that's our blank line).</p>
+   
+  <p>Thereafter, the scalar range operator will return true until its right side becomes true; the 
+   right-side regex (<span class="orange">/\A\.\Z/</span>) is true when we reach a line that consists of precisely a 
+   period, optionally followed by a newline.</p>
+   
+  <p>You can have any expression you want on either side. The scalar range operator still has one more trick. If 
+   either the left or the right side is an integer, it will be compared to the line number of the current 
+   input stream. Create <span class="darkred">numbering.pl</span> as shown:</p>
+   
+<div class="listingBox"><div class="listingTitle">CODE TO TYPE: numbering.pl</div><div class="listing"><pre><ins>#!/usr/bin/perl
+use strict;
+use warnings;
+
+while ( &lt;DATA&gt; )
+{
+  print if ( 3 .. 5 ) || ( 10 .. 11 );
+}
+
+__END__
+Dear Sir,
+
+I received your request for a reference for Mr. Ronald Smith,
+who is interviewing with your company and hoping to obtain
+employment.  I am quite happy to report that
+he performed his duties with exemplary conduct during his
+entire tenure at our firm and we were eminently satisfied
+with his product.
+Whenever we observed him creating computer programs,
+it was a pleasure to see him go; I cannot find the
+words to describe how disgusted we were by his output
+of a letter of resignation.</ins>
+</pre></div></div>
+   
+   <p><img src="images/coderunner/checksyntax.JPG"> and run it. Oh my—we <i>do</i> need to check our 
+     output! We've actually got two scalar range operators at work there, which resulted in  
+   printing only lines 3 through 5 and 10 through 11 of the DATA stream.</p>
+   <p>You're doing great so far, and adding lots of handy new tools to your toolbox! Keep it up!</p>
+  
+ </div>
+  <br><br><br><br> 
+  <p>Once you finish this lesson, go back to the syllabus page by clicking on the page tab above and do
+    the assignments.</p>
+<div class="footer"><div id="timeSurvey"></div>				
+				Copyright © 1998-2014 O'Reilly Media, Inc.<br><img src="https://courses.oreillyschool.com/common/cclicense.png"><br>
+				This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 Unported License.<br>
+				See <a href="http://creativecommons.org/licenses/by-sa/3.0/legalcode">http://creativecommons.org/licenses/by-sa/3.0/legalcode</a> 
+				for more information.
+				</div><iframe id="t" width="1" height="1" border="0" style="display:none"></iframe><script language="javascript">bodyLoaded();</script><script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+  ga('create', 'UA-44720547-1', 'oreillyschool.com');
+  ga('send', 'pageview');
+</script></body></html>

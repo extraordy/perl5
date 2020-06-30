@@ -1,0 +1,655 @@
+<html><!-- Copyright (c) 1998-2014 O'Reilly Media, Inc.
+			This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 Unported License.
+			See http://creativecommons.org/licenses/by-sa/3.0/legalcode for more information.
+            --><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"><link rel="stylesheet" type="text/css" href="../common/Lab.css"><script type="text/javascript" src="../common/Lab.js"></script><script language="javascript"></script><title>Web Programming, on Web Servers</title></head><body id="body"><a name="top"></a><div class="title">Web Programming, on Web Servers</div><div class="resize"><a href="Perl4-09.html#top" onclick="changeSize('smaller');" class="aS" title="Keep clicking to make fonts smaller">A</a><a href="Perl4-09.html#top" onclick="changeSize('larger');" class="aL" title="Keep clikcing to make fonts larger">A</a><a href="Perl4-09.html#top" onclick="lv()" class="lv" title="Adjust Page for High Contrast">HC</a><div id="fh"><p>Click on <span class="aS">A</span> to make all fonts on the page smaller.</p><p>Click on <span class="aL">A</span> to make all fonts on the page larger.</p><p>Click on <span class="lv">HC</span> to toggle high contrast mode. When you move your mouse over 
+                 some bold words in high contrast mode, related words are automatically highlighted. Text is shown
+                 in black and white. 
+             </p></div></div><hr>
+ 
+ <div class="goalTitle">Lesson Objectives</div><div class="goals">
+ 
+ When you complete this lesson, you will be able to:
+ 
+  <ul><li><a href="Perl4-09.html#generating_html_with_perl">Generate HTML with Perl</a>.</li><li>execute <a href="Perl4-09.html#web_form_processing_with_perl">Web Form Processing with Perl</a>.</li></ul>
+  
+ </div><hr>
+ 
+ <p>Welcome to our first lesson on Perl programming for the World Wide Web! In this lesson, you'll learn 
+  how to generate HTML pages to be viewed in a web browser and how to read the results of forms submitted by a 
+  person using that web browser. Technically, those are two completely different functions, but it doesn't make 
+  much sense to parse a form without displaying a page in response, so we'll tackle them both together.</p>
+   
+
+ <a href="Perl4-09.html" name="generating_html_with_perl"></a>
+ <a name="h_01"></a><div class="heading">Generating HTML with Perl</div><div class="headingText">
+   
+  <p>The web pages we'll work with during this lesson are going to be relatively plain, ordinary pages because:</p>
+   
+  <ol><li>We're focusing specifically on Perl here, not the HTML, web page design, or cascading style sheets that are used 
+    to add graphic design elements to web pages.</li><li>We want the HTML source code to be as clean as possible so as not to confuse or distract from the Perl tasks at hand.</li><li>Your course author has no aesthetic sensibility (just ask his wife).</li></ol>
+  
+  <a name="s_01"></a><div id="s_01"><div class="subheading">HTML::Template</div><div class="subheadingText">
+   
+   <p>Alright, let's get going! We'll need a module from CPAN for this task. Install the HTML::Template module as shown:</p>
+   
+<div class="interactiveBox"><div class="interactiveTitle">INTERACTIVE TERMINAL SESSION: Command to type</div><div class="interactive"><pre>cold:~$ <ins>cd perl4</ins>
+cold:~/perl4$ <ins>PERL5LIB=~/mylib/lib/perl5 cpan HTML::Template</ins>
+[output omitted]
+  /usr/bin/make install  -- OK</pre></div></div>
+   
+   <p><table class="noteBox fBox pBox "><tr><td class="noteTitle">Note</td><td class="note"> There are numerous modules available for HTML templating. HTML::Template strikes the right balance 
+    for our purposes; it's not too difficult to learn, has the capability we need, and is useful in a production environment. If 
+    you plan to do a lot of templating for big sites, you'll want to learn the Template Toolkit, which is
+    much more capable than HTML::Template and designed for sites of any size. (The Template Toolkit takes longer 
+    to learn, install, and configure though.)</td></tr></table></p>
+   
+   <p>We can demonstrate the functionality of this module right away, without having to resort to a web server. 
+    Create a new file in the CodeRunner editor:</p>
+   
+<div class="listingBox"><div class="listingTitle">CODE TO TYPE:</div><div class="listing"><pre>Hello, &lt;TMPL_VAR NAME="username"&gt;, how are you today?</pre></div></div>
+   
+   <p><img src="images/coderunner/save.gif"> Save it as <b>/perl4/first.tmpl</b>. That's all there is to 
+    it! Our code doesn't actually have any HTML in it; that TMPL_VAR tag isn't legal HTML, but HTML::Template uses that 
+    format so that HTML editors that do not evaluate tags too strictly (most of them) can be used to edit 
+    these templates. (If you're using an editor that does evaluate tags strictly, HTML::Template tags can be formatted as 
+    HTML comments.) Now we need a program that uses this template. Create a new Perl program in the editor:</p>
+   
+<div class="listingBox"><div class="listingTitle">CODE TO ENTER:</div><div class="listing"><pre>#!/usr/local/bin/perl
+use strict;
+use warnings;
+
+use lib qw(<i>your_home_directory</i>/mylib/lib/perl5);
+use HTML::Template;
+
+my $template = HTML::Template-&gt;new( filename =&gt; "first.tmpl" );
+$template-&gt;param( username =&gt; $ENV{USER} );
+print $template-&gt;output;
+</pre></div></div>
+   
+   <p><img src="images/coderunner/save.gif"> Save it as <b>/perl4/atm_entry.pl</b> and run it, and you'll 
+    see this:</p>
+   
+<div class="interactiveBox"><div class="interactiveTitle">INTERACTIVE TERMINAL SESSION: Command to type</div><div class="interactive"><pre>cold:~/perl4$ <ins>./atm_entry.pl</ins>
+Hello, <i>your username</i>, how are you today?
+</pre></div></div>
+   
+   <p>This illustrates the basic process of templating that takes a <i>template</i> that specifies the basic 
+    (invariant) form of the page to be displayed, and then performs substitutions on it from code that 
+    changes the varying parts of the template.  Here's what happened:</p>
+   
+<div class="observeBox"><div class="observeTitle">OBSERVE: atm_entry.pl</div><div class="observe"><pre>.
+.
+.
+my $template = <span class="darkred">HTML::Template</span>-&gt;new( filename =&gt; "<span class="darkblue">first.tmpl</span>" );
+$template-&gt;param( <span class="green">username</span> =&gt; <span class="purple">$ENV{USER}</span> );
+print $template-&gt;<span class="darkgreen">output</span>;
+.
+.
+.</pre></div></div>   
+   
+   <ul><li>We created a new <span class="darkred">HTML::Template</span> object initialized from the template file 
+     <span class="darkblue">first.tmpl</span>.</li><li>We specified that the TMPL_VAR <span class="green">username</span> tag should be replaced with the value of 
+     <span class="purple">$ENV{USER}</span> (your username, from the environment).</li><li>We printed the result of calling the <span class="darkgreen">output</span> method, which
+     generated the string corresponding to the template with all of the substitutions.</li></ul>
+   
+   <p>Here are some tasks HTML::Template can perform:</p>
+   
+   <ul><li>Variable substitution via TMPL_VAR (like in our example)</li><li>Loops via TMPL_LOOP (which allows for repetition at run time)</li><li>Conditions via TMPL_IF and TMPL_UNLESS (with optional TMPL_ELSE clauses)</li></ul>
+   
+   <p>Let's try a more complicated example now. Create another new file in the CodeRunner editor:</p>
+   
+<div class="listingBox"><div class="listingTitle">CODE TO ENTER:</div><div class="listing"><pre>Account number: &lt;TMPL_VAR NAME="account_number"&gt;
+Owners: &lt;TMPL_IF NAME="owner_loop"&gt;
+  &lt;TMPL_LOOP NAME="owner_loop"&gt;&lt;TMPL_VAR NAME="owner"&gt;&lt;TMPL_UNLESS NAME="last"&gt;, &lt;/TMPL_UNLESS&gt;&lt;/TMPL_LOOP&gt; (Joint Account)
+&lt;TMPL_ELSE&gt;
+  &lt;TMPL_VAR NAME="single_owner"&gt;
+&lt;/TMPL_IF&gt;
+Balance: $&lt;TMPL_VAR NAME="balance"&gt;
+</pre></div></div>
+   
+   <p><img src="images/coderunner/save.gif"> Save it as <b>/perl4/atm_info.tmpl</b>. Now create a new Perl 
+    program as shown:</p>
+   
+<div class="listingBox"><div class="listingTitle">CODE TO ENTER:</div><div class="listing"><pre>#!/usr/local/bin/perl
+use strict;
+use warnings;
+
+use lib qw(<i>your_home_directory</i>/mylib/lib/perl5);
+use HTML::Template;
+
+my $template = HTML::Template-&gt;new( filename =&gt; "atm_info.tmpl" );
+$template-&gt;param( account_number =&gt; 10001,
+                  single_owner =&gt; 'Richie Rich',
+                  balance =&gt; 450_000 );
+print $template-&gt;output;
+
+print "\n-------------------\n\n";
+
+$template = HTML::Template-&gt;new( filename =&gt; "atm_info.tmpl" );
+$template-&gt;param( account_number =&gt; 10002,
+                  owner_loop =&gt; [ { owner =&gt; 'Orphan Annie' },
+                                  { owner =&gt; 'Sandy',
+                                    last =&gt; 1 } ],
+                  balance =&gt; 50 );
+print $template-&gt;output;</pre></div></div>
+   
+   <p><img src="images/coderunner/save.gif">Save it as <b>/perl4/atm_info.pl</b> and run it:</p>
+   
+<div class="interactiveBox"><div class="interactiveTitle">INTERACTIVE TERMINAL SESSION: Command to type</div><div class="interactive"><pre>cold:~/perl4$ <ins>./atm_info.pl</ins>
+Account number: 10001
+Owners: 
+  Richie Rich
+ 
+Balance: $450000
+
+-------------------
+
+Account number: 10002
+Owners: 
+  Orphan Annie, Sandy (Joint Account)
+
+Balance: $50
+</pre></div></div>
+   
+   <p>Here's how loops work in a template:</p>
+
+<div class="observeBox"><div class="observeTitle">OBSERVE: atm_info.tmpl</div><div class="observe"><pre>Account number: &lt;TMPL_VAR NAME="account_number"&gt;
+Owners: &lt;TMPL_IF NAME="<span class="darkgreen">owner_loop</span>"&gt;
+  &lt;<span class="darkred">TMPL_LOOP</span> NAME="<span class="darkgreen">owner_loop</span>"&gt;&lt;<span class="darkblue">TMPL_VAR</span> NAME="owner"&gt;&lt;TMPL_UNLESS NAME="last"&gt;, &lt;/TMPL_UNLESS&gt;&lt;<span class="darkred">/TMPL_LOOP</span>&gt; (Joint Account)
+&lt;TMPL_ELSE&gt;
+  &lt;TMPL_VAR NAME="single_owner"&gt;
+&lt;/TMPL_IF&gt;
+Balance: $&lt;TMPL_VAR NAME="balance"&gt;
+</pre></div></div>
+   
+   <p>Between the <span class="darkred">TMPL_LOOP</span> tags, you can refer to <span class="darkblue">TMPL_VAR</span> variables that 
+    exist just within that scope. The loop has a name (<span class="darkgreen">owner_loop</span>) that corresponds to a 
+    parameter being passed in to <b>param()</b> that is an arrayref of hashrefs, each one corresponding to one 
+    iteration of the loop, each one specifying the values of the loop-scoped variables.</p>
+   
+   <p>You can also see how conditionals work: if the named parameter (<span class="darkgreen">owner_loop</span>) exists 
+    and has a true value, then the TMPL_IF clause will be interpolated. The presence of a parameter that is the name 
+    of a loop also evaluates as true.</p>
+   
+   <p>It can be a challenge to make newlines and spaces occur where you want them to when you're using conditionals and loops, and 
+    still maintain a readable template. (Try inserting more newlines in the template for 
+    readability and see what happens.) Fortunately, we'll be using HTML for this module and also 
+    later in this lesson, and newlines and spaces aren't significant
+    in HTML . </p>   
+   
+   <p>Many programmers still use HTML code in Perl programs, in <b>print</b> statements or
+    heredocs. There are benefits to having HTML in separate files: </p>
+   
+   <ul><li>HTML-aware programs can edit and verify its syntactic correctness.</li><li>Your Perl programs now contain only Perl, so there's no need to think in another langauge as you read a program.</li><li>The job of editing HTML can now be given to someone who doesn't know any Perl (and, conversely,
+     may be a lot better at making nice looking pages than your average Perl programmer).</li><li>Code and data are not mixed together.</li><li>Internationalization and localization are easier.</li></ul>
+  </div></div>
+ </div>
+ 
+ <a href="Perl4-09.html" name="web_form_processing_with_perl"></a> 
+ <a name="h_02"></a><div class="heading">Web Form Processing with Perl</div><div class="headingText">
+   
+  <p>Now we've come to one of the most useful parts of this course: learning to process a form that a user submits 
+   through a web browser. Once again, since this is not an HTML course, the HTML we use will be minimal. Start 
+   by creating a simple web form. Create a new file in HTML mode in the CodeRunner editor:</p>
+  
+<div class="listingBox"><div class="listingTitle">CODE TO ENTER:</div><div class="listing"><pre>&lt;HTML&gt;
+ &lt;HEAD&gt;
+  &lt;TITLE&gt;First Bank of O'Reilly&lt;/TITLE&gt;
+ &lt;/HEAD&gt;
+ &lt;BODY&gt;
+  &lt;H2&gt;First Bank of O'Reilly&lt;/H2&gt;
+  &lt;P&gt;Automated Teller Machine&lt;/P&gt;
+  &lt;FORM ACTION="atm_select.cgi" METHOD="POST"&gt;
+   Account number: &lt;INPUT TYPE="TEXT" NAME="account_number"&gt;&lt;BR/&gt;
+   &lt;INPUT TYPE="SUBMIT"&gt;
+  &lt;/FORM&gt;
+ &lt;/BODY&gt;
+&lt;/HTML&gt;
+</pre></div></div>
+   
+  <p><img src="images/coderunner/save.gif"> Save it as <b>atm_select.html</b>. </p>
+    
+  <p>Click <img src="images/coderunner/Preview.png"> and you'll see this form appear in your web browser via 
+   the server <i>your_username</i>.oreillystudent.com:</p>
+  
+  <p><div class="c"><img src="images/lessonImages/atm_select_1.png"></div></p>
+          
+  <p>But entering anything in that form and submitting it will trigger an error, because <b>atm_select.cgi</b> does not 
+   exist yet. We'll take care of that next! Leave the form window open and switch 
+   back to the CodeRunner window.</p>
+  
+  <a name="s_01"></a><div id="s_01"><div class="subheading">CGI.pm</div><div class="subheadingText">
+   
+   <p>The extension of that filename is not <b>.pl</b>; it is .<b>cgi</b>, which stands for—no, not Computer-Generated 
+    Imagery, as used in summer blockbuster movies to make the actors look young and attractive—Common 
+    Gateway Interface (which is another expansion that no one uses any more). It's still a Perl program (and you can run 
+    it at the command line if you want), but it's designed to be invoked by a web server, which has been 
+    configured to execute certain types of files according to the CGI protocol specification, which dictates how 
+    inputs from the user should be passed along. This diagram shows how it works:</p>
+   
+   
+   <p><div class="c"><img src="images/lessonImages/CGI&#32;protocol.png"></div></p>
+      
+   <p>Because that protocol <i>appears</i> to be relatively simple, many a misguided programmer has pasted 
+    chunks of code into their Perl programs to get those user inputs. We're not going to do that, because 99% of 
+    that <a href="http://en.wikipedia.org/wiki/Cargo_cult_programming" target="_blank">cargo cult</a> code is 
+    wrong. Instead, we'll borrow <a href="http://stein.cshl.org/~lstein/" target="_blank">Lincoln Stein</a>'s CGI.pm module (thank you Mr. Stein), 
+    another module that we 
+    refer to with the <b>.pm</b> extension to avoid confusing it with something else.</p>
+
+   <p>Let's see how that works. Switch back to Perl mode and then create this new file:</p>
+   
+<div class="listingBox"><div class="listingTitle">CODE TO ENTER:</div><div class="listing"><pre><ins>#!/usr/local/bin/perl
+use strict;
+use warnings;
+
+use CGI qw(:all);
+
+print header, "You entered: ", ( param( 'account_number' ) || '&amp;lt;nothing&amp;gt;' ), "\n";
+</ins>
+</pre></div></div>
+   
+   <p><img src="images/coderunner/save.gif"> Save it as <b>atm_select.cgi</b>, switch back to your HTML form 
+    window, enter something in the input box on the web page, then click <b>Submit</b>. You'll see a page 
+    that says "You entered: (whatever you typed)."  (You don't need to <b>use lib</b> on your ~/mylib 
+    /lib/perl5 directory yet, because CGI.pm is in the core.)</p>
+   
+   <p>The <b>use CGI qw(:all)</b> statement is a directive to load CGI.pm and <i>import</i> all of the 
+    functions that it is prepared to export (remember the Exporter?). That includes the two functions 
+    <b>header</b> and <b>param</b>. <b>header</b> evaluates to a string that must precede all the content you 
+    want to send. In this case the HTTP header specifies that HTML is coming next. 
+    <b>param</b> returns the value of the named parameter from the input form.</p>
+   
+   <p>We haven't actually returned HTML here (try viewing the page source in your browser), but it's close
+    enough that your browser will display it.</p>
+ 
+  </div></div>
+  <a name="s_02"></a><div id="s_02"><div class="subheading">CGI.pm and HTML::Template</div><div class="subheadingText">
+   
+   <p>By now I bet you're thinking, "I know how I can send HTML easily—using HTML::Template!" Let's 
+    try that in an example. Modify <b>atm_select.cgi</b>: </p>
+    
+<div class="listingBox"><div class="listingTitle">CODE TO EDIT:</div><div class="listing"><pre>#!/usr/local/bin/perl
+use strict;
+use warnings;
+
+<ins>use lib qw(<i>your_home_directory</i>/mylib/lib/perl5);</ins>
+use CGI qw(:all);
+<ins>use HTML::Template;</ins>
+ 
+<ins>my $template = HTML::Template-&gt;new( filename =&gt; 'atm_select.tmpl' );
+my @accounts = ( { account_number =&gt; 1234 }, { account_number =&gt; 9876 } );
+$template-&gt;param( account_loop =&gt; \@accounts );</ins>
+print header, <del>"You entered: ", ( param( 'account_number' ) || '&amp;lt;nothing&amp;gt;' ), "\n"</del><ins>$template-&gt;output;</ins>
+</pre></div></div>
+   
+   <p>Now, in HTML mode, create the template:</p>
+     
+<div class="listingBox"><div class="listingTitle">CODE TO TYPE:</div><div class="listing"><pre>&lt;HTML&gt;
+  &lt;HEAD&gt;
+    &lt;TITLE&gt;First Bank of O'Reilly&lt;/TITLE&gt;
+  &lt;/HEAD&gt;
+  &lt;BODY&gt;
+    &lt;H2&gt;First Bank of O'Reilly&lt;/H2&gt;
+    &lt;P&gt;Automated Teller Machine&lt;/P&gt;
+    &lt;FORM ACTION="atm_select.cgi" METHOD="POST"&gt;
+      Account number:
+      &lt;SELECT NAME="account_number"&gt;
+        &lt;TMPL_LOOP NAME="account_loop"&gt;
+        &lt;OPTION VALUE="&lt;TMPL_VAR NAME=account_number&gt;"&gt;&lt;TMPL_VAR NAME="account_number"&gt;
+        &lt;/TMPL_LOOP&gt;
+      &lt;/SELECT&gt; &lt;BR/&gt;
+      &lt;INPUT TYPE="SUBMIT"&gt;
+    &lt;/FORM&gt;
+  &lt;/BODY&gt;
+&lt;/HTML&gt;
+</pre></div></div>
+     
+   <p><img src="images/coderunner/save.gif"> Save it as <b>atm_select.tmpl</b>. Now load 
+    <b>http://<i>your_username</i>.oreillystudent.com/perl4/atm_select.cgi</b> in your browser. You'll see this 
+    form:</p>
+     
+   <p><div class="c"><img src="images/lessonImages/atm_select_2.png"></div></p>
+     
+   <p>So far, we're not using the form-parsing capability of CGI.pm in this program. Let's change that:</p>
+     
+<div class="listingBox"><div class="listingTitle">CODE TO EDIT:</div><div class="listing"><pre>#!/usr/local/bin/perl
+use strict;
+use warnings;
+
+use lib qw(<i>your_home_directory</i>/mylib/lib/perl5);
+use CGI qw(:all);
+use HTML::Template;
+
+my $template = HTML::Template-&gt;new( filename =&gt; 'atm_select.tmpl' );
+<del>my @accounts = ( { account_number =&gt; 1234 }, { account_number =&gt; 9876 } );
+$template-&gt;param( account_loop =&gt; \@accounts );</del>
+<ins>if ( my $account_number = param( 'account_number' ) )
+{
+  $template-&gt;param( account_number =&gt; $account_number);
+}
+else
+{
+  my @accounts = ( { account_number =&gt; 1234 }, { account_number =&gt; 9876 } );
+  $template-&gt;param( account_loop =&gt; \@accounts );
+}</ins>
+print header, $template-&gt;output;
+</pre></div></div>
+     
+   <p><img src="images/coderunner/save.gif"> Save it and modify <b>atm_select.tmpl</b> as shown:</p>
+   
+<div class="listingBox"><div class="listingTitle">CODE TO EDIT:</div><div class="listing"><pre>&lt;HTML&gt;
+  &lt;HEAD&gt;
+    &lt;TITLE&gt;First Bank of O'Reilly&lt;/TITLE&gt;
+  &lt;/HEAD&gt;
+  &lt;BODY&gt;
+    &lt;H2&gt;First Bank of O'Reilly&lt;/H2&gt;
+<ins>    &lt;TMPL_IF NAME="account_loop"&gt;</ins>
+      &lt;P&gt;Automated Teller Machine&lt;/P&gt;
+      &lt;FORM ACTION="atm_select.cgi" METHOD="POST"&gt;
+        Account number: 
+        &lt;SELECT NAME="account_number"&gt;
+          &lt;TMPL_LOOP NAME="account_loop"&gt;
+            &lt;OPTION VALUE="&lt;TMPL_VAR NAME=account_number&gt;"&gt;&lt;TMPL_VAR NAME="account_number"&gt;
+          &lt;/TMPL_LOOP&gt;
+        &lt;/SELECT&gt; &lt;BR/&gt;
+        &lt;INPUT TYPE="SUBMIT"&gt;
+      &lt;/FORM&gt;
+    <ins>&lt;TMPL_ELSE&gt;
+      &lt;P&gt;You entered: &lt;TMPL_VAR NAME="account_number"&gt;&lt;/P&gt;
+    &lt;/TMPL_IF&gt;</ins>
+  &lt;/BODY&gt;
+&lt;/HTML&gt;
+</pre></div></div>   
+   
+   <p>Now reload <b>http://<i>your_username</i>.oreillystudent.com/perl4/atm_select.cgi</b> in your browser, select 
+    one of the choices, and click <b>Submit</b>. See how it shows you your choice?</p> 
+   
+   <p>There are several different uses for "account_number" inside the template. Can you identify 
+    these uses in that string?:</p>
+     
+   <ul><li>Name of an input field</li><li>Template variable used as an input option value</li><li>Template variable used as input option text</li><li>Template variable used to display result</li></ul>
+          
+   <p>We've used the CGI program and the template to handle two different ways of displaying 
+    the initial form and displaying the results of handling that form. Each one has its own conditional for 
+    deciding how it will be invoked.  The CGI program looks to see if the account_number input has been entered, 
+    while the template looks to see if the account_loop parameter has been set.</p>
+   
+   <p>In an uncomplicated case, that approach works. But with more variation between the two cases, it makes 
+    less sense. Let's expand our program now to see an example of when splitting up the CGI and the template works better. First, modify 
+    <b>atm_select.tmpl</b> as shown:</p>
+     
+ <div class="listingBox"><div class="listingTitle">CODE TO EDIT:</div><div class="listing"><pre>&lt;HTML&gt;
+  &lt;HEAD&gt;
+    &lt;TITLE&gt;First Bank of O'Reilly&lt;/TITLE&gt;
+  &lt;/HEAD&gt;
+  &lt;BODY&gt;
+    &lt;H2&gt;First Bank of O'Reilly&lt;/H2&gt;
+<del>   &lt;TMPL_IF NAME="account_loop"&gt;</del>
+    &lt;P&gt;Automated Teller Machine&lt;/P&gt;
+    &lt;FORM ACTION="atm_<del>select</del><ins>choose</ins>.cgi" METHOD="POST"&gt;
+      Account number:
+      &lt;SELECT NAME="account_number"&gt;
+        &lt;TMPL_LOOP NAME="account_loop"&gt;
+        &lt;OPTION VALUE="&lt;TMPL_VAR NAME=account_number&gt;"&gt;&lt;TMPL_VAR NAME="account_number"&gt;
+        &lt;/TMPL_LOOP&gt;
+      &lt;/SELECT&gt; &lt;BR/&gt;
+      &lt;INPUT TYPE="SUBMIT"&gt;
+    &lt;/FORM&gt;
+<del>   &lt;TMPL_ELSE&gt;
+    &lt;P&gt;You entered: &lt;TMPL_VAR NAME="account_number"&gt;&lt;/P&gt;
+   &lt;/TMPL_IF&gt;</del>
+  &lt;/BODY&gt;
+&lt;/HTML&gt;
+</pre></div></div>
+     
+   <p>Now let's create a module that contains some handy code we'll use from one or more of our CGI 
+    programs. It will set the DSN parameters, but it can't use $ENV{USER} because that isn't set to the right 
+    value when the program runs under a web server. Instead, we'll pull your username from a pattern match
+    on the current directory. Create a new Perl file:</p>
+   
+<div class="listingBox"><div class="listingTitle">CODE TO ENTER:</div><div class="listing"><pre>package MyDB;
+use strict;
+use warnings;
+
+use lib qw(<i>your_home_directory</i>/mylib/lib/perl5);
+use DBI;
+use Cwd;
+
+my ($USER) = (cwd() =~ m!/.*?/(.*?)/!);
+my $PASS   = '<i>secret</i>';                   # XXX Change
+my $SERVER = 'sql';
+my $DB     = $USER;
+
+my $dbh = DBI-&gt;connect( "dbi:mysql:database=$DB;host=$SERVER", $USER, $PASS );
+
+sub get_accounts
+{
+  my $ar = $dbh-&gt;selectall_arrayref( 'SELECT * FROM account', { Slice =&gt; {} } );
+  return @$ar;
+}
+
+1;
+</pre></div></div>
+     <p><img src="images/coderunner/save.gif"> Save it as <b>MyDB.pm</b>. This creates a MySQL connection and 
+      supplies the get_accounts() function we wrote in the last lesson. You'll need to put your 
+      password in this file (where it says <i>secret</i>); make sure it isn't a password you use elsewhere. 
+      Now, <i>replace</i> atm_select.cgi with the code below:</p>
+     
+<div class="listingBox"><div class="listingTitle">CODE TO EDIT:</div><div class="listing"><pre>#!/usr/local/bin/perl
+use strict;
+use warnings;
+
+use lib qw(<i>your_home_directory</i>/mylib/lib/perl5);
+use CGI qw(:all);
+use CGI::Carp qw(fatalsToBrowser);
+use HTML::Template;
+use MyDB;
+
+my $template = HTML::Template-&gt;new( filename =&gt; 'atm_select.tmpl' );
+my @accounts = MyDB-&gt;get_accounts();
+$template-&gt;param( account_loop =&gt; \@accounts );
+
+print header, $template-&gt;output;
+</pre></div></div>
+     
+   <p><img src="images/coderunner/save.gif"> Save it and reload 
+    <b>http://<i>your_username</i>.oreillystudent.com/perl4/atm_select.cgi</b> in your browser. You'll get this error message: </p>
+     
+<div class="observeBox"><div class="observeTitle">OBSERVE: Browser Error</div><div class="observe"><pre><b>Software error:</b>
+HTML::Template-&gt;output() : fatal error in loop output : HTML::Template : Attempt to set nonexistent parameter
+'transactions_id' - this parameter name doesn't match any declarations in the template file : 
+(die_on_bad_params =&gt; 1) at /usr/encap/lib/perl5/site_perl/5.11.4/HTML/Template.pm line 3068
+ at atm_select.cgi line 16
+</pre></div></div>
+     
+   <p>We've used the module CGI::Carp to specify that fatal error messages should be sent to the browser 
+    instead of to the web server error log. This message tells us that we've set some parameters in the template file to which there are no 
+    TMPL_* references. We've actually just passed over the same array of hash references 
+    that we got out of get_accounts() before, and it includes attributes in addition to the account_number that 
+    we want. We can tell HTML::Template to ignore that extra information:</p>
+     
+<div class="listingBox"><div class="listingTitle">CODE TO EDIT:</div><div class="listing"><pre>#!/usr/local/bin/perl
+use strict;
+use warnings;
+
+use lib qw(<i>your_home_directory</i>/mylib/lib/perl5);
+use CGI qw(:all);
+use CGI::Carp qw(fatalsToBrowser);
+use HTML::Template;
+use MyDB;
+
+my $template = HTML::Template-&gt;new( filename =&gt; 'atm_select.tmpl'<ins>, die_on_bad_params =&gt; 0</ins> );
+my @accounts = MyDB-&gt;get_accounts();
+$template-&gt;param( account_loop =&gt; \@accounts );
+
+print header, $template-&gt;output;
+</pre></div></div>
+     
+   <p><img src="images/coderunner/save.gif"> Save it and reload 
+    <b>http://<i>your_username</i>.oreillystudent.com/perl4/atm_select.cgi</b> in your browser. This 
+    time you get the two account numbers that we last created in your MySQL database. (If not, 
+    then revisit the previous lesson and rerun the programs <b>bank_mysql_create.pl</b> and 
+    <b>bank_mysql_populate.pl</b>.)</p>
+     
+   <p>Now let's look at the bank account itself. Create a new Perl file in the editor as shown:</p>
+     
+<div class="listingBox"><div class="listingTitle">CODE TO ENTER:</div><div class="listing"><pre>#!/usr/local/bin/perl
+use strict;
+use warnings;
+
+use lib qw(<i>your_home_directory</i>/mylib/lib/perl5);
+use CGI qw(:all);
+use CGI::Carp qw(fatalsToBrowser);
+use HTML::Template;
+use MyDB;
+
+my $template = HTML::Template-&gt;new( filename =&gt; 'atm_choose.tmpl', die_on_bad_params =&gt; 0 );
+my $account_number = param( 'account_number' );
+my $account = MyDB-&gt;get_account( $account_number );
+$template-&gt;param( %$account );
+print header, $template-&gt;output;
+</pre></div></div>
+     
+   <p><img src="images/coderunner/save.gif"> Save it as <b>/perl4/atm_choose.cgi</b>. We're calling the 
+    get_account() function (we're actually calling it like a class method, but as it happens, we're not going to do 
+    anything with the phantom first parameter) that will be like the one you implemented in your homework.</p>
+     
+   <p>And now we'll add the extra functionality  we want to <b>MyDB.pm</b> (by pasting in functions that 
+    we created in the last lesson, and then calling them to merge their data in to the account information hash 
+    returned from get_account()). Modify your code as shown:</p>
+     
+<div class="listingBox"><div class="listingTitle">CODE TO EDIT:</div><div class="listing"><pre>package MyDB;
+use strict;
+use warnings;
+
+use lib qw(<i>your_home_directory</i>/mylib/lib/perl5);
+use DBI;
+use Cwd;
+
+my ($USER) = (cwd() =~ m!/.*?/(.*?)/!);
+my $PASS   = 'secret';                   # XXX Change
+my $SERVER = 'sql';
+my $DB     = $USER;
+
+my $dbh = DBI-&gt;connect( "dbi:mysql:database=$DB;host=$SERVER", $USER, $PASS );
+
+sub get_accounts
+{
+  my $ar = $dbh-&gt;selectall_arrayref( 'SELECT * FROM account', { Slice =&gt; {} } );
+  return @$ar;
+}
+<ins>
+
+sub get_account
+{
+  my $acct_num = pop;
+  
+  my $ar = $dbh-&gt;selectall_arrayref( 'SELECT * FROM account WHERE account_number = ?', { Slice =&gt; {} }, $acct_num );
+  my ($account) = @$ar;
+  my @transactions = get_transactions( $account-&gt;{transactions_id} );
+  $account-&gt;{transactions} = [ map { { line =&gt; $_ } } @transactions ];
+  $account-&gt;{owners} = get_owners( $account-&gt;{customers_id} );
+  return $account;
+}
+
+
+sub get_owners
+{
+  my $customers_id = shift;
+  
+  my $sql = &lt;&lt;'EOSQL';
+    SELECT CONCAT(p.first_name, ' ', p.last_name)
+      FROM person p
+      JOIN customers c ON p.id = c.person_id
+     WHERE c.id =?
+EOSQL
+  my $ar = $dbh-&gt;selectcol_arrayref( $sql, undef, $customers_id );
+  return join ', ' =&gt; @$ar;
+}
+
+
+sub get_transactions
+{
+  my $transactions_id = shift;
+  
+  my $sql = &lt;&lt;'EOSQL';
+    SELECT s.transaction_date, type.name, s.amount, s.new_balance
+      FROM transactions t
+      JOIN single_transaction s ON t.single_transaction_id = s.id
+      JOIN transaction_type type ON s.transaction_type_id = type.id
+     WHERE t.id = ?
+EOSQL
+  my $ar = $dbh-&gt;selectall_arrayref( $sql, undef, $transactions_id );
+  my @lines;
+  for ( @$ar )
+  {
+    my ($date, $type, $amount, $new_balance) = @$_;
+    push @lines, "$date\t$type\t$amount\t$new_balance";
+  }
+  return @lines;
+}
+</ins>
+
+1;</pre></div></div>
+     
+   <p><img src="images/coderunner/save.gif"> Save it, and create a new HTML file:</p>
+     
+<div class="listingBox"><div class="listingTitle">TEXT TO ENTER:</div><div class="listing"><pre><ins>&lt;HTML&gt;
+  &lt;HEAD&gt;
+    &lt;TITLE&gt;First Bank of O'Reilly&lt;/TITLE&gt;
+  &lt;/HEAD&gt;
+  &lt;BODY&gt;
+   &lt;H2&gt;First Bank of O'Reilly&lt;/H2&gt;
+   &lt;P&gt;Automated Teller Machine&lt;/P&gt;
+   &lt;TABLE BORDER="1"&gt;
+    &lt;TR&gt;&lt;TD&gt;Account number&lt;/TD&gt;&lt;TD&gt;&lt;TMPL_VAR NAME="account_number"&gt;&lt;/TD&gt;&lt;/TR&gt;
+    &lt;TR&gt;&lt;TD&gt;Owner(s)&lt;/TD&gt;&lt;TD&gt;&lt;TMPL_VAR NAME="owners"&gt;&lt;/TD&gt;&lt;/TR&gt;
+    &lt;TR&gt;&lt;TD&gt;Balance&lt;/TD&gt;&lt;TD&gt;&lt;TMPL_VAR NAME="Balance"&gt;&lt;/TD&gt;&lt;/TR&gt;
+    &lt;TMPL_LOOP NAME="transactions"&gt;
+     &lt;TR&gt;&lt;TD&gt;Transaction:&lt;/TD&gt;&lt;TD&gt;&lt;TMPL_VAR NAME="line"&gt;&lt;/TD&gt;&lt;/TR&gt;
+    &lt;/TMPL_LOOP&gt;
+   &lt;/TABLE&gt;
+  &lt;/BODY&gt;
+&lt;/HTML&gt;
+</ins></pre></div></div>
+     
+   <p><img src="images/coderunner/save.gif"> Save it as <b>atm_choose.tmpl</b>. Reload  
+    <b>http://<i>your_username</i>.oreillystudent.com/perl4/atm_select.cgi</b> in your browser, select an account 
+    number from the drop-down menu, then click <b>Submit</b>. The result is a table of information about that 
+    account. Each account has only one transaction in it (which we don't display with any kind of structure;
+    we're just reusing code from before that produced a line for each transaction), but you can add more if you want
+    to see the loop display them.</p>
+     
+   <p>A special capability of CGI.pm is that you can test scripts by entering parameters on the 
+    command line:</p>
+     
+<div class="interactiveBox"><div class="interactiveTitle">INTERACTIVE TERMINAL SESSION: Command to type</div><div class="interactive"><pre>cold:~/perl4$ <ins>./atm_choose.cgi account_number=10001</ins>
+[HTML output omitted]</pre></div></div>
+ </div></div>
+   
+  <br><br>
+  <p>And this concludes our whirlwind tour of HTML form handling and templating. You'll want to have the 
+   documentation for <a href="http://search.cpan.org/perldoc?CGI" target="_blank">CGI.pm</a> and  
+   <a href="http://search.cpan.org/perldoc?HTML::Template" target="_blank">HTML::Template</a> close by as you 
+   start developing more applications using those tools. Congratulations! Now you know how to handle web forms
+   and display dynamic content. A whole world of web applications, such as e-commerce, has just opened up for 
+   you!</p>
+   
+ </div>
+  
+ <p>Once you finish the lesson, go back to the syllabus to complete the homework.</p>
+   
+<div class="footer"><div id="timeSurvey"></div>				
+				Copyright © 1998-2014 O'Reilly Media, Inc.<br><img src="https://courses.oreillyschool.com/common/cclicense.png"><br>
+				This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 Unported License.<br>
+				See <a href="http://creativecommons.org/licenses/by-sa/3.0/legalcode">http://creativecommons.org/licenses/by-sa/3.0/legalcode</a> 
+				for more information.
+				</div><iframe id="t" width="1" height="1" border="0" style="display:none"></iframe><script language="javascript">bodyLoaded();</script><script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+  ga('create', 'UA-44720547-1', 'oreillyschool.com');
+  ga('send', 'pageview');
+</script></body></html>

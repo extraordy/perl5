@@ -1,0 +1,593 @@
+<html><!-- Copyright (c) 1998-2014 O'Reilly Media, Inc.
+			This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 Unported License.
+			See http://creativecommons.org/licenses/by-sa/3.0/legalcode for more information.
+            --><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"><link rel="stylesheet" type="text/css" href="../common/Lab.css"><script type="text/javascript" src="../common/Lab.js"></script><script language="javascript"></script><title>Introduction to Perl</title></head><body id="body"><a name="top"></a><div class="title">Introduction to Perl</div><div class="resize"><a href="Perl1-01.html#top" onclick="changeSize('smaller');" class="aS" title="Keep clicking to make fonts smaller">A</a><a href="Perl1-01.html#top" onclick="changeSize('larger');" class="aL" title="Keep clikcing to make fonts larger">A</a><a href="Perl1-01.html#top" onclick="lv()" class="lv" title="Adjust Page for High Contrast">HC</a><div id="fh"><p>Click on <span class="aS">A</span> to make all fonts on the page smaller.</p><p>Click on <span class="aL">A</span> to make all fonts on the page larger.</p><p>Click on <span class="lv">HC</span> to toggle high contrast mode. When you move your mouse over 
+                 some bold words in high contrast mode, related words are automatically highlighted. Text is shown
+                 in black and white. 
+             </p></div></div><hr>
+
+
+  
+  <p>Welcome to the O'Reilly School of Technology's (OST) <b>Introduction to Perl</b> course. We hope 
+    you enjoy the process of learning this practical language with us and then using Perl to resolve all sorts 
+    of programming challenges.</p>
+<div class="outcomesTitle">Course Objectives</div><div class="outcomes">
+  
+
+  <p> When you complete this course, you will be able to:</p>
+
+    <ul><li>create and run Perl programs using basic scalars, arithmetic, conditional statements, and interpolation.</li><li>implement and manipulate strings, functions, operators, lists, loops, and arrays in Perl.</li><li>format output and list content.</li><li>map data with hashes in Perl.</li><li>perform basic Unix commands.</li><li>aggregate and sort data using subroutines.</li><li>read external files in Perl.</li></ul>
+  
+</div>
+
+ 
+  
+ <a name="h_01"></a><div class="heading">Learning with O'Reilly School of Technology Courses</div><div class="headingText">  
+  <p>As with every O'Reilly School of Technology course, we'll take a <i>user-active</i> 
+    approach to learning. This means that you (the user) will be active! You'll learn by doing,  
+    building live programs, testing them and experimenting with them—hands-on!</p>
+  
+  <p>To learn a new skill or technology, you have to experiment. The more you experiment, the more 
+    you learn. Our system is designed to maximize experimentation and help you <i>learn to 
+      learn</i> a new skill.</p>
+  
+  <p>We'll program as much as possible to be sure that the principles sink in and stay with you.</p>
+  
+  <p>Each time we discuss a new concept, you'll put it into code and see what YOU can do with it.  
+   On occasion we'll even give you code that doesn't work, so you can see common mistakes and how 
+   to recover from them. Making mistakes is actually another good way to learn.</p>  
+    
+  <p>Above all, we want to help you to <i>learn to learn</i>. We give you the tools to take control 
+    of your own learning experience. </p>
+
+  <p>When you complete an OST course, you know the subject matter, <i>and</i> you know how to 
+    expand your knowledge, so you can handle changes like software and operating system updates.</p>
+   
+   <p>Here are some tips for using O'Reilly School of Technology courses effectively:</p>
+
+  <ul><li><b>Type the code.</b> Resist the temptation to cut and paste the example code we give you. 
+    Typing the code  
+      actually gives you a feel for the programming task. Then play around with the examples to find out what 
+      else you can make them do, and to check your understanding. It's highly
+      unlikely you'll break anything by experimentation. If you <i>do</i> break something, that's an indication to us that 
+      we need to improve our system!</li><li><b>Take your time.</b> Learning takes time. Rushing can have negative effects on your 
+      progress. Slow down and let your brain absorb the new information thoroughly. 
+      Taking your time helps to maintain a relaxed, positive approach. It also gives you the 
+      chance to try new things and learn more than you otherwise would if you blew 
+      through all of the coursework too quickly.</li><li><b>Experiment.</b> Wander from the path often and explore the possibilities. We can't 
+      anticipate all of your questions and ideas, so it's up to you to experiment and create on 
+      your own. Your instructor will help if you go completely off the rails.</li><li><b>Accept guidance, but don't depend on it.</b> Try to solve problems on your own. Going 
+      from misunderstanding to understanding is the best way to acquire a new skill. Part of what 
+      you're learning is problem solving. Of course, you can always contact your instructor 
+      for hints when you need them.</li><li><b>Use all available resources!</b> In real-life problem-solving, you aren't bound by false 
+      limitations; in OST courses, you are free to use any resources at your disposal to solve
+      problems you encounter: the Internet, reference books, and online help are all fair game.   
+      </li><li><b>Have fun!</b> Relax, keep practicing, and don't be afraid to make mistakes! 
+      Your instructor will keep you at it until you've 
+      mastered the skill. We want you to get that satisfied, "I'm so cool! I did it!"
+      feeling. And you'll have some projects to show off when you're done.</li></ul>
+  </div>   
+ <a name="h_01"></a><div class="heading">Lesson Format</div><div class="headingText">
+        
+    <p>We'll try out lots of examples in each lesson. We'll have you write code, 
+    look at code, and edit existing code. The code will be presented in boxes that will 
+    indicate what needs to be done to the code inside.</p>
+        
+    <p>Whenever you see white boxes like the one below, you'll <i>type</i> the contents into the editor window to try the example yourself. 
+      The CODE TO TYPE bar on top of the white box contains directions for you to follow:</p>
+        
+<div class="listingBox"><div class="listingTitle">CODE TO TYPE:</div><div class="listing"><pre>White boxes like this contain code for you to try out (type into a file to run).
+
+If you have already written some of the code, new code for you to add <ins>looks like this</ins>. 
+    
+If we want you to remove existing code, the code to remove <del>will look like this</del>.
+  
+<span class="gray">We may also include instructive comments that you don't need to type.</span>  
+</pre></div></div>
+   
+   <p>We may run programs and do some other activities in a terminal session in the operating system or other command-line environment. These will be shown 
+     like this:</p>
+   
+<div class="interactiveBox"><div class="interactiveTitle">INTERACTIVE SESSION:</div><div class="interactive"><pre>
+The plain black text that we present in these INTERACTIVE boxes is 
+provided by the system (not for you to type). The commands we want you to type <ins>look like this</ins>.
+</pre></div></div>   
+        
+  <p>Code and information presented in a gray OBSERVE box is for you to <i>inspect</i> and <i>absorb</i>. 
+  This information is often color-coded, and followed by text explaining the code in detail:</p>
+        
+<div class="observeBox"><div class="observeTitle">OBSERVE:</div><div class="observe"><pre>
+Gray "Observe" boxes like this contain <span class="darkred">information</span> (usually code specifics) for you to <i>observe</i>.
+</pre></div></div>
+
+   <p>The paragraph(s) that follow may provide addition details on <span class="darkred">information</span> that was 
+     highlighted in the Observe box.</p>
+   
+   <p>We'll also set especially pertinent information apart in "Note" boxes:</p>      
+   
+   <p><div class="c"><table class="noteBox fBox pBox "><tr><td class="noteTitle">Note</td><td class="note">Notes provide information that is useful, but not absolutely necessary for performing the tasks at hand.</td></tr></table></div> </p>
+   
+   <p><div class="c"><table class="noteBox fBox pBox "><tr><td class="noteTitle">Tip</td><td class="note">Tips provide information that might help make the tools easier for you to use, such as shortcut keys.</td></tr></table></div></p>
+   
+   <p><div class="c"><table class="noteBox fBox pBox "><tr><td class="noteTitle">WARNING</td><td class="note">Warnings provide information that can help prevent program crashes and data loss.</td></tr></table></div></p>
+        
+ </div>   
+ <a name="h_01"></a><div class="heading">The CodeRunner Screen</div><div class="headingText">
+    
+     <p>This course is presented in CodeRunner, OST's self-contained environment. We'll discuss the 
+         details later, but here's a quick overview of the various areas of the screen:</p>
+    
+     <p><div class="c"><img src="../common/images/CodeRunnerScreen.png"></div></p>
+     
+     <p>These videos explain how to use CodeRunner:</p>
+         
+     <p><a href="http://www.youtube.com/watch?v=45sATp529Mw" target="_blank">File Management Demo</a></p>
+     <p><a href="http://www.youtube.com/watch?v=SvbM6vPAG9k" target="_blank">Code Editor Demo</a></p>
+     <p><a href="http://www.youtube.com/watch?v=WmajY8bIXrA" target="_blank">Coursework Demo</a></p>
+
+ </div>
+    
+ <a name="h_01"></a><div class="heading">What is Perl?</div><div class="headingText">
+     
+    <p>Perl has been around for a <i>long</i> time. It was invented by Larry Wall in 
+       <a href="http://history.perl.org/PerlTimeline.html" target="_blank">1987</a>. Since then, it has evolved 
+     significantly and it's also been the subject of a few myths. Perl has been described as "the duct tape of 
+      the internet," because of its adaptability and flexibility. When the Web was invented,  
+      people everywhere used Perl to create web pages during the frenzy we now wistfully refer to as <i>the dot-com boom.</i></p> 
+     <p>To give you a bit more background, here are some FAQs and answers about Perl:</p>
+     
+    <ul><li><b>Q:</b> Is Perl compiled or interpreted?</li><li><b>A:</b> Perl code is compiled to a kind of byte code, which is then 
+         executed, but we don't keep the byte code around between executions. 
+         Perl reads source really quickly, so performance isn't an issue. And Perl programs can 
+         construct code to be compiled and executed at run time, so the compiler always has to be 
+         available. Perl reads all of the code before running any of it, so 
+         the code must be syntactically correct before its execution begins.</li><li><b>Q:</b> Is Perl fast?</li><li><b>A:</b> Hand-optimized assembly language will always be fastest, but 
+        most of the time, people worry too much about performance—if your program takes 0.1 seconds 
+        to run, but it could have been improved to run in 0.01 seconds, most of the time no one will 
+        care. We are concerned instead with the speed of development and 
+        the ease of maintenance our programs offer. Perl's built-in functions are written in hand-optimized
+        C code, so quite often, a Perl program performing text manipulation will run faster than a 
+        casually written C version.</li><li><b>Q:</b> Is Perl difficult to understand?</li><li><b>A:</b> As with any language, people can write code in Perl that's clear or murky. 
+        Perl provides multiple ways to execute 
+        the same tasks. If programmers learn Perl through copying bad examples, they'll write bad code. 
+        But in this course, we'll write Perl that conforms to the best practices and write great code!</li><li><b>Q:</b> What is Perl good for?</li><li><b>A:</b> Just about everything that doesn't involve touching hardware—we don't recommend 
+        writing device drivers or operating systems in Perl.
+      Large enterprise-scale applications involving the work of multiple teams need to be 
+      developed with discipline and a consistent methodology, because tools that enforce style and interface 
+      definitions are uncommon for Perl. But large-scale applications and frameworks have 
+      been developed in Perl.
+       </li><li><b>Q:</b> How has Perl been used so far?</li><li><b>A:</b> Some of the most important uses of Perl are secret, because businesses view them 
+        as strategic advantages. Some of the known prominent known uses of Perl include: Large 
+        parts of the infrastructures of eBay, Yahoo!, and Amazon. Morgan Stanley, Bank of America, 
+        Deutsche Bank and other large financial institutions make heavy use of Perl, as do 
+        TicketMaster and the British Broadcasting Corporation. Perl use is especially widespread in 
+        educational institutions, research agencies such as NASA, and government offices such as the 
+        US Courts.</li><li><b>Q:</b> How do I get help using Perl for my project?</li><li><b>A:</b> A great triumph of the Perl community is the Comprehensive Perl Archive Network, 
+        or <i>CPAN</i>. This is a repository of tens of thousands of downloadable
+        <i>modules</i> written by lots of different authors, providing reusable code that 
+        performs almost every conceivable task. Using CPAN modules will help you accomplish 
+        any Perl task that much faster!</li></ul>
+        
+ </div> 
+
+ <a name="h_02"></a><div class="heading">Getting Started</div><div class="headingText">
+
+   <p>Before we get started with Perl, you need to be familiar with the working environment we'll be using: 
+     the Unix environment. Unix allows you to write Perl programs on our computers so you don't need to worry about 
+     having any special software on your own  
+     computer. We have an entire OST course devoted to Unix if you'd like a deeper understanding of that operating
+     system.
+     For now, let's go over just the elements
+     you'll need to get started learning Perl. </p>
+   
+ </div>
+
+  
+ <a name="h_03"></a><div class="heading">Build and Run a Perl Program</div><div class="headingText"> 
+   
+    <p>True to OST form, we're going to get to programming right away. Let's make sure you can run a Perl program first.</p>
+    
+    <p>Usually you'll 
+      enter a Perl program in your favorite text editor and then run it by typing a command in a 
+      command <i>shell</i> (that's the term for one of those special programs whose job in life
+      is to display a prompt and then let you type in a command that causes it to run a program when 
+      you press Enter). On a Unix or Linux type of system (that includes OS X), the shell is bash, 
+      or tcsh, or some other -sh, and the editor is vim or Emacs or any of many other possibilities. 
+      On Windows the shell is the DOS window (what you get by running "cmd") and the editor is 
+      Notepad or Wordpad or vim or, again, any of many other possibilities. (You can also run 
+      programs on Windows by double-clicking their icons, but then the usual input and output 
+      streams are not available.)</p>
+  
+    <p>In this course we're going to use a completely integrated environment because we want the 
+      course to be about learning Perl, not about learning a particular editor and operating 
+      system. Later in the course there is a brief lesson on basic Unix commands and editors so 
+      that, when you're ready, you can transfer your knowledge of Perl to the real world.</p>
+
+   <p>Let's get started on your first program! First, we'll create a folder to keep all of our Perl stuff 
+     organized. In the left panel of your CodeRunner window, right-click <b>Home</b>, and select 
+     <b>New folder...</b> as shown:</p>
+   
+   <p><div class="c"> <img src="images/coderunner/NewFolder.gif"></div></p>
+   
+   <p>Name the new folder <b>perl1</b> as shown, and press <b>Enter</b>:</p>
+   
+   <p><div class="c"> <img src="images/coderunner/NewFolderPerl1.gif"></div></p>
+   
+   <p>Now, select <b>Perl</b> in the <b>Syntax</b> drop-down menu:</p>
+      
+   <p><div class="c"> <img src="images/coderunner/perlmode.jpg"></div></p>
+      
+    <p>You should now see a <img src="images/coderunner/checksyntax.JPG"> icon on the left side of the 
+      toolbar.</p> 
+      
+    <p>In the editor, type (don't just cut and paste!) all the lines you see below so it looks like this:</p>
+
+<div class="listingBox"><div class="listingTitle">CODE TO TYPE:</div><div class="listing"><pre><ins>#!/usr/bin/perl
+use strict;
+use warnings;
+print "Hello, world!\n";</ins>
+</pre></div></div>
+     
+   <p>Once you've typed the code, save it and check the syntax. Click the 
+     <img src="images/coderunner/checksyntax.JPG"> button. A new window will open where you can name and 
+     save the file. Select the <b>/perl1</b> folder you just created (save all your files here unless otherwise specified), 
+     enter the file name <b>hello_world.pl</b>, and click <b>Save</b>:</p> 
+   
+   <p><div class="c"> <img src="images/coderunner/SaveHelloWorld.gif"></div></p>
+      
+   <p>You'll see the Results of debugging your program. If everything went 
+     alright, you'll see the message <span class="darkred">hello_world.pl syntax OK</span>:</p>
+   
+   <p><div class="c"> <img src="images/coderunner/results.gif"></div></p>
+      
+   <p>Note that there are two buttons, one labeled <b>Preview</b> and one labeled <b>Close</b>.
+   The Preview button can be used to view scripts that can be run in a web browser, but in this 
+   course we will be writing Perl scripts that can <i>only be executed on the command line</i>.
+   Go ahead and click the <b>Close</b> button, and let's learn how to do this.</p>
+  
+  <a name="s_01"></a><div id="s_01"><div class="subheading">Running Your Program</div><div class="subheadingText">
+   <p>Now that your program is saved and the syntax checked, let's run it!</p>
+    
+    <p>Click the <b>New Terminal</b> button in the Toolbar: <img src="images/coderunner/newterminal.JPG">.</p>
+      
+     <p>Log in to the OST server.  Be sure to replace <ins>username</ins> with your username.
+     It should look something like this:</p>
+      
+<div class="interactiveBox"><div class="interactiveTitle">INTERACTIVE TERMINAL SESSION:</div><div class="interactive"><pre>
+login: <ins>username</ins>
+password:
+Last login: Mon Aug 16 11:36:41 from 63.171.219.110
+cold:~$ 
+</pre></div></div>
+    
+    <table class="noteBox pBox "><tr><td class="noteTitle">Note</td><td class="note">When you enter your password, the cursor will not move.  In fact, it will not appear
+    as though anything is happening.  Rest assured, it is.  Just be sure to type your password
+    carefully and hit Enter.  If you are having trouble, please contact your mentor.</td></tr></table>
+       
+      <p>The server is named <b>cold</b>.  All OST students have shells on this server.  A <b>shell</b>
+      is the place where you execute Unix commands on the server.  The commands you execute on your
+      shell will not effect any other shell.</p>
+       
+      <p><b>cold:~$</b> is called a command prompt.  If you see this, you're ready to execute 
+        Unix commands.  To run your program, go to the Unix prompt, and change the directory to the
+        perl1 directory.  Then call the program by name:</p>
+   
+<div class="listingBox"><div class="listingTitle">CODE TO TYPE:</div><div class="listing"><pre>
+cold:~$ <ins>cd perl1</ins>
+cold:~/perl1$ <ins>./hello_world.pl</ins>
+Hello, world!
+cold:~/perl1$ 
+</pre></div></div>
+
+    <p><table class="noteBox fBox pBox "><tr><td class="noteTitle">Note</td><td class="note">We're saving all of our programs in the /perl1 folder, so we will change to that folder to run them. As a reminder, 
+      we'll show the <b>cd perl1</b> command in the interactive session in each lesson.</td></tr></table></p>    
+  
+  </div></div>
+    
+   <p>Congratulations, you've run a Perl program! Sure, it's nothing fancy—it just prints out "Hello 
+      World"—but we're off to a good start.</p>
+   
+   <p>From now on, when we want you to run a program, we'll just say 
+     "<img src="images/coderunner/checksyntax.JPG"> and run it," and you should follow the procedure 
+     above.</p>
+    
+   <p>You've probably guessed what the <span class="darkgreen">print()</span> function does, but you may be
+      wondering what those other lines in the program do. The short answer is that every Perl 
+      program you write will begin with those lines, so don't worry about them. But we 
+      figure that you're the curious type, or you wouldn't be here. So here's the real scoop:</p>
+
+<div class="observeBox"><div class="observeTitle">OBSERVE:</div><div class="observe"><pre>
+<ins>#!/usr/bin/perl</ins>
+<span class="purple">use strict;
+use warnings;</span>
+</pre></div></div>
+  
+    <p>The first line is what we call a "shebang" line—all scripts on Unix-like computers start 
+      with #! and scripts on Windows mostly ignore that line. What follows the #! characters tells 
+      the operating system where to find the program that can read the rest of the file. Now you 
+      know that /usr/bin/perl is where to find the specific program that runs Perl programs in this script. 
+      The location may vary depending on which computer you're using.</p> 
+    
+    <p>The next two lines of code (in <span class="purple">purple</span>) enable optional parts of Perl called 
+      <i>pragmas</i>, that tell Perl to be picky about the code we give it. The result is that Perl 
+      will catch and tell us about many common programming errors that we might make.</p>
+  
+    <p>You will likely encounter Perl programs written by other people who have neglected to include those 
+      lines at the beginning. We are not going to be like those programmers. 
+      This course uses <i>best practices</i> in Perl programming, and using those 
+      lines is one of them. </p>
+    
+    <p><div class="c"><table class="noteBox fBox pBox "><tr><td class="noteTitle">Note</td><td class="note">An older alternative to "use warnings" is to include a " -w" at the end of the shebang line;
+      if you see that, it's almost as good as "use warnings."</td></tr></table></div></p>
+
+    <p>So you're probably wondering, "What happens if I take those lines out?" Let's give it a try and 
+      see what happens. Remove the code in <del>red</del> as shown:</p>
+  
+<div class="listingBox"><div class="listingTitle">CODE TO EDIT:</div><div class="listing"><pre>#!/usr/bin/perl
+<del>use strict;
+use warnings;</del>
+print "Hello, world!\n";
+</pre></div></div>
+    
+   <p><img src="images/coderunner/checksyntax.JPG"> and run it.</p> 
+     
+<div class="interactiveBox"><div class="interactiveTitle">INTERACTIVE TERMINAL SESSION:</div><div class="interactive"><pre>cold:~/perl1$ <ins>./hello_world.pl</ins>
+Hello, world!
+cold:~/perl1$ 
+</pre></div></div>
+     
+      <p>No difference, right? That's because 
+      we wrote a good program to begin with. Now let's mess with it a bit. Don't be shy about this, 
+      because you're going to mess programs up accidentally anyway; we all do. Try leaving out one of the 
+      quotation marks. Edit your code as shown below, removing the <del>red</del> quotation mark:</p>
+    
+<div class="listingBox"><div class="listingTitle">CODE TO EDIT:</div><div class="listing"><pre>#!/usr/bin/perl
+print "Hello, world!\n<del><b>"</b></del>;
+</pre></div></div>
+  
+    
+   <p><img src="images/coderunner/checksyntax.JPG"> and run it.</p>
+   
+<div class="interactiveBox"><div class="interactiveTitle">INTERACTIVE TERMINAL SESSION:</div><div class="interactive"><pre>cold:~/perl1$ <ins>./hello_world.pl</ins>
+Can't find string terminator '"' anywhere before EOF at ./hello_world.pl line 2.
+cold:~/perl1$ 
+</pre></div></div>
+   
+      <p>Now, Perl can detect <i>that</i> 
+      mistake without any help from <span class="purple">use strict</span> or <span class="purple">use warnings</span>! 
+      Let's try another experiment. Add the <ins> blue</ins> code as shown:</p>
+
+  
+<div class="listingBox"><div class="listingTitle">CODE TO TYPE:</div><div class="listing"><pre>#!/usr/bin/perl
+print<ins><b>:</b></ins> "Hello, world!\n<ins><b>"</b></ins>;
+</pre></div></div>
+    
+   <p><img src="images/coderunner/checksyntax.JPG"> and run it.
+      What happens? (We're not going to tell you—you'll just have to try it!)</p>
+  
+    <p>Okay, now put the two <ins>use</ins> lines back, keeping the colon in as shown:</p>
+
+<div class="listingBox"><div class="listingTitle">CODE TO EDIT:</div><div class="listing"><pre>#!/usr/bin/perl
+<ins>use strict;
+use warnings;</ins>
+print: "Hello, world!\n";
+</pre></div></div>
+    
+   <p><img src="images/coderunner/checksyntax.JPG"> and run it.
+      Now what happens?</p>
+  
+ </div>
+ <a name="h_04"></a><div class="heading">Our Second Program</div><div class="headingText">
+ 
+    <p>Let's try a new program that's similar to the first one you created, but with different code. Create  
+      a new Perl file in the editor. Select <b>New File</b> from the
+      Toolbar: <img src="images/coderunner/newfile.JPG">.</p>
+   
+   <p>Go ahead and copy the code from hello_world.pl into the new file 
+   (we'll let you copy just this once, since you typed it yourself in the 
+   first place, but don't get used to it!) and then 
+      add the code in <ins>blue</ins> as shown:</p>
+
+<div class="listingBox"><div class="listingTitle">CODE TO TYPE:</div><div class="listing"><pre>#!/usr/bin/perl
+use strict;
+use warnings;  
+
+print "Hello, world!\n";
+
+<ins>die "Farewell, cruel world!\n";</ins>
+</pre></div></div>
+
+   <p><img src="images/coderunner/checksyntax.JPG"> and 
+     name it <b>hello_world2.pl</b>. Now run it: </p>
+   
+<div class="interactiveBox"><div class="interactiveTitle">INTERACTIVE TERMINAL SESSION:</div><div class="interactive"><pre>cold:~/perl1$ <ins>./hello_world2.pl</ins>
+Hello, world!
+Farewell, cruel world!
+cold:~/perl1$ 
+</pre></div></div>
+    
+   <p>This program used a new function, <span class="darkgreen">die()</span>. It might look like 
+      <span class="darkgreen">die()</span> does the same things as <span class="darkgreen">print()</span>—they both 
+     send a string to the screen—but that's not the case. Add the <ins>blue</ins> code 
+     to the program as shown:</p>
+
+<div class="listingBox"><div class="listingTitle">CODE TO TYPE:</div><div class="listing"><pre>#!/usr/bin/perl
+use strict;
+use warnings;  
+          
+print "Hello, world!\n";
+          
+die "Farewell, cruel world!\n";
+<ins>
+print "Hello again.\n";
+</ins> 
+</pre></div></div>
+      
+   <p><img src="images/coderunner/checksyntax.JPG"> and run it:</p>
+     
+<div class="interactiveBox"><div class="interactiveTitle">INTERACTIVE TERMINAL SESSION:</div><div class="interactive"><pre>cold:~/perl1$ <ins>./hello_world2.pl</ins>
+Hello, world!
+Farewell, cruel world!
+cold:~/perl1$ 
+</pre></div></div>
+       
+     <p><ins>Hello again.</ins> is not printed this time.  You can see why 
+       <span class="darkgreen">die</span> has its name—it causes the program 
+       to stop right after it prints its argument.</p>
+
+ </div>
+ <a name="h_05"></a><div class="heading">Scripting</div><div class="headingText">
+    
+    <p>Perl programs are often referred to as scripts, but some people think that means they're not 
+      intended for serious work, so we'll call them programs throughout this course. Unlike, say, 
+      C or Java programs, Perl programs do not get compiled into a different 
+      file that you run. So you never have to wonder whether your source 
+      code is the same version as the one you're running—they're the same file!</p>
+    
+    <p>So is Perl a procedural language, a functional language, or an object-oriented language? 
+    Yes, yes, and yes. Perl has elements of all of those types of languages. In this course, we will not be 
+      exercising the object-oriented aspect, and functional programming in Perl is usually more of 
+      an academic exercise than anything else. We're going to focus our efforts on structured, 
+      procedural programming.</p>
+
+    <p><i>Structured</i> means that the program is composed of blocks for handling loops and 
+      conditions, instead of executing one command after another or executing commands at random.</p> 
+
+    <p><i>Procedural</i> means that the program places sections of code that perform specific functions
+      into special blocks that have names which allow them to be referred to from other places within the 
+      code; in Perl these blocks are called <i>subroutines</i>. This is also referred to as 
+      <i>modular</i> programming.</p>
+  
+   <p>Some languages require you to write only in object-oriented code, 
+   as opposed to the conventional model, in which a program is seen as a list of 
+   tasks (subroutines) to perform. Perl is not such a 
+      language.</p>
+
+    <p>Some practices are good to incorporate no matter the language you're using. One 
+      of them is <i>constant refactoring</i>. Whenever we develop a program, we usually start out
+      with a short list of tasks it needs to execute. When we get the program working, we usually 
+      congratulate ourselves, and put it aside. But our work rarely ends there. Usually we'll need to go back and 
+      add more capabilities to the program. This is especially true if we did a good job to begin 
+      with; people like our work and want more of the same good quality programming to do more for them.
+      Pretty soon a program that was originally designed to 
+      perform one little task can grow to do a hundred more. If we don't continually adjust 
+      the design of the program to correspond to its expanding purposes, it is likely to become an unwieldy bunch of 
+      parts added together without coordination, like an apartment complex grown from a tool shed:</p>
+  
+    <p><div class="c"><img src="images/habitat67.jpg"></div></p>
+  
+   <p><i>This image provided by Brian Pirie per <a href="http://creativecommons.org/licenses/by/2.0/" target="_blank">CC BY 2.0</a></i></p>
+         
+  
+
+    <p>So as you revise your programs, keep looking for ways to execute the same tasks while 
+    improving the design of the code (this is called "refactoring"). 
+      One efficient way to refactor is to look for code that is repeated and figure out a way to remove 
+      the duplication.</p>
+    
+    <p>Be sure to make some deliberate errors in your programs during the lessons to see what happens 
+      (accidental errors are fine as well). Let's give it a try. Modify your <b>hello_world2.pl</b> as shown:</p>
+      
+<div class="listingBox"><div class="listingTitle">CODE TO EDIT:</div><div class="listing"><pre>
+#!/usr/bin/perl
+use strict;
+use warnings;  
+          
+print "Hello, world!\n"<del>;</del>
+          
+die "Farewell, cruel world!\n";
+
+print "Hello again.\n";
+</pre></div></div>        
+     
+   <p><img src="images/coderunner/checksyntax.JPG"> and run it to see what happens. Now, modify it again as shown:</p> 
+   
+<div class="listingBox"><div class="listingTitle">CODE TO EDIT:</div><div class="listing"><pre>
+#!/usr/bin/perl
+use strict;
+use warnings;  
+          
+print "Hello, world!\n"<ins>,</ins>
+          
+die "Farewell, cruel world!\n";
+
+print "Hello again.\n";
+</pre></div></div>        
+     
+   <p><img src="images/coderunner/checksyntax.JPG"> and run it to see what happens. Replace the semicolon as shown:</p> 
+   
+<div class="listingBox"><div class="listingTitle">CODE TO EDIT:</div><div class="listing"><pre>
+#!/usr/bin/perl
+use strict;
+use warnings;  
+          
+print "Hello, world!\n"<ins>;</ins>
+          
+die "Farewell, cruel world!\n";
+
+print "Hello again.\n";
+</pre></div></div>        
+   
+   <p>The semicolon is a <i>statement separator</i> in Perl; 
+      you can put multiple statements on one line or (more commonly) split statements across several 
+      lines—Perl doesn't care. Since the end of the line doesn't indicate to Perl where one statement 
+      ends and another begins, something else has to—our friend the semicolon. 
+      <i>The shebang line at the top of the program does not count as a statement.</i></p>
+    
+    <p>It isn't crucial that you understand the meaning of an error
+    message entirely, so long as you can locate the error and handle it. But if you do want a more detailed 
+      explanation of your error messages, add the code in <ins>blue</ins> near the top of the 
+      program and add the colon again as shown:</p>
+ 
+<div class="listingBox"><div class="listingTitle">CODE TO EDIT:</div><div class="listing"><pre>#!/usr/bin/perl
+use strict;
+use warnings;
+<ins>use diagnostics;</ins>
+print<ins><b>:</b></ins> "Hello, world!\n";
+die "Farewell, cruel world!\n";
+print "Hello again.\n";
+</pre></div></div>
+    
+   <p><img src="images/coderunner/checksyntax.JPG"> and run it
+   to see what happens.</p>
+    
+    <p>What do you suppose the two-character sequence <ins>\n</ins> in the 
+      <span class="darkgreen">print()</span> string does? Try leaving it out, then try adding another one in the 
+      middle. Of course, you aren't expected to understand the code completely just yet, but we'll 
+      get there.</p>  
+ 
+   <a name="s_01"></a><div id="s_01"><div class="subheading">perldoc -f</div><div class="subheadingText">
+     
+     <p>There are many built-in functions in Perl, all documented in the giant page that you get 
+       with <b>perldoc perlfunc</b>. That page is so huge that searching 
+       through it for the function you want would result in certain agony. Fortunately, there is an alternative to perldoc that 
+       shows you just the part of perlfunc for the function you specify. You get that with the <b>-f</b> option 
+       to perldoc. Try it in the Unix (or Unix 2) shell. Type the <ins>blue</ins> code as shown:</p>
+     
+     <div class="listingBox"><div class="listingTitle">CODE TO TYPE:</div><div class="listing"><pre>cold:~/perl1$ <ins>perldoc -f print</ins>
+     </pre></div></div>
+     
+     <p>You can scroll through the test using the up and down arrows on your keyboard, then when you're ready,
+       exit the page by typing <b>q</b>.</p>
+     
+     <p>You can find the functions listed alphabetically and by category at <a href="http://perldoc.perl.org/perlfunc.html" target="_blank">http://perldoc.perl.org/perlfunc.html</a>.</p>
+   </div></div>
+    
+  <p>Phew! That was a long lesson. But you've got a good foundation to build on as we go 
+ forward learning Perl. You're doing great so far!  Be sure and go back to your syllabus page and complete the 
+    Lesson 1 quizzes and projects to make sure you're ready to move on to the next lesson.  See you there!</p>
+      
+ </div>
+<div class="footer"><div id="timeSurvey"></div>				
+				Copyright © 1998-2014 O'Reilly Media, Inc.<br><img src="https://courses.oreillyschool.com/common/cclicense.png"><br>
+				This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 Unported License.<br>
+				See <a href="http://creativecommons.org/licenses/by-sa/3.0/legalcode">http://creativecommons.org/licenses/by-sa/3.0/legalcode</a> 
+				for more information.
+				</div><iframe id="t" width="1" height="1" border="0" style="display:none"></iframe><script language="javascript">bodyLoaded();</script><script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+  ga('create', 'UA-44720547-1', 'oreillyschool.com');
+  ga('send', 'pageview');
+</script></body></html>

@@ -1,0 +1,97 @@
+<html>
+   <!-- Copyright (c) 1998-2014 O'Reilly Media, Inc. Unauthorized use is strictly
+                prohibited. None of this code or content can by copied without the express written
+                permission from O'Reilly Media, Inc. -->
+   <head>
+      <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+      <link rel="stylesheet" type="text/css" href="http://archive.oreilly.com/oreillyschool/courses/Perl1/common/Lab.css">
+      <title>Perl's Contextual Behavior - Quiz 2</title>
+   </head>
+   <body id="body">
+      <h2>Perl's Contextual Behavior - Quiz 2</h2> 
+      
+      
+      
+      
+      <p>In the following code snippets, identify the context of <i>EXPR</i> (notation standing for whatever expression might 
+         be put at that place in the code).
+      </p>
+      
+      
+      <p>Your choices are:</p>
+      
+      <ul>
+         <li>List</li>
+         <li>Scalar</li>
+         <li>Boolean (Scalar)</li>
+      </ul>
+      
+      
+      <p>The snippets are:</p>
+      
+      
+      <ol>
+         <li>print <i>EXPR</i></li>
+         <li>if (<i>EXPR</i>) { print "Hello" }
+         </li>
+         <li>17 + 42 * <i>EXPR</i></li>
+         <li>push @array, <i>EXPR</i></li>
+         <li>print reverse( "begin" .<i>EXPR</i>. "end" )
+         </li>
+         <li>while ( 0 + <i>EXPR</i>)
+         </li>
+         <li>foreach my $thing ( @array,<i>EXPR</i>)
+         </li>
+      </ol>
+      
+        
+      
+      
+      <ol>
+         <li>list</li>
+         <li>boolean (scalar)</li>
+         <li>scalar [defined by *]</li>
+         <li>list</li>
+         <li>scalar [defined by . (concat) Note these are not ,]</li>
+         <li>scalar [defined by 0+ rather then while]</li>
+         <li>list</li>
+      </ol>
+      
+      
+      <p><b>Grading Criteria:</b> Student should demonstrate understanding of correct context for a given expression in any situation.</p>
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+          
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+   </body>
+</html>

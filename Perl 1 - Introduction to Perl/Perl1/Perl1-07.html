@@ -1,0 +1,324 @@
+<html><!-- Copyright (c) 1998-2014 O'Reilly Media, Inc.
+			This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 Unported License.
+			See http://creativecommons.org/licenses/by-sa/3.0/legalcode for more information.
+            --><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"><link rel="stylesheet" type="text/css" href="../common/Lab.css"><script type="text/javascript" src="../common/Lab.js"></script><script language="javascript"></script><title>Arrays and Array Functions</title></head><body id="body"><a name="top"></a><div class="title">Arrays and Array Functions</div><div class="resize"><a href="Perl1-07.html#top" onclick="changeSize('smaller');" class="aS" title="Keep clicking to make fonts smaller">A</a><a href="Perl1-07.html#top" onclick="changeSize('larger');" class="aL" title="Keep clikcing to make fonts larger">A</a><a href="Perl1-07.html#top" onclick="lv()" class="lv" title="Adjust Page for High Contrast">HC</a><div id="fh"><p>Click on <span class="aS">A</span> to make all fonts on the page smaller.</p><p>Click on <span class="aL">A</span> to make all fonts on the page larger.</p><p>Click on <span class="lv">HC</span> to toggle high contrast mode. When you move your mouse over 
+                 some bold words in high contrast mode, related words are automatically highlighted. Text is shown
+                 in black and white. 
+             </p></div></div><hr>
+ 
+ <div class="goalTitle">Lesson Objectives</div><div class="goals">
+  
+  
+  When you complete this lesson, you will be able to:
+  
+  <ul><li>declare arrays.</li><li>assign array elements.</li><li>assign an array to a list.</li><li>copy one array to another.</li><li>use array functions.</li></ul>
+ </div><hr>
+ 
+ <a name="h_01"></a><div class="heading">Arrays and Array Functions</div><div class="headingText">
+  <a name="s_01"></a><div id="s_01"><div class="subheading">Arrays</div><div class="subheadingText">
+  
+   
+   <p>Now that you're familiar with Perl's scalar variable type, it's time to introduce you 
+    to a completely new kind of variable: the array. We know that a scalar can hold anything (a number, a string, 
+    or several things you haven't learned about yet), but it can only hold <i>one</i> thing, no more, no fewer.</p>
+   
+   <p>The array is one of two variable types in Perl that are collectively known 
+   as <i>aggregates,</i> meaning they can hold <i>any</i> number 
+    of things. (The other aggregate is the <i>hash</i>, which we'll discuss 
+    later.) </p>
+   
+   <p>Here's a graphical representation of our variables:</p>
+   
+   <p><div class="c"><img src="images/array.png"></div></p><br>
+   
+   <p><div class="c"><table class="noteBox fBox pBox "><tr><td class="noteTitle">WARNING</td><td class="note">More fruit ahead. If this is making you hungry, go grab a snack immediately and come back, so 
+    you're not distracted!</td></tr></table></div></p>
+   
+   <p>The scalar in that diagram is called <b>$fruit_type</b>, and the array is called 
+    <b>@fruit_types</b>. Code is generally easier to understand if arrays are named in the 
+    plural. You'll notice that each part of the array looks remarkably similar to the scalar. That's 
+    because every part, or <i>element</i>, of an array <i>is</i> a scalar.</p>
+   
+   <p>But because arrays are different variable types than scalars, their names start with a different punctuation character. 
+   The <b>@</b> sign was chosen because it looks like the letter <b>a</b>, which makes it a 
+    good <i>mnemonic device</i> (memory-jogger) for <b>a</b>rray.</p>
+   
+   <H1>Declaring and Using Arrays</H1>
+   
+   <p>You declare arrays just as you would scalars—using <span class="purple">my</span>:</p>
+   
+<div class="observeBox"><div class="observeTitle">OBSERVE: Declaring an Array</div><div class="observe"><pre>
+<span class="purple">my</span> <span class="darkred">@fruit_types</span>;
+</pre></div></div>
+   
+   <p>So how do we assign arrays? An array is a collection of zero or more things. Where 
+    have we encountered something like that before? In the last lesson—lists! So the array in the 
+    example above could have been created with this code:</p>
+
+<div class="observeBox"><div class="observeTitle">OBSERVE: Assigning Array Elements</div><div class="observe"><pre>
+<span class="purple">my</span> <span class="darkred">@fruit_types</span> = (<span class="orange">'apple'</span>, <span class="orange">'pear'</span>, <span class="orange">'kiwi'</span>, <span class="orange">'peach'</span>, <span class="orange">'lime'</span>, <span class="orange">'grape'</span>);
+</pre></div></div>
+   
+  <div class="c"><table class="noteBox fBox pBox "><tr><td class="noteTitle">Note</td><td class="note">You can save time and work with a shortcut for lists that are "well-behaved." Each element of a well-behaved list 
+   contains no white space (spaces or tabs). You can use the special 
+    <span class="darkgreen">qw()</span> (quote word) function to make your code more readable:<br><br>
+    
+    <span class="purple">my</span> <span class="darkred">@fruit_types</span> = <span class="darkgreen">qw</span>(<span class="orange">apple pear orange 
+     kiwi peach lime grape</span>);<br><br> 
+    
+    The <span class="darkgreen">qw()</span> function makes your code much easier to read. 
+    The elements can't contain white 
+    space—because white space in a <span class="darkgreen">qw()</span> operator tells Perl where one 
+    element ends and another begins.  The <span class="darkgreen">qw()</span> operator returns a list of all 
+    elements between its parentheses that have white space between them (you can put in line 
+   breaks as well). It's kind of like executing a <span class="darkgreen">split()</span>.</td></tr></table></div> 
+     
+   <p>Arrays are "born empty," meaning they contain zero elements. So there's no real difference between 
+    these two statements:</p>
+   
+<div class="observeBox"><div class="observeTitle">OBSERVE: Creating an Empty Array</div><div class="observe"><pre>
+<span class="purple">my</span> <span class="darkred">@fruit_types</span>;
+<span class="purple">my</span> <span class="darkred">@fruit_types</span> = ();
+</pre></div></div>
+   
+   <p>Some Perl programmers will write the second form, thinking that it's 
+    somehow necessary. It isn't.</p>
+   
+   <p>And just as you can assign a list to an array, you can assign an array to a list:</p>
+   
+<div class="observeBox"><div class="observeTitle">OBSERVE: Assigning an Array to a List</div><div class="observe"><pre>
+<span class="purple">my</span> (<span class="darkred">$fruit1</span>, <span class="darkred">$fruit2</span>, <span class="darkred">$fruit3</span>) = <span class="darkred">@fruit_types</span>;
+</pre></div></div>
+   
+   <p>If there are fewer than three elements in <span class="darkred">@fruit_types</span>, then one or more 
+    of the scalars on the left side will be undefined. If there are more than three elements in 
+    <span class="darkred">@fruit_types</span>, then the remaining ones will be ignored.</p>
+   
+   <p>Now you've seen that arrays convert to and from lists in assignements, you can see how to copy one array to another:</p>
+      
+<div class="observeBox"><div class="observeTitle">OBSERVE: Copying One Array to Another</div><div class="observe"><pre>
+<span class="purple">my</span> <span class="darkred">@fruit_types</span> = <span class="darkred">@citrus_types</span>;
+</pre></div></div>
+   
+   <p>Let's try it in an example. Create a file called <b>sku.pl</b> 
+    as shown:</p>
+   
+<div class="listingBox"><div class="listingTitle">CODE TO TYPE:</div><div class="listing"><pre><ins>#!/usr/bin/perl
+use strict;
+use warnings;
+
+my $stock_lines = &lt;&lt;'END_OF_REPORT';
+Inventory Stock-Keeping Units follow:
+90-5825 87-9398 93-8589 40-6910
+END_OF_REPORT
+
+my ($heading, $line1) = split "\n", $stock_lines;
+my @SKUs = split " ", $line1;
+my ($sku1, $sku2, $sku3, $sku4) = @SKUs;
+print "First SKU = $sku1; third SKU = $sku3\n";
+</ins></pre></div></div>
+   
+   <p><img src="images/coderunner/checksyntax.JPG"> and run it. </p>
+   
+<div class="interactiveBox"><div class="interactiveTitle">INTERACTIVE TERMINAL SESSION:</div><div class="interactive"><pre>cold:~$ <ins>cd perl1</ins> 
+cold:~/perl1$ <ins>./sku.pl</ins>
+First SKU = 90-5825; third SKU = 93-8589
+cold:~/perl1$ 
+</pre></div></div>
+   
+   <p>We're getting a lot better at parsing text! We were able to ignore the 
+    title line of the report by putting it in <span class="darkblue">$heading</span> and then leaving it alone.</p>
+   
+   <p>Arrays also interpolate in double-quoted strings. Modify sku.pl as shown below:</p>
+   
+<div class="listingBox"><div class="listingTitle">CODE TO EDIT:</div><div class="listing"><pre>#!/usr/bin/perl
+use strict;
+use warnings;
+
+my $stock_lines = &lt;&lt;'END_OF_REPORT';
+Inventory Stock-Keeping Units follow:
+90-5825 87-9398 93-8589 40-6910
+END_OF_REPORT
+
+my ($heading, $line1) = split "\n", $stock_lines;
+my @SKUs = split " ", $line1;
+my ($sku1, $sku2, $sku3, $sku4) = @SKUs;
+print "First SKU = $sku1; third SKU = $sku3\n";<ins>
+print "All SKUs: @SKUs\n";
+</ins></pre></div></div>
+   
+   <p><img src="images/coderunner/checksyntax.JPG"> and run it. </p>
+   
+<div class="interactiveBox"><div class="interactiveTitle">INTERACTIVE TERMINAL SESSION:</div><div class="interactive"><pre>cold:~/perl1$ <ins>./sku.pl</ins>
+First SKU = 90-5825; third SKU = 93-8589
+All SKUs: 90-5825 87-9398 93-8589 40-6910
+cold:~/perl1$ 
+</pre></div></div>
+   
+   <p>In the output, the array 
+    elements get printed in order, with a single space between each one. </p>
+     
+  </div></div>
+  <a name="s_02"></a><div id="s_02"><div class="subheading">Array Functions</div><div class="subheadingText">
+        
+   <p>Perl arrays can grow and shrink as much as you need. We know how to replace the 
+    contents of an array entirely. 
+    You don't have to predict the size of your arrays in advance either. 
+   Memory permitting, they can expand to hold one element to twenty million and back down again, effortlessly. 
+  We'll take a look at 
+    four <i>array functions</i> that will allow our arrays to expand and contract:</p>  
+   
+   <ul><li><span class="darkgreen">push</span> <span class="darkred">@array</span>, <span class="darkred">$scalar</span>, ...</li><li><span class="darkred">$scalar</span> = <span class="darkgreen">pop</span> <span class="darkred">@array</span></li><li><span class="darkred">$scalar</span> = <span class="darkgreen">shift</span> <span class="darkred">@array</span></li><li><span class="darkgreen">unshift</span> <span class="darkred">@array</span>, <span class="darkred">$scalar</span>, ...</li></ul>
+   
+   <p>Of course, you can use any variable names you like; <span class="darkred">@array</span> and <span class="darkred">$scalar</span> 
+    are just examples. The ellipses (<b>...</b>) mean that you can have more scalars if you want; just 
+    separate them with commas (that's right, it's a list).</p>
+   
+   <p>So, what do those functions do? You ask all the right questions!</p>
+   <p><ul><li><span class="darkgreen">push</span> inserts <span class="darkred">$scalar</span> at the end of the array. </li><li><span class="darkgreen">unshift</span> inserts <span class="darkred">$scalar</span> at the beginning of the array. </li><li><span class="darkgreen">shift</span> removes an element from the beginning of the array.</li><li><span class="darkgreen">pop</span> removes an element from the end of the array.</li></ul></p>
+    
+   <p>When elements are added to or removed from the beginning of 
+    the array, every element in the array shifts accordingly. When elements are added to or removed 
+    from the end of the array, the array resizes accordingly. Here's a diagram to help 
+    you visualize what's taking place:</p>
+   
+   <p><div class="c"><img src="images/arrayfuncs.png"></div></p>
+   
+   <p>Let's try some of those functions in an example using a names database. Names come in many forms, 
+   but most databases are picky and demand 
+    a "sanitized" form of data that can be divided into a first and a last name, and possibly more. The 
+    program below uses <span class="darkgreen">split()</span>, <span class="darkgreen">shift()</span>, and 
+    <span class="darkgreen">pop()</span> to locate a first and last name without counting anything that may be in between.</p>
+   
+   <p>Create a new program called <b>name_find.pl</b> as shown below:</p>
+   
+<div class="listingBox"><div class="listingTitle">CODE TO TYPE:</div><div class="listing"><pre><ins>#!/usr/bin/perl
+use strict;
+use warnings;
+
+my $name = "Charles Francis Xavier";
+my @names = split ' ', $name;
+my $first_name = shift @names;
+my $last_name = pop @names;
+print "$name is sanitized to $last_name, $first_name\n";
+
+$name = "Hiram K. Hackenbacker";
+@names = split ' ', $name;
+$first_name = shift @names;
+$last_name = pop @names;
+print "$name is sanitized to $last_name, $first_name\n";
+
+$name = "James Moriarty";
+@names = split ' ', $name;
+$first_name = shift @names;
+$last_name = pop @names;
+print "$name is sanitized to $last_name, $first_name\n";
+
+$name = "Samuel Finley Breese Morse";
+@names = split ' ', $name;
+$first_name = shift @names;
+$last_name = pop @names;
+print "$name is sanitized to $last_name, $first_name\n";
+</ins></pre></div></div>
+
+   <p><img src="images/coderunner/checksyntax.JPG"> and run it. </p>
+   
+<div class="interactiveBox"><div class="interactiveTitle">INTERACTIVE TERMINAL SESSION:</div><div class="interactive"><pre>cold:~/perl1$ <ins>./name_find.pl</ins>
+Charles Francis Xavier is sanitized to Xavier, Charles
+Hiram K. Hackenbacker is sanitized to Hackenbacker, Hiram
+James Moriarty is sanitized to Moriarty, James
+Samuel Finley Breese Morse is sanitized to Morse, Samuel    
+cold:~/perl1$ 
+</pre></div></div>
+
+   <p>The code after each different assignment to <span class="darkblue">$name</span> is exactly the same; don't worry about that for now. 
+    We'll learn more about that later.</p>
+   
+  </div></div>
+  <a name="s_03"></a><div id="s_03"><div class="subheading">Individual Array Elements</div><div class="subheadingText">
+   
+   <p>Now let's see how we can access individual elements of an array without having to assign the 
+    whole array to a list of scalars. </p>
+   
+   <p><div class="c"><img src="images/array1.png"></div></p>
+      
+   <p>The numbers next to the elements of the array aren't really part of the array, 
+    they're just diagrammatic notation to help you understand that these elements are 
+    <i>ordered</i>, and can be accessed according to their location within the array. We call them 
+    <i>indexes</i> (<i>indices</i> if you want to be more formal). The index of the first element of the array is 
+    zero. </p>
+      
+   <table class="noteBox "><tr><td class="noteTitle">Note</td><td class="note">The first element has index 0, the second element index 1, and so on. but wouldn't it be 
+    easier to talk about array indexes if the first one was 1, the second one 2, so on?  Yes, if that were the case, 
+    it would 
+    be easier to talk about them, but it would be harder to program them. The FORTRAN language made 
+    that mistake and suffered for it. If arrays started their indexing at 1, you'd be forever 
+    peppering your program with -1 and +1 expressions and forgetting which one to use when, resulting in what we 
+    call a <a href="http://en.wikipedia.org/wiki/Off-by-one_error" target="_blank">fencepost error</a>.</td></tr></table>
+   
+   <p>If we want to access the third element of the array of fruit types, it has the index 2. Because 
+    each element of the array is a scalar, its name starts with a dollar sign. The syntax for an 
+    individual element of an array is: dollar sign, name of array (without the @ sign), and then the 
+    index in square brackets.</p>
+   
+   <p>Create a new program called <b>array_indexes.pl</b> as shown:</p>
+   
+<div class="listingBox"><div class="listingTitle">CODE TO TYPE:</div><div class="listing"><pre><ins>#!/usr/bin/perl
+use strict;
+use warnings;
+
+my @fruit_types = qw(apple pear kiwi peach lime grape);
+print "First fruit type = $fruit_types[0]\n";
+my $index = 3;
+print "Fruit type at index $index = $fruit_types[$index]\n";
+shift @fruit_types;
+print "First fruit type is now $fruit_types[0]\n";
+print "Last fruit type is $fruit_types[-1]\n";
+</ins></pre></div></div>
+   
+   <p><img src="images/coderunner/checksyntax.JPG"> and run it. </p>
+   
+<div class="interactiveBox"><div class="interactiveTitle">INTERACTIVE TERMINAL SESSION:</div><div class="interactive"><pre>cold:~/perl1$ <ins>./array_indexes.pl</ins>
+First fruit type = apple
+Fruit type at index 3 = peach
+First fruit type is now pear
+Last fruit type is grape    
+cold:~/perl1$ 
+</pre></div></div>
+   
+   <p>We don't often access array elements by their indexes; most of the time, we 
+    should be able to access them by other means. But still, it happens enough that you need to know 
+    how to do it. </p>
+   
+   <p>The first element changes after a <span class="darkgreen">shift()</span>. 
+    We don't have to assign the result of <span class="darkgreen">shift()</span> to anything if all we want to 
+    do is throw away the first element of the array.</p>
+   
+   <p>Okay, so what about that index of <span class="orange">-1</span>? The Perl designers decided that instead of  
+    negative indexes resulting in an error, they'd make them be useful instead. To that end, an index of 
+    <span class="orange">-1</span> refers to the <i>last</i> element of the array. An index of <span class="orange">-2</span> 
+    refers to the second-to-last element, and so on.</p>
+
+  </div></div>
+
+  <p>That's it. You are now well on your way to working effectively with arrays in Perl! Feel free to 
+  go get a smoothie or pie or whatever else you're craving after all this 
+   talk about fruit.</p>
+  
+  
+  <p><div class="c"><img src="images/Fruit.jpg"></div></p>
+    
+ </div>
+<div class="footer"><div id="timeSurvey"></div>				
+				Copyright © 1998-2014 O'Reilly Media, Inc.<br><img src="https://courses.oreillyschool.com/common/cclicense.png"><br>
+				This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 Unported License.<br>
+				See <a href="http://creativecommons.org/licenses/by-sa/3.0/legalcode">http://creativecommons.org/licenses/by-sa/3.0/legalcode</a> 
+				for more information.
+				</div><iframe id="t" width="1" height="1" border="0" style="display:none"></iframe><script language="javascript">bodyLoaded();</script><script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+  ga('create', 'UA-44720547-1', 'oreillyschool.com');
+  ga('send', 'pageview');
+</script></body></html>

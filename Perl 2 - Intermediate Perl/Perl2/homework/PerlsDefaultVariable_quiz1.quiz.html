@@ -1,0 +1,67 @@
+<html>
+   <!-- Copyright (c) 1998-2014 O'Reilly Media, Inc. Unauthorized use is strictly
+                prohibited. None of this code or content can by copied without the express written
+                permission from O'Reilly Media, Inc. -->
+   <head>
+      <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+      <link rel="stylesheet" type="text/css" href="http://archive.oreilly.com/oreillyschool/courses/Perl2/common/Lab.css">
+      <title>Properties - Quiz 1</title>
+   </head>
+   <body id="body">
+      <h2>Properties - Quiz 1</h2> 
+      
+      
+      
+      
+      <p>Experiment as necessary to answer the following questions: </p>
+      
+      
+      <p>1. What is the value of <b>$_</b> following a foreach loop with no explicit loop variable?</p>
+      
+      
+      <p>2. Is the value of <b>$_</b> changed following a call to a subroutine that modifies <b>$_</b>?</p>
+      
+        
+      
+      
+      <p>1. After a foreach loop, the value of $_ reverts back to what it was before the loop.</p>
+      
+      
+      <p>2. If a subroutine modifies $_, then the caller will see the change.</p>
+      
+      
+      <p><b>Grading Criteria:</b> Student should demonstrate knowledge of how the default variable $_ is scoped and what effect should be expected because
+         of this.
+      </p>
+      
+      
+      
+      
+      
+      
+      <p>Which of the following functions can have an argument default to <b>$_</b> (hint: perldoc -f):</p>
+      
+      
+      <ol>
+         <li>join</li>
+         <li>split</li>
+         <li>crypt</li>
+         <li>pop</li>
+         <li>chmod</li>
+         <li>localtime</li>
+         <li>kill</li>
+      </ol>
+      
+      
+      
+      
+      <p>split is the only function in this list that uses the value of $_ if no values are passed to it.</p>
+      
+      
+      <p><b>Grading Criteria:</b> Student should demonstrate knowledge of the default behaviors of a few common functions and the use of default values.</p>
+      
+      
+      
+      
+   </body>
+</html>

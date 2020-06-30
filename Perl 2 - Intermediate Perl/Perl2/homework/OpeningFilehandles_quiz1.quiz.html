@@ -1,0 +1,65 @@
+<html>
+   <!-- Copyright (c) 1998-2014 O'Reilly Media, Inc. Unauthorized use is strictly
+                prohibited. None of this code or content can by copied without the express written
+                permission from O'Reilly Media, Inc. -->
+   <head>
+      <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+      <link rel="stylesheet" type="text/css" href="http://archive.oreilly.com/oreillyschool/courses/Perl2/common/Lab.css">
+      <title>Opening Filehandles - Quiz 1</title>
+   </head>
+   <body id="body">
+      <h2>Opening Filehandles - Quiz 1</h2> 
+      
+      
+      
+      
+      <p>What is the difference between:</p>
+      
+      
+      <div class="observeBox">
+         <div class="observeTitle">Observe:</div>
+         <div class="observe"><pre>open my $fh, '&lt;', $file || die $!</pre></div>
+      </div>
+      
+      
+      <p>and:</p>
+      
+      
+      <div class="observeBox">
+         <div class="observeTitle">Observe:</div>
+         <div class="observe"><pre>open my $fh, '&lt;', $file or die $!</pre></div>
+      </div>
+      
+      
+      <p>?</p>
+      
+        
+      
+      
+      <p>The || operator binds tightly so that it tests the truth of $file instead of open.</p>
+      
+      
+      <p><b>Grading Criteria:</b>  Student should demonstrate knowledge of the presence of the or operators in Perl.</p>
+      
+      
+      
+      
+      
+      
+      <p>How could you keep the || operator but still have the same effect as the second statement?</p>
+      
+      
+      
+      
+      <p>Use parentheses: <b>open( my $fh, '&lt;', $file ) || die $!;</b>.</p>
+      
+      
+      <p><b>Grading Criteria:</b> Student should demonstrate knowledge of how to properly manage the precedence of an operator by way 
+         of parentheses.
+      </p>
+      
+      
+      
+      
+   </body>
+</html>

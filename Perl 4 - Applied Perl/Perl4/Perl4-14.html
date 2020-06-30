@@ -1,0 +1,594 @@
+<html><!-- Copyright (c) 1998-2014 O'Reilly Media, Inc.
+			This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 Unported License.
+			See http://creativecommons.org/licenses/by-sa/3.0/legalcode for more information.
+            --><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"><link rel="stylesheet" type="text/css" href="../common/Lab.css"><script type="text/javascript" src="../common/Lab.js"></script><script language="javascript"></script><title>Portable Programming; Dates and Times</title></head><body id="body"><a name="top"></a><div class="title">Portable Programming; Dates and Times</div><div class="resize"><a href="Perl4-14.html#top" onclick="changeSize('smaller');" class="aS" title="Keep clicking to make fonts smaller">A</a><a href="Perl4-14.html#top" onclick="changeSize('larger');" class="aL" title="Keep clikcing to make fonts larger">A</a><a href="Perl4-14.html#top" onclick="lv()" class="lv" title="Adjust Page for High Contrast">HC</a><div id="fh"><p>Click on <span class="aS">A</span> to make all fonts on the page smaller.</p><p>Click on <span class="aL">A</span> to make all fonts on the page larger.</p><p>Click on <span class="lv">HC</span> to toggle high contrast mode. When you move your mouse over 
+                 some bold words in high contrast mode, related words are automatically highlighted. Text is shown
+                 in black and white. 
+             </p></div></div><hr>
+ 
+ <div class="goalTitle">Lesson Objectives</div><div class="goals">
+ 
+ When you complete this lesson, you will be able to:
+ 
+ 
+  <ul><li>implement <a href="Perl4-14.html#portable_programming">Portable Programming</a>.</li><li>parse, generate, and manipulate <a href="Perl4-14.html#dates_and_times">Dates and Times</a>.</li></ul>
+ </div><hr>
+ 
+ <p>Welcome! In this lesson we'll take a break from advanced object-oriented techniques to learn 
+  about some more basic, but highly useful capabilities.</p>
+
+
+ 
+ <a href="Perl4-14.html" name="portable_programming"></a>
+ <a name="h_01"></a><div class="heading">Portable Programming</div><div class="headingText">
+  
+  <p>Let's tackle <i>portable programming</i> first. Perl is extremely portable and extremely 
+   <i>ported</i>; it runs on over 100 different architectures from Cray to iPhone, and many thousands of 
+   combinations of compilers and options on those architectures. Everything 
+   you've learned in our first three courses and most of what you've learned in this one works 
+   identically on all of those platforms. Transparent portability is an important goal for Perl.</p>
+  
+  <a name="s_01"></a><div id="s_01"><div class="subheading">Easy Portability Gains</div><div class="subheadingText">
+   
+   <p>Some steps you take to improve your programs also buy you increased 
+    portability. Chief among those is to have them avoid calling out to external programs. A Perl 
+    program can invoke an external program using any of these tools:</p>
+   
+   <ul><li><b>system()</b></li><li><b>exec()</b></li><li>Backticks (<b>``</b>)</li><li>Piped opens: either the 2-argument form: <b>open <i>FILEHANDLE</i>, "|<i>program</i>"</b> or 
+     <b>open <i>FILEHANDLE</i>, "<i>program</i>|"</b> or the 3-argument form: <b>open <i>FILEHANDLE</i>, 
+      "|-" ,"<i>program</i>"</b> or <b>open <i>FILEHANDLE</i>, "-|", "<i>program</i>"</b></li></ul>
+   
+   <p>If you use any of those tools to call something other than a Perl program that you have provided, you 
+    have introduced a portability issue, because the program you are calling may not be available on the 
+    system where your program is running. If you have a known and bounded customer set for your 
+    program—such as a program written for a specific enterprise work group—then you may be able 
+    to ignore this issue because you can specify the running environment for your program. The less 
+    certainty you have about where your program may be run, the more you will want to avoid calling external 
+    programs. Be aware that even among versions of Unix there are differences in the user interface of 
+    well-known programs like <b>tar</b> and <b>find</b>.</p>
+   
+   <p>Fortunately, Perl is good at doing just about anything you'd want to call an external program for 
+    anyway. Here's a list of the types of program you might be tempted to call and the approach to using Perl 
+    instead (some of the modules mentioned here are CPAN modules that we have not previously discussed or 
+    downloaded):</p>
+   
+   <table class="tbl" border=""><tr><th>Task</th><th>Perl Equivalent</th></tr><tr><td>Date fetching and manipulation with <b>date</b></td><td><b>localtime()</b>, and various Date:: modules that we will cover in the next lesson.</td></tr><tr><td>Web page fetching with <b>wget</b></td><td>WWW::Mechanize, LWP::Simple</td></tr><tr><td>Database access with <b>mysql</b> or <b>sqlplus</b></td><td>DBI with the appropriate DBD:: driver, and many of the DBIx:: convenience extensions</td></tr><tr><td>Background processing with the <b>&amp;</b> shell operator</td><td><b>fork()</b> and <b>exec()</b></td></tr><tr><td>Pipeline chaining of text filters with the <b>|</b> operator in the shell</td><td>Replace filters with Perl functions passing strings to each other</td></tr><tr><td><b>tar</b></td><td>Archive::Tar</td></tr><tr><td><b>compress</b> or <b>gzip</b></td><td>Compress::Zlib</td></tr><tr><td>Image-manipulation programs</td><td>Image::Resize, Image::Magick</td></tr><tr><td>Mail-sending programs</td><td>Email::Sender and Email::Stuff</td></tr><tr><td>Recursive deletions (<b>rm -r</b>)</td><td>File::Path::rmtree</td></tr></table>
+  
+   <p>There are a few functions that are not guaranteed to be completely portable. Let's go over ways to handle some of those now.</p>
+  
+  </div></div>
+  <a name="s_02"></a><div id="s_02"><div class="subheading">File::Basename</div><div class="subheadingText">
+   
+   <p>One such less-than-portable feature is the structure of file paths. On Unix, a file path looks like this: 
+    /path/to/directory/file.ext. 
+    On VMS, a path looks like this: DEV:[PATH.TO.DIRECTORY]FILE.EXT;1. On Windows, a path looks like this:  
+    C:\path\to\directory\file.ext. Perl will convert paths in Unix format to and from the local variant, but 
+    if you plan to program extensively on platforms with variant filesystems, be 
+    especially careful and consider implementing some of the upcoming suggestions.</p>
+   
+   <p><b>File::Basename</b> provides functions that pick apart a path without the need for
+    regular expressions. Create a new file and call it <b>/perl4/filebase.pl</b>:</p>
+   
+<div class="listingBox"><div class="listingTitle">CODE TO ENTER:</div><div class="listing"><pre>#!/usr/local/bin/perl
+use strict;
+use warnings;
+
+use File::Basename;
+
+my @suffix_list = qw(.pl .cgi .htm .html);
+
+my $FMT = "%15s %30s %30s\n";
+while ( my $path = prompt() )
+{
+  printf $FMT, '', 'Hardcoded suffix list', 'Regex suffix list';
+  my ($filename_h, $directories_h, $suffix_h) = fileparse( $path, @suffix_list );
+  my ($filename_r, $directories_r, $suffix_r) = fileparse( $path, qr/\.[^.]*/ );
+  printf $FMT, 'Filename:', $filename_h, $filename_r;
+  printf $FMT, 'Directories:', $directories_h, $directories_r;
+  printf $FMT, 'Suffix:', $suffix_h, $suffix_r;
+}
+
+
+sub prompt
+{
+  my $line;
+  {
+    print "Enter a filename (q to quit): ";
+    chomp( $line = &lt;STDIN&gt; );
+    redo unless length $line;
+    exit if lc $line eq 'q';
+  }
+  return $line;
+}</pre></div></div>
+   
+   <p><img src="images/coderunner/save.gif"> Save and run it:</p>
+   
+<div class="interactiveBox"><div class="interactiveTitle">INTERACTIVE TERMINAL SESSION: Command to type</div><div class="interactive"><pre>cold:~$ <ins>cd perl4</ins>
+cold:~/perl4$ <ins>./filebase.pl</ins>
+Enter a filename (q to quit): <ins>filebase.pl</ins>
+                         Hardcoded suffix list              Regex suffix list
+      Filename:                       filebase                       filebase
+   Directories:                             ./                             ./
+        Suffix:                            .pl                            .pl
+Enter a filename (q to quit): <ins>../src/main.c</ins>
+                         Hardcoded suffix list              Regex suffix list
+      Filename:                         main.c                           main
+   Directories:                        ../src/                        ../src/
+        Suffix:                                                            .c
+Enter a filename (q to quit): <ins>/home/me/public_html/index.html</ins>
+                         Hardcoded suffix list              Regex suffix list
+      Filename:                          index                          index
+   Directories:          /home/me/public_html/          /home/me/public_html/
+        Suffix:                          .html                          .html
+Enter a filename (q to quit): <ins>/var/tmp</ins>
+                         Hardcoded suffix list              Regex suffix list
+      Filename:                            tmp                            tmp
+   Directories:                          /var/                          /var/
+        Suffix:  
+Enter a filename (q to quit): <ins>q</ins></pre></div></div>
+</div></div>
+  
+  <p>The <b>fileparse</b> function breaks a path up into the leading directories, the file basename, and any 
+   extension that matches one of the list or regex provided. This is the preferred way of extracting the name 
+   of a file from a path that might contain higher 
+   directory levels. This function makes no assumptions about the nature of filename extensions; you have to tell 
+   it exactly what you think constitutes an extension.</p>
+    
+  <a name="s_03"></a><div id="s_03"><div class="subheading">File::Spec</div><div class="subheadingText">
+   
+   <p><b>File::Basename</b> parses a path, but what if we want to change a path? The module <b>File::Spec</b> provides an 
+    object-oriented interface to do just that. But usually it's more succinct to import functions 
+    rather than call class methods to do the job, so we use the module <b>File::Spec::Functions</b> instead. 
+    Create a new file called <b>/perl4/filespec.pl</b> as shown:</p>
+     
+<div class="listingBox"><div class="listingTitle">CODE TO ENTER:</div><div class="listing"><pre>#!/usr/local/bin/perl
+use strict;
+use warnings;
+
+use File::Spec::Functions qw(abs2rel canonpath catfile file_name_is_absolute);
+
+my $messy_path = '/top/.//next/./component/file';
+my $clean_path = canonpath( $messy_path );
+print "$messy_path =&gt; $clean_path\n";
+
+print "$clean_path ", ( file_name_is_absolute( $clean_path ) ? "is" : "isn't" ), " absolute\n";
+
+my $base = "/top";
+
+print "Relative to $base, $clean_path = ", abs2rel( $clean_path, $base ), "\n";
+
+my $part = "/next/level/newfile.ext";
+print "Joining $base and $part =&gt; ", catfile( $base, $part ), "\n";
+</pre></div></div>
+     
+   <p><img src="images/coderunner/save.gif"> Save and run it:</p>
+     
+<div class="interactiveBox"><div class="interactiveTitle">INTERACTIVE TERMINAL SESSION: Command to type</div><div class="interactive"><pre>cold:~/perl4$ <ins>./filespec.pl</ins>
+/top/.//next/./component/file =&gt; /top/next/component/file
+/top/next/component/file is absolute
+Relative to /top, /top/next/component/file = next/component/file
+Joining /top and /next/level/newfile.ext =&gt; /top//next/level/newfile.ext</pre></div></div>
+     
+   <p>The <b>canonpath</b> function "cleans up" a path; the <b>abs2rel</b> function converts an absolute path 
+    to one relative to a given base, and the <b>catfile</b> function joins together any number of filesystem 
+    components (we've used two). There are several other functions exportable from this module, and like 
+    these, they will do the right thing on any operating system. </p>
+ 
+  </div></div>
+ </div>
+ <a href="Perl4-14.html" name="dates_and_times"></a>
+ <a name="h_02"></a><div class="heading">Dates and Times</div><div class="headingText">
+   
+  <p><div class="c">Perfection in a clock does not consist in being fast, but in being on time.<br>
+   -Vauvenargues, "Reflexions"</div></p>
+   
+  <p>Parsing, generating, and manipulating dates and times is an important requirement of many programs. It 
+   may <i>look</i> straightforward—twenty-four hours in a day, and a simple enough rule for leap days, 
+   right? But in reality there are exceptions that can be difficult to manage. <i>Daylight Savings Time</i> 
+   is one of them; it varies according to geography (some US states don't change to 
+   DST) and the calendar (the UK changes on different dates, and the US recently 
+   changed its schedule for DST). In addition, the official time has "leap seconds" added to compensate for changes in the Earth's 
+   rotational speed. Some time zones are offset by half an hour instead of an hour. If you're tracking back 
+   to historical times, there was the shift from the Julian Calendar to the Gregorian Calendar (type 
+   <b>cal 1752</b> at a shell prompt and look at September) that actually happened at different dates in
+   different places and not until the twentieth century in Greece. </p>
+   
+  <p>When you start dealing with any of those cases (for instance, when figuring out the amount 
+   of time between two timestamps that may span a DST change, or whether February had twenty-nine 
+   days in 2000), you'll be glad there's an existing module to handle them. Let's look at some common date and time tasks.</p>
+  
+  <a name="s_01"></a><div id="s_01"><div class="subheading">Parsing Unpredictable Timestamps</div><div class="subheadingText">
+   
+   <p>We often need to read a date and/or time of unpredictable format, either from a file or other stream, 
+    or from user input. Forcing the user to follow a rigid fixed format is impolite; picking apart that 
+    format to recognize a date is tedious. We can solve those problems with <b>Date::Parse</b>. Go ahead and install it:</p>
+   
+<div class="interactiveBox"><div class="interactiveTitle">INTERACTIVE TERMINAL SESSION: Command to type</div><div class="interactive"><pre>cold:~/perl4$ <ins>PERL5LIB=~/mylib/lib/perl5 cpan Date::Parse</ins>
+[output omitted]</pre></div></div>
+   
+   <p><b>Date::Parse</b> exports a function <b>str2time</b> that is capable of recognizing a date in just about any 
+    format. Create a new file:</p>
+   
+<div class="listingBox"><div class="listingTitle">CODE TO ENTER:</div><div class="listing"><pre>#!/usr/local/bin/perl
+use strict;
+use warnings;
+
+use lib "$ENV{HOME}/mylib/lib/perl5";
+use Date::Parse;
+
+while ( my $str = prompt() )
+{
+  if ( my $time = str2time( $str ) )
+  {
+    print "$str =&gt; " . localtime( $time ) . "\n";
+  }
+  else
+  {
+    warn "Unable to parse '$str'\n";
+  }
+}
+
+sub prompt
+{
+  my $line;
+  {
+    print "Enter a date (q to quit): ";
+    chomp( $line = &lt;STDIN&gt; );
+    redo unless length $line;
+    exit if lc $line eq 'q';
+  }
+  return $line;
+}</pre></div></div>
+   
+   <p><img src="images/coderunner/save.gif"> Save it as <b>/perl4/parsedate.pl</b> and run it. Try entering
+    various dates and formats:</p>
+   
+<div class="interactiveBox"><div class="interactiveTitle">INTERACTIVE TERMINAL SESSION: Commands to type</div><div class="interactive"><pre>cold:~/perl4 <ins>./parsedate.pl</ins>
+Enter a date (q to quit): <ins>19870424T16:11:23</ins>
+19870424T16:11:23 =&gt; Fri Apr 24 16:11:23 1987
+Enter a date (q to quit): <ins>Jan  1 1969</ins>
+Jan  1 1969  =&gt; Wed Jan  1 00:00:00 1969
+Enter a date (q to quit): <ins>12:45</ins>
+12:45 =&gt; Wed May  4 12:45:00 2011
+Enter a date (q to quit): <ins>July 7</ins>
+July 7 =&gt; Wed Jul  7 00:00:00 2010
+Enter a date (q to quit): <ins>4/7/99 5pm</ins>
+4/7/99 5pm =&gt; Wed Apr  7 17:00:00 1999
+Enter a date (q to quit): <ins>tomorrow</ins>
+Unable to parse 'tomorrow'
+Enter a date (q to quit): <ins>q</ins>
+</pre></div></div>
+   
+   <p>Note that this program was run on May 4 2011. See the 
+    <a href="http://search.cpan.org/perldoc?Date::Parse" target="_blank">Date::Parse documentation</a> for 
+    information on how to use it with languages other than English. Also, note that when the month and day are 
+    both given as numbers, it is assumed that the month comes first.</p>
+   
+   <p>For a more modern but less lightweight approach, we'll introduce the <b>DateTime</b> module
+    family. This is a comprehensive system of everything to do 
+    with dates and times, with complete localization. It even knows about leap seconds. DateTime is to dates 
+    and times as DBI is to relational databases and Moose is to objects. Numerous CPAN extension modules build 
+    on the core capability provided by the DateTime module itself. 
+    We're going to use the extension 
+    <b>DateTime::Format::Natural</b>; installing it will automatically pull down DateTime as a dependency:</p>
+   
+<div class="interactiveBox"><div class="interactiveTitle">INTERACTIVE TERMINAL SESSION: Command to type</div><div class="interactive"><pre>cold:~/perl4$ <ins>PERL5LIB=~/mylib/lib/perl5 cpan DateTime::Format::Natural
+</ins>[output omitted]</pre></div></div>
+   
+   <p>Answer "no" to any requests to install temporary modules permanently. Now let's try the same 
+    application. Modify <b>parsedate.pl</b> as shown:</p>
+   
+<div class="listingBox"><div class="listingTitle">CODE TO EDIT:</div><div class="listing"><pre>#!/usr/local/bin/perl
+use strict;
+use warnings;
+
+use lib "$ENV{HOME}/mylib/lib/perl5";
+<del>use Date::Parse;</del>
+<ins>use DateTime::Format::Natural;
+my $parser = DateTime::Format::Natural-&gt;new( time_zone =&gt; 'local' );</ins>
+ 
+while ( my $str = prompt() )
+{
+<del>  if ( my $time = str2time( $str ) )</del>
+<ins>  if ( my $time = $parser-&gt;parse_datetime( $str )and $parser-&gt;success )</ins>
+  {
+<del>    print "$str =&gt; " . localtime( $time ) . "\n";</del>
+<ins>    print "$str =&gt; $time\n";</ins>
+  }
+  else
+  {
+    warn "Unable to parse '$str'\n";
+  }
+}
+
+sub prompt
+{
+  my $line;
+  {
+    print "Enter a date (q to quit): ";
+    chomp( $line = &lt;STDIN&gt; );
+    redo unless length $line;
+    exit if lc $line eq 'q';
+  }
+  return $line;
+}</pre></div></div>
+   
+   <p><img src="images/coderunner/save.gif"> Save and run it:</p>
+   
+<div class="interactiveBox"><div class="interactiveTitle">INTERACTIVE TERMINAL SESSION: Commands to type</div><div class="interactive"><pre>cold:~/perl4$ <ins>./parsedate.pl</ins>
+Enter a date (q to quit): <ins>19870424T16:11:23</ins>
+Unable to parse '19870424T16:11:23'
+Enter a date (q to quit): <ins>Jan  1 1969</ins>
+Jan  1 1969 =&gt; 1969-01-01T00:00:00
+Enter a date (q to quit): <ins>12:45</ins>
+12:45 =&gt; 2011-05-04T12:45:00
+Enter a date (q to quit): <ins>July 7</ins>
+July 7 =&gt; 2011-07-07T00:00:00
+Enter a date (q to quit): <ins>4/7/99 5pm</ins>
+4/7/99 5pm =&gt; 2099-07-04T17:00:00
+Enter a date (q to quit): <ins>tomorrow</ins>
+tomorrow =&gt; 2011-05-05T00:00:00
+Enter a date (q to quit): <ins>20 minutes from now</ins>
+20 minutes from now =&gt; 2011-05-04T10:07:52
+Enter a date (q to quit): <ins>Next Tuesday</ins>
+Next Tuesday =&gt; 2011-05-10T00:00:00
+Enter a date (q to quit): <ins>3 weeks from now</ins>
+3 weeks from now =&gt; 2011-05-25T09:48:30
+Enter a date (q to quit): <ins>q</ins></pre></div></div>
+   
+   <p>As you can see, there are some formats that <b>DateTime::Format::Natural</b> recognizes but <b>Date::Parse</b> doesn't, and vice-versa. 
+    There are also as some cases where <b>DateTime::Format::Natural</b> draws a different conclusion from ambiguous input. It 
+    is also slower. But if you are going to do complex operations on dates, it is worth investing the time to 
+    learn DateTime.</p>
+   
+  </div></div>
+  <a name="s_02"></a><div id="s_02"><div class="subheading">Parsing Fixed Timestamp Formats</div><div class="subheadingText">
+   
+   <p>If you know in advance which format a timestamp you're going to have to parse, you can use a 
+    more effective approach that removes the necessity for Perl to guess the format. There are many 
+    DateTime::Format:: modules on CPAN you can use, and there is also the core (since Perl 
+    5.10) module <b>Time::Piece</b>. Create this new file:</p>
+   
+<div class="listingBox"><div class="listingTitle">CODE TO ENTER:</div><div class="listing"><pre>#!/usr/local/bin/perl
+use strict;
+use warnings;
+
+use Time::Piece;
+
+my $FORMAT = '%FT%T';
+
+while ( &lt;DATA&gt; )
+{
+  chomp;
+  if ( my $tp = eval { Time::Piece-&gt;strptime( $_, $FORMAT ) } )
+  {
+    print "$_ =&gt; $tp\n";
+  }
+  else
+  {
+    warn "Unable to parse '$_'\n";
+  }
+}
+
+__END__
+2001-03-17T03:04:05
+1999-12-31T23:59:59
+2005-05-21T07:00:00
+2009-02-29T12:00:00
+1968-01-01T00:00:00
+1977-07-42T06:07:08
+</pre></div></div>
+     
+   <p><img src="images/coderunner/save.gif"> Save it as <b>/perl4/timepiece.pl</b>and run it:</p>
+   
+<div class="interactiveBox"><div class="interactiveTitle">INTERACTIVE TERMINAL SESSION: Command to type</div><div class="interactive"><pre>cold:~/perl4$ <ins>./timepiece.pl</ins>
+2001-03-17T03:04:05 =&gt; Sat Mar 17 03:04:05 2001
+1999-12-31T23:59:59 =&gt; Fri Dec 31 23:59:59 1999
+2005-05-21T07:00:00 =&gt; Sat May 21 07:00:00 2005
+2009-02-29T12:00:00 =&gt; Sun Mar  1 12:00:00 2009
+1968-01-01T00:00:00 =&gt; Mon Jan  1 00:00:00 1968
+Unable to parse '1977-07-42T06:07:08'
+</pre></div></div>
+          
+   <p>This does a pretty good job (it recognizes dates before January 1 1969), but also offers some
+    questionable "help" (it converts a nonexistent February&nbsp;29 into March&nbsp;1).</p>
+  
+  </div></div>
+  <a name="s_03"></a><div id="s_03"><div class="subheading">Timestamp Arithmetic</div><div class="subheadingText">
+    
+   <p>Let's turn our attention now to arithmetic with dates. <b>Time::Piece</b> can do some simple 
+    calculations. Modify <b>timepiece.pl</b> as shown: </p>
+    
+<div class="listingBox"><div class="listingTitle">CODE TO EDIT:</div><div class="listing"><pre>#!/usr/local/bin/perl
+use strict;
+use warnings;
+
+use Time::Piece;
+<ins>use Time::Seconds;</ins>
+
+my $FORMAT = '%FT%T';
+
+<ins>my $last;</ins>
+while ( &lt;DATA&gt; )
+{
+  chomp;
+  if ( my $tp = eval { Time::Piece-&gt;strptime( $_, $FORMAT ) } )
+  {
+<del>    print "$_ =&gt; $tp\n";</del>
+<ins>    print "$_           =&gt; $tp\n";</ins>
+<del>  }</del>
+<ins>    if ( $last )
+    {
+      print $tp - $last, " seconds since $last\n";
+    }
+    $last = $tp;
+    $tp += ONE_DAY;
+    print "$_ + ONE_DAY = $tp\n";
+  }</ins>
+  else
+  {
+    warn "Unable to parse '$_'\n";
+  }
+}
+
+__END__
+2001-03-17T03:04:05
+1999-12-31T23:59:59
+2005-05-21T07:00:00
+2009-02-29T12:00:00
+1968-01-01T00:00:00
+<del>1977-07-42T06:07:08</del></pre></div></div>
+    
+   <p><img src="images/coderunner/save.gif"> Save and run it:</p>
+   
+    <div class="interactiveBox"><div class="interactiveTitle">INTERACTIVE TERMINAL SESSION: Command to type</div><div class="interactive"><pre>cold:~/perl4$ <ins>./timepiece.pl</ins>
+2001-03-17T03:04:05           =&gt; Sat Mar 17 03:04:05 2001
+2001-03-17T03:04:05 + ONE_DAY = Sun Mar 18 03:04:05 2001
+1999-12-31T23:59:59           =&gt; Fri Dec 31 23:59:59 1999
+-38113446 seconds since Sat Mar 17 03:04:05 2001
+1999-12-31T23:59:59 + ONE_DAY = Sat Jan  1 23:59:59 2000
+2005-05-21T07:00:00           =&gt; Sat May 21 07:00:00 2005
+169974001 seconds since Fri Dec 31 23:59:59 1999
+2005-05-21T07:00:00 + ONE_DAY = Sun May 22 07:00:00 2005
+2009-02-29T12:00:00           =&gt; Sun Mar  1 12:00:00 2009
+119250000 seconds since Sat May 21 07:00:00 2005
+2009-02-29T12:00:00 + ONE_DAY = Mon Mar  2 12:00:00 2009
+1968-01-01T00:00:00           =&gt; Mon Jan  1 00:00:00 1968
+-1299067200 seconds since Sun Mar  1 12:00:00 2009
+1968-01-01T00:00:00 + ONE_DAY = Tue Jan  2 00:00:00 1968</pre></div></div>
+    
+   <p>You can see from this program that <b>Time::Piece</b> objects behave differently in a string context from a 
+    numeric context. This is called <i>operator overloading</i>. You can read more about it in 
+    <b>perldoc overload</b>.</p>
+    
+   <p>For a long time, the standard answer to complex date arithmetic was the module <b>Date::Calc</b>, but then 
+    <b>DateTime</b> came along and streamlined everything to do with dates. Create this new file:</p>
+    
+<div class="listingBox"><div class="listingTitle">CODE TO ENTER:</div><div class="listing"><pre>#!/usr/local/bin/perl
+use strict;
+use warnings;
+
+use lib "$ENV{HOME}/mylib/lib/perl5";
+use DateTime;
+
+my $dt = DateTime-&gt;now;
+$dt-&gt;add( years =&gt; 1, months =&gt; 2, days =&gt; 3, hours =&gt; 4, minutes =&gt; 5 );
+print "1 year, 2 months, 3 days, 4 hours, and 5 minutes from now = $dt\n";
+</pre></div></div>
+    
+   <p><img src="images/coderunner/save.gif"> Save it as <b>/perl4/timecalc.pl</b>and run it:</p>
+    
+<div class="interactiveBox"><div class="interactiveTitle">INTERACTIVE TERMINAL SESSION: Command to type</div><div class="interactive"><pre>cold:~/perl4$ <ins>./timecalc.pl</ins>
+1 year, 2 months, 3 days, 4 hours, and 5 minutes from now = 2012-07-07T21:34:16</pre></div></div>
+    
+   <p>Of course, you'll see a different time every time you run this program. <b>DateTime</b> objects 
+    also have <i>stringification</i> overloaded just like <b>Time::Piece</b> objects. DateTime takes into account 
+    leap seconds and daylight savings time changes when making these calculations. It also accommodates 
+    varying interpretations of what it may mean to add a month (see the 
+    <a href="http://search.cpan.org/perldoc?DateTime#Adding_a_Duration_to_a_Datetime" target="_blank">appropriate section of the DateTime documentation</a>).</p>
+    
+   <p>If you want nicely formatted <i>durations</i> representing the difference in time between two events, 
+    you need to do a bit more work, because the <b>DateTime::Duration</b> objects do not stringify by default. Edit 
+    <b>timecalc.pl</b> as shown:</p>
+    
+<div class="listingBox"><div class="listingTitle">CODE TO EDIT:</div><div class="listing"><pre>#!/usr/local/bin/perl
+use strict;
+use warnings;
+
+use lib "$ENV{HOME}/mylib/lib/perl5";
+use DateTime;
+
+my $dt = DateTime-&gt;now;
+$dt-&gt;add( years =&gt; 1, months =&gt; 2, days =&gt; 3, hours =&gt; 4, minutes =&gt; 5 );
+print "1 year, 2 months, 3 days, 4 hours, and 5 minutes from now = $dt\n";
+<ins>my $difference = $dt - DateTime-&gt;now;
+print "Difference = $difference\n";</ins>
+</pre></div></div>
+    
+   <p><img src="images/coderunner/save.gif"> Save and run it:</p>
+    
+<div class="interactiveBox"><div class="interactiveTitle">INTERACTIVE TERMINAL SESSION: Command to type</div><div class="interactive"><pre>cold:~/perl4$ <ins>./timecalc.pl</ins>
+1 year, 2 months, 3 days, 4 hours, and 5 minutes from now = 2012-07-07T21:41:23
+Difference = DateTime::Duration=HASH(0x8bbe9e8)
+</pre></div></div>
+    
+   <p>We need another module. Let's install it:</p>
+    
+<div class="interactiveBox"><div class="interactiveTitle">INTERACTIVE TERMINAL SESSION: Command to type</div><div class="interactive"><pre>cold:~/perl4$ <ins>PERL5LIB=~/mylib/lib/perl5 cpan DateTime::Format::Duration</ins>
+[output omitted]</pre></div></div>
+    
+   <p>Edit <b>timecalc.pl</b> as shown:</p>
+    
+<div class="listingBox"><div class="listingTitle">CODE TO EDIT:</div><div class="listing"><pre>#!/usr/local/bin/perl
+use strict;
+use warnings;
+
+use lib "$ENV{HOME}/mylib/lib/perl5";
+use DateTime;
+<ins>use DateTime::Format::Duration;
+my $FMT = '%Y years, %m months, %e days, %H hours, %M minutes, %S seconds';
+my $duration_formatter = DateTime::Format::Duration-&gt;new( pattern =&gt; $FMT );
+</ins>my $dt = DateTime-&gt;now;
+$dt-&gt;add( years =&gt; 1, months =&gt; 2, days =&gt; 3, hours =&gt; 4, minutes =&gt; 5 );
+print "1 year, 2 months, 3 days, 4 hours, and 5 minutes from now = $dt\n";
+my $difference = $dt - DateTime-&gt;now;
+<del>print "Difference = $difference\n";</del>
+<ins>print "Difference = ", $duration_formatter-&gt;format_duration( $difference ), "\n";
+</ins>
+</pre></div></div>
+    
+   <p><img src="images/coderunner/save.gif"> Save and run it:</p>
+   
+<div class="interactiveBox"><div class="interactiveTitle">INTERACTIVE TERMINAL SESSION: Command to type</div><div class="interactive"><pre>cold:~/perl4$ <ins>./timecalc.pl</ins>
+1 year, 2 months, 3 days, 4 hours, and 5 minutes from now = 2012-07-07T21:50:03
+Difference = 0 years, 14 months, 3 days, 00 hours, 245 minutes, 00 seconds
+</pre></div></div>
+    
+   <p>There are still some surprises with using these modules. Edit <b>timecalc.pl</b> 
+    again:</p>
+    
+<div class="listingBox"><div class="listingTitle">CODE TO EDIT:</div><div class="listing"><pre>#!/usr/local/bin/perl
+use strict;
+use warnings;
+
+use lib "$ENV{HOME}/mylib/lib/perl5";
+use DateTime;
+use DateTime::Format::Duration;
+
+my $FMT = '%Y years, %m months, %e days, %H hours, %M minutes, %S seconds';
+<del>my $duration_formatter = DateTime::Format::Duration-&gt;new( pattern =&gt; $FMT );</del>
+<ins>my $duration_formatter = DateTime::Format::Duration-&gt;new( pattern =&gt; $FMT, normalize =&gt; 1 );
+</ins>my $dt = DateTime-&gt;now;
+$dt-&gt;add( years =&gt; 1, months =&gt; 2, days =&gt; 3, hours =&gt; 4, minutes =&gt; 5 );
+print "1 year, 2 months, 3 days, 4 hours, and 5 minutes from now = $dt\n";
+my $difference = $dt - DateTime-&gt;now;
+print "Difference = ", $duration_formatter-&gt;format_duration( $difference ), "\n";
+</pre></div></div>
+    
+   <p><img src="images/coderunner/save.gif"> Save and run it:</p>
+
+<div class="interactiveBox"><div class="interactiveTitle">INTERACTIVE TERMINAL SESSION: Command to type</div><div class="interactive"><pre>cold:~/perl4$ <ins>./timecalc.pl</ins>
+1 year, 2 months, 3 days, 4 hours, and 5 minutes from now = 2012-07-07T21:54:23
+Difference = 1 years, 02 months, 3 days, 04 hours, 05 minutes, 00 seconds</pre></div></div>
+   
+  </div></div>
+ </div>
+ 
+ <p>We've reached the end of our lesson on portable programming and our introduction to dates and times. You are 
+  only one lesson away from the end of Applied Perl and the entire Perl Certificate series! Great effort so far!</p>
+  
+ <p>Don't forget to do your homework.</p>
+
+<div class="footer"><div id="timeSurvey"></div>				
+				Copyright © 1998-2014 O'Reilly Media, Inc.<br><img src="https://courses.oreillyschool.com/common/cclicense.png"><br>
+				This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 Unported License.<br>
+				See <a href="http://creativecommons.org/licenses/by-sa/3.0/legalcode">http://creativecommons.org/licenses/by-sa/3.0/legalcode</a> 
+				for more information.
+				</div><iframe id="t" width="1" height="1" border="0" style="display:none"></iframe><script language="javascript">bodyLoaded();</script><script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+  ga('create', 'UA-44720547-1', 'oreillyschool.com');
+  ga('send', 'pageview');
+</script></body></html>

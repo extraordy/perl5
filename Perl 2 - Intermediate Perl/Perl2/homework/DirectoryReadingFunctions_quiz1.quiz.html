@@ -1,0 +1,70 @@
+<html>
+   <!-- Copyright (c) 1998-2014 O'Reilly Media, Inc. Unauthorized use is strictly
+                prohibited. None of this code or content can by copied without the express written
+                permission from O'Reilly Media, Inc. -->
+   <head>
+      <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+      <link rel="stylesheet" type="text/css" href="http://archive.oreilly.com/oreillyschool/courses/Perl2/common/Lab.css">
+      <title>Directory Reading Functions - Quiz 1</title>
+   </head>
+   <body id="body">
+      <h2>Directory Reading Functions - Quiz 1</h2> 
+      
+      
+      
+      
+      <p>Name two differences between the results of the following two lines: </p>
+      
+      
+      <div class="observeBox">
+         <div class="observeTitle">Observe:</div>
+         <div class="observe"><pre>opendir my $fh, "foo"; readdir($fh);
+
+glob "foo/*"</pre></div>
+      </div>
+      
+        
+      
+      
+      <p>readdir lists only filenames; glob leaves the path foo/" in each result.</p>
+      
+      
+      <p>readdir lists all the files.</p>
+      
+      
+      <p>glob will not include the files whose names begin with a period (in the example given).</p>
+      
+      
+      <p><b>Grading Criteria:</b> Student should demonstrate knowledge of Perl directory functions.</p>
+      
+      
+      
+      
+      
+      
+      <p>What are regular expressions equivalent to the following glob patterns: </p>
+      
+      
+      <ol>
+         <li>"*.*"</li>
+         <li>"a[bc]d"</li>
+         <li>"w{xa,yb}z"</li>
+      </ol>
+      
+      
+      
+      
+      <ol>
+         <li>/.*\..*/</li>
+         <li>/a[bc]d/</li>
+         <li>/w(?:xa|yb)z/</li>
+      </ol>
+      
+      
+      <p><b>Grading Criteria:</b> Student should demonstrate knowledge of glob patterns.</p>
+      
+      
+      
+      
+   </body>
+</html>

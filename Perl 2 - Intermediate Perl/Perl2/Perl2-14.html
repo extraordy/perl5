@@ -1,0 +1,290 @@
+<html><!-- Copyright (c) 1998-2014 O'Reilly Media, Inc.
+			This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 Unported License.
+			See http://creativecommons.org/licenses/by-sa/3.0/legalcode for more information.
+            --><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"><link rel="stylesheet" type="text/css" href="../common/Lab.css"><script type="text/javascript" src="../common/Lab.js"></script><script language="javascript"></script><title>Directory Reading Functions</title></head><body id="body"><a name="top"></a><div class="title">Directory Reading Functions</div><div class="resize"><a href="Perl2-14.html#top" onclick="changeSize('smaller');" class="aS" title="Keep clicking to make fonts smaller">A</a><a href="Perl2-14.html#top" onclick="changeSize('larger');" class="aL" title="Keep clikcing to make fonts larger">A</a><a href="Perl2-14.html#top" onclick="lv()" class="lv" title="Adjust Page for High Contrast">HC</a><div id="fh"><p>Click on <span class="aS">A</span> to make all fonts on the page smaller.</p><p>Click on <span class="aL">A</span> to make all fonts on the page larger.</p><p>Click on <span class="lv">HC</span> to toggle high contrast mode. When you move your mouse over 
+                 some bold words in high contrast mode, related words are automatically highlighted. Text is shown
+                 in black and white. 
+             </p></div></div><hr>
+ 
+ <div class="goalTitle">Lesson Objectives</div><div class="goals">
+  
+  
+  When you complete this lesson, you will be able to:
+  
+  <ul><li>use directory reading functions.</li></ul>
+ </div><hr>
+
+ <p>Hello!  In this lesson we'll look at functions that return the names of files on the filesystem. Perl 
+  provides two ways of doing that: the <span class="darkgreen">readdir</span> function that's borrowed from the C 
+  language binding to the Unix system call of the same name, and the <span class="darkgreen">glob</span> operator 
+  that's borrowed from the Unix shell capability.</p>
+  
+ <a name="h_01"></a><div class="heading">opendir, readdir, closedir</div><div class="headingText">
+   
+  <p>In the Unix filesystem, a directory is just another file, albeit one that is treated differently and is  
+   it is hard for you to read it directly like a file.  The functions <span class="darkgreen">opendir</span>,
+   <span class="darkgreen">readdir</span>, and <span class="darkgreen">closedir</span> are used for reading directory files; 
+   they have a lot in common with the normal file access functions of <span class="darkgreen">open</span>,
+   <span class="darkgreen">readline</span>, and <span class="darkgreen">close</span>. Perl provides the directory functions
+   even on non-Unix systems, so you don't need to worry about cross-platform compatibility. Here's how they 
+   work:</p>
+   
+  <ul><li><span class="darkgreen">opendir</span> creates a directory handle, like an input filehandle, 
+    except that you can only use it for 
+    calling the next two functions. If the directory cannot be read for any reason, 
+    <span class="darkgreen">opendir</span> returns false and sets <span class="red">$!</span> (similar to 
+    <span class="darkgreen">open</span>).</li><li><span class="darkgreen">readdir</span> takes a directory handle as argument and, in a scalar context, acts as 
+    an iterator, returning the next filename from the directory until there are none left, at which point it 
+    returns <span class="orange">undef</span> (just like <span class="darkgreen">readline</span>). In a list context, it returns 
+    all the remaining filenames in the directory.</li><li><span class="darkgreen">closedir</span> tells Perl that you are done using the directory handle that you pass 
+    to this function. If you follow the good practice of creating the directory handle in a scope that ends 
+    when you are done with the directory anyway, you can omit this call because Perl will call it for you 
+    implicitly when it destroys the storage associated with the directory handle as it goes out of scope.</li></ul>
+   
+  <p>Let's see these functions in action. Create <span class="darkred">dir_read.pl</span> as shown:</p>
+   
+<div class="listingBox"><div class="listingTitle">CODE TO TYPE: dir_read.pl</div><div class="listing"><pre><ins>#!/usr/bin/perl
+use strict;
+use warnings;
+
+my $dir = '.';
+opendir my $dh, $dir or die "Couldn't open $dir: $!\n";
+while ( my $file_name = readdir $dh )
+{
+  print "$dir: $file_name\n";
+}
+closedir $dh;
+
+$dir = '/etc';
+opendir $dh, $dir or die "Couldn't open $dir: $!\n";
+for my $file_name ( readdir $dh )
+{
+  print "$dir: $file_name\n";
+}</ins>
+</pre></div></div>
+   
+  <p><img src="images/coderunner/checksyntax.JPG"> and run it.  Let's take a closer look.</p>
+    
+<div class="observeBox"><div class="observeTitle">OBSERVE: dir_read.pl</div><div class="observe"><pre>#!/usr/bin/perl
+use strict;
+use warnings;
+
+my $dir = <span class="orange">'.'</span>;
+opendir <span class="purple">my</span> <span class="red">$dh</span>, $dir or die "Couldn't open $dir: $!\n";
+<span class="purple">while</span> ( my $file_name = <span class="darkgreen">readdir</span> $dh )
+{
+  print "$dir: $file_name\n";
+}
+closedir <span class="red">$dh</span>;
+
+$dir = <span class="orange">'/etc'</span>;
+opendir <span class="red">$dh</span>, $dir or die "Couldn't open $dir: $!\n";
+<span class="purple">for</span> my $file_name ( readdir <span class="red">$dh</span> )
+{
+  print "$dir: $file_name\n";
+}
+</pre></div></div>
+  
+  <p>In the <span class="purple">while</span> loop, we call <span class="darkgreen">readdir</span> in scalar context, so it acts 
+   as an iterator. We call the <span class="purple">foreach</span> loop in list context, so we get back all the 
+   filenames. Get in the habit of processing filenames one at a time (in scalar 
+   context) to save time and memory.</p>
+   
+  <p><span class="orange">'.'</span> is the current directory. <span class="orange">'/etc'</span> is a system directory we know 
+   will exist on any Unix or Linux system.</p>
+   
+  <p>The file names are returned in random order (okay, the order depends on esoteric 
+   and idiosyncratic properties of your filesystem but is, for all intents and purposes, random).</p>
+   
+  <p>Also, consider the scoping of <span class="red">$dh</span>, the directory handle: we declared <span class="red">$dh</span> with <span class="purple">my</span> 
+   at the moment of first use, which is in the outermost scope level, so it still exists after the loop 
+   and should not be declared again.</p>
+   
+  <p>Finally, each directory contains files with the names <span class="orange">'.'</span> and 
+   <span class="orange">'..'</span>.  They are in fact directories (subdirectories look the same as normal files to 
+   <span class="darkgreen">readdir</span>), and are placed in every directory by the operating system for purposes of 
+   navigation. <span class="orange">'.'</span> is the current directory itself (this is rarely useful), and 
+   <span class="orange">'..'</span> is the parent directory.  Even the top-most directory (<span class="orange">'/'</span> on a 
+   Unix or Linux system) still contains <span class="orange">'..'</span>; it just points to itself. Usually, you'll 
+   ignore those files. Now exclude <b>.</b> and <b>..</b> by modifying the code as shown:</p>
+  
+<div class="listingBox"><div class="listingTitle">CODE TO EDIT: dir_read.pl</div><div class="listing"><pre>
+#!/usr/bin/perl
+use strict;
+use warnings;
+
+my $dir = '.';
+opendir my $dh, $dir or die "Couldn't open $dir: $!\n";
+while ( my $file_name = readdir $dh )
+{
+<ins>  next if $file_name =~ /\A\.\.?\z/;</ins>
+  print "$dir: $file_name\n";
+}
+closedir $dh;
+
+$dir = '/etc';
+opendir $dh, $dir or die "Couldn't open $dir: $!\n";
+for my $file_name ( readdir $dh )
+{
+<ins>  next if $file_name =~ /\A\.\.?\z/;</ins>
+  print "$dir: $file_name\n";
+}</pre></div></div>
+   
+  <p><img src="images/coderunner/checksyntax.JPG"> and run it, and verify that <span class="orange">'.'</span> and 
+   <span class="orange">'..'</span> are no longer in the output.</p>
+ 
+ </div>
+ <a name="h_02"></a><div class="heading">glob</div><div class="headingText">
+   
+  <p>The other directory-reading function is called <span class="darkgreen">glob</span>. It takes as an argument a 
+   glob <i>pattern</i>. In list context, it returns a list of all the matching filenames. In scalar 
+   context, it acts as an iterator just like <span class="darkgreen">readdir</span>. The big difference between <span class="darkgreen">glob</span> 
+   and <span class="darkgreen">readdir</span> is that <span class="darkgreen">glob</span> 
+   leaves in the output any directory path, absolute or relative, that you included in the pattern.</p>
+  
+  <p>So what is the glob pattern? It's <i>like</i> a regular expression but it isn't one. It's the same kind 
+   of pattern that you can type at a shell after a command like <span class="blue">ls</span> that gets expanded by the 
+   shell into a list of filenames. For example, to delete all the files with names that end in 
+   <span class="orange">.o</span>, you'd type <b>rm *.o</b> (or in Windows, <b>erase *.o</b>). The shell has its own
+   glob function that it calls to return a list of matching filenames to pass to the <span class="blue">rm</span> program. 
+   In fact, early versions of Perl just called out to the shell to do the globbing for them. But the 
+   shell's glob facility wasn't as powerful as the Perl developers wanted it to be, so they wrote their own. 
+  You gotta love that ingenuity!</p>
+   
+  <p>If you're used to typing glob patterns at shell command lines, you're used to the glob metacharacters 
+   already. But just in case, here's a list of the meanings of the most common ones:</p>
+   
+  <ul><li><span class="blue">*</span>: Zero or more characters.</li><li><span class="blue">?</span>: Exactly one character.</li><li><span class="blue">[abc]</span>: Any one of the characters <span class="blue">a</span>, <span class="blue">b</span>, or <span class="blue">c</span>.</li><li><span class="blue">[a-z]</span>: Any character in the inclusive range <span class="blue">a</span> through <span class="blue">z</span>
+     (same rules as Perl regexes).</li><li><span class="blue">pattern1 pattern2</span>: The union of the result of <span class="blue">pattern1</span> and 
+    <span class="blue">pattern2</span>.</li></ul>
+   
+  <p>This may seem a lot like regular expression syntax, but it isn't—for example, the period
+   has no special meaning, <span class="blue">*</span> is the same as the regex <span class="orange">/.*/</span>, and <span class="blue">?</span> 
+   is the same as the regex <span class="orange">/./</span>. Here are some examples of glob patterns and their 
+   meanings:</p>
+   
+  <ul><li><span class="blue">*.p[lm]</span>: All files with names ending in <span class="blue">.pl</span> or <span class="blue">.pm</span>.</li><li><span class="blue">*/*~</span>: All files with names ending in <span class="blue">~</span> in subdirectories of the current 
+    directory.</li><li><span class="blue">../*/spam?/in.mbx</span>: All files named <span class="blue">in.mbx</span> in all subdirectories named 
+    <span class="blue">spam</span> followed by a single character in all sibling directories of the current directory.</li><li><span class="blue">/etc/rc[1-4].d/K1*</span>: All files with names starting with <span class="blue">K1</span> in subdirectories 
+    <span class="blue">rc1.d</span>, <span class="blue">rc2.d</span>, <span class="blue">rc3.d</span>, and <span class="blue">rc4.d</span> of 
+    <span class="blue">/etc</span>.</li></ul>
+   
+  <p>There is one giant exception to all of the rules and examples listed above though. <i>They do not match filenames 
+   beginning with a period unless you explicitly include the period.</i> (This restriction does not apply to 
+   <span class="darkgreen">readdir</span>.) This is the Unix way of trying to hide files. It's not particularly effective, 
+   since you can get at the "hidden" files with the glob pattern <span class="blue">".*"</span>, and then match all files 
+   with the glob pattern <span class="blue">"* .*"</span>.</p>
+  
+  <p>It might seem as though you need to qualify every glob search to match both kinds of files, but in 
+   practice, you only use <span class="darkgreen">glob</span> to match files that couldn't possibly start with a 
+   period. In other cases, you'll generally use <span class="darkgreen">readdir</span>. <span class="darkgreen">glob</span> is 
+   handy when you want to find a list of files matching a pattern you can turn into a glob pattern; 
+   with <span class="darkgreen">readdir</span> you would need to take the additional step of selecting candidates 
+   based on a regular expression.</p>
+   
+  <p>Let's try an example using <span class="darkgreen">glob</span> now; create <span class="darkred">glob_read.pl</span> as shown:</p>
+   
+<div class="listingBox"><div class="listingTitle">CODE TO TYPE: glob_read.pl</div><div class="listing"><pre><ins>#!/usr/bin/perl
+use strict;
+use warnings;
+
+print ".: $_\n"    for glob "*";
+
+print "/etc: $_\n" for glob "/etc/*";</ins>
+</pre></div></div>
+   
+  <p><img src="images/coderunner/checksyntax.JPG"> and run it.  It's the <span class="darkgreen">glob</span> 
+   equivalent of <span class="darkred">dir_read.pl</span>, with the exception that it doesn't list files with names 
+   beginning with periods, and so it omits <span class="orange">'.'</span> and <span class="orange">'..'</span> (among others).</p>
+   
+  <p>Let's try another short example using <span class="darkgreen">glob</span> in scalar context, with one of the 
+   patterns that was used as an example above. Create <span class="darkred">glob_while.pl</span> as shown:</p>
+
+<div class="listingBox"><div class="listingTitle">CODE TO TYPE: glob_while.pl</div><div class="listing"><pre><ins>#!/usr/bin/perl
+use strict;
+use warnings;
+
+while ( my $file = glob "/etc/rc[1-4].d/K1*" )
+{
+  print "Matching file: $file\n";
+}</ins>
+</pre></div></div>
+   
+  <p><img src="images/coderunner/checksyntax.JPG"> and run it.</p>
+   
+  
+  
+   
+  <p>There's another part of the <span class="darkgreen">glob</span> pattern syntax that behaves a bit 
+   differently. If you don't use any of the metacharacters listed above, Perl does no filename matching. 
+   So, for instance, glob "nonesuch.pl" will return <span class="orange">"nonesuch.pl"</span>, regardless of whether 
+   such a file exists in the current directory. Don't take my word for it though, try it yourself!
+   Type a one-liner in the Unix shell as shown:</p> 
+   
+<div class="interactiveBox"><div class="interactiveTitle">INTERACTIVE TERMINAL SESSION:</div><div class="interactive"><pre>cold:~$ <ins>ls -l nonesuch.pl</ins>
+ls: nonesuch.pl: No such file or directory
+cold:~$ <ins>perl -le 'print glob "nonesuch.pl"'</ins>
+nonesuch.pl
+cold:~$ 
+</pre></div></div> 
+  
+  <p>It doesn't seem very likely that you would write a <span class="darkgreen">glob</span> pattern without any 
+   expansion metacharacters, though, does it?</p>
+   
+  <p>Well, there are some metacharacters that do not trigger filename matching. Curly brackets surrounding
+   strings, separated by commas, expand to the list of elements in brackets; so, for example, 
+   <span class="orange">"{foo,bar}.pl"</span> is treated as <span class="orange">"foo.pl bar.pl"</span>, so that's the result you 
+   will get regardless of whether those files exist.</p>
+   
+  <p>You can even use this facility as a quick-and-dirty way of generating permutations! Run this 
+   one-liner:</p>
+   
+<div class="interactiveBox"><div class="interactiveTitle">INTERACTIVE TERMINAL SESSION:</div><div class="interactive"><pre>cold:~$ <ins>perl -le 'print for glob "{a,b,c}{d,e}{f,g,h,i}"'</ins>
+</pre></div></div>
+   
+  <p>If you want to use brackets in a <span class="darkgreen">glob</span> pattern and make sure that you only get results 
+   that match filenames, insert any of the metacharacters <span class="blue">*</span>, <span class="blue">?</span>, or 
+   <span class="blue">[]</span> outside of the braces to force a name check. For example, run these two one-liners and 
+   observe the different results:</p>
+  
+<div class="interactiveBox"><div class="interactiveTitle">INTERACTIVE TERMINAL SESSION:</div><div class="interactive"><pre>cold:~$ <ins>perl -le 'print for glob "{foo,bar}.pl"'</ins>
+foo.pl
+bar.pl
+cold:~$ <ins>perl -le 'print for glob "{foo,bar}.p[l]"'</ins>
+cold:~$ 
+</pre></div></div>
+ 
+  <p>The second pattern is exactly the same as the first one because there is only one character inside 
+   the character class.</p>
+   
+  <p>To get details on the syntax of <span class="darkgreen">glob</span> patterns, run <b>perldoc File::Glob</b>.</p>
+   
+  <p><div class="c"><table class="noteBox fBox pBox "><tr><td class="noteTitle">Note</td><td class="note">In older Perl programs, it was common to use angle brackets (<span class="blue">&lt;&gt;)</span> as a synonym 
+   for <span class="darkgreen">glob</span>. Perl is (usually) able to tell the difference between a filehandle and a 
+   glob pattern and call <span class="darkgreen">readline</span> or <span class="darkgreen">glob</span> as necessary. This 
+   practice can be confusing though, and isn't preferred now.</td></tr></table></div></p>
+  
+ </div>
+  
+ <p>The range of useful programs you can write in Perl is dramatically broader than it was
+  at the beginning of this course. You are now able to write Perl programs that can solve lots of the problems you encounter in 
+  real life. Amazing! In the next and final lesson we'll create the biggest example program we've tackled
+  yet!</p>
+   
+ <br><br><br><br>
+  
+ <p>Once you finish this lesson, go back to the syllabus page by clicking on the page tab above and do
+   the assignments.</p>
+<div class="footer"><div id="timeSurvey"></div>				
+				Copyright © 1998-2014 O'Reilly Media, Inc.<br><img src="https://courses.oreillyschool.com/common/cclicense.png"><br>
+				This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 Unported License.<br>
+				See <a href="http://creativecommons.org/licenses/by-sa/3.0/legalcode">http://creativecommons.org/licenses/by-sa/3.0/legalcode</a> 
+				for more information.
+				</div><iframe id="t" width="1" height="1" border="0" style="display:none"></iframe><script language="javascript">bodyLoaded();</script><script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+  ga('create', 'UA-44720547-1', 'oreillyschool.com');
+  ga('send', 'pageview');
+</script></body></html>

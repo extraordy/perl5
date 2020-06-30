@@ -5,13 +5,13 @@ The O’Reilly School of Technology is now closed (RIP - January 31, 2016), but 
 
 If you are interested in learning Perl 5, you can actually use the same curriculum, as it is licensed under the Creative Commons Attributions-ShareAlike 3.0 Unported licence (briefly, you are free to share and adapt the course materials for any purpose, even commercially) and is still available on the web: : 
 
-Perl 1: Introduction to Perl - http://archive.oreilly.com/oreillyschool/courses/courses.html#course_id_128
+Perl 1: Introduction to Perl  
 
-Perl 2: Intermediate Perl - http://archive.oreilly.com/oreillyschool/courses/courses.html#course_id_137
+Perl 2: Intermediate Perl 
 
-Perl 3: Advanced Perl - http://archive.oreilly.com/oreillyschool/courses/courses.html#course_id_144
+Perl 3: Advanced Perl  
 
-Perl 4: Applied Perl - http://archive.oreilly.com/oreillyschool/courses/courses.html#course_id_146
+Perl 4: Applied Perl 
 
 The OST Perl Programming certificate series comprised these four courses from a beginner to an advanced level - a total of 240 Clock Hours or 16 Continuing Education Units. The author of this program is Peter Scott (Perl Debugged, Perl Medic) - whom I hold in high estimation and consider him one of the greatest Perl evangelists -, who has been teaching Perl for over a dozen years. I chose this certificate program to reassess and systematize my Perl knowledge with a user-active approach, learning and recapping by doing.
 

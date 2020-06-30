@@ -1,0 +1,668 @@
+<html><!-- Copyright (c) 1998-2014 O'Reilly Media, Inc.
+			This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 Unported License.
+			See http://creativecommons.org/licenses/by-sa/3.0/legalcode for more information.
+            --><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"><link rel="stylesheet" type="text/css" href="../common/Lab.css"><script type="text/javascript" src="../common/Lab.js"></script><script language="javascript"></script><title>Data Mapping with Hashes</title></head><body id="body"><a name="top"></a><div class="title">Data Mapping with Hashes</div><div class="resize"><a href="Perl1-12.html#top" onclick="changeSize('smaller');" class="aS" title="Keep clicking to make fonts smaller">A</a><a href="Perl1-12.html#top" onclick="changeSize('larger');" class="aL" title="Keep clikcing to make fonts larger">A</a><a href="Perl1-12.html#top" onclick="lv()" class="lv" title="Adjust Page for High Contrast">HC</a><div id="fh"><p>Click on <span class="aS">A</span> to make all fonts on the page smaller.</p><p>Click on <span class="aL">A</span> to make all fonts on the page larger.</p><p>Click on <span class="lv">HC</span> to toggle high contrast mode. When you move your mouse over 
+                 some bold words in high contrast mode, related words are automatically highlighted. Text is shown
+                 in black and white. 
+             </p></div></div><hr>
+ 
+ <div class="goalTitle">Lesson Objectives</div><div class="goals">
+  
+  
+  When you complete this lesson, you will be able to:
+  
+  <ul><li>use the hash data type.</li><li>map data using hashes.</li><li></li></ul>
+ </div><hr>
+ 
+ <a name="h_01"></a><div class="heading">Hashes</div><div class="headingText">
+  
+  <p>We're about three-quarters of the way through the course and you already have the skills to create 
+   some really useful programs. But there's still lots more to learn about Perl! Let's go over one of the 
+   most important features of the language: <b>hashes</b>. </p> 
+   
+   <p>Before the invention of Perl, most languages didn't include 
+   the hash data type, but it became apparent right away that this type was extremely useful. Nearly 
+   every language invented after Perl includes hashes. And virtually every program you'll ever write to 
+   perform a real task will use this data type. </p>
+  
+  <a name="s_01"></a><div id="s_01"><div class="subheading">Getting Started with Hashes</div><div class="subheadingText">
+   
+   <p>If you've worked in other languages (or earlier versions of Perl), you might already understand the concept of a 
+    key&nbsp;=&gt;&nbsp;value structure as an <i>associative array</i> or <i>dictionary</i>. In current Perl, it's called a hash. </p>
+   
+   <p>A hash contains <i>elements</i>, each of which consists of a pair of scalars: a <i>key</i> and 
+    a <i>value</i>. (Technically, the <i>key</i> is a really a string. You'll learn about the distinctions between them 
+    in later Perl courses.)</p>
+   
+   <p>A hash (like an array) is an <i>aggregate</i>: it may contain zero or more elements. 
+   But unlike an array, there is <i>no order</i> to the elements within a hash. </p>
+   
+   <p>You might think that's weird, especially if you know that computer memory is arranged in linear order; 
+   surely the elements <i>have</i> to be in <i>some</i> order, right? Well, in fact there is a kind of order to them, but 
+   it won't make any sense to you, it isn't 
+    useful for anything, and it can change without warning. We'll just let it go at that and avoid unnecessary confusion!</p>
+   
+   <p>When you store an element in a hash, you must specify the key and the value. If the element 
+    with that key already exists, the value is overwritten; if it does not exist, then it is created. When 
+    you retrieve an element, you specify the key and you get back the value. So, the keys of a 
+    hash are all unique, but the values do not need to be unique.</p>
+   
+   <p>Okay, let's see how this works with a return to Echidna Eric's Insect Emporium! Create a file
+   called <b>emporium.pl</b> as shown:</p>
+   
+<div class="listingBox"><div class="listingTitle">CODE TO TYPE:</div><div class="listing"><pre><ins>#!/usr/bin/perl
+use strict;
+use warnings;
+
+my (%count, %cost);
+$count{'ants'}        = 47_000;
+$count{'fleas'}       = 240_000;
+$count{'beetles'}     = 520;
+$count{'fruit flies'} = 1_500_000;
+
+$cost{'ants'}        = 0.10;
+$cost{'fleas'}       = 0.04;
+$cost{'beetles'}     = 0.02;
+$cost{'fruit flies'} = 0.001;
+
+my $insect = 'ants';
+print "Value of $insect on hand = ", $count{$insect} * $cost{$insect}, "\n";
+</ins></pre></div></div>
+   
+   <p><img src="images/coderunner/checksyntax.JPG"> and run it. </p>
+   
+<div class="interactiveBox"><div class="interactiveTitle">INTERACTIVE TERMINAL SESSION:</div><div class="interactive"><pre>cold:~$ <ins>cd perl1</ins>
+cold:~/perl1$ <ins>./emporium.pl</ins>
+Value of ants on hand = 4700
+cold:~/perl1$    
+</pre></div></div>
+   
+   <p>Check to make sure you get the correct result. Now try changing the value of <span class="darkred">$insect</span> to 
+    <span class="darkblue">'fleas'</span>, <span class="darkblue">'beetles'</span>, and <span class="darkblue">'fruit flies'</span> in turn and see if 
+    you get the right results for those values too. 
+    Finally, try setting <span class="darkred">$insect</span> to a different value of your choice.</p>
+   
+   <p>Okay, now let's dissect this script:</p>
+   
+<div class="observeBox"><div class="observeTitle">OBSERVE: Hash Declaration</div><div class="observe"><pre>
+<span class="purple">my</span> (<span class="darkred">%count</span>, <span class="darkred">%cost</span>);    
+</pre></div></div>
+   
+   <p>This line declares two hashes. Because it's a new data type, the hash begins with a new punctuation
+    character, the percent sign (<b>%</b>). We won't use <b>%</b> very often because most of the time our programs 
+    will refer to individual hash elements rather than the hash that contains them. But we need to 
+    name the full hash when declaring it initially.</p>
+   
+<div class="observeBox"><div class="observeTitle">OBSERVE: Hash Element Population</div><div class="observe"><pre>
+<span class="darkred">$count</span>{<span class="orange">'ants'</span>} = <span class="orange">47_000</span>;  
+</pre></div></div>
+   
+   <p>This line puts an element in the hash <span class="darkred">%count</span>. The element's key is <span class="orange">'ants'</span>
+    and its value is <span class="orange">47_000</span>. (Remember, the underscore in a literal integer is 
+    ignored; use it where we would use a comma to write out the entire number.) If there had 
+    already been an element in that hash with the <span class="orange">'ants'</span> key, its value would have been overwritten with 
+    <span class="orange">47_000</span>.</p>
+   
+   <p>Just as with arrays, each individual value of a hash is a scalar, so when we refer to it, we 
+    use a dollar sign <b>$</b> to remind us that we're getting a scalar. When you see a dollar sign <b>$</b>
+    followed by a name and something inside curly brackets <b>{}</b>, you're looking at a reference to a hash 
+    value whose key is found within those curly brackets <b>{}</b>. </p>
+   
+   <H4>Reading Hash Values</H4>
+   <p>If we use that same syntax inside an expression instead of assigning to it, then we 
+    <i>fetch</i> the value from the hash corresponding to the key between the curly brackets <b>{}</b>. If there 
+    is no element in the hash with that key, we get the undefined value. (And yes, you can store the 
+    undefined value in a hash value; later we'll find out how to tell the difference between an undefined hash value and 
+    a hash element that's not there at all.)</p>
+   
+   <p>We've used a variable as the key in our example. Now let's modify <b>emporium.pl</b> to use a literal as the key: </p>
+   
+<div class="listingBox"><div class="listingTitle">CODE TO EDIT:</div><div class="listing"><pre>#!/usr/bin/perl
+use strict;
+use warnings;
+    
+my (%count, %cost);
+$count{'ants'}        = 47_000;
+$count{'fleas'}       = 240_000;
+$count{'beetles'}     = 520;
+$count{'fruit flies'} = 1_500_000;
+    
+$cost{'ants'}        = 0.10;
+$cost{'fleas'}       = 0.04;
+$cost{'beetles'}     = 0.02;
+$cost{'fruit flies'} = 0.001;
+    
+<ins>print "Value of ants on hand = ", $count{'ants'} * $cost{'ants'}, "\n";</ins>
+</pre></div></div>
+   
+   <p><img src="images/coderunner/checksyntax.JPG"> and run it. </p>
+   
+<div class="interactiveBox"><div class="interactiveTitle">INTERACTIVE TERMINAL SESSION:</div><div class="interactive"><pre>cold:~/perl1$ <ins>./emporium.pl</ins>
+Value of ants on hand = 4700
+cold:~/perl1$    
+</pre></div></div>
+   
+   <p>A hash is like an array, but instead of having a numeric index 
+    that starts at zero and increases by one for each element, the hash index is whatever you deem it to be. 
+    Instead of square brackets, hash elements have curly brackets and finally, instead of just numbers in the index position, 
+    hashes have arbitrary strings. 
+  </p>
+   
+   <p>There is one really helpful piece of syntactic sugar we can use when writing hash elements 
+    with literal keys. Change the last line of <b>emporium.pl</b> like this: </p>
+   
+<div class="listingBox"><div class="listingTitle">CODE TO EDIT:</div><div class="listing"><pre>#!/usr/bin/perl
+use strict;
+use warnings;
+    
+my (%count, %cost);
+$count{'ants'}        = 47_000;
+$count{'fleas'}       = 240_000;
+$count{'beetles'}     = 520;
+$count{'fruit flies'} = 1_500_000;
+    
+$cost{'ants'}        = 0.10;
+$cost{'fleas'}       = 0.04;
+$cost{'beetles'}     = 0.02;
+$cost{'fruit flies'} = 0.001;
+    
+<ins>print "Value of ants on hand = ", $count{ants} * $cost{ants}, "\n";</ins>
+</pre></div></div>
+   
+   <p><img src="images/coderunner/checksyntax.JPG"> and run it. </p>
+   
+<div class="interactiveBox"><div class="interactiveTitle">INTERACTIVE TERMINAL SESSION:</div><div class="interactive"><pre>cold:~/perl1$ <ins>./emporium.pl</ins>
+Value of ants on hand = 4700
+cold:~/perl1$    
+</pre></div></div>
+   
+   <p>Our changes made no difference. How come?</p> 
+    
+   <p>Well, in Perl it's common to use <b>well-behaved</b> strings for 
+    literal hash keys (here <b>literal</b> means that we spell out the value of the key itself in the program, 
+    rather than put it into a variable first), so we don't need to include
+    quotation marks around those strings used as hash keys.</p>
+   
+   <p><b>Well-behaved</b> means the same thing here as it did it did when we learned about the <b>fat 
+    comma</b> (<b>=&gt;</b>) operator: if it obeys the rules for naming a scalar 
+    <i>after</i> the dollar sign (see lesson 2), it works. And by the way, the same rules apply to 
+    naming an array or a hash—after the at sign (<b>@</b>) or the percent sign (<b>%</b>).</p>
+   
+   <p>There is one key in both hashes in our current example that cannot have the quotation 
+    marks left out when using it as a literal key. Can you tell which one it is? (If not, try 
+    removing quotation marks until you get an error.)</p>
+  
+  </div></div>
+  <a name="s_02"></a><div id="s_02"><div class="subheading">Hash Initialization</div><div class="subheadingText">
+   
+   <p><span class="darkred">emporium.pl</span> contains hashes that are initialized 
+    explicitly; they aren't dependent on data that comes from outside of the program. Most hashes in the 
+    real world fall into the latter category; they will be populated by data 
+    from an external data source when the program is run. </p>
+    
+    <p>A proper version of 
+    <span class="darkred">emporium.pl</span> would likely read the inventory counts and item prices from data 
+    files. But there are still lots of good reasons to use explicitly initialized hashes in a program. For 
+    example, suppose we were doing date conversions and we wanted to be able to convert a date with 
+    an alphabetical month into one with a numeric month. Until now, you might have coded that like 
+    this: </p>
+   
+<div class="observeBox"><div class="observeTitle">OBSERVE:</div><div class="observe"><pre>
+<span class="purple">if</span> ( <span class="darkred">$month_string</span> <span class="darkgreen">eq</span> <span class="orange">'Jan'</span> )
+{
+  <span class="darkred">$month_number</span> = <span class="orange">1</span>;
+}
+<span class="purple">elsif</span> ( <span class="darkred">$month_string</span> <span class="darkgreen">eq</span> <span class="orange">'Feb'</span> )
+{
+  <span class="darkred">$month_number</span> = <span class="orange">2</span>;
+}
+...
+</pre></div></div>
+   
+   <p>Or you might have come up with an array and a loop, relying on the fact that the corresponding 
+    numbers for each month are consecutive small integers that could be array indexes. But now suppose 
+    you have a hash <span class="darkred">%month_num</span> with the month strings for keys and the month numbers for values. 
+    Your code would slim down drastically, and look something like this: </p>
+   
+<div class="observeBox"><div class="observeTitle">OBSERVE:</div><div class="observe"><pre>
+<span class="darkred">$month_number</span> = <span class="darkred">$month_num</span>{ <span class="darkred">$month_string</span> };
+</pre></div></div>
+   
+   <p>This code is more concise.
+    Instead of varying according to the number of comparisons that have to be made in a 
+    multi-way <span class="purple">if</span> statement or loop, the amount of time required 
+    to find hash values from their keys is constant. </p>
+   
+   <p>We don't need to retrieve <span class="darkred">%month_num</span> from outside of the program because we define it within the program. And so
+   we don't need to set up twelve assignments like 
+    we did in <span class="darkred">emporium.pl</span>. We can populate the hash like this: </p>
+   
+<div class="observeBox"><div class="observeTitle">OBSERVE:</div><div class="observe"><pre>
+<span class="purple">my</span> <span class="darkred">%month_num</span>;
+<span class="darkred">%month_num</span> = ( <span class="orange">'Jan'</span>, <span class="orange">1</span>, <span class="orange">'Feb'</span>, <span class="orange">2</span>, <span class="orange">'Mar'</span>, <span class="orange">3</span>, <span class="orange">'Apr'</span>, <span class="orange">4</span>, <span class="orange">'May'</span>, <span class="orange">5</span>, <span class="orange">'Jun'</span>, <span class="orange">6</span>, <span class="orange">'Jul'</span>, <span class="orange">7</span>, <span class="orange">'Aug'</span>, <span class="orange">8</span>, <span class="orange">'Sep'</span>, <span class="orange">9</span>, <span class="orange">'Oct'</span>, <span class="orange">10</span>, <span class="orange">'Nov'</span>, <span class="orange">11</span>, <span class="orange">'Dec'</span>, <span class="orange">12</span> );
+</pre></div></div>
+   
+   <p>A hash is populated by assigning to it a list that will be interpreted as:</p>
+   
+   <p><div class="c">( <i>key, value, key, value, key, value,... </i>)</div></p>
+   
+   <p>There must be an <i>even</i> number of elements in the list or else Perl will give you 
+    a warning. Each <i>key</i> precedes its corresponding <i>value</i> in the list. </p>
+    
+   <p>Even though the list is ordered, when its contents go into the hash, the elements 
+    (pairs of values in the list) lose their order. The list <i>overwrites</i> any contents that are already in the 
+    hash, replacing them with the elements in the list. (If the list is empty, then the 
+    hash will be emptied.)</p>
+   
+   <p>We can combine declaration with population to get initialization. Awesome. But before we go further 
+   with that, think back on the syntactic sugar from the last lesson, particularly the "fat comma." Hash population or 
+    initialization are ideal places to use it. Here's what initializing <span class="darkred">%month_num</span> looks 
+    like with the fat comma:</p>
+     
+<div class="observeBox"><div class="observeTitle">OBSERVE:</div><div class="observe"><pre>
+<span class="purple">my</span> <span class="darkred">%month_num</span> = ( <span class="orange">Jan</span> =&gt; <span class="orange">1</span>, <span class="orange">Feb</span> =&gt; <span class="orange">2</span>, <span class="orange">Mar</span> =&gt; <span class="orange">3</span>, <span class="orange">Apr</span> =&gt; <span class="orange">4</span>, <span class="orange">May</span> =&gt; <span class="orange">5</span>, <span class="orange">Jun</span> =&gt; <span class="orange">6</span>, <span class="orange">Jul</span> =&gt; <span class="orange">7</span>, <span class="orange">Aug</span> =&gt; <span class="orange">8</span>, <span class="orange">Sep</span> =&gt; <span class="orange">9</span>, <span class="orange">Oct</span> =&gt; <span class="orange">10</span>, <span class="orange">Nov</span> =&gt; <span class="orange">11</span>, <span class="orange">Dec</span> =&gt; <span class="orange">12</span> );
+</pre></div></div>
+   
+   <p>Using that fat comma makes it clear what the keys and the values are going to be 
+    when the list is assigned to the hash. (And remember that a string on the left side of a fat comma 
+    must be well-behaved.)</p>
+   
+   <p>Visualize your hash like this (not 
+    all of the elements have been included in order to keep the diagram from becoming too large): </p>
+   
+   <p><div class="c"><img src="images/hash.png"></div></p>
+  
+  </div></div>
+  <a name="s_03"></a><div id="s_03"><div class="subheading">Iterating through Hashes</div><div class="subheadingText">
+   
+   <p>The most common action you'll take with a hash is to go through it printing out each key
+    and its corresponding value. You already know how to get the value corresponding to a given key;
+    you read it from <b><span class="darkred">$hash</span>{<span class="darkred">$key</span>}</b>. But how do you find a key if you 
+    don't know one?</p>
+   <H4>keys()</H4>
+   
+   <p>Enter the <span class="darkgreen">keys()</span> function. When you pass this function the name of a 
+    hash, it returns a list of all the keys in the hash. (Incidentally, although lists have 
+    an order, hash keys don't, so the order of the keys returned by <span class="darkgreen">keys()</span> 
+    is unpredictable and not useful.) Modify <span class="darkred">emporium.pl</span> as shown:</p>
+   
+<div class="listingBox"><div class="listingTitle">CODE TO EDIT:</div><div class="listing"><pre>#!/usr/bin/perl
+use strict;
+use warnings;
+    
+my (%count, %cost);
+$count{'ants'}        = 47_000;
+$count{'fleas'}       = 240_000;
+$count{'beetles'}     = 520;
+$count{'fruit flies'} = 1_500_000;
+    
+$cost{'ants'}        = 0.10;
+$cost{'fleas'}       = 0.04;
+$cost{'beetles'}     = 0.02;
+$cost{'fruit flies'} = 0.001;
+   
+<ins>foreach my $insect ( keys %count )
+{
+  print "Value of $insect on hand = ", $count{$insect} * $cost{$insect}, "\n";
+}</ins>
+</pre></div></div>
+   
+   <p><img src="images/coderunner/checksyntax.JPG"> and run it. </p>
+   
+<div class="interactiveBox"><div class="interactiveTitle">INTERACTIVE TERMINAL SESSION:</div><div class="interactive"><pre>cold:~/perl1$ <ins>./emporium.pl</ins>
+Value of ants on hand = 4700
+Value of beetles on hand = 10.4
+Value of fruit flies on hand = 1500
+Value of fleas on hand = 9600    
+cold:~/perl1$    
+</pre></div></div>
+   
+   <p>One line is printed 
+    for every element in the hash. We called the <span class="darkgreen">keys()</span> function with 
+    the <span class="darkred">%count</span> hash as its argument. Hash elements (and array elements) interpolate in double-quoted strings. </p>
+  
+   <p><div class="c"><table class="noteBox fBox pBox "><tr><td class="noteTitle">Note</td><td class="note">This program assumes that every key in <span class="darkred">%count</span> is also a key in <span class="darkred">%cost</span>. It's 
+    okay to make that assumption as long as you've checked the program design beforehand to ensure that it will always be valid.</td></tr></table></div></p>  
+     
+   <p>Modify <span class="darkred">emporium.pl</span> as shown:</p>
+   
+<div class="listingBox"><div class="listingTitle">CODE TO EDIT:</div><div class="listing"><pre>#!/usr/bin/perl
+use strict;
+use warnings;
+    
+my (%count, %cost);
+$count{'ants'}        = 47_000;
+$count{'fleas'}       = 240_000;
+$count{'beetles'}     = 520;
+$count{'fruit flies'} = 1_500_000;
+    
+$cost{'ants'}        = 0.10;
+$cost{'fleas'}       = 0.04;
+$cost{'beetles'}     = 0.02;
+$cost{'fruit flies'} = 0.001;
+   
+foreach my $insect ( keys %count )
+{
+  print "<ins>We have $count{$insect} of $insect on hand at \$$cost{$insect} each\n</ins>";
+}
+</pre></div></div>
+      
+   <p><img src="images/coderunner/checksyntax.JPG"> and run it. </p>
+   
+<div class="interactiveBox"><div class="interactiveTitle">INTERACTIVE TERMINAL SESSION:</div><div class="interactive"><pre>cold:~/perl1$ <ins>./emporium.pl</ins>
+We have 47000 of ants on hand at $0.1 each
+We have 520 of beetles on hand at $0.02 each
+We have 1500000 of fruit flies on hand at $0.001 each
+We have 240000 of fleas on hand at $0.04 each    
+cold:~/perl1$    
+</pre></div></div>
+  
+  </div></div>
+  <a name="s_04"></a><div id="s_04"><div class="subheading">Miscellaneous Hash Functions</div><div class="subheadingText">
+   
+   <p>Before we learn the many uses for hashes themselves, let's cover a few hash 
+    functions: </p>
+   
+   <H4>exists()</H4>
+   
+   <p>When you pass the <span class="darkgreen">exists()</span> function a hash element, it returns true if 
+    that element is in the hash, and false if it isn't. Here's an example: </p>
+   
+<div class="observeBox"><div class="observeTitle">OBSERVE: exists()</div><div class="observe"><pre>
+<span class="purple">if</span> ( <span class="darkgreen">exists</span> <span class="darkred">$cost{spider}</span> )
+{
+  <span class="darkgreen">print</span> <span class="orange">"Arachnophobes, beware!\n"</span>;
+}
+</pre></div></div>
+   
+   <p>Hey, wait a minute—isn't this going to <i>evaluate</i> the hash element <span class="darkred">$cost{spider}</span> 
+    first, and if it's not there, get the undefined value, and then pass that to the 
+    <span class="darkgreen">exists()</span> function? That seems like a violation of 
+    Perl's rules, doesn't it?</p>
+   
+   <p>But it's not. Perl's semantics, like English, aren't entirely regular. Some 
+    built-in functions operate—to promote ease of reading—as though they were passed something 
+    other than what they are actually passed. This is one of them. Similarly, when you call the 
+    <span class="darkgreen">keys()</span> function, Perl doesn't evaluate the hash in a list context and pass 
+    the results of that on to <span class="darkgreen">keys()</span>. The <span class="darkgreen">keys()</span> and 
+    <span class="darkgreen">exists()</span> built-in functions are special in this respect; they're doing 
+    things that you cannot (yet) write subroutines to do.</p>
+   
+   <p>The <span class="darkgreen">exists()</span> function lets us tell the difference between a hash 
+    element with an undefined value, and an element that is not present in the hash 
+    at all. But most uses for hashes turn out to have values that are not only defined, but 
+    true, so you end up testing for the existence of a key with code like this:</p>
+   
+<div class="observeBox"><div class="observeTitle">OBSERVE: hash element test</div><div class="observe"><pre>
+<span class="purple">if</span> ( <span class="darkred">$cost{spider}</span> )
+{
+  <span class="darkgreen">print</span> <span class="orange">"Arachnophobes, beware!\n"</span>;
+}
+</pre></div></div>
+   
+   <p>This test presumes that you'd never stock something with a cost of zero.</p>
+   
+  <H4>delete()</H4>
+   
+   <p>When you pass the <span class="darkgreen">delete()</span> function a hash element, Perl removes that 
+    element from the hash. (If it wasn't in the hash to begin with, Perl doesn't complain.) Take a look:</p>
+   
+   <div class="observeBox"><div class="observeTitle">OBSERVE: delete()</div><div class="observe"><pre>
+<span class="purple">foreach my</span> <span class="darkred">$removed</span> ( <span class="darkred">@discontinued_items</span> )    
+{
+  <span class="darkgreen">delete</span> <span class="darkred">$cost{$removed}</span>;
+  <span class="darkgreen">delete</span> <span class="darkred">$count{$removed}</span>;
+}      
+</pre></div></div>
+   
+   <p>Once again, Perl is not evaluating the element before passing it to 
+    <span class="darkgreen">delete()</span>, but instead passing the name of the hash and the value of the 
+    key as distinct parameters, and using the hash element as a reader-friendly syntax.</p>
+   
+   <p><span class="darkgreen">delete()</span> returns the value of the element it just removed from the hash. 
+    This is often useful for making code succinct.</p>
+   
+   <H4>values()</H4>
+   
+   <p>There is also a 
+    <span class="darkgreen">values()</span> function. The <span class="darkgreen">values()</span> function is not quite as useful 
+    as <span class="darkgreen">keys()</span> though, because values are not 
+    required to be unique and you can't specify a hash element given its value. 
+    Also, the order of <span class="darkgreen">values()</span> is as unpredictable as that of <span class="darkgreen">keys()</span>, 
+    except in this useful situation: if you have just run <span class="darkgreen">keys()</span> and <i> have not changed the hash</i>
+    before running <span class="darkgreen">values()</span>, then the order of the values will match the order 
+    of the keys. </p>
+      
+   <div class="observeBox"><div class="observeTitle">OBSERVE: values()</div><div class="observe"><pre>
+<span class="purple">foreach my</span> <span class="darkred">$value</span> ( <span class="darkgreen">values</span> <span class="darkred">%cost</span> )    
+{
+  <span class="darkgreen">print</span> <span class="orange">"Selling something for \$<span class="darkred">$value</span>\n"</span>  
+}
+</pre></div></div>
+    
+  </div></div>
+  <a name="s_05"></a><div id="s_05"><div class="subheading">Using Hashes</div><div class="subheadingText">
+  
+   <p>It's unusual to solve a problem with a Perl program without using a 
+    hash somewhere in that code. There are many <i>patterns</i> of uses for 
+    hashes that show up repeatedly in problem-solving. We'll describe a couple of them here.</p>
+  
+   <H4>Testing Set Membership</H4>
+  
+   <p>Often we want to know whether a given value is a member of some 
+    particular set. Is a tomato a fruit or a vegetable? Is a duck-billed platypus a mammal or an amphibian? Is a 
+    chickpea a chick or a pea? The hash is ideal for answering these questions because it looks up the answer 
+    instantly, instead of scanning through an entire array. It reads all of the members of the set 
+    into a hash at the start. (By the end of the course we'll see how to read from a file.) Here's 
+    an example of this type of code:</p>
+  
+   <div class="observeBox"><div class="observeTitle">OBSERVE: Set Membership</div><div class="observe"><pre>
+<span class="purple">my</span> <span class="darkred">@tree_names</span> = <span class="darkgreen">qw</span>(<span class="orange">larch pine oak birch fir palm</span>);
+<span class="purple">my</span> <span class="darkred">%is_a_tree</span>;
+<span class="purple">foreach my</span> <span class="darkred">$tree</span> (<span class="darkred">@tree_names</span>)
+{
+  <span class="darkred">$is_a_tree{$tree}</span> = <span class="orange">1</span>;
+}
+
+<span class="purple">my</span> <span class="darkred">$tree_to_test</span> = <span class="orange">'manzanita'</span>;
+<span class="purple">if</span> ( <span class="darkred">$is_a_tree{$tree_to_test}</span> )
+{
+  <span class="darkgreen">print</span> <span class="orange">"Yup... it's a tree\n"</span>;
+}
+else
+{
+  <span class="darkgreen">print</span> <span class="orange">"Not a tree... sure it's not a bush?\n"</span>;
+}
+</pre></div></div>
+  
+<H4>Counting Occurrences</H4>
+  
+   <p>It's common to inquire how many times a particular string (or number, or pattern) 
+    shows up in a chunk of text. Maybe you have a web server log file and you want to know how often a 
+    particular client hit your server. Or you may have a text version of an e-book and want to know how 
+    many times the author used the word "spiffy." Let's find out how many times the word 
+    "love" occurs in the Beatles' song, "Love Me Do." Create a file called <b>word_count.pl</b>
+   as shown:</p>
+  
+<div class="listingBox"><div class="listingTitle">CODE TO TYPE:</div><div class="listing"><pre><ins>#!/usr/bin/perl
+use strict;
+use warnings;
+
+my $text = &lt;&lt;'END_OF_TEXT';
+Love, love me do.
+You know I love you,
+I'll always be true,
+So please, love me do.
+Whoa, love me do.
+
+Love, love me do.
+You know I love you,
+I'll always be true,
+So please, love me do.
+Whoa, love me do.
+
+Someone to love,
+Somebody new.
+Someone to love,
+Someone like you.
+
+Love, love me do.
+You know I love you,
+I'll always be true,
+So please, love me do.
+Whoa, love me do.
+
+Love, love me do.
+You know I love you,
+I'll always be true,
+So please, love me do.
+Whoa, love me do.
+Yeah, love me do.
+Whoa, oh, love me do
+END_OF_TEXT
+
+my %count;  
+foreach my $line ( split "\n", $text )
+{
+  foreach my $word ( split " ", $line )
+  {
+    $count{$word}++;
+  }
+}
+
+print "'love' occurs $count{love} times\n";</ins>
+</pre></div></div>
+      
+   <p><img src="images/coderunner/checksyntax.JPG"> and run it. </p>
+   
+<div class="interactiveBox"><div class="interactiveTitle">INTERACTIVE TERMINAL SESSION:</div><div class="interactive"><pre>cold:~/perl1$ <ins>./word_count.pl</ins>
+'love' occurs 18 times
+cold:~/perl1$    
+</pre></div></div>
+    
+   <p>We counted <i>all</i> of the words in the lyrics, not just "love." 
+   We can postincrement (<b>++</b>) an element in the hash if the element doesn't 
+    exist yet:</p>
+   
+<div class="observeBox"><div class="observeTitle">OBSERVE: postincrement</div><div class="observe"><pre>
+<span class="darkred">$count{$word}</span><span class="darkgreen">++</span>
+</pre></div></div>
+  
+   <p> The code above is <i>syntactic sugar</i> for: </p>
+
+   <div class="observeBox"><div class="observeTitle">OBSERVE: postincrement expanded</div><div class="observe"><pre>
+<span class="darkred">$count{$word}</span> = <span class="darkred">$count{$word}</span> + <span class="orange">1</span>
+</pre></div></div>
+  
+   <p>If Perl evaluates the <span class="darkred">$count{$word}</span> on the right side of the <b>=</b> sign, and that 
+    element does not yet exist in the hash, the result evaluates as the undefined value (which has 
+    the name <span class="orange">undef</span>). In a <i>numeric context</i> (a subset of scalar context, forced 
+    in this case by the <span class="darkgreen">+</span> sign), <span class="orange">undef</span> is zero, and so the 
+    expression becomes adding zero to one to get one, and assigning that to <span class="darkred">$count{$word}</span>. 
+    Normally, using <span class="orange">undef</span> in a numeric context also results in a 
+    warning (if we have <span class="darkred">use warnings</span> turned on), but in the <i>specific</i> case 
+    where the numeric context occurs as a result of using the <span class="darkgreen">++</span> operator, 
+    that warning will <i>not</i> appear. (That design choice was made specifically so 
+    that this coding idiom would work.)</p>
+   
+   <p>Let's improve a program from an earlier lesson.</p> 
+   
+   <p><img src="images/coderunner/open.gif"> Open <span class="darkred">store_report.pl</span> 
+    again in CodeRunner:</p>
+   
+<div class="observeBox"><div class="observeTitle">OBSERVE: store_report.pl</div><div class="observe"><pre>
+#!/usr/bin/perl
+use strict;
+use warnings;
+
+my $lines = &lt;&lt;'END_OF_REPORT';
+ 0.95   300   White Peaches
+ 1.45   120   California Avocados
+10.50    10   Durien
+ 0.40  1500   Spartan Apples
+END_OF_REPORT
+
+my @sold = (12, 6, -1, 24);  # One durien returned... too smelly
+foreach my $line ( split "\n", $lines )
+{
+  my ($cost, $quantity, $item) = split " ", $line, 3;
+  $quantity -= shift @sold;
+  printf "%5.2f %6d %s\n", $cost, $quantity, $item;
+}   
+</pre></div></div>
+   
+   <p>You should be concerned that the array of the 
+    number of fruit sold must be ordered the same way as the items in the report. That's <i>fragile</i> 
+    code; it can break easily. If we were to change a line in the report to a new fruit, nothing 
+    would tell us that we should also change the contents of the array <span class="darkred">@sold</span>, so the 
+    output would look valid, but it would be wrong.</p>
+   
+   <p>We need to associate each count of fruit sold with the item it corresponds to; a 
+    hash is just the way to do it. Modify <b>store_report.pl</b> as shown:</p>
+   
+<div class="listingBox"><div class="listingTitle">CODE TO EDIT: </div><div class="listing"><pre>#!/usr/bin/perl
+use strict;
+use warnings;
+
+my $lines = &lt;&lt;'END_OF_REPORT';
+ 0.95   300   White Peaches
+ 1.45   120   California Avocados
+10.50    10   Durien
+ 0.40  1500   Spartan Apples
+END_OF_REPORT
+<ins>
+my %sold = ('White Peaches' =&gt; 12, 'Rainier Cherries' =&gt; 20,
+             Durien         =&gt; -1, 'Spartan Apples'   =&gt; 24);  # One durien returned... too smelly</ins>
+foreach my $line ( split "\n", $lines )
+{
+  my ($cost, $quantity, $item) = split " ", $line, 3;
+  <ins>if ( exists $sold{$item} )
+  {
+    $quantity -= $sold{$item};
+  }
+  else
+  {
+    warn "Didn't sell any $item this time\n";
+  }</ins>
+  printf "%5.2f %6d %s\n", $cost, $quantity, $item;
+}
+</pre></div></div>
+   
+   <p><img src="images/coderunner/checksyntax.JPG"> and run it. </p>
+   
+<div class="interactiveBox"><div class="interactiveTitle">INTERACTIVE TERMINAL SESSION:</div><div class="interactive"><pre>cold:~/perl1$ <ins>./store_report.pl</ins>
+ 0.95    288 White Peaches
+Didn't sell any California Avocados this time
+ 1.45    120 California Avocados
+10.50     11 Durien
+ 0.40   1476 Spartan Apples    
+cold:~/perl1$    
+</pre></div></div>
+   
+   <p>Make sure you understand the logic behind these
+    results. You can still use the fat comma after a string that has quotation marks around 
+    it, in which case it doesn't have any effect at all, but it's still useful to be able to use the fat comma 
+    to differentiate keys from values.</p>
+  
+  </div></div>
+  
+  <p>So there you have it—well done! You've just powered through a really important topic that will dramatically 
+   improve your Perl coding skills! </p>
+   
+  <br><br><br><br>
+  
+  <p>And remember: time flies like an arrow, but fruit flies like a banana. Alright then. See you in the next lesson!</p>
+ </div>
+<div class="footer"><div id="timeSurvey"></div>				
+				Copyright © 1998-2014 O'Reilly Media, Inc.<br><img src="https://courses.oreillyschool.com/common/cclicense.png"><br>
+				This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 Unported License.<br>
+				See <a href="http://creativecommons.org/licenses/by-sa/3.0/legalcode">http://creativecommons.org/licenses/by-sa/3.0/legalcode</a> 
+				for more information.
+				</div><iframe id="t" width="1" height="1" border="0" style="display:none"></iframe><script language="javascript">bodyLoaded();</script><script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+  ga('create', 'UA-44720547-1', 'oreillyschool.com');
+  ga('send', 'pageview');
+</script></body></html>

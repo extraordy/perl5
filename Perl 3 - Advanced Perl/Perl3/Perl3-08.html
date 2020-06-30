@@ -1,0 +1,462 @@
+<html><!-- Copyright (c) 1998-2014 O'Reilly Media, Inc.
+			This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 Unported License.
+			See http://creativecommons.org/licenses/by-sa/3.0/legalcode for more information.
+            --><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"><link rel="stylesheet" type="text/css" href="../common/Lab.css"><script type="text/javascript" src="../common/Lab.js"></script><script language="javascript"></script><title>Hash References and Dereferencing Syntax</title></head><body id="body"><a name="top"></a><div class="title">Hash References and Dereferencing Syntax</div><div class="resize"><a href="Perl3-08.html#top" onclick="changeSize('smaller');" class="aS" title="Keep clicking to make fonts smaller">A</a><a href="Perl3-08.html#top" onclick="changeSize('larger');" class="aL" title="Keep clikcing to make fonts larger">A</a><a href="Perl3-08.html#top" onclick="lv()" class="lv" title="Adjust Page for High Contrast">HC</a><div id="fh"><p>Click on <span class="aS">A</span> to make all fonts on the page smaller.</p><p>Click on <span class="aL">A</span> to make all fonts on the page larger.</p><p>Click on <span class="lv">HC</span> to toggle high contrast mode. When you move your mouse over 
+                 some bold words in high contrast mode, related words are automatically highlighted. Text is shown
+                 in black and white. 
+             </p></div></div><hr>
+  
+  <div class="goalTitle">Lesson Objectives</div><div class="goals"> 
+    
+    When you complete this lesson, you will be able to:
+    <ul><li>make <a href="Perl3-08.html#references_to_named_hashes">references to Named Hashes</a>.</li><li>use the <a href="Perl3-08.html#data_dumper">Data::Dumper</a> module.</li><li>make <a href="Perl3-08.html#references_to_anonymous_hashes"> references to Anonymous Hashes</a>.</li><li>apply both <a href="Perl3-08.html#dereferencing_the_two_rules"> rules for Dereferencing</a>.</li></ul>
+  </div><hr>
+ 
+ <p>Hello and welcome back! This lesson will include lots of valuable information.</p>
+ 
+ 
+  <a href="Perl3-08.html" name="references_to_named_hashes"></a>
+<a name="h_01"></a><div class="heading">References to Named Hashes</div><div class="headingText">
+   
+  <p>Now that you've experienced the power of scalar and array references, you probably aren't surprised to learn that 
+    you can also take references to hashes. In fact, references to hashes are arguably the most useful references in Perl.</p>
+   
+  <p>Perl remains consistent in its syntax. To take a reference to a hash, put a backslash <span class="orange">\</span> before the hash:</p>
+   
+<div class="observeBox"><div class="observeTitle">OBSERVE:</div><div class="observe"><pre>
+$hash_ref = <span class="orange">\</span>%hash
+</pre></div></div>
+   
+  <p>Let's try a short example. Create <b>hash_ref.pl</b> in your <b>/perl3</b> folder as 
+   shown:</p>
+  
+<div class="listingBox"><div class="listingTitle">CODE TO TYPE:</div><div class="listing"><pre>#!/usr/bin/perl
+use strict;
+use warnings;
+
+my %country = ( us =&gt; 'USA',     uk =&gt; 'United Kingdom', fr =&gt; 'France',
+                de =&gt; 'Germany', es =&gt; 'Spain',          mx =&gt; 'Mexico',
+                jp =&gt; 'Japan',   in =&gt; 'India',          th =&gt; 'Thailand' );
+
+my $country_ref = \%country;
+
+print "\$country_ref = $country_ref\n";
+
+print "$_ = $$country_ref{$_}\n" for keys %$country_ref;
+</pre></div></div>
+   
+  <p><img src="images/coderunner/checksyntax.JPG"> and run it as shown:</p>
+
+<div class="interactiveBox"><div class="interactiveTitle">INTERACTIVE SESSION:</div><div class="interactive"><pre>cold:~$ <ins>cd perl3</ins>
+cold:~/perl3$ <ins>./hash_ref.pl</ins>
+$country_ref = HASH(0x8c2971c)
+mx = Mexico
+uk = United Kingdom
+fr = France
+jp = Japan
+de = Germany
+in = India
+es = Spain
+us = USA
+th = Thailand
+</pre></div></div>
+   
+  <p>Here's a graphical representation of that operation:</p>
+   
+  <p><div class="c"><img src="images/lessonImages/hash_ref.png"></div></p>
+      
+  <p>First we printed a stringified <b>hash ref</b>. Then 
+   we show a couple of ways to dereference a hash ref. A hash ref works just like an array ref: you 
+   can use a hash ref everywhere you would ordinarily use the <i>name</i> portion of a hash (the identifier 
+   that comes after the <span class="red">%</span> sigil) in code. So, to access the keys of the hash via the
+   reference, if we were working on an actual hash like <span class="red">%country</span>, we would type 
+   <span class="red">%country</span>, but since we're working on a hash <i>reference</i>, we substitute the
+   reference for the identifier portion (<span class="red">country</span>) of the hash and end up with 
+   <span class="red">%$country_ref</span>. Then we applied the same principle to get each successive value in the hash 
+   with the key <span class="red">$_</span>. If we had an actual hash <span class="red">%country</span>, we would access 
+   <span class="red">$country{$_}</span>, but instead, we have a reference, so we end up with 
+   <span class="red">$$country_ref{$_}</span>.</p>
+   
+  <p>The diagram above illustrates that a hash is a 
+   container that exists independently of the scalars within it, and so a reference to the 
+   hash is not the same as a reference to a member of that hash. A reference to a member of the hash would look like this:</p>
+   
+  <p><div class="c"><img src="images/lessonImages/hash_element_ref.png"></div></p>
+   
+  <p>Let's see how we'd do that. Create <b>element_ref2.pl</b> in your <b>/perl3</b> folder 
+   as shown:</p>
+  
+<div class="listingBox"><div class="listingTitle">CODE TO TYPE:</div><div class="listing"><pre>#!/usr/bin/perl
+use strict;
+use warnings;
+
+my %country = ( us =&gt; 'USA',     uk =&gt; 'United Kingdom', fr =&gt; 'France',
+                de =&gt; 'Germany', es =&gt; 'Spain',          mx =&gt; 'Mexico',
+                jp =&gt; 'Japan',   in =&gt; 'India',          th =&gt; 'Thailand' );
+
+my $hispanic_ref = \$country{mx};
+
+print "\$hispanic_ref = $hispanic_ref\n";
+$$hispanic_ref = 'United Mexican States';  # http://en.wikipedia.org/wiki/Mexico
+
+print "$_ = $country{$_}\n" for sort keys %country;
+</pre></div></div>
+   
+  <p><img src="images/coderunner/checksyntax.JPG"> and run it as shown:</p>
+
+<div class="interactiveBox"><div class="interactiveTitle">INTERACTIVE SESSION:</div><div class="interactive"><pre>cold:~/perl3$ <ins>./element_ref2.pl</ins>
+$hispanic_ref = SCALAR(0x819f75c)
+de = Germany
+es = Spain
+fr = France
+in = India
+jp = Japan
+mx = United Mexican States
+th = Thailand
+uk = United Kingdom
+us = USA
+</pre></div></div>
+  
+  <p>Looks good!</p>
+ 
+ </div>
+ <a href="Perl3-08.html" name="data_dumper"></a>
+ <a name="h_02"></a><div class="heading">Data::Dumper</div><div class="headingText">
+      
+  <p>Now let's take a different look at hash references. Open <b>map_hash.pl</b> in your 
+   <b>/perl3</b> folder and modify it as shown:</p>
+
+<div class="listingBox"><div class="listingTitle">CODE TO TYPE:</div><div class="listing"><pre>#!/usr/bin/perl
+use strict;
+use warnings;
+
+<ins>use Data::Dumper;</ins>
+
+my %marsupial = map { ($_, 1) } qw(koala kangaroo possum wombat);
+
+chomp( my @amphibians = &lt;DATA&gt; );
+
+my %amphibian = map { $_, 1 } @amphibians;
+
+<del>print "Marsupials: ", join( ' ', sort keys %marsupial ), "\n";
+print "Amphibians: ", join( ' ', sort keys %amphibian ), "\n";</del>
+<ins>print Dumper \%amphibian, \%marsupial;</ins>
+
+__END__
+frog
+toad
+salamander
+newt
+caecilian
+</pre></div></div>
+   
+  <p><img src="images/coderunner/checksyntax.JPG"> and run it as shown:</p>
+   
+<div class="interactiveBox"><div class="interactiveTitle">INTERACTIVE SESSION:</div><div class="interactive"><pre>cold:~/perl3$ <ins>./map_hash.pl</ins>
+$VAR1 = {
+          'toad' =&gt; 1,
+          'newt' =&gt; 1,
+          'salamander' =&gt; 1,
+          'caecilian' =&gt; 1,
+          'frog' =&gt; 1
+        };
+$VAR2 = {
+          'wombat' =&gt; 1,
+          'kangaroo' =&gt; 1,
+          'possum' =&gt; 1,
+          'koala' =&gt; 1
+        };
+</pre></div></div>
+   
+  <p>(You might see the hash elements in a different order.)</p>
+   
+  <p>Let's take a closer look at this program:</p> 
+
+<div class="observeBox"><div class="observeTitle">OBSERVE:</div><div class="observe"><pre>
+#!/usr/bin/perl
+use strict;
+use warnings;
+
+use <span class="purple">Data::Dumper</span>;
+
+my %marsupial = <span class="darkgreen">map</span> <span class="darkblue">{ ($_, 1) }</span> qw(koala kangaroo possum wombat);
+
+chomp( my @amphibians = &lt;DATA&gt; );
+
+my %amphibian = map <span class="darkblue">{ ($_, 1) }</span> @amphibians;
+
+print <span class="darkgreen">Dumper</span> <span class="red">\%amphibian</span>, <span class="red">\%marsupial</span>;
+__END__
+frog
+toad
+salamander
+newt
+caecilian
+</pre></div></div>  
+  
+  <p>We use the map technique we learned about earlier to initialize a hash. We use 
+   the handy <span class="purple">Data::Dumper</span> module, which provides the <span class="darkgreen">Dumper()</span> 
+   function which displays the contents of any list of variables, including references. This feature is really useful for 
+   printing a quick dump of a data structure when you're troubleshooting a program. (You can delve more 
+   deeply into modules and even learn how to write your own in the next Perl course!)</p>
+   
+  <p>I've passed the <span class="darkgreen">Dumper()</span> routine two arguments: two references to hashes. 
+   <span class="darkgreen">Dumper()</span> can recognize a hash ref (we'll see how later). As you may 
+   recall, a hash ref does not give you the means to get at the name of the variable it references, so 
+   <span class="darkgreen">Dumper()</span> prints <span class="red">$VAR1</span> and <span class="red">$VAR2</span> instead.</p>
+   
+   <p>So what's up with this <span class="darkblue">{ ($_, 1) }</span> syntax that <span class="darkgreen">Dumper()</span> has chosen to denote a hash ref? 
+   That's the topic of our next section!</p>
+ 
+ </div>
+ <a href="Perl3-08.html" name="references_to_anonymous_hashes"></a>
+ <a name="h_03"></a><div class="heading">References to Anonymous Hashes</div><div class="headingText">
+   
+  <p>Perl is consistent in its choice of syntax for references to anonymous hashes. Just as 
+   anonymous array refs are delimited with square brackets (square brackets are 
+   used around array indexes), anonymous hash refs are delimited with curly braces <span class="blue">{}</span> (similar to the way 
+    they're used around hash keys). Here's a general picture of the syntax:</p>
+   
+<div class="observeBox"><div class="observeTitle">OBSERVE:</div><div class="observe"><pre>
+$hash_ref = <span class="blue">{</span> <i>LIST</i> <span class="blue">}</span>
+</pre></div></div>
+   
+  <p>And here's that syntax at work in a specific example:</p>
+   
+<div class="observeBox"><div class="observeTitle">OBSERVE:</div><div class="observe"><pre>
+$stock_ref = <span class="blue">{</span> ants =&gt; 10E6, aardvarks =&gt; 4, antelopes =&gt; 2 <span class="blue">}</span>
+</pre></div></div>
+   
+  <p>Fortunately, Perl can tell when you intend for braces to 
+   be used as an anonymous hash ref constructor, even when you're using them as the 
+   <i>implicit</i> result returned from a subroutine. Create <b>anon_hash.pl</b> in your 
+   <b>/perl3</b> folder as shown:</p>
+   
+<div class="listingBox"><div class="listingTitle">CODE TO TYPE:</div><div class="listing"><pre>#!/usr/bin/perl
+use strict;
+use warnings;
+
+my $trans_ref = make_trans_ref( 'French' );
+
+print "J'ai un rendez-vous $$trans_ref{Friday} soir\n"; 
+
+sub make_trans_ref
+{
+  my $language = shift;
+
+  if ( $language eq 'French' )
+  {
+    { Sunday    =&gt; 'dimanche', Monday   =&gt; 'lundi', Tuesday =&gt; 'mardi',
+      Wednesday =&gt; 'mercredi', Thursday =&gt; 'jeudi',
+      Friday    =&gt; 'vendredi', Saturday =&gt; 'samedi' }; 
+  }
+  elsif ( $language eq 'German' )
+  {
+    { Sunday    =&gt; 'Sonntag',  Monday   =&gt; 'Montag', Tuesday =&gt; 'Dienstag',
+      Wednesday =&gt; 'Mittwoch', Thursday =&gt; 'Donnerstag',
+      Friday    =&gt; 'Freitag',  Saturday =&gt; 'Samstag' };
+  }
+  else
+  {
+    die "Unknown language $language";
+  }
+}
+</pre></div></div>
+   
+  <p><img src="images/coderunner/checksyntax.JPG"> and run it as shown:</p>
+   
+<div class="interactiveBox"><div class="interactiveTitle">INTERACTIVE SESSION:</div><div class="interactive"><pre>cold:~/perl3$ <ins>./anon_hash.pl</ins>
+J'ai un rendez-vous vendredi soir
+</pre></div></div>
+   
+  <p>Perl doesn't require you to use the keyword <b>return</b> to return a value from a subroutine;
+   the value of the last expression evaluated will be the returned value if there is no <b>return</b>
+   statement. Still, I recommend that you do use it, 
+   especially in a case like this, because it's difficult to see that we've inserted 
+   anonymous hash refs rather than naked blocks (Perl <i>still</i> gets it right though).  
+   Go ahead and put the <b>return</b> statement in before each of those anonymous hash refs and 
+   see how much clearer the code is.</p>
+   
+  <p>Of course, you can use any list expression inside the braces, not just a literal list. Create 
+   <b>stock.pl</b> in your <b>/perl3</b> folder as shown:</p>
+   
+<div class="listingBox"><div class="listingTitle">CODE TO TYPE:</div><div class="listing"><pre>#!/usr/bin/perl
+use strict;
+use warnings;
+
+my $stock_ref = get_stock_ref( 'INSECTS' );
+print "I have $$stock_ref{ants} ants\n";
+
+sub get_stock_ref
+{
+  my $seeking = shift;
+
+  my (@data, $type);
+  while ( &lt;DATA&gt; )
+  {
+    if ( ( my ($what, $number) = /(.*)\s+(\d+)/ ) &amp;&amp; ( $type eq $seeking ) )
+    {
+      push @data, $what, $number;
+    }
+    elsif ( /(\S+)/ )
+    {
+      $type = $1;
+    }
+    else
+    {
+      next;
+    }
+  }
+  return { @data };
+}
+
+__END__
+
+INSECTS
+ants 1000000
+beetles 200000
+
+MAMMALS
+aardvarks 4
+antelopes 3
+
+FISH
+guppies 10
+angel fish 40
+king crabs 10
+</pre></div></div>
+   
+  <p><img src="images/coderunner/checksyntax.JPG"> and run it as shown:</p>
+   
+<div class="interactiveBox"><div class="interactiveTitle">INTERACTIVE SESSION:</div><div class="interactive"><pre>cold:~/perl3$ <ins>./stock.pl</ins>
+I have 1000000 ants</pre></div></div>
+   
+  <p>This isn't very good program design; the <span class="blue">get_stock_ref</span> routine can only be 
+   called once before running out of data. Still, the program is useful because it demonstrates that you can populate an anonymous hash 
+   ref with an array. (Although it would be better to populate a named hash and return a reference to it.)</p>
+   
+  <p>Okay, now here's a handy idiom for setting defaults, used with a hash ref. Create <b>default.pl</b> 
+   in your <b>/perl3</b> folder as shown:</p>
+   
+<div class="listingBox"><div class="listingTitle">CODE TO TYPE:</div><div class="listing"><pre>#!/usr/bin/perl
+use strict;
+use warnings;
+
+use Data::Dumper;
+
+my $supplied_ref = { @ARGV };
+my $default_ref = { pants =&gt; 3, shirts =&gt; 6, ties =&gt; 10 };
+my $merged_ref = { %$default_ref, %$supplied_ref };
+print Dumper $merged_ref;
+</pre></div></div>
+   
+  <p><img src="images/coderunner/checksyntax.JPG"> and run it, first without parameters and then with parameters, as shown:</p>
+   
+<div class="interactiveBox"><div class="interactiveTitle">INTERACTIVE SESSION:</div><div class="interactive"><pre>cold:~/perl3$ <ins>./default.pl</ins>
+$VAR1 = {
+          'pants' =&gt; 3,
+          'ties' =&gt; 10,
+          'shirts' =&gt; 6
+        };
+cold:~/perl3$ <ins>./default.pl socks 4 ties 6</ins>
+$VAR1 = {
+          'socks' =&gt; '4',
+          'pants' =&gt; 3,
+          'ties' =&gt; '6',
+          'shirts' =&gt; 6
+        };
+</pre></div></div>
+   
+  <p>Inside the last anonymous hash ref constructor, we dereference first the defaults, then the arguments
+    that were supplied, so that the arguments take precedence over the defaults (in a list of key-value pairs 
+    assigned to a hash, if any key is repeated, the last occurrence wins).</p>
+ 
+ </div>
+ <a href="Perl3-08.html" name="dereferencing_the_two_rules"></a>
+ <a name="h_04"></a><div class="heading">Dereferencing: Two Rules</div><div class="headingText">
+   
+  <p>There are two rules for dereferencing in general. We've only exercised one 
+   of them so far.</p>
+   
+  <p>You may construct a dereferencing expression by figuring out what the equivalent expression would be 
+   for the type of thing (scalar, array, or hash) your reference points to, and then substituting the 
+   <i>name</i> or <i>identifier</i> portion of that type of thing (that which follows the <b>$</b> 
+   <b>@</b>, or <b>%</b>) with either: </p>
+   
+  <ul><li>Rule 1: A simple scalar (like <b>$array_ref</b>) containing a reference to that kind of thing; 
+    or</li><li>Rule 2: A block containing anything other than a simple scalar that evaluates to a reference to 
+    that kind of thing.</li></ul>
+   
+  <p>So far, we've only exercised rule 1, because we've only had references contained in simple scalars. 
+    But, while an array element like <b>$insects_ref[2]</b> is a 
+   scalar, it's not a simple one. An expression that evaluates to a reference, say, 
+   <b>make_stock_ref( 'INSECT' )</b> is not a simple scalar either.</p>
+   
+  <p>These rules are actually harder to describe than they are to understand, so let's try an example that makes them more
+   clear. Create <b>ref_rules.pl</b> in your <b>/perl3</b> folder as shown:</p>
+   
+<div class="listingBox"><div class="listingTitle">CODE TO TYPE:</div><div class="listing"><pre>#!/usr/bin/perl
+use strict;
+use warnings;
+
+my $furn_ref = [ qw(sofa chair loveseat piano credenza) ];
+my $cost_ref = { sofa =&gt; 1500, chair =&gt; 300, loveseat =&gt; 800, piano =&gt; 6000, credenza =&gt; 500 };
+
+# Rule 1
+print "Cost of third item from \$furn_ref is: ",
+      $$cost_ref{ $$furn_ref[2] },
+      "\n";
+
+# Rule 2
+my $alt_furn_ref = [ qw(bed rug rocker stool) ];
+my $alt_cost_ref = { bed =&gt; 3000, rug =&gt; 75, rocker =&gt; 450, stool =&gt; 125 };
+my @refs = ( $cost_ref, $alt_cost_ref );
+
+print "Cost of third item in \$alt_furn_ref from second reference in array is: ",
+      ${ $refs[1] }{ $$alt_furn_ref[2] },
+      "\n";
+</pre></div></div>
+   
+  <p><img src="images/coderunner/checksyntax.JPG"> and run it as shown:</p>
+
+<div class="interactiveBox"><div class="interactiveTitle">INTERACTIVE SESSION:</div><div class="interactive"><pre>cold:~/perl3$ <ins>./ref_rules.pl</ins>
+Cost of third item from $furn_ref is: 800
+Cost of third item in $alt_furn_ref from second reference in array is: 450
+</pre></div></div>
+   
+  <p>That looks pretty tricky, but don't worry! We'll go over all of it, and in the next lesson, we'll
+    show you how some of those constructions can be simplified.</p>
+   
+  <p>In the first case—exercising Rule 1—we want to get the third item from 
+    <b>$furn_ref</b>, which is an array reference, <b>$$furn_ref[2]</b>, and then print 
+      the cost of that item, which is stored in <b>$cost_ref</b>, which is a hash reference,
+    <b>$$cost_ref{ $$furn_ref[2] }</b>. The hash <i>key</i> is a complex value, but the 
+        <i>reference</i> is in a simple scalar, <b>$cost_ref</b>, so this is an application of Rule 1.</p>
+   
+  <p>In the second case—exercising Rule 2—we want to get the third item from 
+    <b>$alt_furn_ref</b>, which is an array reference, <b>$$alt_furn_ref[2]</b> 
+   (application of Rule 1), and then print the cost of that item, which is stored in the second element 
+   in <b>@refs</b> (that is, <b>$refs[1]</b>), which is a hash reference. That is <i>not</i> a 
+     simple scalar, so we apply Rule 2, and put it in a <i>block</i>—that's the <b>{ $refs[1] }</b> 
+     part—and then add the complete expression as <b>${ $refs[1] }{ $$alt_furn_ref[2] }</b>.</p>
+   
+  <p>Wow.  Fortunately, that's about as complicated as it ever gets with references. We'll learn how to 
+   create much more complicated data structures, but for now, our syntax is complex enough. Great work today!</p>
+ 
+ </div>
+ 
+ <p>Once you finish the lesson, go back to the syllabus to complete the homework.</p>
+   
+<div class="footer"><div id="timeSurvey"></div>				
+				Copyright © 1998-2014 O'Reilly Media, Inc.<br><img src="https://courses.oreillyschool.com/common/cclicense.png"><br>
+				This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 Unported License.<br>
+				See <a href="http://creativecommons.org/licenses/by-sa/3.0/legalcode">http://creativecommons.org/licenses/by-sa/3.0/legalcode</a> 
+				for more information.
+				</div><iframe id="t" width="1" height="1" border="0" style="display:none"></iframe><script language="javascript">bodyLoaded();</script><script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+  ga('create', 'UA-44720547-1', 'oreillyschool.com');
+  ga('send', 'pageview');
+</script></body></html>

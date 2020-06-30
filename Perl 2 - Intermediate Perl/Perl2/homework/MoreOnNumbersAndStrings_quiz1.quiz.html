@@ -1,0 +1,65 @@
+<html>
+   <!-- Copyright (c) 1998-2014 O'Reilly Media, Inc. Unauthorized use is strictly
+                prohibited. None of this code or content can by copied without the express written
+                permission from O'Reilly Media, Inc. -->
+   <head>
+      <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+      <link rel="stylesheet" type="text/css" href="http://archive.oreilly.com/oreillyschool/courses/Perl2/common/Lab.css">
+      <title>More on Numbers and Strings; More on Regular Expressions; More on Hashes - Quiz 1</title>
+   </head>
+   <body id="body">
+      <h2>More on Numbers and Strings; More on Regular Expressions; More on Hashes - Quiz 1</h2> 
+      
+      
+      
+      
+      <p>Explain the difference between <b>/\b/</b> and <b>"\b".</b></p>
+      
+        
+      
+      
+      <p><b>/\b/</b> is a regular expression fragment matching a word boundary (it would be useless as it stands without more).</p>
+      
+      
+      <p><b>"\b"</b> is a string containing a backspace control character.</p>
+      
+      
+      <p><b>Grading Criteria:</b> Student should be able to explain the difference between control characters and regular expression fragments.</p>
+      
+      
+      
+      
+      
+      
+      <p>You have the name of the author in <b>$author</b> and the path of this program in <b>$0</b>. What regex will match a 
+         string of the form "<i>path</i> was written by <i>author</i>"?
+      </p>
+      
+      
+      
+      
+      <p>/\Q$0\E was written by \Q$author\E/. (The final \E may be omitted.)</p>
+      
+      
+      <p><b>Grading Criteria:</b> Student should demonstrate knowledge of how to properly escape values in a regular expression.</p>
+      
+      
+      
+      
+      
+      
+      <p>How can you get a single quote inside a string in a one-liner? (Hint: <b>perldoc perlop</b>)</p>
+      
+      
+      
+      
+      <p>Use a code for the character; for example "\047" (ASCII code for single quote) or "\x27" (hex).</p>
+      
+      
+      <p><b>Grading Criteria:</b> Student should demonstrate knowledge of how to use shell ASCII and hex character codes.</p>
+      
+      
+      
+      
+   </body>
+</html>

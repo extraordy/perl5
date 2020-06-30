@@ -1,0 +1,732 @@
+<html><!-- Copyright (c) 1998-2014 O'Reilly Media, Inc.
+			This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 Unported License.
+			See http://creativecommons.org/licenses/by-sa/3.0/legalcode for more information.
+            --><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"><link rel="stylesheet" type="text/css" href="../common/Lab.css"><script type="text/javascript" src="../common/Lab.js"></script><script language="javascript"></script><title>Variable Behavior Overloading with Tieing</title></head><body id="body"><a name="top"></a><div class="title">Variable Behavior Overloading with Tieing</div><div class="resize"><a href="Perl4-07.html#top" onclick="changeSize('smaller');" class="aS" title="Keep clicking to make fonts smaller">A</a><a href="Perl4-07.html#top" onclick="changeSize('larger');" class="aL" title="Keep clikcing to make fonts larger">A</a><a href="Perl4-07.html#top" onclick="lv()" class="lv" title="Adjust Page for High Contrast">HC</a><div id="fh"><p>Click on <span class="aS">A</span> to make all fonts on the page smaller.</p><p>Click on <span class="aL">A</span> to make all fonts on the page larger.</p><p>Click on <span class="lv">HC</span> to toggle high contrast mode. When you move your mouse over 
+                 some bold words in high contrast mode, related words are automatically highlighted. Text is shown
+                 in black and white. 
+             </p></div></div><hr>
+ 
+ <div class="goalTitle">Lesson Objectives</div><div class="goals">
+  
+  
+  When you complete this lesson, you will be able to:
+  <ul><li>use <a href="Perl4-07.html#tie">tie</a> to designate an ordinary variable (scalar, array, hash, and others) 
+    as being "special."</li><li>create data structures that exist beyond the lifetime of a 
+    program that uses them using <a href="Perl4-07.html#date_persistence">Data Persistence</a>.</li></ul>
+ </div><hr>
+
+ <p><div class="c">"When spider webs unite, they can tie up a lion."<br>
+  -Ethiopian proverb</div></p>
+  
+ <p>
+  In this lesson we're going to learn about Perl's <b>tie</b> function and how you can use it to give "secret" 
+  behavior to variables.</p>
+  
+ 
+
+ <a href="Perl4-07.html" name="tie"></a>
+ <a name="h_01"></a><div class="heading">tie</div><div class="headingText">
+  
+  <p>The basic principle behind <b>tie</b> is that you can designate an ordinary variable (scalar, array, hash, and others) 
+   as being "special," so that whenever a user takes action on it, you control the actual result. </p>
+  
+  <p>Let's say our user is a programmer with an expense account, and he wants to adjust his expense account settings. This user 
+   might run the code <b>$balance += 1E6</b>. 
+   However, we have written the program so that <b>$balance</b> is <i>tied</i>.  So, behind the scenes, the tied  
+   <b>$balance</b> variable might send an email message to their manager to inform her that the user had tried to increase their balance 
+   beyond the set limit.</p>
+  
+  <p>That's just one example of how <b>tie</b> can be used, but we don't usually use it for such stealthy and dramatic behaviors. Let's see <b>tie</b> in 
+   action!</p>
+  
+  <a name="s_01"></a><div id="s_01"><div class="subheading">Tied Scalars</div><div class="subheadingText">
+   
+   <p>We'll start off using <b>tie</b> on a scalar. Create a new Perl file in the CodeRunner 
+    editor as shown:</p>
+   
+<div class="listingBox"><div class="listingTitle">CODE TO ENTER:</div><div class="listing"><pre>#!/usr/local/bin/perl
+use strict;
+use warnings;
+
+use MyTime;
+
+tie my $now, "MyTime";
+print "The time is now $now\n";
+sleep 5;
+print "The time is now $now\n";
+
+</pre></div></div>
+   <p><img src="images/coderunner/save.gif"> Save it in your <b>/perl4</b> folder as <b>tie_time.pl</b>. Here 
+    you see the basic form of using a tied variable; use a class, then tie the variable to the class, and 
+    thereafter use the variable as you would normally. Now, create the class:</p>
+   
+<div class="listingBox"><div class="listingTitle">CODE TO ENTER:</div><div class="listing"><pre>package MyTime;
+use strict;
+use warnings;
+
+use POSIX qw(strftime);
+
+sub TIESCALAR
+{
+  my $class = shift;
+  
+  return bless \my ($dummy), $class;
+}
+
+sub FETCH
+{
+  return strftime "%T", localtime;
+}
+
+1;
+</pre></div></div>
+   
+   <p><img src="images/coderunner/save.gif"> Save it in <b>/perl4</b> as <b>MyTime.pm</b>, and then run 
+    <b>tie_time.pl</b>. You'll see something like this (with different times, but still 5 seconds apart):</p>
+   
+<div class="interactiveBox"><div class="interactiveTitle">INTERACTIVE TERMINAL SESSION: Command to type</div><div class="interactive"><pre>cold:~$ <ins>cd perl4</ins> 
+cold:~/perl4$ <ins>./tie_time.pl</ins>
+The time is now 21:09:58
+The time is now 21:10:03</pre></div></div>
+   
+   <p>When a variable is tied to a class, Perl looks for specific methods in the class to run at certain times. 
+    When a scalar is tied to a class, Perl looks for and runs a method called TIESCALAR, so we've defined that. 
+    TIESCALAR is like a constructor; its first argument is a class name and it has to return a blessed 
+    object. This object is associated with the tied variable behind the scenes in a special place in the 
+    variable that only Perl knows how to access. Since this example isn't going to store anything in that object, 
+    we just bless a reference to a scalar and return that. We could easily have returned a reference to an empty 
+    hash or anything else if we had wanted; just because we're tieing a scalar in this example <i>doesn't</i>
+    mean that the underlying object has to be a reference to a scalar.</p>
+   
+   <p>From then on, whenever we try to read the value of the tied scalar, Perl will look for and call FETCH
+    as a method call on the object that was returned by TIESCALAR. This initial implementation  
+    returns the current time as a nice string. It doesn't even look at the object (which it could do, being a 
+    method call); we'll see how to do that in a future example.</p>
+   
+   <p>Okay. Now suppose we want to vary the format that was used to print <b>$now</b>? Perl lets us pass in parameters when we 
+    tie a variable. Give it a try. Modify <b>tie_time.pl</b> as shown:</p>
+   
+<div class="listingBox"><div class="listingTitle">CODE TO EDIT:</div><div class="listing"><pre>#!/usr/local/bin/perl
+use strict;
+use warnings;
+
+use MyTime;
+tie my $now, "MyTime"<ins>, '%M min %S sec'</ins>;
+
+print "The time is now $now\n";
+sleep 5;
+print "The time is now $now\n";
+</pre></div></div>
+   
+   <p>That parameter (the format) will be passed in to the TIESCALAR call. But where should we store it? We already created an 
+    object that is associated with the tied variable; FETCH is a method call on that object. Right now that 
+    object is a reference to a scalar that doesn't have anything stored in it. Let's use that scalar to store the format. 
+    Modify <b>MyTime.pm</b> as shown:</p>
+   
+<div class="listingBox"><div class="listingTitle">CODE TO EDIT:</div><div class="listing"><pre>package MyTime;
+use strict;
+use warnings;
+
+use POSIX qw(strftime);
+
+sub TIESCALAR
+{
+<del>  my $class = shift;</del>
+<ins>  my ($class, $format) = @_;</ins>
+ 
+<del>  return bless \my ($dummy), $class;</del>
+<ins>  return bless \$format, $class;</ins>
+}
+
+sub FETCH
+{
+<ins>  my $self = shift;
+  return strftime $$self, localtime;</ins>
+<del>  return strftime "%T", localtime;</del>
+}
+
+1;</pre></div></div>
+   
+   <p><img src="images/coderunner/save.gif"> Save that file and run <b>tie_time.pl</b>; you'll see something 
+    like this:</p>
+   
+<div class="interactiveBox"><div class="interactiveTitle">INTERACTIVE TERMINAL SESSION: Command to type</div><div class="interactive"><pre>cold:~/perl4$ <ins>./tie_time.pl</ins>
+The time is now 47 min 42 sec
+The time is now 47 min 47 sec</pre></div></div>
+   
+   <p>Pay particular attention to the FETCH method. When a program <i>reads</i> the tied variable <b>$now</b>, Perl 
+    turns that into a call to the FETCH method on the underlying object, which is a reference to <b>$format</b>.</p>
+   
+   <p>We haven't yet defined other methods that might be needed in other circumstances though. That could be a problem. If we 
+    tried to store something in $now, for instance, Perl would look for the method STORE, and hit a wall because it hasn't been defined. 
+    The 
+    methods that can be defined are documented in <b>perldoc perltie</b> and <b>perldoc -f tie</b>.</p>
+   
+   <p>Perl expert Damian Conway compares <b>tie</b> to "space aliens eating the variable's brain," which is a colorful and apt 
+    description.</p>
+   
+  </div></div>
+  <a name="s_02"></a><div id="s_02"><div class="subheading">Tied Hashes</div><div class="subheadingText">
+   
+   <p>We're going to skip tied arrays for now (they'll show up in the homework) and move directly to the 
+    most useful type of tied variable: tied hashes. The most common use case for a tied hash is to 
+    implement transparent access to a database table. The user sees entries being stored and fetched from a 
+    hash, but behind the scenes, the information is being sent to and retrieved from a database like Oracle or 
+    MySQL. An ordinary Perl hash could be made to look like it was storing terabytes of information this way 
+    (because the terabytes were stored in Oracle or MySQL, not in Perl's memory).</p>
+     
+   <p>Let's start out with a basic hash. Suppose you want a hash with case-insensitive keys. Create 
+    a new Perl file:</p>
+     
+<div class="listingBox"><div class="listingTitle">CODE TO ENTER:</div><div class="listing"><pre>#!/usr/local/bin/perl
+use strict;
+use warnings;
+
+my %phone;
+
+$phone{'BOB DELONG'} = '555-4321';
+$phone{'Bob DeLong'} = '555-1234';
+
+print $phone{'bob delong'}, "\n";</pre></div></div>
+     
+   <p><img src="images/coderunner/save.gif"> Save it as <b>/perl4/tie_hash.pl</b>, but don't bother running it 
+    yet. We'd like this code to print out one of the phone numbers set earlier in the program, but of course it 
+    doesn't. When faced with a situation like this, usually we lowercase (or uppercase, as long as we're 
+    consistent) the hash keys before using them. But suppose it was important to remember the case of the key as
+    it was entered? Now we'd have to use a separate hash just for that, or make the first hash 
+    multidimensional.</p>
+     
+   <p>Here's how we can hide the implementation seamlessly. Modify <b>tie_hash.pl</b> slightly to tie the 
+    hash:</p>
+     
+<div class="listingBox"><div class="listingTitle">CODE TO EDIT:</div><div class="listing"><pre>#!/usr/local/bin/perl
+use strict;
+use warnings;
+
+<del>my %phone;</del>
+<ins>use MyCase;
+tie my %phone, 'MyCase';</ins>
+
+$phone{'Bob DeLong'} = '555-1234';
+$phone{'BOB DELONG'} = '555-4321';
+
+print $phone{'bob delong'}, "\n";</pre></div></div>
+     
+   <p>Now we need to implement the MyCase class. Create a new Perl file as shown:</p>
+     
+<div class="listingBox"><div class="listingTitle">CODE TO ENTER:</div><div class="listing"><pre>package MyCase;
+use strict;
+use warnings;
+
+sub TIEHASH
+{
+  return bless { original_key =&gt; {}, value =&gt; {} }, shift;
+}
+
+sub FETCH
+{
+  my ($self, $key) = @_;
+
+  my $original_key = $self-&gt;{original_key}{lc $key} or return;
+  return $self-&gt;{value}{$original_key};
+}
+
+
+sub STORE
+{
+  my ($self, $key, $value) = @_;
+
+  my $store_key = lc $key;
+  my $actual_key = $key;
+  if ( exists $self-&gt;{original_key}{$store_key} )
+  {
+    $actual_key = $self-&gt;{original_key}{$store_key};
+  }
+  else
+  {
+    $self-&gt;{original_key}{$store_key} = $key;
+  }
+  return $self-&gt;{value}{$actual_key} = $value;
+}
+
+1;</pre></div></div>
+     
+   <p><img src="images/coderunner/save.gif"> Save it as <b>/perl4/MyCase.pm</b>, and run <b>tie_hash.pl</b>:</p>
+     
+<div class="interactiveBox"><div class="interactiveTitle">INTERACTIVE TERMINAL SESSION: Command to type</div><div class="interactive"><pre>cold:~/perl4$ <ins>./tie_hash.pl</ins>
+555-4321
+</pre></div></div>
+     
+   <p>Perl found the entry in the hash even though we input a key using lowercase instead of uppercase letters this time. Here's how it works:</p> 
+   
+<div class="observeBox"><div class="observeTitle">OBSERVE:</div><div class="observe"><pre>sub TIEHASH
+{
+  return bless { <span class="darkred">original_key</span> =&gt; {}, <span class="darkblue">value</span> =&gt; {} }, shift;
+}
+
+sub FETCH
+{
+  my ($self, $key) = @_;
+
+  my <span class="darkred">$original_key</span> = $self-&gt;{<span class="darkred">original_key</span>}{lc $key} or return;
+  return $self-&gt;{<span class="darkblue">value</span>}{<span class="darkred">$original_key</span>};
+}
+
+
+sub STORE
+{
+  my ($self, $key, <span class="darkblue">$value</span>) = @_;
+
+  my $store_key = lc $key;
+  my $actual_key = $key;
+  if ( exists $self-&gt;{<span class="darkred">original_key</span>}{$store_key} )
+  {
+    $actual_key = $self-&gt;{<span class="darkred">original_key</span>}{$store_key};
+  }
+  else
+  {
+    $self-&gt;{<span class="darkred">original_key</span>}{$store_key} = $key;
+  }
+  return $self-&gt;{<span class="darkblue">value</span>}{$actual_key} = <span class="darkblue">$value</span>;
+}
+</pre></div></div>   
+   
+   <p>The underlying object created by TIEHASH is a reference to a hash containing two elements with the keys 
+    <span class="darkred">original_key</span> and <span class="darkblue">value</span>, both references to hashes. Again, it's 
+    coincidental that the underlying object is a hash; it could have been an array, but the code would have 
+    been less clear. It could <i>not</i> have been a scalar though, because we needed to store two references in it.</p>
+
+   <p>When we put an element in the hash with something like <b>$phone{$name} = $number</b>, Perl turns that into a 
+    method call <b>$underlying_object-&gt;STORE( $name, $number )</b>. We're going to approach this using parallel 
+    hashes: <span class="darkred">original_key</span> points to one whose keys are the lowercased versions of the hash 
+    keys and whose values are those keys in whatever case they came in, and <span class="darkblue">value</span> points
+    to a hash whose keys are the original keys in the case they came in, and whose values are the values the 
+    user is storing (phone numbers). This diagram makes that clearer:</p>
+     
+   <p><div class="c"><img src="images/lessonImages/tie_lookup.png"></div></p>
+     
+   <p>Look at the first test in STORE:</p>
+     
+<div class="observeBox"><div class="observeTitle">OBSERVE: Code fragment</div><div class="observe"><pre>  if ( exists $self-&gt;{original_key}{$store_key} )
+  {
+    $actual_key = $self-&gt;{original_key}{$store_key};
+  }
+</pre></div></div>
+     
+   <p>This code tells your program that, when a key is input to look up an entry in the hash, if that key 
+    has been used before <i>in any mix of case</i>, to use the key with the case hat was first used rather than the 
+    case used of the input key. This means that once we 
+    have stored an entry for 'Bob DeLong,' when we store an entry for 'BOB DELONG,' the <i>value</i> is
+    overwritten, but the <i>key</i> remains as 'Bob DeLong.' We'll see this demonstrated shortly.</p>
+     
+   <p>When we FETCH an entry from the hash, we use its lowercased version to look up the original 
+    key. If it's not there, we return the undefined value (an empty return). That's what you'd expect from a
+      hash lookup on a nonexistent key. Otherwise we use the original key to look up the value in the 
+    <span class="darkblue">value</span> hash. </p>
+     
+   <p>Now let's prove that the first key to get entered is the one that "sticks." Modify <b>tie_hash.pl</b> as 
+    shown:</p>
+     
+<div class="listingBox"><div class="listingTitle">CODE TO EDIT:</div><div class="listing"><pre>#!/usr/local/bin/perl
+use strict;
+use warnings;
+
+use MyCase;
+tie my %phone, 'MyCase';
+
+<ins>$phone{'Bob DeLong'} = '555-1234';</ins>
+$phone{'BOB DELONG'} = '555-4321';
+<del>$phone{'Bob DeLong'} = '555-1234';</del>
+
+print $phone{'bob delong'}, "\n";
+<ins>print keys( %phone ), "\n";</ins></pre></div></div>
+     
+   <p><img src="images/coderunner/save.gif"> Save and run it, and you'll see this:</p>
+   
+<div class="interactiveBox"><div class="interactiveTitle">INTERACTIVE TERMINAL SESSION: Command to type</div><div class="interactive"><pre>cold:~/perl4$ <ins>./tie_hash.pl</ins>
+555-4321
+Can't locate object method "FIRSTKEY" via package "MyCase" at ./tie_hash.pl line 12.</pre></div></div>
+     
+   <p>Whoops! Our tied hash class can't retrieve keys from the hash yet  
+    because it has no idea what underlying structure we've defined (or even if there <i>is</i> an underlying 
+    structure—but if you tie something to a hash, it ought to have hash-like behavior). Let's teach it 
+    how to find and enumerate the actual (not lowercased) keys we're preserving. Modify <b>MyCase.pm</b> like this:</p>
+     
+<div class="listingBox"><div class="listingTitle">CODE TO EDIT:</div><div class="listing"><pre>package MyCase;
+use strict;
+use warnings;
+
+sub TIEHASH
+{
+  return bless { original_key =&gt; {}, value =&gt; {} }, shift;
+}
+
+sub FETCH
+{
+  my ($self, $key) = @_;
+
+  my $original_key = $self-&gt;{original_key}{lc $key} or return;
+  return $self-&gt;{value}{$original_key};
+}
+
+
+sub STORE
+{
+  my ($self, $key, $value) = @_;
+
+  my $store_key = lc $key;
+  my $actual_key = $key;
+  if ( exists $self-&gt;{original_key}{$store_key} )
+  {
+    $actual_key = $self-&gt;{original_key}{$store_key};
+  }
+  else
+  {
+    $self-&gt;{original_key}{$store_key} = $key;
+  }
+  return $self-&gt;{value}{$actual_key} = $value;
+}
+
+<ins>sub FIRSTKEY
+{
+  my $self = shift;
+  
+  keys %{ $self-&gt;{value} };  # Reset hash iterator
+  return $self-&gt;NEXTKEY;
+}
+
+
+sub NEXTKEY
+{
+  my $self = shift;
+  
+  return scalar each %{ $self-&gt;{value} };
+}
+
+</ins>1;
+</pre></div></div>
+     
+   <p>The FIRSTKEY method is required to return whatever your tied object class wants to pretend is the first key in the  
+    hash the user has tied. Then the NEXTKEY  method is called repeatedly to return the next key until there are none left, 
+    at which point it must return <b>undef</b>. The order is up to you. Since this time there actually is a hash underlying 
+    this tied variable, we  
+    just perform the Perl equivalent of FIRSTKEY and NEXTKEY on it.  The <span class="darkgreen">each</span> function in a 
+    scalar context is a hash iterator. We can ensure that we go back to the "beginning" of the hash by calling 
+    the <span class="darkgreen">keys</span> function (see <b>perldoc -f each</b>). (Hash keys have no 
+    predictable order, but if you iterate through them, you'll encounter them one at a time.)</p>
+     
+   <p>Now rerun the program as shown:</p>
+   
+<div class="interactiveBox"><div class="interactiveTitle">INTERACTIVE TERMINAL SESSION: Command to type</div><div class="interactive"><pre>cold:~/perl4$<ins> ./tie_hash.pl</ins>
+555-4321
+Bob DeLong
+</pre></div></div>
+   <p>Now it prints out the key.</p>
+  </div></div>
+ </div>
+ <a href="Perl4-07.html" name="date_persistence"></a> 
+ <a name="h_02"></a><div class="heading">Data Persistence</div><div class="headingText">
+   
+  <p><i>Persistence</i> refers to data structures that exist beyond the lifetime of a 
+   program that uses them. You've already implemented persistence in 
+   programs that wrote data to a file that it then read back in the next time it was run. Usually, though, we 
+   reserve the term "persistence" for when we store a complex data structure to a file (called <i>freezing</i> 
+   or <i>serializing</i>) and later retrieve it (called <i>thawing</i> or <i>deserializing</i>) with simple 
+   statements that don't involve writing parsing code or designing a file format.</p>
+  
+  <a name="s_01"></a><div id="s_01"><div class="subheading">Persistence Through Tieing to DBM::Deep</div><div class="subheadingText">
+   
+   <p>Perl supplies many modules for implementing persistence, some in the core, and some through CPAN. If 
+    you just want to serialize a simple hash (one which contains no references in its values), you can use the module 
+    DB_File that comes with Perl. You can serialize 
+    any value in Perl with the Dumper method of Data::Dumper, although the result is a bit lengthy. We're 
+    going to use the modern CPAN module DBM::Deep, because it can persist hierarchical data structures, so we 
+    don't have to worry about whether there are references in our data. </p>
+   
+   
+   <p>We are going to install some modules that want to be built with the modern Module::Build 
+    tool rather than <b>make</b>, but sometimes that leads to problems that more of a headache than we want to
+    deal with right now, so we will tell <b>cpan</b> to use only <b>make</b>:</p>
+   
+<div class="interactiveBox"><div class="interactiveTitle">INTERACTIVE TERMINAL SESSION: Commands to type</div><div class="interactive"><pre>cold:~/perl4$ <ins>cpan</ins>
+<u>cpan[1]&gt;</u> <ins>o conf prefer_installer EUMM</ins>
+[output omitted]
+<u>cpan[2]&gt;</u> <ins>o conf commit</ins>
+[output omitted]
+<u>cpan[3]&gt;</u> <ins>q</ins>
+</pre></div></div>
+   
+   <p>We're going install the module DBM::Deep, but first we'll install the YAML module to reduce the 
+    volume of output during cpan installations:</p>
+   
+<div class="interactiveBox"><div class="interactiveTitle">INTERACTIVE TERMINAL SESSION: Command to type</div><div class="interactive"><pre>cold:~/perl4$ <ins>PERL5LIB=~/mylib/lib/perl5 cpan YAML</ins>
+[output omitted]
+cold:~/perl4$ <ins>PERL5LIB=~/mylib/lib/perl5 cpan DBM::Deep</ins>
+[output omitted]
+Run the long-running tests [n ] <ins>(press <b>Enter</b>)</ins>
+[output omitted]
+/usr/bin/make install  -- OK
+</pre></div></div>
+   
+   <p>You'll be asked several times during that dialogue whether you want to install a certain module 
+    permanently. Press <b>Enter</b> to accept the default 
+    answer of 'yes' every time.</p>
+   
+   <p>Now let's create a program that ties a hash to a file.  Create a new Perl file <b>/perl4/tie_dbm.pl</b> as shown:</p>
+   
+<div class="listingBox"><div class="listingTitle">CODE TO ENTER:</div><div class="listing"><pre>#!/usr/local/bin/perl
+use strict;
+use warnings;
+
+use lib qw(<i>your_home_directory</i>/mylib/lib/perl5);
+use DBM::Deep;
+
+tie my %inventory, 'DBM::Deep', { file =&gt; 'store.data' };
+
+print "Current inventory:\n";
+print "$_: $inventory{$_}\n" for sort keys %inventory;
+
+my ($what, $number);
+{
+  print "\nEnter a new item and count (e.g. 'Russian Fleas 400'): ";
+  chomp ($_ = &lt;STDIN&gt;);
+  ($what, $number) = /(.*)\D(\d+)\s*\z/ or redo;
+}
+$inventory{$what} = $number;
+
+</pre></div></div>
+   
+   <p><img src="images/coderunner/save.gif"> Save it as <b>/perl4/tie_dbm.pl</b>. In the exchange below, 
+    you can see how the contents of the hash %inventory change from one run of the program to the next:</p>
+   
+<div class="interactiveBox"><div class="interactiveTitle">INTERACTIVE TERMINAL SESSION: Commands to type</div><div class="interactive"><pre>cold:~/perl4$ <ins>./tie_dbm.pl</ins>
+Current inventory:
+Enter a new item and count (e.g. 'Russian Fleas 400'): <ins>Spanish Flies 760</ins>
+
+cold:~/perl4$ <ins>./tie_dbm.pl</ins>
+Current inventory:
+Spanish Flies: 760
+
+Enter a new item and count (e.g. 'Russian Fleas 400'): <ins>French Ants 200</ins>
+
+cold:~/perl4$ <ins>./tie_dbm.pl</ins>
+Current inventory:
+French Ants: 200
+Spanish Flies: 760
+
+Enter a new item and count (e.g. 'Russian Fleas 400'): <ins>German Bees 827</ins>
+
+cold:~/perl4$ <ins>file store.data</ins> 
+store.data: data
+</pre></div></div>
+   
+   <p>In the final command, the <b>store.data</b> file has been created (you can also see it in 
+    your <b>/perl4</b> folder in the CodeRunner File Browser). It contains a binary representation of the hash. 
+    The format of this file is unimportant; think of it as a "black box." All you need to know is that 
+    DBM::Deep writes it and DBM::Deep reads it.</p>
+ 
+  </div></div>
+  <a name="s_02"></a><div id="s_02"><div class="subheading">A Persistent BankAccount</div><div class="subheadingText">
+   
+   <p>For our final example of persistence, we'll illustrate an advanced object-oriented Moose technique. 
+    We'll make bank accounts persistent so that whenever we run our program, it will save the state of each 
+    account to a file and then, when it's run again, it will load the account state (including the latest balance) from that 
+    file.</p>
+     
+   <p>Moose objects are hash references, so we want to tie the hash pointed to by each account object to 
+    DBM::Deep. We will do the tieing in BankAccount, so that CheckingAccount and SavingsAccount objects inherit 
+    the behavior. Those classes won't have to change at all. Object-oriented programming can 
+    save programmers like us lots of time! We're about to make all kinds of bank accounts persistent and the derived 
+    classes don't even have to know that we're doing it!</p>
+     
+   <p>But where should we do the <b>tie</b>?  It should happen as soon as the object is created, but we don't 
+    have a constructor in BankAccount: fortunately, Moose takes care of that for us. Moose provides special
+    methods that we can implement to hook into its constructor. See 
+    [PERL5LIB=~/mylib/lib/perl5 perldoc Moose::Manual::Construction] or 
+    <a href="http://search.cpan.org/perldoc?Moose::Manual::Construction" target="_blank">http://search.cpan.org/perldoc?Moose::Manual::Construction</a>. We're going to implement the 
+    BUILD hook.</p>
+     
+   <p>Use the usebank.pl, SavingsAccount.pm ,and CheckingAccount.pm from the previous lesson's 
+    homework—or, if you prefer, extract from the file <b>Banking.tar.gz</b>. Create this modified version of 
+    <b>BankAccount.pm</b> (the changes are highlighted):</p>
+
+<div class="listingBox"><div class="listingTitle">CODE TO ENTER:</div><div class="listing"><pre>package BankAccount;
+
+use Moose;
+
+has account_number =&gt; ( isa =&gt; 'Int', is =&gt; 'ro',
+                       default =&gt; \&amp;next_acctno );
+has transactions   =&gt; ( isa =&gt; 'ArrayRef[Str]', is =&gt; 'rw',
+                        default =&gt; sub { [] } );
+has balance        =&gt; ( isa =&gt; 'Num', is =&gt; 'rw' );
+
+use POSIX qw(strftime);
+
+<ins>use DBM::Deep;</ins>
+
+{
+  my $NEXT_ACCTNO = 10001;
+
+  sub next_acctno
+  {
+    return $NEXT_ACCTNO++;
+  }
+}
+
+<ins>
+sub BUILD
+{
+  my $self = shift;
+  
+  my $acct = $self-&gt;account_number;
+  my %data = %$self;
+  tie %$self, 'DBM::Deep', { file =&gt; "account.$acct" };
+  %$self = %data unless %$self;
+}
+</ins>
+
+sub transact
+{
+  my ($self, $type, $amount) = @_;
+
+  my $balance = $self-&gt;balance( $self-&gt;balance + $amount );
+  my %transaction = ( date =&gt; time, type =&gt; $type, amount =&gt; $amount,
+                      balance =&gt; $balance );
+  push @{ $self-&gt;transactions }, \%transaction;
+}
+
+
+sub debit
+{
+  my ($self, $amount) = @_;
+
+  $self-&gt;transact( debit =&gt; -$amount );
+}
+
+
+sub credit
+{
+  my ($self, $amount) = @_;
+
+  $self-&gt;transact( credit =&gt; $amount );
+}
+
+
+sub transfer
+{
+  my ($self, $amount, $target_account) = @_;
+
+  my $message = "Transfer to " . $target_account-&gt;account_number;
+  $self-&gt;transact( $message, -$amount );
+  $message = "Transfer from " . $self-&gt;account_number;
+  $target_account-&gt;transact( $message, $amount );
+}
+
+
+sub statement
+{
+  my $self = shift;
+
+  my $str = "Statement for account " . $self-&gt;account_number . ":\n";
+  for my $trans ( @{ $self-&gt;transactions } )
+  {
+    my ($time, $type, $amount, $balance)
+       = @{$trans}{qw(date type amount balance)};
+    $_ = sprintf '%.2f', $_ for ($amount, $balance);
+    $str .= strftime( "%d-%b-%Y", localtime $time )
+         . "\t$type\t$amount\t$balance\n";
+  }
+  $self-&gt;transactions( [] );
+  return $str;
+}
+
+1;</pre></div></div>
+     
+   <p>If you're working with the version of <b>usebank.pl</b> supplied in the tarball, be sure to change 
+    <i>your_home_directory</i> to your actual home directory. Save and run <b>usebank.pl</b> a couple of times and you 
+    will see:</p>
+   
+<div class="interactiveBox"><div class="interactiveTitle">INTERACTIVE TERMINAL SESSION: Commands to type</div><div class="interactive"><pre>cold:~/perl4$ <ins>./usebank.pl</ins>
+Statement for account 10001:
+24-Apr-2011     Check #101 to Greenpeace        -250.00 750.00
+24-Apr-2011     Check #102 to O'Reilly  -395.00 355.00
+24-Apr-2011     Transfer to 10002       -100.00 255.00
+
+Statement for account 10002:
+24-Apr-2011     Transfer from 10001     100.00  5100.00
+24-Apr-2011     Interest at 1.5%        76.00   5176.50
+
+cold:~/perl4$ <ins>./usebank.pl</ins>
+Statement for account 10001:
+24-Apr-2011     Check #103 to Greenpeace        -250.00 5.00
+24-Apr-2011     Check #104 to O'Reilly  -395.00 -390.00
+24-Apr-2011     Transfer to 10002       -100.00 -490.00
+
+Statement for account 10002:
+24-Apr-2011     Transfer from 10001     100.00  5276.50
+24-Apr-2011     Interest at 1.5%        79.00   5355.65
+
+cold:~/perl4$ <ins>file account*</ins>
+account.10001: data
+account.10002: data
+</pre></div></div>
+     
+   <p>See how the account files got created? And do you see how the behavior changed from one run of <b>usebank.pl</b> 
+    to the next because on the second run, each account was starting from the place it left off at the end of 
+    the first run? Now let's go over the BUILD method:</p>
+   
+<div class="observeBox"><div class="observeTitle">OBSERVE: BUILD</div><div class="observe"><pre>sub BUILD
+{
+  my <span class="darkred">$self</span> = shift;
+  
+  my $acct = <span class="darkred">$self</span>-&gt;account_number;
+  my <span class="darkblue">%data</span> = %<span class="darkred">$self</span>;
+  tie %<span class="darkred">$self</span>, 'DBM::Deep', { file =&gt; "account.$acct" };
+  %<span class="darkred">$self</span> = <span class="darkblue">%data</span> unless %<span class="darkred">$self</span>;
+}</pre></div></div>
+     
+   <p>Moose calls BUILD right after object construction, so <span class="darkred">$self</span> is the new BankAccount (or 
+    CheckingAccount, or SavingsAccount), which is a reference to a hash. We extract the account number so we 
+    can use it in the data file. Then we save the initial state of the account in <span class="darkblue">%data</span>: 
+    this will include the balance, and other such pieces of information that were specified in the call to <b>new()</b>.  
+    The tie will cause the hash to "forget" any values that were stored in it; tieing a variable 
+    clears its contents. Then we restore the contents we saved to the newly-tied variable, <i>unless</i> that 
+    newly-tied variable contains actual data, which means that it has read something in from a file. This will 
+    cause it to ignore any data specified in the constructor. (By the way, this really isn't a great user interface for a bank 
+    account, but it works well as an example for our purposes.)</p>
+     
+   <p>When the program exits, as the account goes out of scope, Perl will untie it and DBM::Deep will ensure that 
+    the buffers for the corresponding data file are flushed (which means all accumulated characters are transmitted to the file). </p>
+ 
+  </div></div>
+  <br><br><br><br>
+   
+  <p>There are almost always better ways to solve a given problem that do not involve tieing; usually that better solution involves 
+   objects. The 
+   hash tied to a database is a notable exception. </p>
+  
+  <p>But a tied variable may be the <i>only</i> solution when you're passing variables to 
+   code that isn't yours. Suppose you need functionality that isn't provided by that code? You can't pass in an 
+   object, because the code expects to see a scalar (or an array, or a hash). Rather than make a copy of that 
+   code so you can modify it (which introduces maintenance problems), you can pass in a tied variable and then 
+   make it do whatever you want. </p>
+  
+  <p>Good work! I am resisting the urge to make a pun about your persistence. (You're welcome.) See you in the next lesson!</p>
+   
+ </div>
+
+ <p>Once you finish the lesson, go back to the syllabus to complete the homework.</p>
+   
+<div class="footer"><div id="timeSurvey"></div>				
+				Copyright © 1998-2014 O'Reilly Media, Inc.<br><img src="https://courses.oreillyschool.com/common/cclicense.png"><br>
+				This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 Unported License.<br>
+				See <a href="http://creativecommons.org/licenses/by-sa/3.0/legalcode">http://creativecommons.org/licenses/by-sa/3.0/legalcode</a> 
+				for more information.
+				</div><iframe id="t" width="1" height="1" border="0" style="display:none"></iframe><script language="javascript">bodyLoaded();</script><script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+  ga('create', 'UA-44720547-1', 'oreillyschool.com');
+  ga('send', 'pageview');
+</script></body></html>

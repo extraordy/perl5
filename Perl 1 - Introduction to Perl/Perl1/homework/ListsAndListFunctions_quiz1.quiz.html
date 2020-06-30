@@ -1,0 +1,90 @@
+<html>
+   <!-- Copyright (c) 1998-2014 O'Reilly Media, Inc. Unauthorized use is strictly
+                prohibited. None of this code or content can by copied without the express written
+                permission from O'Reilly Media, Inc. -->
+   <head>
+      <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+      <link rel="stylesheet" type="text/css" href="http://archive.oreilly.com/oreillyschool/courses/Perl1/common/Lab.css">
+      <title>Properties - Quiz 1</title>
+   </head>
+   <body id="body">
+      <h2>Properties - Quiz 1</h2> 
+      
+      
+      
+      
+      <p>John Q. Programmer wanted to print out a line with three strings separated by asterisks, and so he wrote:</p>
+      
+      
+      <div class="observeBox">
+         <div class="observeTitle">Observe:</div>
+         <div class="observe"><pre>print join '*', 'a', 'b', 'c', "\n";</pre></div>
+      </div>
+      
+      
+      <p>What's wrong with that code and how would you fix it?</p>
+      
+        
+      
+      
+      <p>The reason this is an "error" is that the developer probably did not want <b>a*b*c*\n</b>; rather they wanted 
+         <b>a*b*c\n</b> (without the extra * between c and \n).
+      </p>
+      
+      
+      <div class="observeBox">
+         <div class="observeTitle">Observe:</div>
+         <div class="observe"><pre>print join('*', 'a', 'b', 'c'), "\n";</pre></div>
+      </div>
+      
+      
+      <p>If the student has split up the list by saving off $string as the join of a,b,c and then prints "$string\n", inform them that
+         
+         while this does address the issue there is a simpler way that only requires the use of two additional characters in the 
+         example code.
+      </p>
+      
+      
+      <p>Note that this will not work: print (join '*', 'a', 'b', 'c'), "\n";</p>
+      
+      
+      <p><b>Grading Criteria:</b> Student should demonstrate knowledge of the join statement.</p>
+      
+      
+      
+      
+      
+      
+      <p>In the statement:</p>
+      
+      
+      <div class="observeBox">
+         <div class="observeTitle">Observe:</div>
+         <div class="observe"><pre>($x, $y, $z) = (1, 2);</pre></div>
+      </div>
+      
+      
+      <p>What does <b>$z</b> get set to?</p>
+      
+      
+      
+      
+      <div class="observeBox">
+         <div class="observeTitle">Observe:</div>
+         <div class="observe"><pre>undef</pre></div>
+      </div>
+      
+      
+      <p>Other common answers that define the same concept are: Uninitialized, Null, and Nil. If these are given, tell the student
+         
+         that they are correct but in Perl we call this concept undef.
+      </p>
+      
+      
+      <p><b>Grading Criteria:</b> Student should demonstrate understanding of how an empty value in a list is handled.</p>
+      
+      
+      
+      
+   </body>
+</html>

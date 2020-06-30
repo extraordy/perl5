@@ -1,0 +1,439 @@
+<html><!-- Copyright (c) 1998-2014 O'Reilly Media, Inc.
+			This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 Unported License.
+			See http://creativecommons.org/licenses/by-sa/3.0/legalcode for more information.
+            --><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"><link rel="stylesheet" type="text/css" href="../common/Lab.css"><script type="text/javascript" src="../common/Lab.js"></script><script language="javascript"></script><title>Grouping, Alternation, and Complete Parsing</title></head><body id="body"><a name="top"></a><div class="title">Grouping, Alternation, and Complete Parsing</div><div class="resize"><a href="Perl2-08.html#top" onclick="changeSize('smaller');" class="aS" title="Keep clicking to make fonts smaller">A</a><a href="Perl2-08.html#top" onclick="changeSize('larger');" class="aL" title="Keep clikcing to make fonts larger">A</a><a href="Perl2-08.html#top" onclick="lv()" class="lv" title="Adjust Page for High Contrast">HC</a><div id="fh"><p>Click on <span class="aS">A</span> to make all fonts on the page smaller.</p><p>Click on <span class="aL">A</span> to make all fonts on the page larger.</p><p>Click on <span class="lv">HC</span> to toggle high contrast mode. When you move your mouse over 
+                 some bold words in high contrast mode, related words are automatically highlighted. Text is shown
+                 in black and white. 
+             </p></div></div><hr>
+ 
+ <div class="goalTitle">Lesson Objectives</div><div class="goals">
+  
+  
+  When you complete this lesson, you will be able to:
+  
+  <ul><li>use <span class="red">$_</span> with regexes.</li><li><i>group</i> (how to 
+    treat several atoms as though they were a single atom.</li><li>use alternation (to match one of several choices).</li><li>parse with regexes.</li></ul>
+ </div><hr>
+ 
+  <p>Hi and welcome back! In this lesson, you'll learn about using <span class="red">$_</span> with regexes, <i>grouping</i> (how to 
+   treat several atoms as though they were a single atom; you'd think the term for this would be "molecule," 
+   but it isn't), and alternation (how to match one of several choices). Then we'll try some examples 
+   of parsing with regexes.</p>
+  
+  <a name="h_01"></a><div class="heading">$_ and regexes</div><div class="headingText">
+   
+   <p>Our previous examples have been more long-winded than they needed to be. So far we've always matched a regex against 
+    an explicitly named input using the binding operator (<span class="blue">=~</span>). But there is a default 
+    variable available for regex matching—no prizes for guessing what it is! When you have a regex that is not 
+    bound to any variable via <span class="blue">=~</span>, it will match against <span class="red">$_</span>. We introduced 
+    regexes in the course by incorporating a hypothetical function called <span class="darkgreen">regmatch</span>. When 
+    you call <span class="darkgreen">regmatch</span> with only one argument, <b>regmatch( $regex )</b>, 
+    instead of two, <b>regmatch( $regex, $input )</b>, it's as though <span class="red">$_</span> is the second argument, 
+    <b>regmatch( $regex, $_ )</b>.</p>
+   
+   <p>What does that look like?  Let's do an example! Copy <span class="darkred">reg_capture4.pl</span> from the 
+    previous lesson and modify it:</p>
+   
+<div class="listingBox"><div class="listingTitle">CODE TO EDIT: reg_capture4.pl</div><div class="listing"><pre>
+#!/usr/bin/perl
+use strict;
+use warnings;
+
+<del>while ( my $line = &lt;DATA&gt; )
+{
+  chomp $line;
+  if ( $line =~ /(.*),\s+(\w\w)\s+(\d{5})/ )</del>
+<ins>while ( $_ = &lt;DATA&gt; )
+{
+  chomp;
+  if ( /(.*),\s+(\w\w)\s+(\d{5})/ )</ins>
+  {
+    my ($city, $state, $zip) = ($1, $2, $3);
+    printf "City: %-20s; State: $state; Zip: $zip\n", $city;
+  }
+}
+
+__END__
+O'Reilly School of Technology
+1005 Gravenstein Highway
+Sebastopol, CA 95472
+
+O'Reilly Media
+10 Fawcett Street
+Cambridge, MA  02138
+
+PSDT
+136 E. 8th Street #232
+Port Angeles, WA 98362
+</pre></div></div>
+   
+   <p><img src="images/coderunner/checksyntax.JPG">, saving it as <b>reg_capture5.pl</b>. Then, run it to 
+    make sure it produces the same output as before:</p>
+   
+<div class="interactiveBox"><div class="interactiveTitle">INTERACTIVE TERMINAL SESSION:</div><div class="interactive"><pre>cold:~$ <ins>cd perl2</ins>
+cold:~/perl2$ <ins>./reg_capture5.pl</ins>
+City: Sebastopol          ; State: CA; Zip: 95472
+City: Cambridge           ; State: MA; Zip: 02138
+City: Port Angeles        ; State: WA; Zip: 98362
+cold:~/perl2$ 
+</pre></div></div>
+   
+   <p>Again, we don't declare <span class="red">$_</span> with <span class="purple">my</span>; it doesn't belong to us, it 
+    belongs to Perl. And the default variable for 
+    <span class="darkgreen">chomp()</span> is <span class="red">$_</span>.</p>
+   
+   <p>We'll make even better use of <span class="red">$_</span> as we proceed in this lesson.</p>
+  
+  </div>
+  <a name="h_02"></a><div class="heading">Groups</div><div class="headingText">
+   
+   <p>One problem we've run into when applying quantifiers is that we can only apply them to something that 
+    matches a single character. When I introduced the <span class="orange">?</span> quantifier with the example 
+    <span class="orange">apples?</span>, you may have thought, "Hmm, there are lots of plural forms that won't be able to use this quantifier. What about 
+    words that are made plural by adding 'es'?"</p>
+   
+   <p>Fortunately, capturing parentheses have a helpful side-effect that we can take advantage of here. They <i>group</i> 
+    everything between them so that it effectively becomes an atom. That means that if you put a quantifier 
+    after a parenthesis group, it applies to everything in the group. So to match <span class="orange">"wrench"</span>
+    or its plural, you can write <span class="orange">/wrench(es)?/</span> (or, if you also want to match serving maids, 
+    <span class="orange">/wr?ench(es)?/</span>).</p>
+   
+   <p>There's one disadvantage here though. If we are capturing parts of the input to use in <span class="red">$1</span> or some other quantifier as well, 
+    then introducing a parenthesis group solely for the purpose of forming an atom to be quantified, will
+    throw off our counting: <span class="red">$1</span> may become <span class="red">$2</span>, for instance. We need 
+    <i>noncapturing</i> parentheses: parentheses that will form a group, but not capture to a numbered variable. Perl 
+    does have them, but they look a bit weird. After the opening parenthesis we have to add <span class="orange">?:</span>, like 
+    this: </p>
+   
+<div class="observeBox"><div class="observeTitle">OBSERVE: noncapturing parentheses</div><div class="observe"><pre>
+<span class="orange">(?:<i>regex</i>)</span></pre></div></div>
+
+   <p>Let's try an example. Suppose you're capturing US zip codes, some of which 
+    might be five-digit codes like <span class="orange">95472</span>, and some of which might be ZIP+4 codes like 
+    <span class="orange">95472-2811</span>. Create <span class="darkred">reg_zip.pl</span> as shown:</p>
+   
+<div class="listingBox"><div class="listingTitle">CODE TO TYPE: reg_zip.pl</div><div class="listing"><pre><ins>#!/usr/bin/perl
+use strict;
+use warnings;
+
+while ( $_ = &lt;DATA&gt; )
+{
+  chomp;
+  /(\d{5}(?:-\d{4})?)/ and print "Found zip: $1\n";
+}
+
+__END__
+O'Reilly School of Technology
+1005 Gravenstein Highway
+Sebastopol, CA 95472-2811
+
+O'Reilly Media
+10 Fawcett Street
+Cambridge, MA  02138
+
+PSDT
+136 E. 8th Street #232
+Port Angeles, WA 98362-6129</ins>
+</pre></div></div>
+   
+   <p><img src="images/coderunner/checksyntax.JPG"> and run it.  See how it finds and captures both types 
+    of zip code?  Let's dissect the regex <b><span class="red">/(\d{5}(?:-\d{4})?)/&gt;</span></b>: </p>
+   
+   <div class="c"><table class="tbl" border="" cellspacing="15" cellpadding="15"><tr><td><span class="orange">(</span></td><td>Begin a group capturing to <span class="red">$1</span></td></tr><tr><td><span class="orange">\d{5}</span></td><td>&nbsp;&nbsp;Match five digits</td></tr><tr><td><span class="orange">(?:</span></td><td>&nbsp;&nbsp;Begin a noncapturing group</td></tr><tr><td><span class="orange">-</span></td><td>&nbsp;&nbsp;&nbsp;&nbsp;Match a hyphen</td></tr><tr><td><span class="orange">\d{4}</span></td><td>&nbsp;&nbsp;&nbsp;&nbsp;Match four digits</td></tr><tr><td><span class="orange">)</span></td><td>&nbsp;&nbsp;Close noncapturing group</td></tr><tr><td><span class="orange">?</span></td><td>&nbsp;&nbsp;Quantify noncapturing group as optional</td></tr><tr><td><span class="orange">)</span></td><td>End capturing to <span class="red">$1</span></td></tr></table></div>
+   
+   <p>The inner parentheses are noncapturing, so no <span class="red">$2</span> is created. This could be especially 
+    helpful later on if we have inputs with text occurring after the zip code that we want to capture, 
+    because it makes counting the numbered capture variables easier.</p>
+    
+  </div>
+  <a name="h_03"></a><div class="heading">Alternation</div><div class="headingText">
+     
+   <p>Sometimes we want to match one thing <i>or</i> another. Suppose we want to match one of a number 
+    of fruit. We could use Perl's Boolean || operator; create <span class="darkred">reg_or.pl</span> as follows:</p>
+   
+<div class="listingBox"><div class="listingTitle">CODE TO TYPE: reg_or.pl</div><div class="listing"><pre><ins>#!/usr/bin/perl
+use strict;
+use warnings;
+
+while ( $_ = &lt;DATA&gt; )
+{
+  chomp;
+  print "Captured: $1\n" if /(apple)/ || /(banana)/ || /(cherry)/;
+}
+
+__END__
+I have apple in stock
+You are the apple of my eye
+Time flies like an arrow; fruit flies like a banana
+I have cherry in stock
+I have kiwi fruit in stock; no banana, sorry</ins></pre></div></div>
+   <p><img src="images/coderunner/checksyntax.JPG"> and run it:</p> 
+   
+<div class="interactiveBox"><div class="interactiveTitle">INTERACTIVE TERMINAL SESSION:</div><div class="interactive"><pre>cold:~/perl2$ <ins>./reg_or.pl</ins>
+Captured: apple
+Captured: apple
+Captured: banana
+Captured: cherry
+Captured: banana
+cold:~/perl2$ 
+</pre></div></div>   
+      
+   <p>This is not a bad approach, but its capabilities are limited.</p> 
+
+   <p>Suppose we wanted to match a phrase of the form "I have &lt;fruit&gt; 
+    in stock," and capture the fruit; now we have to write <span class="orange">/I have (apple) in stock/</span> 
+    <span class="blue">||</span> <span class="orange">/I have (banana) in stock/</span> <span class="blue">||</span> <span class="orange">/I have (cherry) in 
+     stock/</span>.</p> 
+   
+   <p>The repetition here makes the expression nearly unreadable. Try it in the program and see:</p>
+   
+<div class="listingBox"><div class="listingTitle">CODE TO EDIT: reg_or.pl</div><div class="listing"><pre>#!/usr/bin/perl
+use strict;
+use warnings;
+
+while ( $_ = &lt;DATA&gt; )
+{
+  chomp;
+  print "Captured: $1\n" if <del>/(apple)/ || /(banana)/ || /(cherry)/</del><ins>/I have (apple) in stock/ || /I have (banana) in stock/ || /I have (cherry) in stock/</ins>;
+}
+
+__END__
+I have apple in stock
+You are the apple of my eye
+Time flies like an arrow; fruit flies like a banana
+I have cherry in stock
+I have kiwi fruit in stock; no banana, sorry
+</pre></div></div>
+      
+   <p><img src="images/coderunner/checksyntax.JPG"> and run it:</p>
+   
+<div class="interactiveBox"><div class="interactiveTitle">INTERACTIVE TERMINAL SESSION:</div><div class="interactive"><pre>cold:~/perl2$ <ins>./reg_or.pl</ins>
+Captured: apple
+Captured: cherry
+cold:~/perl2$ 
+</pre></div></div>
+    
+   <p><div class="c"><table class="noteBox fBox pBox "><tr><td class="noteTitle">Note</td><td class="note">This also changes the regex to match against the complete phrase, "I have <i>x</i> in 
+    stock"; we find matches now on only the first and fourth lines.</td></tr></table></div></p>
+    
+   <p>Let's see how to make it easier with alternation.  Create 
+    <span class="darkred">reg_alt.pl</span> as shown:</p>
+     
+<div class="listingBox"><div class="listingTitle">CODE TO TYPE: reg_alt.pl</div><div class="listing"><pre><ins>#!/usr/bin/perl
+use strict;
+use warnings;
+
+while ( $_ = &lt;DATA&gt; )
+{
+  chomp;
+  print "Captured: $1\n" if /(apple|banana|cherry)/;
+}
+
+__END__
+I have apple in stock
+You are the apple of my eye
+Time flies like an arrow; fruit flies like a banana
+I have cherry in stock
+I have kiwi fruit in stock; no banana, sorry</ins></pre></div></div>
+     
+   <p><img src="images/coderunner/checksyntax.JPG"> and run it:</p> 
+
+<div class="interactiveBox"><div class="interactiveTitle">INTERACTIVE TERMINAL SESSION:</div><div class="interactive"><pre>cold:~/perl2$ <ins>./reg_alt.pl</ins>
+Captured: apple
+Captured: apple
+Captured: banana
+Captured: cherry
+Captured: banana
+cold:~/perl2$ 
+</pre></div></div>   
+   
+   <p>The regular expression language provides a solution with the <i>alternation</i> operator. 
+    It looks familiar; it's a single vertical bar (<span class="blue">|</span>) and it means "or."
+    Remember, this vertical bar is being used <i>inside</i> a regular expression; even though it is  
+    being used to mean "or," it's <i>not</i> the same as the boolean operator we used in <span class="darkred">reg_or.pl</span>!<br>
+   Now rewrite the program to handle the second match we were trying to make:</p>
+     
+<div class="listingBox"><div class="listingTitle">CODE TO EDIT: reg_alt.pl</div><div class="listing"><pre>#!/usr/bin/perl
+use strict;
+use warnings;
+
+while ( $_ = &lt;DATA&gt; )
+{
+  chomp;
+  print "Captured: $1\n" if <del>/(apple|banana|cherry)/</del><ins>/I have (apple|banana|cherry) in stock/</ins>;
+}
+
+__END__
+I have apple in stock
+You are the apple of my eye
+Time flies like an arrow; fruit flies like a banana
+I have cherry in stock
+I have kiwi fruit in stock; no banana, sorry
+</pre></div></div>    
+
+   <p><img src="images/coderunner/checksyntax.JPG"> and run it:</p>
+   
+<div class="interactiveBox"><div class="interactiveTitle">INTERACTIVE TERMINAL SESSION:</div><div class="interactive"><pre>cold:~/perl2$ <ins>./reg_alt.pl</ins>
+Captured: apple
+Captured: cherry
+cold:~/perl2$ 
+</pre></div></div>
+    
+   <p>Our examples show that the <i>scope</i> of the alternation operator is to the nearest enclosing parentheses, or the edges of 
+    the regex if there are no enclosing parentheses.</p>
+     
+   <p>If we didn't have the <span class="orange">\b</span> anchor available to us, we might rewrite
+      <span class="orange">/\b\d{5}\b/</span> as <span class="orange">/(?:\A\d{5}\D\D|\d{5}\z|\A\d{5}\z)/</span>. But
+      I think you'll agree that <span class="orange">\b</span> is a lot better!</p>
+     
+   <p>Let's do another example.  Create <span class="darkred">reg_alternate.pl</span> as shown:</p>
+     
+<div class="listingBox"><div class="listingTitle">CODE TO TYPE: reg_alternate.pl</div><div class="listing"><pre><ins>#!/usr/bin/perl
+use strict;
+use warnings;
+
+while ( $_ = &lt;DATA&gt; )
+{
+  chomp;
+  /\b(\S+berr(?:y|ies))/ and print "Enfruitened: $1\n";
+}
+
+__END__
+We have strawberries,
+and "whateverberries,"
+and a giant gooseberry
+on a big plate with a lingonberry pie!
+</ins></pre></div></div>
+     
+   <p><img src="images/coderunner/checksyntax.JPG"> and run it.</p> 
+
+<div class="interactiveBox"><div class="interactiveTitle">INTERACTIVE TERMINAL SESSION:</div><div class="interactive"><pre>cold:~/perl2$ <ins>./reg_alternate.pl</ins>
+Enfruitened: strawberries
+Enfruitened: whateverberries
+Enfruitened: gooseberry
+Enfruitened: lingonberry
+cold:~/perl2$ 
+</pre></div></div>   
+   
+   <p>The inner parenthesis group in the 
+    regex—<span class="orange">(?:y|ies)</span>—does not <i>need</i> to be noncapturing (take out the 
+    <span class="orange">?:</span> and rerun the program and see for yourself). But it is  
+    good <i>practice</i> to make sure you <i>never</i> use capturing parentheses, unless you use the numbered variable that 
+    is created. Many programmers, upon reading a regex and encountering a capturing group, automatically 
+   look for the use of the corresponding numbered variable and become frustrated if they don't find 
+    it.</p>
+     
+   <p><div class="c"><table class="noteBox fBox pBox "><tr><td class="noteTitle">WARNING</td><td class="note">Perl tests alternation possibilities from left to right, and stops at the first 
+    match. If a later alternative would produce a longer match, it won't be found after an earlier 
+    match has already succeeded. So the regex <span class="orange">/\d{5}|\d{5}-\d{4}/</span> would <i>never</i> match a 
+    ZIP+4 zip code, because the first alternative (<span class="orange">\d{5}</span>) will always succeed first. Switch 
+    the order of the alternatives!</td></tr></table></div></p>
+  
+  </div>
+  <a name="h_04"></a><div class="heading">Complete Parsing</div><div class="headingText">
+    
+   <p>Now we'll use your new regex skills to parse text files with some of Perl's most common
+     idioms. </p>
+   
+   <p><b>$_ and &lt;&gt;</b> Remember the programmer's motto: Don't Repeat Yourself. You've already seen
+    code in these forms:</p>
+    
+   <div class="observeBox"><div class="observeTitle">OBSERVE: line input idiom</div><div class="observe"><pre>
+<span class="purple">while</span> ( <span class="darkgreen">defined</span>( <span class="purple">my</span> <span class="red">$line</span> = &lt;DATA&gt; ) )
+<span class="purple">while</span> ( <span class="darkgreen">defined</span>( <span class="red">$_</span> = &lt;DATA&gt; ) )
+</pre></div></div>
+    
+   <p> And we've learned that this code can be shortened using a special case of the <span class="purple">while</span> statement. 
+    If the condition contains an assignment from the readline operator, then Perl will 
+    <i>implicitly</i> wrap the assignment in <span class="darkgreen">defined()</span> for you. So you can write the 
+    lines above like this:</p>
+   
+   <div class="observeBox"><div class="observeTitle">OBSERVE: line input idiom</div><div class="observe"><pre>
+<span class="purple">while</span> ( <span class="purple">my</span> <span class="red">$line</span> = &lt;DATA&gt; )
+<span class="purple">while</span> ( <span class="red">$_</span> = &lt;DATA&gt; )
+</pre></div></div>
+    
+   <p>But wait—it gets better! If there is a readline operator, but <i>no</i> assignment to a variable, Perl 
+    will <i>implicitly</i> assign to <span class="red">$_</span> for you. So the second line above can be written just 
+    like this:</p>
+    
+   <div class="observeBox"><div class="observeTitle">OBSERVE: line input idiom</div><div class="observe"><pre>
+<span class="purple">while</span> ( &lt;DATA&gt; )
+</pre></div></div>
+    
+   <p>Now <i>that's</i> succinct. And it applies to the use of the readline operator on <i>any</i>
+     filehandle, including the magic behavior with <i>no</i> filehandle:</p>
+    
+   <div class="observeBox"><div class="observeTitle">OBSERVE: line input idiom</div><div class="observe"><pre>
+<span class="purple">while</span> ( &lt;&gt; )
+</pre></div></div>
+    
+   <p>A <i>very</i> common pattern in Perl programs is: </p>
+    
+   <div class="observeBox"><div class="observeTitle">OBSERVE: Perl filter pattern</div><div class="observe"><pre>
+<span class="purple">while</span> ( &lt;&gt; )
+{
+  <span class="darkgreen">chomp;</span>
+  <span class="purple">if</span> ( <span class="orange">/<i>regex</i>/</span> )
+   {
+     # Do something with match
+   }
+}
+</pre></div></div>
+    
+   <p>Let's try an example. Create <span class="darkred">grep.pl</span> as show:</p>
+   
+<div class="listingBox"><div class="listingTitle">CODE TO TYPE: grep.pl</div><div class="listing"><pre><ins>#!/usr/bin/perl
+use strict;
+use warnings;
+
+my $regex = shift;
+
+while ( &lt;&gt; )
+{
+  print if /$regex/;
+}
+</ins></pre></div></div>
+    
+   <p>Our examples are getting <i>shorter</i>. That is very cool.</p> 
+   
+   <p><img src="images/coderunner/checksyntax.JPG"> and run it.  This is the world's shortest 
+    implementation of the famous Unix <i>grep</i> program. You have <i>grep</i> available in your shell; try 
+    it out if you're not already familiar with it:</p>
+    
+<div class="interactiveBox"><div class="interactiveTitle">INTERACTIVE TERMINAL SESSION:</div><div class="interactive"><pre>cold:~/perl2$ <ins>grep perl ./*.pl</ins>
+</pre></div></div>
+    
+   <p>This is the synopsis of how to run our version:</p>
+  
+<div class="observeBox"><div class="observeTitle">OBSERVE: invocation</div><div class="observe"><pre>
+./grep.pl <i>regex</i> <i>files</i>
+</pre></div></div>
+    
+   <p>The first argument is the regex to match and the remaining arguments are the search files (omit them if 
+    you want to search standard input, for instance, if this is part of a shell pipeline). Okay, now try this:</p>
+    
+<div class="interactiveBox"><div class="interactiveTitle">INTERACTIVE TERMINAL SESSION:</div><div class="interactive"><pre>cold:~/perl2$ <ins>./grep.pl '\bw\w' ./*.pl</ins>
+</pre></div></div>
+    
+   <p>It prints lines from the code we've entered in this lesson that contain words
+     starting with "w."  Have fun and experiment with other regexes!</p>
+     
+  </div>
+ <br><br><br><br> 
+  <p>Once you finish this lesson, go back to the syllabus page by clicking on the page tab above and do
+   the assignments.</p>
+ 
+<div class="footer"><div id="timeSurvey"></div>				
+				Copyright © 1998-2014 O'Reilly Media, Inc.<br><img src="https://courses.oreillyschool.com/common/cclicense.png"><br>
+				This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 Unported License.<br>
+				See <a href="http://creativecommons.org/licenses/by-sa/3.0/legalcode">http://creativecommons.org/licenses/by-sa/3.0/legalcode</a> 
+				for more information.
+				</div><iframe id="t" width="1" height="1" border="0" style="display:none"></iframe><script language="javascript">bodyLoaded();</script><script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+  ga('create', 'UA-44720547-1', 'oreillyschool.com');
+  ga('send', 'pageview');
+</script></body></html>

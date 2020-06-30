@@ -1,0 +1,348 @@
+<html><!-- Copyright (c) 1998-2014 O'Reilly Media, Inc.
+			This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 Unported License.
+			See http://creativecommons.org/licenses/by-sa/3.0/legalcode for more information.
+            --><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"><link rel="stylesheet" type="text/css" href="../common/Lab.css"><script type="text/javascript" src="../common/Lab.js"></script><script language="javascript"></script><title>Hashes of Hashes</title></head><body id="body"><a name="top"></a><div class="title">Hashes of Hashes</div><div class="resize"><a href="Perl3-10.html#top" onclick="changeSize('smaller');" class="aS" title="Keep clicking to make fonts smaller">A</a><a href="Perl3-10.html#top" onclick="changeSize('larger');" class="aL" title="Keep clikcing to make fonts larger">A</a><a href="Perl3-10.html#top" onclick="lv()" class="lv" title="Adjust Page for High Contrast">HC</a><div id="fh"><p>Click on <span class="aS">A</span> to make all fonts on the page smaller.</p><p>Click on <span class="aL">A</span> to make all fonts on the page larger.</p><p>Click on <span class="lv">HC</span> to toggle high contrast mode. When you move your mouse over 
+                 some bold words in high contrast mode, related words are automatically highlighted. Text is shown
+                 in black and white. 
+             </p></div></div><hr>
+ 
+ <div class="goalTitle">Lesson Objectives</div><div class="goals"> 
+  
+  When you complete this lesson, you will be able to:
+  <ul><li><a href="Perl3-10.html#representing_data_with_hashes_of_hashes">Represent Data with Hashes of Hashes</a>.</li><li>explain and use <a href="Perl3-10.html#autovivification">Autovivification</a>.</li></ul>
+ </div><hr>
+ 
+ <p>Welcome back!</p>
+ 
+
+ 
+ <a href="Perl3-10.html" name="representing_data_with_hashes_of_hashes"></a>
+ <a name="h_01"></a><div class="heading">Representing Data with Hashes of Hashes</div><div class="headingText">
+ 
+  <p>In this lesson, we will look at how hashes of hashes can be used to represent data in the same way
+   that a relational database does.</p>
+ 
+  <p>We've used hashes before to store data in much the same way that a table stores data in a relational 
+   database. For example, a table of names of US states with their abbreviations would look like this:</p>
+
+  <div class="c"><table class="tbl" border=""><tr><th>Abbreviation</th><th>Name</th></tr><tr><td>AK</td><td>Alaska</td></tr><tr><td>AL</td><td>Alabama</td></tr><tr><td>AR</td><td>Arkansas</td></tr><tr><td>...</td><td>...</td></tr></table></div>
+  
+  <p>And a hash of that data could be defined like this:</p>
+  
+<div class="observeBox"><div class="observeTitle">OBSERVE:</div><div class="observe"><pre>%name = ( AK =&gt; 'Alaska', AL =&gt; 'Alabama', AR =&gt; 'Arkansas', ...) 
+</pre></div></div>
+  
+  <p>This works fine until we encounter a table that has more than one column in addition to the primary key:</p>
+  
+  <div class="c"><table class="tbl" border=""><tr><th>Abbreviation</th><th>Name</th><th>Capital</th></tr><tr><td>AK</td><td>Alaska</td><td>Juneau</td></tr><tr><td>AL</td><td>Alabama</td><td>Montgomery</td></tr><tr><td>AR</td><td>Arkansas</td><td>Little Rock</td></tr><tr><td>...</td><td>...</td><td>...</td></tr></table></div>
+  
+  <p>In that case we need two hashes:</p>
+  
+<div class="observeBox"><div class="observeTitle">OBSERVE:</div><div class="observe"><pre>%name = ( AK =&gt; 'Alaska', AL =&gt; 'Alabama', AR =&gt; 'Arkansas', ...) 
+%capital = ( AK =&gt; 'Juneau', AL =&gt; 'Montgomery', AR =&gt; 'Little Rock', ...) 
+</pre></div></div>
+  
+  <p>I know that this is deeply unsatisfying to you. The code is repetitive and fragile, and it 
+   requires you to keep abbreviations synchronized between the two lists. 
+   And even worse, the names of the dependent columns (or attributes) are embedded not in data, but in 
+   the variable names themselves. This is the just the wrong 
+   approach. Programmers post this kind of code in forums all the time though, asking how 
+   to access a variable when another variable already contains its name. But we know better! We'll use references instead. Here's how it's 
+   done. Create <b>state_short.pl</b> in your <b>/perl3</b> folder as shown:</p>
+  
+<div class="listingBox"><div class="listingTitle">CODE TO TYPE:</div><div class="listing"><pre>#!/usr/bin/perl
+use strict;
+use warnings;
+
+my %state = ( AK =&gt; { name    =&gt; 'Alaska',
+                      capital =&gt; 'Juneau'
+                    },
+              AL =&gt; { name    =&gt; 'Alabama',
+                      capital =&gt; 'Montgomery',
+                    },
+              AR =&gt; { name    =&gt; 'Arkansas',
+                      capital =&gt; 'Little Rock',
+                    },
+            );
+
+print "The capital of $state{AR}{name} is $state{AR}{capital}.\n";
+</pre></div></div>
+  
+  <p><img src="images/coderunner/checksyntax.JPG"> and run it by typing the commands below as shown:</p>
+  
+<div class="interactiveBox"><div class="interactiveTitle">INTERACTIVE SESSION:</div><div class="interactive"><pre>cold:~$ <ins>cd perl3</ins>
+cold:~/perl3$ <ins>./state_short.pl</ins>
+The capital of Arkansas is Little Rock.
+</pre></div></div>
+  
+  <p>This is the hash equivalent of <b>@board</b> and an array of array refs. The keys in the 
+   top-level hash <b>%state</b> are what we would call as the primary keys in a database table. The 
+   values are hashrefs whose keys are the column names and its values are the column values.</p>
+  
+  <p>We have used the syntactic sugar that allows us to omit the arrow in 
+   <b>{AR}-&gt;{capital}</b>; that rule works for any combination of brackets and braces. </p>
+  
+  <p>That data structure looks like this:</p>
+  
+  <p><div class="c"><img src="images/lessonImages/hoh.png"></div></p>
+
+
+  <p>Now let's try a more realistic example that reads in the data from an external file, 
+   <b>state.data</b>, which is included with your lesson files. </p>
+   
+  <p>Create <b>state.pl</b> in your <b>/perl3</b> folder as shown:</p>
+  
+<div class="listingBox"><div class="listingTitle">CODE TO TYPE:</div><div class="listing"><pre>#!/usr/bin/perl
+use strict;
+use warnings;
+
+my %state;
+while ( &lt;&gt; )
+{
+  chomp;
+  my ($abbreviation, $name, $capital) = split /\s*\|\s*/;
+  next if $abbreviation eq 'key';
+  $state{$abbreviation} = { name =&gt; $name, capital =&gt; $capital };
+}
+
+my $limit;
+for my $abbr ( sort keys %state )
+{
+  print "$abbr: $state{$abbr}{name}'s capital is $state{$abbr}{capital}\n";
+  exit if ++$limit &gt;= 5;
+}
+</pre></div></div>
+  
+  <p><img src="images/coderunner/checksyntax.JPG"> and run it with <b>state.data</b> 
+   as input:</p>
+  
+<div class="interactiveBox"><div class="interactiveTitle">INTERACTIVE SESSION:</div><div class="interactive"><pre>cold:~/perl3$ <ins>./state.pl /software/Perl3/state.data</ins>
+AK: Alaska's capital is Juneau
+AL: Alabama's capital is Montgomery
+AR: Arkansas's capital is Little Rock
+AZ: Arizona's capital is Phoenix
+CA: California's capital is Sacramento
+</pre></div></div>
+  
+  <p>(In order to save screen space, we printed only the first five entries.) The loop shows you how we iterate 
+   through a hash-of-hashes, but it presumes that we know the keys of the second-level hashes. 
+   Even though the same code sets them a few lines earlier, let's pretend we didn't have that information and see what happens. 
+   Modify the code as 
+   shown:</p>
+  
+<div class="listingBox"><div class="listingTitle">CODE TO TYPE:</div><div class="listing"><pre>#!/usr/bin/perl
+use strict;
+use warnings;
+
+my %state;
+while ( &lt;&gt; )
+{
+  chomp;
+  my ($abbreviation, $name, $capital) = split /\s*\|\s*/;
+  next if $abbreviation eq 'key';
+  $state{$abbreviation} = { name =&gt; $name, capital =&gt; $capital };
+}
+
+my $limit;
+for my $abbr ( sort keys %state )
+{
+  <del>print "$abbr: $state{$abbr}{name}'s capital is $state{$abbr}{capital}\n";</del>
+  <ins>print "$abbr: ";
+  for my $key ( sort keys %{ $state{$abbr} } )
+  {
+    print "$key =&gt; $state{$abbr}{$key}, ";
+  }
+  print "\n";</ins>
+  exit if ++$limit &gt;= 5;
+}
+</pre></div></div>
+  
+  <p><img src="images/coderunner/checksyntax.JPG"> and run it:</p>
+  
+<div class="interactiveBox"><div class="interactiveTitle">INTERACTIVE SESSION:</div><div class="interactive"><pre>cold:~/perl3$ <ins>./state.pl /software/Perl3/state.data</ins>
+AK: capital =&gt; Juneau, name =&gt; Alaska,
+AL: capital =&gt; Montgomery, name =&gt; Alabama, 
+AR: capital =&gt; Little Rock, name =&gt; Arkansas, 
+AZ: capital =&gt; Phoenix, name =&gt; Arizona, 
+CA: capital =&gt; Sacramento, name =&gt; California, 
+</pre></div></div>
+  
+  <p>If you were dealing with a <b>sparse data structure</b> instead of a fully-populated 
+   table-equivalent, that approach would make sense. (One example of a sparse data structure would be a record 
+   in an LDAP directory—Lightweight Directory Access Protocol, is an internet protocol 
+   that email and other programs use to look up information from a server.) In such a data structure, there would be many 
+   keys that didn't have values in 
+   most records.</p>
+  
+  <p>It might also make sense if the <i>schema</i> for the database was defined outside the program. In 
+   fact, the first line of the state.data file contains that schema—we've just been ignoring it. 
+   Let's modify the program now to use it:</p>
+  
+<div class="listingBox"><div class="listingTitle">CODE TO TYPE:</div><div class="listing"><pre>#!/usr/bin/perl
+use strict;
+use warnings;
+
+my %state;
+<ins>my @names;</ins>
+while ( &lt;&gt; )
+{
+  chomp;
+  <del>my ($abbreviation, $name, $capital) = split /\s*\|\s*/;</del>
+  <ins>my ($abbreviation, @fields) = split /\s*\|\s*/;</ins>
+  <ins>@names = @fields and </ins>next if $abbreviation eq 'key';
+  <ins>my %data;
+  @data{@names} = @fields;
+  $state{$abbreviation} = \%data;</ins>
+  <del>$state{$abbreviation} = { name =&gt; $name, capital =&gt; $capital };</del>
+}
+
+my $limit;
+for my $abbr ( sort keys %state )
+{
+  print "$abbr: ";
+  for my $key ( sort keys %{ $state{$abbr} } )
+  {
+    print "$key =&gt; $state{$abbr}{$key}, ";
+  }
+  print "\n";
+  exit if ++$limit &gt;= 5;
+}
+</pre></div></div>
+  
+  <p><img src="images/coderunner/checksyntax.JPG"> and run it. You'll get exactly the same result. 
+   Now try running it on the <b>state_full.data</b> file:</p>
+  
+<div class="interactiveBox"><div class="interactiveTitle">INTERACTIVE SESSION:</div><div class="interactive"><pre>cold:~/perl3$ <ins>./state.pl /software/Perl3/state_full.data</ins>
+AK: bird =&gt; Willow Ptarmigan, capital =&gt; Juneau, flower =&gt; Forget-me-not, largest_city =&gt; Anchorage, name =&gt; Alaska,
+AL: bird =&gt; Yellowhammer, capital =&gt; Montgomery, flower =&gt; Camellia, largest_city =&gt; Birmingham, name =&gt; Alabama,
+AR: bird =&gt; Mockingbird, capital =&gt; Little Rock, flower =&gt; Apple Blossom, largest_city =&gt; Little Rock, name =&gt; Arkansas,
+AZ: bird =&gt; Cactus Wren, capital =&gt; Phoenix, flower =&gt; Saguaro Cactus Blossom, largest_city =&gt; Phoenix, name =&gt; Arizona,
+CA: bird =&gt; California Valley Quail, capital =&gt; Sacramento, flower =&gt; Golden Poppy, largest_city =&gt; Los Angeles, name =&gt; California, 
+</pre></div></div>
+  
+  <p>Because that data file is in the same format, we can now read it in without changing the program! 
+   That's impressive! This technique will let us do some serious data processing.</p>
+  
+  <p>See how we used the <b>and</b> operator to get two things done in a conditional without 
+   having to create a block and an <b>if</b> statement? <b>@names = @fields and next if ...</b> 
+   will always execute the <b>next</b> statement because there will always be something in 
+   <b>@fields</b>, so the result of the assignment will be true (because it is a list assignment 
+   and the result will be the number of things assigned).</p>
+  
+  <p>Also, we used the <i>hash slice</i> to set the hash <b>%data</b>. To 
+   be even more concise, you can slice using the reference itself—this is generally not recommended for the faint of heart, 
+   but hey, this <i>is</i> <i>Advanced</i> Perl! Let's give it a try. Modify <b>state.pl</b> like this:</p>
+  
+<div class="listingBox"><div class="listingTitle">CODE TO TYPE:</div><div class="listing"><pre>#!/usr/bin/perl
+use strict;
+use warnings;
+
+my %state;
+my @names;
+while ( &lt;&gt; )
+{
+  chomp;
+  my ($abbreviation, @fields) = split /\s*\|\s*/;
+  @names = @fields and next if $abbreviation eq 'key';
+<del>  my %data;
+  @data{@names} = @fields;
+  $state{$abbreviation} = \%data;</del>
+<ins>  @{ $state{$abbreviation} }{@names} = @fields;</ins>
+}
+
+my $limit;
+for my $abbr ( sort keys %state )
+{
+  print "$abbr: ";
+  for my $key ( sort keys %{ $state{$abbr} } )
+  {
+    print "$key =&gt; $state{$abbr}{$key} ";
+  }
+  print "\n";
+  exit if ++$limit &gt;= 5;
+}
+</pre></div></div>
+  
+  <p><img src="images/coderunner/checksyntax.JPG"> and run it; the output will be identical. You 
+   can see that this is an application of <i>Rule 2</i>.</p>
+  
+ </div>
+ <a href="Perl3-10.html" name="autovivification"></a>
+ <a name="h_02"></a><div class="heading">Autovivification</div><div class="headingText">
+  
+  <p>Now let's learn a ten-dollar word that will impress our friends and our boss. The next time 
+   you're having a conversation, toss in, "I see your program 
+   is abusing autovivification." Provided you have used it correctly, they'll be in awe of your expertise. </p>
+ 
+  <p>The best way to explain Autovivification is to show it in action. Create <b>auto.pl</b> in 
+   your <b>/perl3</b> folder as shown:</p>
+  
+<div class="listingBox"><div class="listingTitle">CODE TO TYPE:</div><div class="listing"><pre>#!/usr/bin/perl
+use strict;
+use warnings;
+
+use Data::Dumper;
+
+my %state;
+
+$state{AK}{capital} = 'Juneau';
+print Dumper \%state;
+</pre></div></div>
+ 
+  <p>It may look like it shouldn't work, 
+   but just go with it. <img src="images/coderunner/checksyntax.JPG"> and run it as shown:</p>
+ 
+<div class="interactiveBox"><div class="interactiveTitle">INTERACTIVE SESSION:</div><div class="interactive"><pre>cold:~/perl3$ <ins>./auto.pl</ins>
+$VAR1 = {
+          'AK' =&gt; {
+                    'capital' =&gt; 'Juneau'
+                  }
+        };
+</pre></div></div>
+ 
+  <p>Most other languages wouldn't let you get away 
+   with this—they'd demand that you create an inner hash in order to populate it. 
+  But not Perl, and that's a real advantage. In Perl you don't need to create the inner hash in order to populate it; instead, when Perl sees the 
+   assignment to <b>$state{AK}{capital}</b> this is what happens:</p>
+ 
+  <ul><li>It replaces the arrow we omitted through syntactic sugar: <b>$state{AK}-&gt;{capital}</b></li><li>It looks at the right side of the arrow and sees braces, which means they must enclose a hash key and 
+    the left side of the arrow must be a hash reference.</li><li><b>$state{AK}</b> doesn't exist, but throwing an exception wouldn't be 
+    particularly useful, so in this situation, Perl <i>creates</i> <b>$state{AK}</b>, knowing that it 
+    must contain a reference to a hash. </li><li>Then Perl populates <b>$state{AK}</b> with a reference to an empty anonymous hash.</li><li>Finally, Perl populates that anonymous hash with the key <b>capital</b> and the value 
+    <b>Juneau</b> as coded. </li></ul>
+ 
+  <p>So there you have the principle of autovivification: if you use a nonexistent data slot (array or 
+   hash element) in a context that assumes it is a reference to something, Perl will first populate it 
+   with a reference to an empty version of that type of thing.</p>
+ 
+  <p>In case you didn't notice, the last change we made to <b>state.pl</b> used 
+   autovivification; the first element in the list implied by the slice will be assigned through a 
+   top-level key that hasn't been created yet. It could also be done with a loop:</p>
+ 
+<div class="observeBox"><div class="observeTitle">OBSERVE:</div><div class="observe"><pre>$state{$abbreviation}{$_} = <span class="darkgreen">shift</span> @fields for @names;
+</pre></div></div>
+ 
+  <p>But that's a bit harder to read, because you have to puzzle out why one array is being 
+   <span class="darkgreen">shift</span>ed and the other isn't.</p>
+ 
+ </div>
+  
+ <p>So now you're thinking, "Okay, the data structure we've used in this lesson <i>does</i> hold 
+  all the data together cohesively; but it repeats the keys <b>name</b>, <b>capital</b>, and other stuff, 
+  unnecessarily." Good thinking! We'll look at ways to improve on <i>that</i> in the next lesson!</p>
+  
+ <p>Once you finish the lesson, go back to the syllabus to complete the homework.</p>
+   
+<div class="footer"><div id="timeSurvey"></div>				
+				Copyright © 1998-2014 O'Reilly Media, Inc.<br><img src="https://courses.oreillyschool.com/common/cclicense.png"><br>
+				This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 Unported License.<br>
+				See <a href="http://creativecommons.org/licenses/by-sa/3.0/legalcode">http://creativecommons.org/licenses/by-sa/3.0/legalcode</a> 
+				for more information.
+				</div><iframe id="t" width="1" height="1" border="0" style="display:none"></iframe><script language="javascript">bodyLoaded();</script><script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+  ga('create', 'UA-44720547-1', 'oreillyschool.com');
+  ga('send', 'pageview');
+</script></body></html>

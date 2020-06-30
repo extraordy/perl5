@@ -1,0 +1,58 @@
+<html>
+   <!-- Copyright (c) 1998-2014 O'Reilly Media, Inc. Unauthorized use is strictly
+                prohibited. None of this code or content can by copied without the express written
+                permission from O'Reilly Media, Inc. -->
+   <head>
+      <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+      <link rel="stylesheet" type="text/css" href="http://archive.oreilly.com/oreillyschool/courses/Perl2/common/Lab.css">
+      <title>Regular Expressions: Character Classes - Quiz 1</title>
+   </head>
+   <body id="body">
+      <h2>Regular Expressions: Character Classes - Quiz 1</h2> 
+      
+      
+      
+      
+      <p>If you didn't have the /i modifier, what regular expression would match "dog" regardless of case?</p>
+      
+        
+      
+      
+      <p>/[Dd][Oo][Gg]/</p>
+      
+      
+      <p><b>Grading Criteria:</b> Student should demonstrate knowledge of character classes in a regular expression.</p>
+      
+      
+      
+      
+      
+      
+      <p>Give regular expressions to validate:</p>
+      
+      
+      <ol>
+         <li>A four-digit hexadecimal address in any case.</li>
+         <li>A Canadian postal code (see <a href="http://en.wikipedia.org/wiki/Postal_codes_in_Canada" target="_blank">specification in Wikipedia</a>).
+         </li>
+      </ol>
+      
+      
+      
+      
+      <ol>
+         <li><b>/[0-9A-F][0-9A-F][0-9A-F][0-9A-F]/i</b> (It is okay without slash delimiters if the character class is [])</li>
+         <li><b>/[A-Z][0-9][A-Z] [0-9][A-Z][0-9]/</b> (Many bonus points if they read the spec completely and came up with 
+            <b>[A-CEGHJ-NPRSTV-Z][0-9][A-CEGHJ-NPRSTV-Z][0-9][A-CEGHJ-NPRSTV-Z][0-9]</b> or put the character class in a scalar first 
+            and used that in the regex.
+         </li>
+      </ol>
+      
+      
+      <p><b>Grading Criteria:</b> Student should show they know how to use character classes.</p>
+      
+      
+      
+      
+   </body>
+</html>

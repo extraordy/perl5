@@ -1,0 +1,882 @@
+<html><!-- Copyright (c) 1998-2014 O'Reilly Media, Inc.
+			This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 Unported License.
+			See http://creativecommons.org/licenses/by-sa/3.0/legalcode for more information.
+            --><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"><link rel="stylesheet" type="text/css" href="../common/Lab.css"><script type="text/javascript" src="../common/Lab.js"></script><script language="javascript"></script><title>Exception Handling</title></head><body id="body"><a name="top"></a><div class="title">Exception Handling</div><div class="resize"><a href="Perl3-13.html#top" onclick="changeSize('smaller');" class="aS" title="Keep clicking to make fonts smaller">A</a><a href="Perl3-13.html#top" onclick="changeSize('larger');" class="aL" title="Keep clikcing to make fonts larger">A</a><a href="Perl3-13.html#top" onclick="lv()" class="lv" title="Adjust Page for High Contrast">HC</a><div id="fh"><p>Click on <span class="aS">A</span> to make all fonts on the page smaller.</p><p>Click on <span class="aL">A</span> to make all fonts on the page larger.</p><p>Click on <span class="lv">HC</span> to toggle high contrast mode. When you move your mouse over 
+                 some bold words in high contrast mode, related words are automatically highlighted. Text is shown
+                 in black and white. 
+             </p></div></div><hr>
+  
+  <div class="goalTitle">Lesson Objectives</div><div class="goals"> 
+    
+    When you complete this lesson, you will be able to:
+    <ul><li>handle <a href="Perl3-13.html#exceptions">Exceptions</a>.</li><li>us the special hash <a href="Perl3-13.html#sig">%SIG</a> to handle <i>signals</i>.</li></ul>
+  </div><hr>
+ 
+ <p>Welcome back to <i>Advanced Perl!</i> We've learned as much as we planned to about
+  references in the course; now we're ready to explore some useful Perl features that <i>use</i> those references. </p> 
+ 
+ <p>The term "transfer of control" refers to the way the run-time system determines 
+  which statement in a program to execute next.</p>
+ 
+ <p>So far, the transfer of control in our programs has been <i>local</i>, and the next statement to be 
+  executed has been predictable. Our programs have either the statements in sequence, or in a loop, or the statement after 
+  returning from a subroutine. But now we'll see some <i>nonlocal</i> transfer of control using 
+  <i>exceptions.</i></p>
+ 
+ 
+ <a href="Perl3-13.html" name="exceptions"></a>
+ <a name="h_01"></a><div class="heading">Exceptions</div><div class="headingText">
+  
+  <p>An exception is when your program does something <i>exceptional</i>, that is, different from 
+   the usual or typical pattern of execution. This almost always means that an error has occurred and the 
+   program needs to handle it by going to a special place in the code.</p>
+   
+  <p>The terminology of exceptions is that we <i>throw</i> an exception when the error is first 
+   recognized in a program, and <i>catch</i> an exception when the flow of control arrives to the 
+   <i>exception handler</i>. The notion that program execution is somehow "up in the air" between these 
+   events is an appropriate one, since the transfer of control may jump over many lines of code and <i>stack 
+    frames</i> (every time you call a subroutine, a "frame" containing data concerning where it was called from 
+   gets pushed onto a stack in the Perl run-time, and every time you return from a subroutine, the frame 
+   is popped off; so nested subroutine calls result in multiple frames on the stack).</p>
+  
+  <p>
+   The term <i>exception</i> is often used in a abstract sense. We will make it more concrete by saying that the 
+   exception is an error message, a string.</p>
+    
+  <a name="s_01"></a><div id="s_01"><div class="subheading">Throwing Exceptions</div><div class="subheadingText">
+     
+   <p>Perl exceptions are thrown with the function <span class="darkgreen">die()</span>—the same 
+    <span class="darkgreen">die()</span> that causes your program to exit with an error message. That is 
+    an exception's default behavior: quit the program. Nothing caught the exception, so  
+    a <i>default exception handler</i> just prints the exception to the standard error stream and 
+    then calls <span class="darkgreen">exit()</span> with a number other than zero (the actual code that it exits 
+     with varies and is described in <a href="http://perldoc.perl.org/5.8.9/functions/die.html" target="_blank">perldoc -f die</a>). </p>
+     
+   <p>Let's go to work using exceptions right now by creating <b>exception.pl</b> in our 
+    <b>/perl3</b> folder as shown:</p>
+   
+<div class="listingBox"><div class="listingTitle">CODE TO TYPE:</div><div class="listing"><pre>#!/usr/bin/perl
+use strict;
+use warnings;
+
+init( shift || 'nonesuch.conf' );
+print "Cell at (4,2) = ", field_value(4,2), "\n";
+
+{
+  my $data_ref;
+
+  sub init
+  {
+    handle_file( config =&gt; shift );
+    $data_ref = handle_file( data =&gt; config( 'datafile' ) );
+  }
+
+  sub field_value
+  {
+    my ($row, $column) = @_;
+    $data_ref or die "No data collected yet";
+    return $data_ref-&gt;[$row-1][$column-1];
+  }
+}
+
+{
+  my $conf_ref;
+  sub handle_file
+  {
+    my ($file_type, $file_name) = @_;
+
+    if ( $file_type eq 'config' )
+    {
+      $conf_ref = read_config( $file_name, '=' );
+    }
+    elsif ( $file_type eq 'data' )
+    {
+      return read_data( $file_name, $conf_ref-&gt;{separator} );
+    }
+  }
+
+  sub config { $conf_ref-&gt;{ shift() } }
+}
+
+
+sub read_config
+{
+  my ($file, $delimiter) = @_;
+
+  open my $fh, '&lt;', $file or die "Can't open $file: $!";
+  my %config;
+  while ( &lt;$fh&gt; )
+  {
+    chomp;
+    /(.+)$delimiter(.+)/ or next;
+    $config{$1} = $2;
+  }
+  return \%config;
+}
+
+sub read_data
+{
+  my ($file, $separator) = @_;
+
+  open my $fh, '&lt;', $file or die "Can't open $file: $!";
+  my @output;
+  while ( &lt;$fh&gt; )
+  {
+    chomp;
+    my @fields = split /\Q$separator\E/;
+    @fields &gt; 1 or die "Separator not found at line $.";
+    push @output, \@fields;
+  }
+  return \@output;
+}
+</pre></div></div>
+     
+   <p>Now create the input file <b>config.in</b> in your 
+    <b>/perl3</b> folder as shown:</p>
+     
+<div class="listingBox"><div class="listingTitle">CODE TO TYPE:</div><div class="listing"><pre>separator=|
+datafile=data.dat
+</pre></div></div>
+     
+   <p>...and create the data file <b>data.dat</b> as shown:</p>
+     
+<div class="listingBox"><div class="listingTitle">CODE TO TYPE:</div><div class="listing"><pre>Date|High|Low|Close
+10/1/10|100.5|95.6|96.7
+10/2/10|96.7|94.4|94.6
+10/3/10|94.5|92.2|92.2
+10/4/10|93.4|91.2|91.8
+</pre></div></div>
+     
+    <p><img src="images/coderunner/checksyntax.JPG"> and run <b>exception.pl</b> by typing the commands below as shown:</p>
+     
+<div class="interactiveBox"><div class="interactiveTitle">INTERACTIVE SESSION:</div><div class="interactive"><pre>cold:~$ <ins>cd perl3</ins>
+cold:~/perl3$ <ins>./exception.pl </ins>
+Can't open nonesuch.conf: No such file or directory at ./exception.pl line 49.
+cold: ~$ <ins>./exception.pl ./config.in</ins>
+Cell at (4,2) = 94.5
+</pre></div></div>
+
+    <p>Okay, now suppose the program was modified to wrap a loop around the main processing code. Edit <b>exception.pl</b> as 
+    shown:</p>
+        
+<div class="listingBox"><div class="listingTitle">CODE TO TYPE:</div><div class="listing"><pre>#!/usr/bin/perl
+use strict;
+use warnings;
+
+<del>init( shift || 'nonesuch.conf' );
+print "Cell at (4,2) = ", field_value(4,2), "\n";</del>
+<ins>while ( my $config = shift )
+{
+  init( $config );
+  print "Cell at (4,2) = ", field_value(4,2), "\n";
+}
+</ins>
+{
+  my $data_ref;
+
+  sub init
+  {
+    handle_file( config =&gt; shift );
+    $data_ref = handle_file( data =&gt; config( 'datafile' ) );
+  }
+
+  sub field_value
+  {
+    my ($row, $column) = @_;
+    $data_ref or die "No data collected yet";
+    return $data_ref-&gt;[$row-1][$column-1];
+  }
+}
+
+{
+  my $conf_ref;
+  sub handle_file
+  {
+    my ($file_type, $file_name) = @_;
+
+    if ( $file_type eq 'config' )
+    {
+      $conf_ref = read_config( $file_name, '=' );
+    }
+    elsif ( $file_type eq 'data' )
+    {
+      return read_data( $file_name, $conf_ref-&gt;{separator} );
+    }
+  }
+
+  sub config { $conf_ref-&gt;{ shift() } }
+}
+
+
+sub read_config
+{
+  my ($file, $delimiter) = @_;
+
+  open my $fh, '&lt;', $file or die "Can't open $file: $!";
+  my %config;
+  while ( &lt;$fh&gt; )
+  {
+    chomp;
+    /(.+)$delimiter(.+)/ or next;
+    $config{$1} = $2;
+  }
+  return \%config;
+}
+
+sub read_data
+{
+  my ($file, $separator) = @_;
+
+  open my $fh, '&lt;', $file or die "Can't open $file: $!";
+  my @output;
+  while ( &lt;$fh&gt; )
+  {
+    chomp;
+    my @fields = split /\Q$separator\E/;
+    @fields &gt; 1 or die "Separator not found at line $.";
+    push @output, \@fields;
+  }
+  return \@output;
+}
+</pre></div></div>
+     
+   <p>Now we can run it with a list of config file names. But let's see what happens if one of those names is bad.
+     Run the program like this:</p>
+     
+<div class="interactiveBox"><div class="interactiveTitle">INTERACTIVE SESSION:</div><div class="interactive"><pre>cold:~/perl3$ <ins>./exception.pl ./nonesuch ./config.in</ins>
+Can't open nonesuch: No such file or directory at ./exception.pl line 52.
+</pre></div></div>
+     
+   <p>Let's say we want our program to keep going to the next config file. We might end up modifying code that's far away 
+    from the part of the code that dictates that change; and the code we modify might be part of a 
+    library that other programs need to use. (We haven't seen how to do that, but it is in the next 
+    course!) Now we're changing code that may not even belong to us and may mess with the plans of 
+    other users of that code.</p>
+  </div></div>
+  <a name="s_02"></a><div id="s_02"><div class="subheading">Catching Exceptions</div><div class="subheadingText">
+    
+    <p>The way to avoid such pitfalls is to catch the exceptions. Modify <b>exception.pl</b> as shown: </p>
+     
+<div class="listingBox"><div class="listingTitle">CODE TO TYPE:</div><div class="listing"><pre>#!/usr/bin/perl
+use strict;
+use warnings;
+
+while ( my $config = shift )
+{
+  <ins>eval {
+    init( $config );
+    print "Cell at (4,2) = ", field_value(4,2), "\n";
+  };
+  if ( $@ )
+  {
+    chomp $@;
+    warn "Caught exception '$@', continuing...\n";
+  }</ins>
+  <del>init( $config );
+  print "Cell at (4,2) = ", field_value(4,2), "\n";</del>
+}
+
+{
+  my $data_ref;
+
+  sub init
+  {
+    handle_file( config =&gt; shift );
+    $data_ref = handle_file( data =&gt; config( 'datafile' ) );
+  }
+
+  sub field_value
+  {
+    my ($row, $column) = @_;
+    $data_ref or die "No data collected yet";
+    return $data_ref-&gt;[$row-1][$column-1];
+  }
+}
+
+{
+  my $conf_ref;
+  sub handle_file
+  {
+    my ($file_type, $file_name) = @_;
+
+    if ( $file_type eq 'config' )
+    {
+      $conf_ref = read_config( $file_name, '=' );
+    }
+    elsif ( $file_type eq 'data' )
+    {
+      return read_data( $file_name, $conf_ref-&gt;{separator} );
+    }
+  }
+
+  sub config { $conf_ref-&gt;{ shift() } }
+}
+
+
+sub read_config
+{
+  my ($file, $delimiter) = @_;
+
+  open my $fh, '&lt;', $file or die "Can't open $file: $!";
+  my %config;
+  while ( &lt;$fh&gt; )
+  {
+    chomp;
+    /(.+)$delimiter(.+)/ or next;
+    $config{$1} = $2;
+  }
+  return \%config;
+}
+
+sub read_data
+{
+  my ($file, $separator) = @_;
+
+  open my $fh, '&lt;', $file or die "Can't open $file: $!";
+  my @output;
+  while ( &lt;$fh&gt; )
+  {
+    chomp;
+    my @fields = split /\Q$separator\E/;
+    @fields &gt; 1 or die "Separator not found at line $.";
+    push @output, \@fields;
+  }
+  return \@output;
+}
+</pre></div></div>
+     
+   <p><img src="images/coderunner/checksyntax.JPG"> and run the program again as shown:</p>
+     
+<div class="interactiveBox"><div class="interactiveTitle">INTERACTIVE SESSION:</div><div class="interactive"><pre>cold:~/perl3$ <ins>./exception.pl ./nonesuch ./config.in</ins>
+Caught exception 'Can't open nonesuch: No such file or directory at ./exception.pl line 59.', continuing...
+Cell at (4,2) = 94.5
+</pre></div></div>
+     
+   <p>So, how does it work?</p>
+   
+<div class="observeBox"><div class="observeTitle">OBSERVE:</div><div class="observe"><pre>while ( my $config = shift )
+{
+  <span class="darkgreen">eval</span> {
+    init( $config );
+    print "Cell at (4,2) = ", field_value(4,2), "\n";
+  };
+  if ( <span class="red">$@</span> )
+  {
+    chomp <span class="red">$@</span>;
+    warn "Caught exception '<span class="red">$@</span>, continuing...\n";
+  }
+  init( $config );
+  print "Cell at (4,2) = ", field_value(4,2), "\n";
+}
+</pre></div></div>
+   
+   <p>First, we have an <span class="darkgreen">eval()</span> statement, which takes a <i>block</i> as argument. 
+    <span class="darkgreen">eval()</span> causes any <b>die</b> situation to "die" only in the scope of the 
+    <span class="darkgreen">eval()</span> block; it's as though the <span class="darkgreen">eval()</span> block is now the 
+    whole program, so <b>die</b> will only kill the program within the block.</p>
+   
+   <p>Second, the special variable <span class="red">$@</span> is set to the argument that was given to 
+    <b>die</b> (you can see this in the program output above).</p>
+     
+   <p>You can even catch implicit <b>die</b>s generated by Perl itself; for example,
+    when you divide a number by zero. Check that out with this one-liner:</p>
+     
+<div class="interactiveBox"><div class="interactiveTitle">INTERACTIVE SESSION:</div><div class="interactive"><pre>cold:~/perl3$ <ins>perl -e 'eval { 1/0 } or print "Caught exception $@"'</ins>
+Caught exception Illegal division by zero at -e line 1.
+</pre></div></div>
+     
+   <p>You can also have nested <span class="darkgreen">eval()</span>s. Make these changes to the 
+     <b>handle_file</b> routine in <b>exception.pl</b>:</p>
+   
+<div class="listingBox"><div class="listingTitle">CODE TO TYPE:</div><div class="listing"><pre>#!/usr/bin/perl
+use strict;
+use warnings;
+
+while ( my $config = shift )
+{
+  eval {
+    init( $config );
+    print "Cell at (4,2) = ", field_value(4,2), "\n";
+  };
+  if ( $@ )
+  {
+    chomp $@;
+    warn "Caught exception '$@', continuing...\n";
+  }
+}
+
+{
+  my $data_ref;
+
+  sub init
+  {
+    handle_file( config =&gt; shift );
+    $data_ref = handle_file( data =&gt; config( 'datafile' ) );
+  }
+
+  sub field_value
+  {
+    my ($row, $column) = @_;
+    $data_ref or die "No data collected yet";
+    return $data_ref-&gt;[$row-1][$column-1];
+  }
+}
+
+{
+  my $conf_ref;
+  sub handle_file
+  {
+    my ($file_type, $file_name) = @_;
+
+    if ( $file_type eq 'config' )
+    {
+      $conf_ref = read_config( $file_name, '=' );
+    }
+    elsif ( $file_type eq 'data' )
+    {
+      <del>return read_data( $file_name, $conf_ref-&gt;{separator} );</del>
+      <ins>return eval { read_data( $file_name, $conf_ref-&gt;{separator} ) }
+                  || [ 0,0,0,[0,42]];</ins>
+    }
+  }
+
+  sub config { $conf_ref-&gt;{ shift() } }
+}
+
+
+sub read_config
+{
+  my ($file, $delimiter) = @_;
+
+  open my $fh, '&lt;', $file or die "Can't open $file: $!";
+  my %config;
+  while ( &lt;$fh&gt; )
+  {
+    chomp;
+    /(.+)$delimiter(.+)/ or next;
+    $config{$1} = $2;
+  }
+  return \%config;
+}
+
+sub read_data
+{
+  my ($file, $separator) = @_;
+
+  open my $fh, '&lt;', $file or die "Can't open $file: $!";
+  my @output;
+  while ( &lt;$fh&gt; )
+  {
+    chomp;
+    my @fields = split /\Q$separator\E/;
+    @fields &gt; 1 or die "Separator not found at line $.";
+    push @output, \@fields;
+  }
+  return \@output;
+}
+</pre></div></div>
+     
+   <p>Now create the file <b>config.bad</b> to refer to a nonexistent data file:</p>
+      
+<div class="listingBox"><div class="listingTitle">CODE TO TYPE:</div><div class="listing"><pre>separator=|
+datafile=nodata.dat
+</pre></div></div>
+     
+   <p><img src="images/coderunner/checksyntax.JPG"> and run the program as shown:</p>
+   
+<div class="interactiveBox"><div class="interactiveTitle">INTERACTIVE SESSION:</div><div class="interactive"><pre>cold:~/perl3$ <ins>./exception.pl ./nonesuch ./config.bad ./config.in</ins>
+Caught exception 'Can't open nonesuch: No such file or directory at ./exception.pl line 60.', continuing
+Cell at (4,2) = 42
+Cell at (4,2) = 94.5
+</pre></div></div>
+     
+   <p>The exception from the <b>read_data</b> subroutine is being caught by the 
+    <span class="darkgreen">eval()</span> wrapped around the call to <b>read_data</b> inside the 
+    <b>handle_file</b> routine. Here, we aren't even looking at <span class="red">$@</span>; we know 
+     that if an exception is thrown inside of an <span class="darkgreen">eval()</span> block, the result of the 
+    block will be <b>undef</b>. We know that if there is no exception, the result from 
+    <b>read_data</b> will be a reference, which is true, so this code effectively provides a 
+    fallback reference if an exception is raised (the fallback is just big enough to contain the element 
+    that the higher level code is printing; this code is a bit contrived in that respect, but hey, 
+    we do whatever it takes to illustrate our points).</p>
+ 
+  </div></div>
+  <a name="s_03"></a><div id="s_03"><div class="subheading">$@</div><div class="subheadingText">
+   
+   <p>As you've seen, <span class="red">$@</span> contains the string that was passed to <b>die</b> (and 
+    since we didn't terminate those strings with a newline, Perl added "at ./exception.pl 
+    line 60."). We can test the value of <span class="red">$@</span> to determine whether to take different action depending on 
+     the type of exception. Modify <b>exception.pl</b> as shown: </p>
+   
+<div class="listingBox"><div class="listingTitle">CODE TO TYPE:</div><div class="listing"><pre>#!/usr/bin/perl
+use strict;
+use warnings;
+
+while ( my $config = shift )
+{
+  eval {
+    init( $config );
+    print "Cell at (4,2) = ", field_value(4,2), "\n";
+  };
+  if ( $@ )
+  {
+    chomp $@;
+    warn "Caught exception '$@', continuing...\n";
+  }
+}
+
+{
+  my $data_ref;
+
+  sub init
+  {
+    handle_file( config =&gt; shift );
+    $data_ref = handle_file( data =&gt; config( 'datafile' ) );
+  }
+
+  sub field_value
+  {
+    my ($row, $column) = @_;
+    $data_ref or die "No data collected yet";
+    return $data_ref-&gt;[$row-1][$column-1];
+  }
+}
+
+{
+  my $conf_ref;
+  sub handle_file
+  {
+    my ($file_type, $file_name) = @_;
+
+    if ( $file_type eq 'config' )
+    {
+      $conf_ref = read_config( $file_name, '=' );
+    }
+    elsif ( $file_type eq 'data' )
+    {
+      <del>return eval { read_data( $file_name, $conf_ref-&gt;{separator} ) }
+                  || [ 0,0,0,[0,42]];</del>
+      <ins>my $ref = eval { read_data( $file_name, $conf_ref-&gt;{separator} ) };
+      if ( $@ )
+      {
+        $@ =~ /separator/i and return [ 0,0,0,[0,42]];
+        die;
+      }
+      return $ref;</ins>
+    }
+  }
+
+  sub config { $conf_ref-&gt;{ shift() } }
+}
+
+sub read_config
+{
+  my ($file, $delimiter) = @_;
+
+  open my $fh, '&lt;', $file or die "Can't open $file: $!";
+  my %config;
+  while ( &lt;$fh&gt; )
+  {
+    chomp;
+    /(.+)$delimiter(.+)/ or next;
+    $config{$1} = $2;
+  }
+  return \%config;
+}
+
+sub read_data
+{
+  my ($file, $separator) = @_;
+
+  open my $fh, '&lt;', $file or die "Can't open $file: $!";
+  my @output;
+  while ( &lt;$fh&gt; )
+  {
+    chomp;
+    my @fields = split /\Q$separator\E/;
+    @fields &gt; 1 or die "Separator not found at line $.";
+    push @output, \@fields;
+  }
+  return \@output;
+}
+</pre></div></div>
+   
+   <p>Now create a file <b>data.badsep</b> that has no separator characters in at least one of the 
+    lines:</p>
+   
+<div class="listingBox"><div class="listingTitle">CODE TO TYPE:</div><div class="listing"><pre>Date,High,Low,Close
+10/1/10|100.5|95.6|96.7
+10/2/10|96.7|94.4|94.6
+10/3/10|94.5|92.2|92.2
+10/4/10|93.4|91.2|91.8
+</pre></div></div>
+   
+   <p>...and finally, create <b>config.badsep</b> to refer to that data file:</p>
+   
+<div class="listingBox"><div class="listingTitle">CODE TO TYPE:</div><div class="listing"><pre>separator=|
+datafile=data.badsep
+</pre></div></div>
+   
+   <p><img src="images/coderunner/checksyntax.JPG"> and run it as shown:</p>
+   
+<div class="interactiveBox"><div class="interactiveTitle">INTERACTIVE SESSION:</div><div class="interactive"><pre>cold:~/perl3$ <ins>./exception.pl ./config.badsep ./config.bad</ins>
+Cell at (4,2) = 42
+Caught exception 'Can't open nodata.dat: No such file or directory at ./exception.pl line 79.
+        ...propagated at ./exception.pl line 51.', continuing...
+</pre></div></div>
+   
+   <p>We've changed the behavior so that the "fallback" reference is only returned in the case of a 
+    missing separator. If we just call <b>die</b> without any arguments, 
+    because <span class="red">$@</span> contains a value, Perl appends the string "...propagated..." to it and uses 
+    that as the exception text.</p>
+   
+  </div></div>
+ </div>
+ <a href="Perl3-13.html" name="sig"></a> 
+ <a name="h_02"></a><div class="heading">%SIG</div><div class="headingText">
+  <a name="s_01"></a><div id="s_01"><div class="subheading">Process Signals</div><div class="subheadingText">
+   
+   <p>The special hash <b>%SIG</b> is used to handle <i>signals</i>: an event delivered to your 
+    program from another process that interrupts it.  A signal is a small number, typically 
+    represented by a string. For example, when you hit <b>[Ctrl+C]</b> to interrupt a program, you're 
+    sending it the INT (interrupt) signal. You can see that with this example:</p>
+   
+<div class="listingBox"><div class="listingTitle">CODE TO TYPE:</div><div class="listing"><pre>#!/usr/bin/perl
+use strict;
+use warnings;
+
+$SIG{INT} = sub { die "Caught INT signal" };
+
+sleep 10;
+
+print "Normal termination\n";
+</pre></div></div>
+   
+   <p><img src="images/coderunner/checksyntax.JPG"> and run it. The first time you run it, wait ten 
+    seconds; the second time, press <b>[Ctrl+C]</b> (<ins>^C</ins> won't appear onscreen) before the ten 
+    seconds are up:</p>
+   
+<div class="interactiveBox"><div class="interactiveTitle">INTERACTIVE SESSION:</div><div class="interactive"><pre>cold:~/perl3$ <ins>./signal.pl</ins>
+Normal termination
+cold:~/perl3$ <ins>./signal.pl
+^C</ins>Caught INT signal at ./signal.pl line 5.
+</pre></div></div>
+   
+   <p>A signal handler is a code reference stored in a special hash in the key with the 
+    name of the signal being handled. There are a few dozen types of signal, but only a select few are 
+    particularly useful:</p>
+   
+  <div class="c"> <table class="tbl" border=""><tr><th>Signal Name</th><th>Meaning</th></tr><tr><td>ALRM</td><td>Triggered by a call to <span class="darkgreen">alarm</span> going off (see <b>perldoc -f alarm</b></td></tr><tr><td>QUIT</td><td>Stronger version of <b>[Ctrl+C]</b> triggered by <b>[Ctrl+\]</b></td></tr><tr><td>TERM</td><td>Termination signal sent by another process</td></tr><tr><td>INT</td><td>Triggered by <b>[Ctrl+C]</b></td></tr><tr><td>HUP</td><td>A general-purpose signal that another process can send to get attention with <b>kill -HUP</b></td></tr></table></div>
+ </div></div>
+   
+  <p>You can have the same handler for multiple signals, because the name of the signal is passed as the 
+   first argument to a signal handler. Modify <b>signal.pl</b> as shown:</p>
+   
+<div class="listingBox"><div class="listingTitle">CODE TO TYPE:</div><div class="listing"><pre>#!/usr/bin/perl
+use strict;
+use warnings;
+
+$SIG{INT} = <ins>$SIG{QUIT} = </ins>sub { die "Caught <del>INT</del><ins>$_[0]</ins> signal" };
+
+sleep 10;
+
+print "Normal termination\n";
+</pre></div></div>
+   
+  <p><img src="images/coderunner/checksyntax.JPG"> and run it twice, first interrupting it with 
+   <b>[Ctrl+C]</b>, and then with <b>[Ctrl+\]</b>:</p>
+   
+<div class="interactiveBox"><div class="interactiveTitle">INTERACTIVE SESSION:</div><div class="interactive"><pre>cold:~/perl3$ <ins>./signal.pl
+^C</ins>Caught INT signal at ./signal.pl line 5.
+cold:~/perl3$ <ins>./signal.pl
+^\</ins>Caught QUIT signal at ./signal.pl line 5.
+</pre></div></div>
+   
+  <p>If you assign the string <b>'IGNORE'</b> (not a coderef) to a <b>%SIG</b> element, the 
+   signal is ignored.</p>
+   
+  <p>Beware of creating a signal handler that ignores a signal or fails to die, and potentially assigning 
+   it to all the ways of interrupting your program. If that kind of program runs out of control, you have 
+   to send the untrappable signal KILL to it from another process. This is to be avoided!</p>
+    
+  <a name="s_02"></a><div id="s_02"><div class="subheading">Pseudo-Signals</div><div class="subheadingText">
+   
+   <p>Signals like INT and TERM are real properties of Unix-like and other operating systems. But 
+    there are also two special signals that you can define handlers for: <b>__WARN__</b> and 
+    <b>__DIE__</b>.</p>
+     
+   <p><b>$SIG{__WARN__}</b>, if defined, will be called whenever your program calls 
+    <span class="darkgreen">warn()</span> (though you can call <span class="darkgreen">warn()</span> from inside a 
+    __WARN__ handler without fear of it recursing). The argument is not the signal name, but instead, it's the 
+    message from <span class="darkgreen">warn()</span>. Create <b>warn.pl</b> in your <b>/perl3</b> 
+    folder as shown:</p>
+     
+<div class="listingBox"><div class="listingTitle">CODE TO TYPE:</div><div class="listing"><pre>#!/usr/bin/perl
+use strict;
+use warnings;
+
+$SIG{__WARN__} = \&amp;warn_handler;
+
+sub warn_handler
+{
+  my $msg = shift;
+
+  $msg =~ /uninitialized value (\S+)/ and return warn "Undef: $1\n";
+  die "Exception: $msg";
+}
+
+my $x;
+print $x;
+my %x = (1);
+print "Unreached\n";
+</pre></div></div>
+     
+   <p><img src="images/coderunner/checksyntax.JPG"> and run it as shown:</p>
+   
+<div class="interactiveBox"><div class="interactiveTitle">INTERACTIVE SESSION:</div><div class="interactive"><pre>cold:~/perl3$ <ins>./warn.pl</ins>
+Undef: $x
+Exception: Odd number of elements in hash assignment at ./warn.pl line 17.
+</pre></div></div>
+     
+   <p>We've altered the text of one type of warning and "promoted" all other warnings to fatal 
+    exceptions.</p>
+     
+   <p>The pseudo-signal handler <b>$SIG{__DIE__}</b> is controversial. It's usually best to 
+    avoid it. Although there is one relatively safe usage: forcing a stack trace. The 
+    <span class="darkgreen">cluck()</span> routine exported by the <b>Carp</b> module will do that. Copy 
+    the program <b>exception.pl</b> into <b>sigdie.pl</b> and modify it as 
+    shown:</p>
+     
+<div class="listingBox"><div class="listingTitle">CODE TO TYPE:</div><div class="listing"><pre>#!/usr/bin/perl
+use strict;
+use warnings;
+
+<ins>use Carp qw(cluck);
+
+$SIG{__DIE__} = sub { cluck shift };</ins>
+
+while ( my $config = shift )
+{
+  eval {
+    init( $config );
+    print "Cell at (4,2) = ", field_value(4,2), "\n";
+  };
+  if ( $@ )
+  {
+    chomp $@;
+    warn "Caught exception '$@', continuing...\n";
+  }
+}
+
+{
+  my $data_ref;
+
+  sub init
+  {
+    handle_file( config =&gt; shift );
+    $data_ref = handle_file( data =&gt; config( 'datafile' ) );
+  }
+
+  sub field_value
+  {
+    my ($row, $column) = @_;
+    $data_ref or die "No data collected yet";
+    return $data_ref-&gt;[$row-1][$column-1];
+  }
+}
+
+{
+  my $conf_ref;
+  sub handle_file
+  {
+    my ($file_type, $file_name) = @_;
+
+    if ( $file_type eq 'config' )
+    {
+      $conf_ref = read_config( $file_name, '=' );
+    }
+    elsif ( $file_type eq 'data' )
+    {
+      my $ref = eval { read_data( $file_name, $conf_ref-&gt;{separator} ) };
+      if ( $@ )
+      {
+        $@ =~ /separator/i and return [ 0,0,0,[0,42]];
+        die;
+      }
+      return $ref;
+    }
+  }
+
+  sub config { $conf_ref-&gt;{ shift() } }
+}
+
+sub read_config
+{
+  my ($file, $delimiter) = @_;
+
+  open my $fh, '&lt;', $file or die "Can't open $file: $!";
+  my %config;
+  while ( &lt;$fh&gt; )
+  {
+    chomp;
+    /(.+)$delimiter(.+)/ or next;
+    $config{$1} = $2;
+  }
+  return \%config;
+}
+
+sub read_data
+{
+  my ($file, $separator) = @_;
+
+  open my $fh, '&lt;', $file or die "Can't open $file: $!";
+  my @output;
+  while ( &lt;$fh&gt; )
+  {
+    chomp;
+    my @fields = split /\Q$separator\E/;
+    @fields &gt; 1 or die "Separator not found at line $.";
+    push @output, \@fields;
+  }
+  return \@output;
+}
+</pre></div></div>
+     
+   <p><img src="images/coderunner/checksyntax.JPG"> and run it as shown:</p>
+     
+<div class="interactiveBox"><div class="interactiveTitle">INTERACTIVE SESSION:</div><div class="interactive"><pre>cold:~/perl3$ <ins>./sigdie.pl ./config.badsep</ins>
+Separator not found at line 1 at ./sigdie.pl line 90, &lt;$fh&gt; line 1.
+ at ./sigdie.pl line 7
+        main::__ANON__('Separator not found at line 1 at ./sigdie.pl line 90, &lt;$fh&gt; l...') called at ./sigdie.pl line 90
+        main::read_data('data.badsep', '|') called at ./sigdie.pl line 51
+        eval {...} called at ./sigdie.pl line 51
+        main::handle_file('data', 'data.badsep') called at ./sigdie.pl line 28
+        main::init('config.badsep') called at ./sigdie.pl line 12
+        eval {...} called at ./sigdie.pl line 11
+Cell at (4,2) = 42
+</pre></div></div>
+     
+   <p>This is handy when you want to see how a routine was called. The __ANON__ portion of the program refers to the 
+    anonymous subroutine used as the __DIE__ handler.</p>
+    
+    <p>So now, not only are you empowered to work with Perl, you even know how to handle exceptions when 
+      things go weird in Perl! That's excellent—keep going! See you soon... </p>
+  
+  </div></div>
+ </div>
+  
+ <p>Once you finish the lesson, go back to the syllabus to complete the homework.</p>
+   
+<div class="footer"><div id="timeSurvey"></div>				
+				Copyright © 1998-2014 O'Reilly Media, Inc.<br><img src="https://courses.oreillyschool.com/common/cclicense.png"><br>
+				This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 Unported License.<br>
+				See <a href="http://creativecommons.org/licenses/by-sa/3.0/legalcode">http://creativecommons.org/licenses/by-sa/3.0/legalcode</a> 
+				for more information.
+				</div><iframe id="t" width="1" height="1" border="0" style="display:none"></iframe><script language="javascript">bodyLoaded();</script><script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+  ga('create', 'UA-44720547-1', 'oreillyschool.com');
+  ga('send', 'pageview');
+</script></body></html>

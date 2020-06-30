@@ -1,0 +1,61 @@
+<html>
+   <!-- Copyright (c) 1998-2014 O'Reilly Media, Inc. Unauthorized use is strictly
+                prohibited. None of this code or content can by copied without the express written
+                permission from O'Reilly Media, Inc. -->
+   <head>
+      <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+      <link rel="stylesheet" type="text/css" href="http://archive.oreilly.com/oreillyschool/courses/Perl2/common/Lab.css">
+      <title>Properties - Quiz 1</title>
+   </head>
+   <body id="body">
+      <h2>Properties - Quiz 1</h2> 
+      
+      
+      
+      
+      <p>Given <b>$_</b> = <b>"one, two, three, four... go!"</b>, you want to match the last word before a comma and come up with the 
+         regular expression <b>/.*(\w+),/</b> but that doesn't work. What does it match instead, and why?
+      </p>
+      
+        
+      
+      
+      <p>It matches the last "e" in "three." This is because the .* is greedy and matches as far as it can, backtracking as necessary,
+         until there is just enough to satisfy the rest of the regex, and the subpattern \w+ only needs one character to match.
+      </p>
+      
+      
+      <p><b>Grading Criteria:</b> Student should demonstrate understanding of how a regular expression will backtrack as needed.</p>
+      
+      
+      
+      
+      
+      
+      <p>The lvalue ternary operator is often abused. You encounter a program containing the code:</p>
+      
+      
+      <div class="observeBox">
+         <div class="observeTitle">Observe:</div>
+         <div class="observe"><pre>($var eq 'Ford' ? $ford : $var eq 'Chrysler' ? $chrysler : $var eq 'Buick' ? $buick : $import) += 1</pre></div>
+      </div>
+      
+      
+      <p>What data type would be a far better representation for this operation?</p>
+      
+      
+      
+      
+      <p>A hash should be used here.</p>
+      
+      
+      <p>Some students will point out, though, that this is not a direct replacement as a hash does not have a default fail over ($import).</p>
+      
+      
+      <p><b>Grading Criteria:</b> Student should demonstrate knowledge of data types as possible replacements for logical code structures.</p>
+      
+      
+      
+      
+   </body>
+</html>

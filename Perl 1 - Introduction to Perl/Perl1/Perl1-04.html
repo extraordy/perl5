@@ -1,0 +1,449 @@
+<html><!-- Copyright (c) 1998-2014 O'Reilly Media, Inc.
+			This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 Unported License.
+			See http://creativecommons.org/licenses/by-sa/3.0/legalcode for more information.
+            --><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"><link rel="stylesheet" type="text/css" href="../common/Lab.css"><script type="text/javascript" src="../common/Lab.js"></script><script language="javascript"></script><title>Interpolation</title></head><body id="body"><a name="top"></a><div class="title">Interpolation</div><div class="resize"><a href="Perl1-04.html#top" onclick="changeSize('smaller');" class="aS" title="Keep clicking to make fonts smaller">A</a><a href="Perl1-04.html#top" onclick="changeSize('larger');" class="aL" title="Keep clikcing to make fonts larger">A</a><a href="Perl1-04.html#top" onclick="lv()" class="lv" title="Adjust Page for High Contrast">HC</a><div id="fh"><p>Click on <span class="aS">A</span> to make all fonts on the page smaller.</p><p>Click on <span class="aL">A</span> to make all fonts on the page larger.</p><p>Click on <span class="lv">HC</span> to toggle high contrast mode. When you move your mouse over 
+                 some bold words in high contrast mode, related words are automatically highlighted. Text is shown
+                 in black and white. 
+             </p></div></div><hr>
+ 
+ <div class="goalTitle">Lesson Objectives</div><div class="goals">
+  
+  
+  When you complete this lesson, you will be able to:
+  
+  <ul><li>assign strings to variables.</li><li>interpolate values in strings.</li></ul>
+ </div><hr>
+ 
+ <a name="h_01"></a><div class="heading">Interpolation in Perl</div><div class="headingText">
+  <a name="s_01"></a><div id="s_01"><div class="subheading">Double-Quoted Strings</div><div class="subheadingText">
+   
+   <p><div class="c"><img src="images/string.jpg"></div></p>
+   
+   
+   <p>We refer to chunks of text as <i>strings</i> because they consist of characters <i>strung</i> together. We've been 
+    using strings to print text. We can also assign them to variables, like this:</p>
+   
+   <p><span class="code">my $title = "Teacher";</span></p>
+    
+   <p>A <i>double-quoted string</i> wraps its contents between—believe it or not—double quotation marks. You 
+    can put anything you want between them, and your code will mean exactly what it says, with a few 
+    exceptions, like:</p>
+   
+   <ul><li>The sequence <b>\n</b> means "line break here"; </li><li>The sequence <b>\t</b> means "move to next tab stop here"; </li></ul>
+   
+   <p>Those two-character sequences—<i>digraphs</i> if you prefer the technical term—are called <i>escape 
+    sequences</i> in Perl (because the backslash character changes the meaning of the next character, 
+    thereby "escaping" it). If you want to include the actual backslash character itself, use 
+    <i>two backslashes: <b>\\</b>.</i></p>
+   
+   <p>Perl doesn't move the cursor to the next line or tab stop. Instead, Perl turns the escape 
+    sequences into <i>control characters</i>—special characters that are invisible—and stores 
+    those in the string. When something prints the string to a screen, the driver that 
+    decides where to put characters on the screen recognizes those control characters and interprets them 
+    in terms of cursor movement. According to convention, there are notional "tab stops" spaced 
+    every eight characters along a line; that convention is coded within the driver for the output 
+    device itself. So if you're printing a string on a printer, the escape sequence <b>\f</b> gets 
+    turned by Perl into the control character called form-feed, and the printer will produce a new 
+    page.</p>
+   
+   <p>Some escape sequences don't get turned into control characters, but instead cause 
+    Perl to change what follows them:</p>
+   
+   <ul><li><b>\l</b>: lowercase next character</li><li><b>\L</b>: lowercase all characters until end of string or the sequence <b>\E</b></li><li><b>\u</b>: uppercase next character</li><li><b>\U</b>: uppercase all characters until end of string or the sequence <b>\E</b></li></ul>
+  
+   <p>Hmm. That seems a little weird; after all, if you want the next character to be uppercase, why not type 
+    it that way? We'll learn the answer to that question shortly.</p>
+   
+   <p>There are a few other escape sequences of diminishing usefulness; see <b>perldoc perlop</b> or 
+    <a href="http://perldoc.perl.org/perlop.html" target="_blank">http://perldoc.perl.org/perlop.html</a>, "Quote and Quote-like Operators."</p>
+   
+   <p>But double-quoted strings are capable of much more. You can put a scalar 
+    variable inside one, and the value of the variable will be substituted—in Perl we say 
+    <i>interpolated</i>—at that point.</p>
+   
+   <p>Let's see what that looks like. Create a new file named <b>insect_sales.pl</b> and type the code below 
+    as shown:</p>
+   
+<div class="listingBox"><div class="listingTitle">CODE TO TYPE:</div><div class="listing"><pre><ins>#!/usr/bin/perl
+use strict;
+use warnings;
+
+my $date        = localtime();
+my $ants        = 47_000;
+my $fleas       = 240_000;
+my $beetles     = 520;
+my $fruit_flies = 1_500_000;
+print "Welcome to Echidna Eric's Insect Emporium\n";
+print "\n";
+print "This is the inventory stock report for $date\n";
+print "---------------------------------------------------------\n";
+print "We have $ants ants\n";
+print "We have $fleas fleas\n";
+print "We have $beetles beetles\n";
+print "We have $fruit_flies fruit flies\n";
+</ins> </pre></div></div>
+   
+   <p><img src="images/coderunner/checksyntax.JPG"> and run it. </p>
+   
+<div class="interactiveBox"><div class="interactiveTitle">INTERACTIVE TERMINAL SESSION:</div><div class="interactive"><pre>cold:~$ <ins>cd perl1</ins>
+cold:~$ <ins>./insect_sales.pl</ins>
+Welcome to Echidna Eric's Insect Emporium
+
+This is the inventory stock report for Thu Dec  3 14:55:14 2009
+---------------------------------------------------------
+We have 47000 ants
+We have 240000 fleas
+We have 520 beetles
+We have 1500000 fruit flies    
+cold:~/perl1$ 
+</pre></div></div>
+   
+   <p>Perl knows the current date and time! That's a feature of the 
+    <span class="darkgreen">localtime()</span> function—assign its result to a scalar and you get that handy 
+    string.</p>
+    
+   <p>We added underscores to large numbers to make them more readable—the underscores
+    are where commas (or in Europe, the decimal points) would be if I was typing the numbers for 
+    publication, like <b>12,345</b>. We can't use commas or periods here, because they mean something 
+    else in Perl, so we use underscores instead.</p> 
+    
+   <p>Every variable inside a double-quoted string is replaced by 
+    its current value at run-time. This <i>interpolation</i> makes <span class="darkblue">print</span> 
+    statements more readable. Compare these two statements:</p>
+    
+   <div class="c"><p><b>print "Name:\t", $name, ", phone:\t", $phone, "\n";</b></p>
+   
+   <p>or</p>
+   
+    <p><b>print "Name:\t$name, phone:\t$phone\n";</b></p></div>
+   <br>
+   <p>A few things about the sample code above might bother you. If you typed the code in by 
+    hand, you probably got tired of all those <span class="darkgreen">print</span> statements. Any time you 
+    spot repetition in a program, that's a sign that there's probably a better way to do 
+    it. How could we collapse all of those <span class="darkgreen">print</span> statements down to one?</p>
+    
+   <p>We could run all the strings together, but the program would become far less <i>readable</i>:</p>
+    
+   <p><div class="c"><b>print "Welcome to Echidna Eric's Insect Emporium\n\nThis is the inventory stock report for 
+    $date\n";</b></div></p> 
+    
+    
+   <p>This is where Perl's <i>here documents</i> come in handy. (We call them <i>heredocs</i> for short.) 
+    What we'd really like to write in the code is the text to be printed out, the way we
+    want it to come out; heredocs let us do this. 
+    Edit the program as shown:
+   </p>
+<div class="listingBox"><div class="listingTitle">CODE TO TYPE:</div><div class="listing"><pre>#!/usr/bin/perl
+use strict;
+use warnings;
+
+my $date        = localtime();
+my $ants        = 47_000;
+my $fleas       = 240_000;
+my $beetles     = 520;
+my $fruit_flies = 1_500_000;
+<ins>print &lt;&lt;"END_OF_REPORT";
+Welcome to Echidna Eric's Insect Emporium
+
+This is the inventory stock report for $date
+---------------------------------------------------------
+We have $ants ants
+We have $fleas fleas
+We have $beetles beetles
+We have $fruit_flies fruit flies
+END_OF_REPORT
+print 'done';
+</ins>
+</pre></div></div>
+   
+   <p><img src="images/coderunner/checksyntax.JPG"> and run it. </p>
+   
+    <p>Running the program gives the same result, but it's much more readable now. Here's  
+    how it works: <span class="darkblue">&lt;&lt;</span>, followed by a string within double quotation marks (in this case, 
+     <span class="darkblue">END_OF_REPORT</span>), is a Perl expression. That expression's value is the string that starts on the next 
+    line and continues up until (but not including) a line consisting of <i>precisely</i> the same string 
+     that followed <span class="darkblue">&lt;&lt;</span>. You must then have a newline character and nothing else.
+    That includes trailing spaces, so make sure you don't have any! If you 
+    do, or if you make some other mistake in the terminating line, Perl will run off the end of your
+    program searching for it and then complain. Let's make that mistake deliberately so you know 
+    what the error looks like. Edit your code as shown:</p>
+
+<div class="listingBox"><div class="listingTitle">CODE TO EDIT:</div><div class="listing"><pre>#!/usr/bin/perl
+use strict;
+use warnings;
+
+my $date        = localtime();
+my $ants        = 47_000;
+my $fleas       = 240_000;
+my $beetles     = 520;
+my $fruit_flies = 1_500_000;
+print &lt;&lt;"END_OF_REPORT";
+Welcome to Echidna Eric's Insect Emporium
+
+This is the inventory stock report for $date
+---------------------------------------------------------
+We have $ants ants
+We have $fleas fleas
+We have $beetles beetles
+We have $fruit_flies fruit flies
+END_OF_<ins>THE_</ins>REPORT
+print 'done';
+</pre></div></div>
+   
+   <p><img src="images/coderunner/checksyntax.JPG"> and run it. </p>
+   
+<div class="interactiveBox"><div class="interactiveTitle">INTERACTIVE TERMINAL SESSION:</div><div class="interactive"><pre>cold:~/perl1$ <ins>./insect_sales.pl</ins>
+Can't find string terminator "END_OF_REPORT" anywhere before EOF at ./insect.pl line 10.    
+cold:~/perl1$ 
+</pre></div></div>
+   
+   
+   <p>Now we've got a problem. Let's change it back so it runs correctly. Remove the <del>red</del> text as shown:</p>
+    
+<div class="listingBox"><div class="listingTitle">CODE TO EDIT:</div><div class="listing"><pre>#!/usr/bin/perl
+use strict;
+use warnings;
+
+my $date        = localtime();
+my $ants        = 47_000;
+my $fleas       = 240_000;
+my $beetles     = 520;
+my $fruit_flies = 1_500_000;
+print &lt;&lt;"END_OF_REPORT";
+Welcome to Echidna Eric's Insect Emporium
+
+This is the inventory stock report for $date
+---------------------------------------------------------
+We have $ants ants
+We have $fleas fleas
+We have $beetles beetles
+We have $fruit_flies fruit flies
+END_OF_<del>THE_</del>REPORT
+print 'done';
+</pre></div></div>
+   
+    <p>The string behaves like a <i>double-quoted</i> string, so you can interpolate variables in it.</p>
+   
+    <p><table class="noteBox fBox pBox "><tr><td class="noteTitle">Note</td><td class="note">You could embed literal newlines within a double-quoted string and print the whole 
+     report with one <span class="darkblue">print</span> statement and one set of double quotes around 
+     everything. But if you include a double quote somewhere 
+     in the report without realizing it, the quote would have to 
+     be escaped. It's also harder to see where a multi-line string ends without a distinctive line, 
+     like the one heredocs supplies.</td></tr></table></p>
+   
+    <p>Edit the program as shown:</p>
+
+<div class="listingBox"><div class="listingTitle">CODE TO EDIT:</div><div class="listing"><pre>#!/usr/bin/perl
+use strict;
+use warnings;
+
+my $date        = localtime();
+my $ants        = 47_000;
+my $fleas       = 240_000;
+my $beetles     = 520;
+my $fruit_flies = 1_500_000;
+
+print &lt;&lt;"END_OF_REPORT";
+Welcome to Echidna Eric's Insect Emporium
+
+This is the inventory stock report for $date
+---------------------------------------------------------
+We have $ants ants
+We have $fleas fleas
+We have $beetles beetles
+We have $fruit_flies fruit flies
+END_OF_REPORT
+<ins>my $insect_of_the_month = "caterpillar";
+ my $insect_of_the_month_count = 1_200;
+ print "This month, we have $insect_of_the_month_count $insect_of_the_months\n";</ins>   
+</pre></div></div>   
+   
+   <p><img src="images/coderunner/checksyntax.JPG"> and run it. </p>
+   
+<div class="interactiveBox"><div class="interactiveTitle">INTERACTIVE TERMINAL SESSION:</div><div class="interactive"><pre>cold:~/perl1$ <ins>./insect_sales.pl</ins>
+Global symbol "$insect_of_the_months" requires explicit package name at ./insect.pl line 23.
+Execution of ./insect.pl aborted due to compilation errors.    
+cold:~/perl1$ 
+</pre></div></div>
+   
+    <p>Hmmm. It doesn't work. There is no variable named 
+     <span class="darkred">$insect_of_the_months</span>. We meant to print 
+     out the value of <span class="darkred">$insect_of_the_month</span> followed by an 's'. But Perl doesn't know 
+     that-it just reads as many consecutive characters in a variable name as it can, while still 
+     following the rules, and used that result. To get the result we want, 
+     we need some syntax in Perl that indicates, "this is the end of a variable name." 
+     For that, we'll use braces {}. Edit <b>insect_sales.pl</b> as shown:</p>
+   
+<div class="listingBox"><div class="listingTitle">CODE TO TYPE:</div><div class="listing"><pre>#!/usr/bin/perl
+use strict;
+use warnings;
+
+my $date        = localtime();
+my $ants        = 47_000;
+my $fleas       = 240_000;
+my $beetles     = 520;
+my $fruit_flies = 1_500_000;
+
+print &lt;&lt;"END_OF_REPORT";
+Welcome to Echidna Eric's Insect Emporium
+
+This is the inventory stock report for $date
+---------------------------------------------------------
+We have $ants ants
+We have $fleas fleas
+We have $beetles beetles
+We have $fruit_flies fruit flies
+END_OF_REPORT
+my $insect_of_the_month = "caterpillar";
+ my $insect_of_the_month_count = 1_200;
+ <ins>print "This month, we have $insect_of_the_month_count ${insect_of_the_month}s\n";</ins>
+</pre></div></div>   
+    
+   <p><img src="images/coderunner/checksyntax.JPG"> and run it. </p>
+   
+<div class="interactiveBox"><div class="interactiveTitle">INTERACTIVE TERMINAL SESSION:</div><div class="interactive"><pre>cold:~/perl1$ <ins>./insect_sales.pl</ins>
+This month, we have 1200 caterpillars    
+cold:~/perl1$ 
+</pre></div></div>
+    
+    <p>So now you've seen how variables 
+     can be interpolated inside double-quoted strings; how do you 
+     think the <b>\l</b> and <b>\U</b> escape sequences are useful? Think it over before reading 
+     the next section.</p>
+   
+  </div></div>
+  <a name="s_02"></a><div id="s_02"><div class="subheading">Single-Quoted Strings</div><div class="subheadingText">
+   
+   <p><div class="c">Quotation, n.: The act of repeating erroneously the words of another. The words 
+    erroneously repeated. - Ambrose Bierce, The Devil's Dictionary</div></p>
+   
+   <p>Let's say you want an actual, uninterpolated, plain 
+    dollar sign <b>$</b> in a double-quoted string. You'd escape it in the usual way: <b>"I have \$10 in my wallet"</b>. And 
+    suppose you want a lot of plain dollar signs and backslash characters that remain as such. 
+    You could accomplish this by escaping each one, but you're going to get tired of hitting the 
+    backslash key, not to mention reading that long string!</p>
+   
+   <p>You might think that this type of situation doesn't come up very often, outside of financial
+    reports, but there's one example of strings like that you're certain to encounter: Perl code itself. 
+    We're not ready to tackle Perl code embedded as strings in 
+    Perl programs just yet, but trust me, they do occur, and when they do, you'll be glad you 
+    learned about <i>single-quoted</i> strings.</p>
+   
+   <p>A single-quoted string is surrounded by single quotation marks and obeys
+    these basic rules:</p>
+   
+   <ul><li>A backslash followed by single quote (<b>\'</b>) means single quote (<b>'</b>)</li><li>A backslash followed by backslash (<b>\\</b>) means backslash (<b>\</b>)</li></ul>
+   
+   <p>That's it. Everything else comes out just the way you put it in—including any backslashes 
+    that aren't followed by a single quotation mark or a backslash. Heredocs 
+    follow the same rules—use a single quotation mark after the <b>&lt;&lt;</b> instead of double quotation marks.  
+    In that case, <i>everything</i> inside the heredoc is taken literally, including all backslashes 
+    and single quotation marks. This can be especially useful when you want to print a chunk of text 
+    completely literally—with no interpolation of any kind—and you don't want to escape dollar 
+    signs or check for other things that can be interpolated.</p> 
+    
+    <p>Take a look at this code:</p>
+   
+<div class="observeBox"><div class="observeTitle">OBSERVE:</div><div class="observe"><pre>#!/usr/bin/perl
+use strict;
+use warnings;
+
+my $mail_message = &lt;&lt;'END_OF_TEXT';
+From: Dutiful Developer &lt;programmer@example.com&gt;
+To: Masterful Manager &lt;boss@example.com&gt;
+Subject: Code finished
+
+Hi boss, I finished my program.  I'm especially proud of this part:
+
+  my $first_name = "creative";
+  my $last_name = "Ceo";
+  print "This program ($0) is dedicated to our dear leader, \L\u$first_name \U$last_name\n";
+END_OF_TEXT
+
+</pre></div></div>
+   
+   <p>There's some interesting stuff embedded 
+    in the code written by Dutiful Developer that I haven't told you about yet. Take the code 
+    fragment that's quoted in the mail message in the program (we have a program within a string 
+    within a program...), put it in a new file called <b>escape_test.pl</b>, and <i>add the necessary 
+    preamble for all programs</i>, as shown:</p>  
+    
+<div class="listingBox"><div class="listingTitle">CODE TO TYPE:</div><div class="listing"><pre><ins>#!/usr/bin/perl
+use strict;
+use warnings;
+
+my $first_name = "creative";
+my $last_name = "Ceo";
+print "This program ($0) is dedicated to our dear leader, \L\u$first_name \U$last_name\n";</ins>
+</pre></div></div>
+    
+    <p><img src="images/coderunner/checksyntax.JPG"> and run it. </p>
+    
+<div class="interactiveBox"><div class="interactiveTitle">INTERACTIVE TERMINAL SESSION:</div><div class="interactive"><pre>cold:~/perl1$ <ins>./escape_test.pl</ins>
+This program (./escape_test.pl) is dedicated to our dear leader, Creative CEO    
+cold:~/perl1$ 
+</pre></div></div>
+    
+    <p>There's a detailed explanation of what's happening in this code
+    here: <a href="http://perldoc.perl.org/perlvar.html" target="_blank">http://perldoc.perl.org/perlvar.html</a>; look for "PROGRAM_NAME." Take note of the  
+    effect of <b>\L\u</b>. Do you see why Perl's creator would want it to work this way?</p>
+   
+   <p>Also, our code has one of Perl's <i>special variables</i>—<span class="darkred">$0</span>. It's not a 
+    variable <i>you</i> can declare—it doesn't comply with the naming rules we know.
+    But it's one of a number of variables that Perl populates with certain values. <span class="darkred">$0</span> 
+    contains the name of the program being executed (including whatever path was specified in the 
+    command line invocation).</p>
+  
+  </div></div>
+  <a name="s_03"></a><div id="s_03"><div class="subheading">Interpolate Now Or Later?</div><div class="subheadingText">
+   
+   <p><div class="c">"Believe me, you have to get up early if you want to get out of bed" <br> 
+    -Groucho Marx</div></p>
+   
+   <p>Modify <span class="darkred">escape_test.pl</span> as follows: </p>
+     
+<div class="listingBox"><div class="listingTitle">CODE TO EDIT:</div><div class="listing"><pre>#!/usr/bin/perl
+use strict;
+use warnings;
+
+my $first_name = "creative";
+my $last_name = "Ceo";
+   <ins>  
+my $dedication = "This program ($0) is dedicated to our dear leader, \L\u$first_name \U$last_name\n";
+$first_name = 'passionate';
+$last_name = 'president';
+print $dedication;</ins>
+</pre></div></div>
+   
+   <p><img src="images/coderunner/checksyntax.JPG"> and save it—but <i>before you run 
+    it</i>—quick, 
+    what do you think it will do?  Will the dedication be to "Creative CEO" or "Passionate President"? 
+    <i>Why</i> do you think that?</p>
+   
+   <p>Now run the program. You can see from the result that Perl does what we call <i>early 
+    binding</i> of variable values. That is, when <span class="darkred">$dedication</span> is assigned, the 
+    variables that are part of the expression assigned to it are evaluated to their values <i>in that instant</i>. 
+    Changing those variables later makes <i>no difference</i> to the value of 
+    <span class="darkred">$dedication</span>, because it's already been formed.</p>
+   
+   <p>(And thank goodness it works this way, too; otherwise Perl programming would become seriously difficult. 
+   Think about it.)</p>
+  
+  </div></div>
+  
+  <p>Wow. We're really making progress. Keep it up! See you in the next lesson!</p>
+  
+ </div>
+<div class="footer"><div id="timeSurvey"></div>				
+				Copyright © 1998-2014 O'Reilly Media, Inc.<br><img src="https://courses.oreillyschool.com/common/cclicense.png"><br>
+				This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 Unported License.<br>
+				See <a href="http://creativecommons.org/licenses/by-sa/3.0/legalcode">http://creativecommons.org/licenses/by-sa/3.0/legalcode</a> 
+				for more information.
+				</div><iframe id="t" width="1" height="1" border="0" style="display:none"></iframe><script language="javascript">bodyLoaded();</script><script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+  ga('create', 'UA-44720547-1', 'oreillyschool.com');
+  ga('send', 'pageview');
+</script></body></html>

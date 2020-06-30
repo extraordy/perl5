@@ -1,0 +1,495 @@
+<html><!-- Copyright (c) 1998-2014 O'Reilly Media, Inc.
+			This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 Unported License.
+			See http://creativecommons.org/licenses/by-sa/3.0/legalcode for more information.
+            --><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"><link rel="stylesheet" type="text/css" href="../common/Lab.css"><script type="text/javascript" src="../common/Lab.js"></script><script language="javascript"></script><title>Creating Reusable Code</title></head><body id="body"><a name="top"></a><div class="title">Creating Reusable Code</div><div class="resize"><a href="Perl1-11.html#top" onclick="changeSize('smaller');" class="aS" title="Keep clicking to make fonts smaller">A</a><a href="Perl1-11.html#top" onclick="changeSize('larger');" class="aL" title="Keep clikcing to make fonts larger">A</a><a href="Perl1-11.html#top" onclick="lv()" class="lv" title="Adjust Page for High Contrast">HC</a><div id="fh"><p>Click on <span class="aS">A</span> to make all fonts on the page smaller.</p><p>Click on <span class="aL">A</span> to make all fonts on the page larger.</p><p>Click on <span class="lv">HC</span> to toggle high contrast mode. When you move your mouse over 
+                 some bold words in high contrast mode, related words are automatically highlighted. Text is shown
+                 in black and white. 
+             </p></div></div><hr>
+ 
+ <div class="goalTitle">Lesson Objectives</div><div class="goals">
+  
+  
+  When you complete this lesson, you will be able to:
+  
+  <ul><li>create reusable code.</li><li>use subroutines.</li><li>define and use digraphs.</li></ul>
+ </div><hr>
+ 
+ <a name="h_01"></a><div class="heading">Subroutines</div><div class="headingText">
+  
+  <p>One of the guiding principles of computer program design has been distilled into this 
+   simple phrase: <b>D</b>on't <b>R</b>epeat <b>Y</b>ourself<sup> </sup> (<b>DRY</b>).*</p>
+  
+  <p>In other words, don't write the same code twice if it's doing the same thing each time. 
+   Instead, put that code in one place and call it from the two (or more) places that you need it.</p>
+ 
+  <p>So, how do you do that?  Great question. Consider the <span class="darkgreen">printf()</span> function. Imagine for now that 
+   it doesn't exist, but you need its functionality. You write some code that will format a number in a 
+   fixed-width field by turning the number into a string, calling the <span class="darkgreen">length()</span> function, 
+   printing out the number of spaces you need, and so on.</p>
+  
+  <p>Later, you need to do that again in a different part of your program to a different number. Do you write 
+   the same code out again?  Of course not—but 
+   you'd be amazed at how often people do just that! 
+   Fortunately, we are not those people. Instead, we'll use the <span class="darkgreen">printf()</span> function to
+   help us call our code whenever we need it.</p>
+
+  <p>We create this kind of reusable code using <b>subroutines</b>.</p>
+ 
+  <p><sup>*</sup> This concept first appeared in <i>The Pragmatic Programmer</i>, by Andy Hunt and Dave Thomas 
+   (Addison-Wesley, 1999).</p>
+  
+  <a name="s_01"></a><div id="s_01"><div class="subheading">Subroutines</div><div class="subheadingText">
+   
+   <p>A subroutine is the basic building block of reusable code in Perl. If you've used the equivalent of 
+    subroutines in other languages, you may be familiar with terms like <i>functions</i> and 
+    <i>procedures</i>. We don't use the term "procedures" in Perl 
+    programming, and when we talk about "functions," we're generally referring to built-in functions. 
+    Technically there's no difference in behavior between functions and subroutines though. Also,
+    subroutines in Perl always refer to code written by the programmer, not a part of Perl itself.</p>
+   
+   <p>If you have programmed things like subroutines in other languages, put that knowledge aside for 
+    this lesson. Perl subroutines work much more simply than subroutines in other languages, and several of the 
+    features you may be used to using don't exist in Perl. </p>
+   
+   <p>Here's how you define a subroutine in Perl:</p>
+   
+<div class="observeBox"><div class="observeTitle">OBSERVE:</div><div class="observe"><pre>
+<span class="purple">sub</span> my_sub
+{
+  # Body of subroutine
+} 
+</pre></div></div>
+   
+   <p>This subroutine is named <b>my_sub</b>. Here's how you'd call it from somewhere in 
+    your Perl program: </p>   
+   
+<div class="observeBox"><div class="observeTitle">OBSERVE:</div><div class="observe"><pre>
+my_sub( ... );
+</pre></div></div>
+   
+   <p>Pretty cool, huh? The ellipsis (<b>...</b>) indicates that "any arguments go here."</p>
+   
+   <p>When you run a Perl program, Perl actually reads your entire program before doing anything—this 
+    is called the <i>compilation</i> phase (it happens much faster in Perl than it does in most other compiled languages). 
+    Then Perl runs your program. When Perl encounters the definition of a subroutine during 
+    compilation, it tucks it away and remembers it. When Perl runs your program, it's as though the 
+    subroutine definitions aren't there—they don't get executed until they are called from a part of 
+    the program that's not in a subroutine definition. (Subroutines that aren't called at 
+    all are referred to as <i>orphaned code</i> and might as well be left out of your programs.)</p>
+      
+   <p>Before we go on, let's go over few guidelines to make sure that you'll follow best practices 
+    and don't become confused by Perl's flexible subroutines syntax options:</p>  
+   
+   <ul><li>Define your subroutines after the main code (this makes the code more readable).</li><li>Call your subroutines with parentheses, even if there are no arguments between the parentheses.</li><li>Don't give a subroutine the same name as a Perl built-in function.</li></ul>
+   
+   <p>That last rule might seem a bit difficult to follow—I mean, how can you remember the names of all the Perl 
+    built-ins? And what are they anyway?</p>
+    
+   <p>Well, you can look them over them if you execute <b>perldoc perlfunc</b> (or <a href="http://perldoc.perl.org/perlfunc.html" target="_blank">http://perldoc.perl.org/perlfunc.html</a>). It's a big page. In fact, this 
+    is the source of [perldoc -f] information. You don't have to read the whole thing; all of the 
+    functions are listed in groups at the top of the page.</p>
+   
+   <p>Still, implementing that third rule looks like a lot of work. 
+   Fortunately, we have another rule to add that will eliminate a big chunk of that work:</p>
+   
+   <ul><li>Include an underscore in your subroutine 
+    name.</li></ul> 
+    
+    <p>The presence of the underscore <i>guarantees</i> that your subroutine will not have the same name as a built-in, because none 
+    of the built-ins have underscores in their names.</p>
+   
+   <p>Believe it or not, after enough programming in Perl, you'll know the built-in function names well 
+    enough to be able to skip the underscore rule, but until then, use them. 
+    Just think of a brief description of your subroutine's task, write it in terms of a few words, 
+    and then put underscores between 
+    the words, like this: </p>
+   
+   <ul><li>trim_strings()</li><li>add_costs()</li><li>ping_servers()</li><li>launch_nuclear_missiles()</li></ul>
+   
+   <p>(If you find yourself writing a Perl subroutine with that last name, please email me before putting it 
+    into production. I'd like to check your code.)</p>
+   
+   <p>Let's explore how subroutines work with an example. Create 
+    a new file called <b>magnitude.pl</b> as shown:</p>
+   
+<div class="listingBox"><div class="listingTitle">CODE TO TYPE:</div><div class="listing"><pre><ins>#!/usr/bin/perl
+use strict;
+use warnings;
+
+foreach my $bignum (qw(7893420000 42 264340000000 3460000000000 96450000 24300))
+{
+  my $nice_form = number_suffix($bignum);
+  print "$bignum = $nice_form\n";
+}
+
+sub number_suffix
+{
+  my $n = shift;
+  
+  my $suffix = '';
+  my @threshold = ( K =&gt; 1E3, M =&gt; 1E6, G =&gt; 1E9, T =&gt; 1E12 );
+  while ( my $divisor = pop @threshold )
+  {
+    my $l = pop @threshold;
+    unless ( $n &gt;= $divisor )
+    {
+      next;
+    }
+    $n /= $divisor;
+    $suffix = $l;
+    last;
+  }
+  return "$n $suffix";
+}</ins>
+</pre></div></div>
+   
+   <p>(Are you wondering what the <span class="purple">next</span> statement is?  
+    It was in the homework for an earlier lesson.  Run [perldoc perlsyn] if you need a reminder.)</p>
+   
+   <p><img src="images/coderunner/checksyntax.JPG"> and run it. </p>
+   
+<div class="interactiveBox"><div class="interactiveTitle">INTERACTIVE SESSION:</div><div class="interactive"><pre>cold:~$ <ins>cd perl1</ins>
+cold:~/perl1$ <ins>./magnitude.pl</ins>
+7893420000 = 7.89342 G
+42 = 42
+264340000000 = 264.34 G
+3460000000000 = 3.46 T
+96450000 = 96.45 M
+24300 = 24.3 K    
+cold:~/perl1$    
+</pre></div></div>
+   
+   <p>Our output tells us that our program is turning big 
+    numbers into more manageable numbers by adding the common suffixes of 'K' for kilo (thousand), 
+    'M' for mega (million), 'G' for giga (billion), and 'T' for tera (thousand billion).</p>
+   
+   <p>In addition to subroutines, this program introduces us to the term <b>digraph</b>. "Digraph" refers to any 
+   pair of characters together that means something 
+    special. For example, <span class="darkblue">=&gt;</span> means the same thing as a comma, except that Perl pretends there are single 
+    quotation marks around the word to the left of it, provided that word is "well-behaved." For our 
+    purposes that means it obeys the same rules of syntax as something that would be legal as the identified part of 
+    a variable (coming after the <b>$</b> for a scalar or the <b>@</b> of an array name). The Perl term for 
+    that digraph is the <b>fat comma</b>, and it's an example of what we call <b>syntactic sugar</b>, that is, something 
+    that isn't absolutely necessary (because we could do it with existing syntax), but it makes reading the program easier.
+    If I didn't use the digraph in that code, this line:</p>
+      
+<div class="observeBox"><div class="observeTitle">OBSERVE: with fat comma</div><div class="observe"><pre>
+<span class="purple">my</span> <span class="darkred">@threshold</span> = ( <span class="orange">K</span> =&gt; <span class="orange">1E3</span>, <span class="orange">M</span> =&gt; <span class="orange">1E6</span>, <span class="orange">G</span> =&gt; <span class="orange">1E9</span>, <span class="orange">T</span> =&gt; <span class="orange">1E12</span> );
+</pre></div></div>
+    
+   <p>...would read:</p>
+   
+   <div class="observeBox"><div class="observeTitle">OBSERVE: without fat comma</div><div class="observe"><pre>
+<span class="purple">my</span> <span class="darkred">@threshold</span> = ( <span class="orange">'K'</span>, <span class="orange">1E3</span>, <span class="orange">'M'</span>, <span class="orange">1E6</span>, <span class="orange">'G'</span>, <span class="orange">1E9</span>, <span class="orange">'T'</span>, <span class="orange">1E12</span> );
+</pre></div></div>
+   
+   <p>Which version do you prefer?  Why? (These questions are designed to get you thinking about code 
+    <i>readability</i> and <i>maintainability</i>.)</p>
+   
+   <p>Okay, now let's look at how the subroutine works here. We're <i>calling</i> the routine 
+    <span class="darkgreen">number_suffix</span> with one argument (<span class="darkred">$bignum</span>) each time through the 
+    <span class="purple">foreach</span> loop. We're getting back a string that is suitable for printing (contains the 
+    scaled number and its suffix). So what happens in between? </p>
+   
+   <p>The code in the body of <span class="darkgreen">number_suffix</span> is executed, starting with the line:</p>
+  
+<div class="observeBox"><div class="observeTitle">OBSERVE: subroutine argument</div><div class="observe"><pre>
+<span class="purple">my</span> <span class="darkred">$n</span> = <span class="darkgreen">shift</span>;
+</pre></div></div>
+   
+   <p>Now, we know what <span class="darkgreen">shift</span> does—but what array are we shifting? We're shifting the 
+    special array:</p>
+
+   <p><span class="darkred">@_</span></p>
+   
+   <p>That's an underscore. Within the definition of a subroutine in Perl, the default array in 
+    <span class="darkgreen">pop</span> and <span class="darkgreen">shift</span> is <span class="darkred">@_</span>, so: </p>
+   
+<div class="observeBox"><div class="observeTitle">OBSERVE: subroutine argument</div><div class="observe"><pre>
+<span class="purple">my</span> <span class="darkred">$n</span> = <span class="darkgreen">shift</span>;
+</pre></div></div>
+   
+   <p>...is exactly the same as:</p>
+      
+<div class="observeBox"><div class="observeTitle">OBSERVE: subroutine argument</div><div class="observe"><pre>
+<span class="purple">my</span> <span class="darkred">$n</span> = <span class="darkgreen">shift</span> <span class="darkred">@_</span>;
+</pre></div></div>
+   
+   <p>...when it's inside a subroutine definition. The universal idiom (common coding practice) is to 
+    leave out the <span class="darkred">@_</span> in this case, so that's what we've done.</p>
+   
+   <p>So, what is the <span class="darkred">@_</span> array? It's the array in which the actual arguments to the 
+    subroutine are passed. In this case, <span class="darkred">@_</span> will contain one element, <span class="darkred">$bignum</span> 
+    (technically, it contains an <i>alias</i> to <span class="darkred">$bignum</span>), and the <span class="darkgreen">shift</span> 
+    line takes that element out of <span class="darkred">@_</span> and copies it into <span class="darkred">$n</span>. Because <span class="darkred">$n</span> is 
+    <i>declared</i> with <span class="purple">my</span> inside the body of the subroutine, only the code in that 
+    subroutine body can reference that <span class="darkred">$n</span>.</p>
+   
+   <p>Finally, the body of the subroutine calculates the result. 
+   When it comes time to 
+    return a result—because we do assign the result of <span class="darkgreen">number_suffix</span> to something 
+    (<span class="darkred">$nice_form</span>)—we use the special keyword <span class="purple">return</span> to mean, "return from the 
+    subroutine now and pass back whatever comes after <span class="purple">return</span> as the result."</p>
+   
+   <p><div class="c"><img src="images/subroutine.png"></div></p>
+   
+   <p>If you've programmed subroutines (or functions, or procedures) in other 
+    languages before, you may be pondering questions about 
+    prototypes, and return signatures, and pass-by-reference, and variadic argument lists.
+    Don't worry about that stuff; Perl doesn't use 
+    or need them. Also, it's possible in Perl to overwrite an argument passed to a subroutine—called an INOUT parameter in 
+    some languages—but it's bad practice, so don't even try. 
+    And there you have it. You've just learned everything you need to know about subroutines in Perl. Nice, huh?</p>
+   
+   <p>Let's keep going! Perl will let you return a 
+    list by entering your list after <span class="purple">return</span>. And Perl has no problem allowing you to assign
+    variables you're passing. It looks like this:</p>
+   
+<div class="observeBox"><div class="observeTitle">OBSERVE: result assignment</div><div class="observe"><pre>
+(<span class="darkred">$x</span>, <span class="darkred">$y</span>) = <span class="darkgreen">cube_it</span>( <span class="darkred">$x</span>, <span class="darkred">$y</span> );
+</pre></div></div>
+   
+   <p>This code is preferable to overwriting arguments in place, because in this code, the action is made clear to the caller.</p>
+   
+   <p>There is <i>no</i> validation of parameters—you can pass zero arguments to a subroutine on 
+    one call and five thousand arguments on the next, and Perl won't complain. If you don't want people to 
+    call your subroutine in a particular way, it's up to you to inspect the size and contents of 
+    <span class="darkred">@_</span> and make your own complaint. Here's how we might do that in our example. Edit <b>magnitude.pl</b>
+     as shown:</p>
+     
+<div class="listingBox"><div class="listingTitle">CODE TO EDIT:</div><div class="listing"><pre>#!/usr/bin/perl
+use strict;
+use warnings;
+
+foreach my $bignum (qw(7893420000 42 264340000000 3460000000000 96450000 24300))
+{
+  my $nice_form = number_suffix($bignum);
+  print "$bignum = $nice_form\n";
+}
+
+sub number_suffix
+{
+<ins>  unless ( @_)
+  {
+    die "number_suffix needs an argument\n";
+  }</ins>
+  my $n = shift;
+  
+  my $suffix = '';
+  my @threshold = ( K =&gt; 1E3, M =&gt; 1E6, G =&gt; 1E9, T =&gt; 1E12 );
+  while ( my $divisor = pop @threshold )
+  {
+    my $l = pop @threshold;
+    unless ( $n &gt;= $divisor )
+    {
+      next;
+    }
+    $n /= $divisor;
+    $suffix = $l;
+    last;
+  }
+  return "$n $suffix";
+}
+</pre></div></div>
+   
+   <p><img src="images/coderunner/checksyntax.JPG"> and run it. </p>
+   
+<div class="interactiveBox"><div class="interactiveTitle">INTERACTIVE TERMINAL SESSION:</div><div class="interactive"><pre>cold:~/perl1$ <ins>./magnitude.pl</ins>
+7893420000 = 7.89342 G
+42 = 42
+264340000000 = 264.34 G
+3460000000000 = 3.46 T
+96450000 = 96.45 M
+24300 = 24.3 K    
+cold:~/perl1$    
+</pre></div></div>
+   
+   <p>We put <span class="darkred">@_</span> in scalar context there.</p>
+   
+   <p>The other changes we made show once again that <a href="https://en.wikipedia.org/wiki/TMTOWTDI" target="_blank">TMTOWTDI</a> (<b>T</b>here's <b>M</b>ore <b>T</b>han <b>O</b>ne <b>W</b>ay <b>T</b>o <b>D</b>o <b>I</b>t)!</p>
+   
+   <p>Our next topic is fairly advanced, but I know after our discussion of the importance of context, 
+   you're going to want to be able to identify the context in which a subroutine is being called. 
+   Work this next example to find out how to do that. 
+    Modify <b>magnitude.pl</b> as follows:</p>
+   
+<div class="listingBox"><div class="listingTitle">CODE TO EDIT:</div><div class="listing"><pre>#!/usr/bin/perl
+use strict;
+use warnings;
+
+<del>foreach my $bignum (qw(7893420000 42 264340000000 3460000000000 96450000 24300))
+{
+  my $nice_form = number_suffix($bignum);
+  print "$bignum = $nice_form\n";
+}</del>
+<ins>my $bignum = 7893420000;
+my $nice_form = number_suffix($bignum);
+print "$bignum = $nice_form\n";
+
+$bignum = 264340000000;
+print "$bignum = ", number_suffix($bignum), "\n";
+
+$bignum = 3460000000000;
+number_suffix($bignum);</ins>
+
+sub number_suffix
+{
+  unless ( @_ )
+  {
+    die "number_suffix needs an argument\n";
+  }
+  my $n = shift;
+
+  my $suffix = '';
+  my @threshold = ( K =&gt; 1E3, M =&gt; 1E6, G =&gt; 1E9, T =&gt; 1E12 );
+  while ( my $divisor = pop @threshold )
+  {
+    my $l = pop @threshold;
+    unless ( $n &gt;= $divisor )
+    {
+      next;
+    }
+    $n /= $divisor;
+    $suffix = $l;
+    last;
+  }
+<ins>
+  if ( wantarray )
+  {
+    return ($n, $suffix);
+  }
+  elsif ( defined(wantarray) )
+  {
+    return "$n $suffix";
+  }
+  else
+  {
+    print "$n $suffix\n";
+  }</ins>
+  <del>return "$n $suffix";</del>
+}
+</pre></div></div>
+   
+   <p><img src="images/coderunner/checksyntax.JPG"> and run it. </p>
+   
+<div class="interactiveBox"><div class="interactiveTitle">INTERACTIVE TERMINAL SESSION:</div><div class="interactive"><pre>cold:~/perl1$ <ins>./magnitude.pl</ins>
+7893420000 = 7.89342 G
+264340000000 = 264.34G
+3.46 T    
+cold:~/perl1$    
+</pre></div></div>
+   
+   <p>We're calling <span class="darkgreen">number_suffix</span> three different ways: first in scalar 
+    context (because the result is assigned to <span class="darkred">$nice_form</span>); second in list context 
+    (because it appears in the argument <i>list</i> of the <span class="darkgreen">print</span> function); and  
+    third in a new context to you, <i>void</i> context (because there is <i>no</i> assignment to 
+    anything). We can use <span class="darkgreen">wantarray()</span> to figure out which context is in use
+    (and yes, it should have been called <span class="darkgreen">wantlist()</span>, but 
+    we're stuck with it now). <span class="darkgreen">wantarray()</span> returns a true value when we're in list 
+    context, a false (but defined) value in scalar context, and the undefined value in void context. 
+    We test for the last case using the built-in function 
+    <span class="darkgreen">defined()</span>, which returns false if its argument is undefined. Make sense?</p>
+   
+   <p>Be sure you understand how your code works; in particular, why there is a 
+    space between the number and the 
+    'G' suffix in the first line of output, but not the second.</p>
+   
+   <p>The void context case of this subroutine actually violates a number of good practices 
+    in code design, but we let it slide this time, just for the sake of example. 
+    Usually we don't even test for void context when 
+    writing subroutines, but it's good practice to test for scalar versus list context if you think your 
+    subroutine might return different things in each context.</p>
+   
+   <p>A few important notes concerning the results of your subroutine queries:</p>
+   
+   <ul><li>You don't have to use the results that a subroutine returns; you can ignore them by calling it
+     in void context. (If you don't want someone to call in void context, now you know how to test for 
+     it!)</li><li>Subroutines don't have to contain a <span class="purple">return</span> statement, but all subroutines
+     return something. If they come to the end of their definition without encountering a
+     <span class="purple">return</span> statement, then they will return the value of the last expression that was 
+     evaluated in any statement. If your subroutine will only be called in void context, none of this matters.</li><li>If you enter an empty <span class="purple">return;</span> (no arguments) in a subroutine, it will return the 
+     undefined value in a scalar context and the empty list in a list context. This can be really useful in 
+     well-designed subroutines.</li></ul>
+   
+   <p>Let's do one more example so you can see the common practice for reading multiple arguments. Create 
+    a new file called <b>make_metric.pl</b> as shown:</p>
+   
+<div class="listingBox"><div class="listingTitle">CODE TO TYPE:</div><div class="listing"><pre><ins>#!/usr/bin/perl
+use strict;
+use warnings;
+
+my $GALLONS_TO_LITERS = 3.87;
+my $POUNDS_TO_KG      = 0.45;
+
+my $quantity = 0.4;
+my $liters = make_metric( $quantity, "gallons" );
+print "$quantity gallons = $liters liters\n";
+
+my $kg = make_metric( $quantity, "pounds" );
+print "$quantity lbs = $kg kg\n";
+
+
+sub make_metric
+{
+  my ($quantity, $type) = @_;
+
+  if ( $type eq 'gallons' )
+  {
+    return $quantity * $GALLONS_TO_LITERS;
+  }
+  elsif ( $type eq 'pounds' )
+  {
+    return $quantity * $POUNDS_TO_KG;
+  }
+  else
+  {
+    die "I don't know what to do with $type\n";
+  }
+}</ins>
+</pre></div></div>
+   
+   <p><img src="images/coderunner/checksyntax.JPG"> and run it. </p>
+   
+<div class="interactiveBox"><div class="interactiveTitle">INTERACTIVE TERMINAL SESSION:</div><div class="interactive"><pre>cold:~/perl1$ <ins>./make_metric.pl</ins>
+0.4 gallons = 1.548 liters
+0.4 lbs = 0.18 kg
+cold:~/perl1$    
+</pre></div></div>
+   
+   
+   <p>A few more characteristics of subroutines to take note of:</p>
+   
+   <ul><li>The <span class="darkred">$quantity</span> inside <span class="darkgreen">make_metric</span> is different from the 
+     <span class="darkred">$quantity</span> earlier in the program, because it is declared in the subroutine with 
+     <span class="purple">my</span>. After that declaration (which also initializes it to the first element of 
+     <span class="darkred">@_</span>), the subroutine <span class="darkgreen">make_metric</span> cannot even see the 
+     <span class="darkred">$quantity</span> in the outer program—it has no way to refer to it.</li><li>Unlike our earlier example, this program does not take anything out of <span class="darkred">@_</span>—it could go 
+     back to the array again if it wanted to, but the universal best practice is to copy the arguments out in 
+     the first line of the subroutine and never refer to <span class="darkred">@_</span> again. The alternative is to 
+     <span class="darkgreen">shift</span> the elements out of <span class="darkred">@_</span> into variables that are local to the 
+     subroutine—as we did with <span class="darkred">magnitude.pl</span>—but we usually don't take that approach if 
+     we expect to be passed more than one argument.</li><li>This program follows a best practice of declaring "magic numbers" (the conversion factors) up at the 
+     top of the program by putting them in variables with descriptive names. For more best practices, see the 
+     book <a href="http://oreilly.com/catalog/9780596001735" target="_blank">Perl Best Practices</a> by Damian Conway (O'Reilly, 2005).</li></ul>
+
+  </div></div>
+
+  <br><br>
+  
+  <p>Subroutines are handy and will save us a lot of time. Experiment
+  and play around with what you've learned to make sure you can take full advantage of them.  See you in the next lesson!</p>
+ 
+ </div>
+<div class="footer"><div id="timeSurvey"></div>				
+				Copyright © 1998-2014 O'Reilly Media, Inc.<br><img src="https://courses.oreillyschool.com/common/cclicense.png"><br>
+				This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 Unported License.<br>
+				See <a href="http://creativecommons.org/licenses/by-sa/3.0/legalcode">http://creativecommons.org/licenses/by-sa/3.0/legalcode</a> 
+				for more information.
+				</div><iframe id="t" width="1" height="1" border="0" style="display:none"></iframe><script language="javascript">bodyLoaded();</script><script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+  ga('create', 'UA-44720547-1', 'oreillyschool.com');
+  ga('send', 'pageview');
+</script></body></html>

@@ -1,0 +1,645 @@
+<html><!-- Copyright (c) 1998-2014 O'Reilly Media, Inc.
+			This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 Unported License.
+			See http://creativecommons.org/licenses/by-sa/3.0/legalcode for more information.
+            --><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"><link rel="stylesheet" type="text/css" href="../common/Lab.css"><script type="text/javascript" src="../common/Lab.js"></script><script language="javascript"></script><title>The Arrow Operator and Multidimensional Arrays</title></head><body id="body"><a name="top"></a><div class="title">The Arrow Operator and Multidimensional Arrays</div><div class="resize"><a href="Perl3-09.html#top" onclick="changeSize('smaller');" class="aS" title="Keep clicking to make fonts smaller">A</a><a href="Perl3-09.html#top" onclick="changeSize('larger');" class="aL" title="Keep clikcing to make fonts larger">A</a><a href="Perl3-09.html#top" onclick="lv()" class="lv" title="Adjust Page for High Contrast">HC</a><div id="fh"><p>Click on <span class="aS">A</span> to make all fonts on the page smaller.</p><p>Click on <span class="aL">A</span> to make all fonts on the page larger.</p><p>Click on <span class="lv">HC</span> to toggle high contrast mode. When you move your mouse over 
+                 some bold words in high contrast mode, related words are automatically highlighted. Text is shown
+                 in black and white. 
+             </p></div></div><hr>
+  
+  <div class="goalTitle">Lesson Objectives</div><div class="goals"> 
+    
+    When you complete this lesson, you will be able to:
+    <ul><li>use <a href="Perl3-09.html#arrow_operator"> the Arrow Operator</a>.</li><li>create <a href="Perl3-09.html#lists_of_lists"> lists of lists</a>.</li><li>reduce the time required for sorting using <a href="Perl3-09.html#schwartzian_transform"> the Schwartzian Transform</a>.</li></ul>
+  </div><hr>
+ 
+ <p>Welcome back to your Advanced Perl course! Can you believe it? We're already past the halfway point in the course. 
+  </p>
+ 
+ 
+ <a href="Perl3-09.html" name="arrow_operator"></a>
+ <a name="h_01"></a><div class="heading">The Arrow Operator</div><div class="headingText">
+   
+  <p>If you find some of the expressions involving references complicated, you're not alone. It can still be pretty challenging 
+    even after you know how to construct or read an expression like:
+    
+<div class="observeBox"><div class="observeTitle">OBSERVE:</div><div class="observe"><pre>${ $refs[1] }{ $$alt_furn_ref[2] }</pre></div></div>
+    
+    Fortunately, there's the <b>arrow operator</b>:  <span class="code"><b>-&gt;</b></span>. 
+   The arrow operator 
+   makes more complex code easier to read.
+ It's a <i>binary infix</i> operator, which means it operates on two things, one to its left and one 
+   to its right (<b>+</b> is another such operator):</p>
+   
+  <p><div class="c"><span class="code"><i>LEFT</i><b>-&gt;</b><i>RIGHT</i></span></div></p>
+   
+  <p>The operation it performs depends on what's on the <i>right</i> side. The arrow operator is used for several 
+   purposes; first we'll see how the arrow operator 
+   <i>accesses members of aggregates pointed to by references</i>.</p>
+   
+   <p>That means we can use it to get at an element of an array, given an array ref, or an element of
+    a hash, given a hash ref. Let's try an example. Create <b>arrow.pl</b> in 
+   your <b>/perl3</b> folder as shown:</p>
+   
+<div class="listingBox"><div class="listingTitle">CODE TO TYPE:</div><div class="listing"><pre>#!/usr/bin/perl
+use strict;
+use warnings;
+
+my @clouds = qw(cumulus nimbus cumulonimbus stratus cirrus);
+my $clouds_ref = \@clouds;
+
+print "Cloud types:\n";
+print "\t $clouds_ref-&gt;[$_]\n" for 0 .. $#$clouds_ref;
+
+# http://www.navy.mil/navydata/questions/bells.html
+my %mid_bells = ( one =&gt; '0030', two =&gt; '0100', three =&gt; '0130', four =&gt; '0200',
+                  five =&gt; '0230', six =&gt; '0300', seven =&gt; '0330', eight =&gt; '0400' );
+my $mid_ref = \%mid_bells;
+print "Fourth mid bell is at $mid_ref-&gt;{four}\n";
+</pre></div></div>
+   
+  <p><img src="images/coderunner/checksyntax.JPG"> and run it by typing the commands below as shown:</p>
+ 
+<div class="interactiveBox"><div class="interactiveTitle">INTERACTIVE SESSION:</div><div class="interactive"><pre>cold:~$ <ins>cd perl3</ins>
+cold:~/perl3$  <ins>./arrow.pl</ins> 
+Cloud types:
+         cumulus
+         nimbus
+         cumulonimbus
+         stratus
+         cirrus
+Fourth mid bell is at 0200
+</pre></div></div>
+   
+   <p>In the above example the arrow operator works with curly braces.
+    When using the arrow operator, if the right side consists of curly braces around an expression, then the right side is interpreted as 
+     braces around a hash key, the left side must be a reference to a hash, and the result is the element with that 
+     key in the hash pointed to by the reference.</p>
+   
+  <p>Now we'll use the arrow operator with square brackets to improve the readability of an earlier program. 
+     When using the arrow operator, if the right side consists of square brackets around an expression, then the right side is interpreted 
+      as brackets around an array index, the left side must be a reference to an array, and the result is 
+      the element at that index of the array pointed to by the reference.</p>
+   <p> Go to 
+    your <b>/perl3</b> folder, open 
+   <b>ref_rules.pl</b> and modify it as shown:</p>
+  
+<div class="listingBox"><div class="listingTitle">CODE TO TYPE:</div><div class="listing"><pre>#!/usr/bin/perl
+use strict;
+use warnings;
+
+my $furn_ref = [ qw(sofa chair loveseat piano credenza) ];
+my $cost_ref = { sofa =&gt; 1500, chair =&gt; 300, loveseat =&gt; 800, piano =&gt; 6000, credenza =&gt; 500 };
+
+# Rule 1
+print "Cost of third item from \$furn_ref is: ",
+      <del>$$cost_ref{ $$furn_ref[2] },</del>
+      <ins>$cost_ref-&gt;{ $furn_ref-&gt;[2] },</ins>
+      "\n";
+
+# Rule 2
+my $alt_furn_ref = [ qw(bed rug rocker stool) ];
+my $alt_cost_ref = { bed =&gt; 3000, rug =&gt; 75, rocker =&gt; 450, stool =&gt; 125 };
+my @refs = ( $cost_ref, $alt_cost_ref );
+
+print "Cost of third item in \$alt_furn_ref from second reference in array is: ",
+      <del>${ $refs[1] }{ $$alt_furn_ref[2] },</del>
+      <ins>$refs[1]-&gt;{ $alt_furn_ref-&gt;[2] },</ins>
+      "\n";
+</pre></div></div>
+   
+  <p><img src="images/coderunner/checksyntax.JPG"> and run it.</p>
+   <p>  The output will be the same as 
+   before, only the code syntax has changed. </p>
+   
+  <p>We could change some of our other earlier programs in the same way. This code fragment:</p>
+  
+<div class="observeBox"><div class="observeTitle">OBSERVE: </div><div class="observe"><pre>
+print "I have $$stock_ref{ants} ants\n";
+</pre></div></div>
+   
+  <p>...could be replaced with this:</p>
+
+<div class="observeBox"><div class="observeTitle">OBSERVE: </div><div class="observe"><pre>
+print "I have $stock_ref-&gt;{ants} ants\n";
+</pre></div></div>
+   
+  <p>...because the arrow operator also works when interpolated in double-quoted strings.</p>
+   
+  <p>The arrow operator can only be used to get <i>elements</i> of an aggregate using a 
+   reference, so there are still times that you'll need to use the dereferencing rules from the last lesson; if you want to access the whole
+    aggregate, for instance, to get the keys of a hash.
+   (You will see more uses of that in the next 
+   few lessons.) But we'll use the arrow syntax from now on for all accesses of aggregate members.</p>
+   
+  <p>So, what happens if the reference doesn't point to the
+   correct type of thing? Let's find out using this one-liner:</p>
+   
+<div class="interactiveBox"><div class="interactiveTitle">INTERACTIVE SESSION:</div><div class="interactive"><pre>cold:~/perl3$ <ins>perl -wle '$h_ref = { J =&gt; 10, Q =&gt; 10, K =&gt; 10 }; print $h_ref-&gt;[42]'</ins>
+Not an ARRAY reference at -e line 1.
+</pre></div></div>
+  
+  <p>That's a fatal run-time exception. The right side of the arrow operator has 
+   square brackets, so it expects the left side to be a reference to an array.</p>
+  
+  <p>Let's do one more arrow operator example, this time using a possible solution to the Lesson 8 project. Create
+   <b>hash_compare.pl</b> in your <b>/perl3</b> folder as shown:</p>
+  
+<div class="listingBox"><div class="listingTitle">CODE TO TYPE:</div><div class="listing"><pre>#!/usr/bin/perl
+use strict;
+use warnings;
+
+my %first  = ( Wallace =&gt; 1, Gromit =&gt; 2 );
+my %second = ( Gromit =&gt; 2, Wallace =&gt; 1 );
+compare( \%first, \%second );
+
+%first  = ( Kirk =&gt; 'Captain', Spock =&gt; 'First Officer', McCoy =&gt; 'Doctor' );
+%second = ( Spock =&gt; 'First Officer', McCoy =&gt; 'Doctor' );
+compare( \%first, \%second );
+
+%first  = ();
+%second = ();
+compare( \%first, \%second );
+
+%first  = ( Wallace =&gt; 1, Gromit =&gt; 2 );
+%second = (Wallace =&gt; 2, Gromit =&gt; 1);
+compare( \%first, \%second );
+
+%first = (Wallace =&gt; 1, Gromit =&gt; 2);
+%second= (Wallace =&gt; 1, Gromit =&gt; 2, Shawn =&gt; 3);
+compare( \%first, \%second );
+
+
+sub compare
+{
+  print "Hashes are ", compare_hashes( @_ ) ? "EQUAL" : "NOT EQUAL", "\n";
+}
+
+# The following routine was the homework
+sub compare_hashes
+{
+  my ($h1_ref, $h2_ref) = @_;
+
+  return 0 if keys %$h1_ref != keys %$h2_ref;  # Unequal # of elements
+
+  for ( keys %$h1_ref )
+  {
+    return 0 if ! exists $$h2_ref{$_} || $$h1_ref{$_} ne $$h2_ref{$_};
+  }
+  return 1;     # Can't be any keys left unvisited
+}
+</pre></div></div>
+  
+  <p><img src="images/coderunner/checksyntax.JPG"> and run it as shown:</p>
+  
+<div class="interactiveBox"><div class="interactiveTitle">INTERACTIVE SESSION:</div><div class="interactive"><pre>cold:~/perl3$ <ins>./hash_compare.pl</ins>
+Hashes are EQUAL
+Hashes are NOT EQUAL
+Hashes are EQUAL
+Hashes are NOT EQUAL
+Hashes are NOT EQUAL
+</pre></div></div>
+   
+  <p>Now we'll make this small modification using the arrow operator to make our program a bit more readable:</p>
+  
+<div class="listingBox"><div class="listingTitle">CODE TO TYPE:</div><div class="listing"><pre>#!/usr/bin/perl
+use strict;
+use warnings;
+
+my %first  = ( Wallace =&gt; 1, Gromit =&gt; 2 );
+my %second = ( Gromit =&gt; 2, Wallace =&gt; 1 );
+compare( \%first, \%second );
+
+%first  = ( Kirk =&gt; 'Captain', Spock =&gt; 'First Officer', McCoy =&gt; 'Doctor' );
+%second = ( Spock =&gt; 'First Officer', McCoy =&gt; 'Doctor' );
+compare( \%first, \%second );
+
+%first  = ();
+%second = ();
+compare( \%first, \%second );
+
+%first  = ( Wallace =&gt; 1, Gromit =&gt; 2 );
+%second = (Wallace =&gt; 2, Gromit =&gt; 1);
+compare( \%first, \%second );
+
+%first = (Wallace =&gt; 1, Gromit =&gt; 2);
+%second= (Wallace =&gt; 1, Gromit =&gt; 2, Shawn =&gt; 3);
+compare( \%first, \%second );
+
+
+sub compare
+{
+  print "Hashes are ", compare_hashes( @_ ) ? "EQUAL" : "NOT EQUAL", "\n";
+}
+
+# The following routine was the homework
+sub compare_hashes
+{
+  my ($h1_ref, $h2_ref) = @_;
+
+  return 0 if keys %$h1_ref != keys %$h2_ref;  # Unequal # of elements
+
+  for ( keys %$h1_ref )
+  {
+<del>    return 0 if ! exists $$h2_ref{$_} || $$h1_ref{$_} ne $$h2_ref{$_};</del>
+<ins>    return 0 if ! exists $h2_ref-&gt;{$_} || $h1_ref-&gt;{$_} ne $h2_ref-&gt;{$_};</ins>  
+  }
+  return 1;     # Can't be any keys left unvisited
+}</pre></div></div>
+  
+ </div>
+ <a href="Perl3-09.html" name="lists_of_lists"></a>
+ <a name="h_02"></a><div class="heading">Lists of Lists</div><div class="headingText">
+   
+  <p>Time to dig into a vital topic that we call <i>Lists of Lists</i>. That's actually an 
+   inaccurate term, because you can't have lists of lists in Perl; what we really mean is  
+    "Aggregates containing references to other aggregates," where "aggregate" is an array or a hash, 
+   but that's a pretty big mouthful, so we'll stick with "lists of lists." That term is 
+   ingrained in Perl culture, and it's the title of the Perl document found through 
+   <b>perldoc perllol</b>.</p>
+  
+  <a name="s_01"></a><div id="s_01"><div class="subheading">Multidimensional Arrays</div><div class="subheadingText">
+   
+   <p>Let's start our experimentation with a familiar entity: the two-dimensional array. Even if you've never programmed one 
+    before, you have a sense of how it works if you've seen a chess 
+    board. We'll work on a smaller scale first with the tic-tac-toe board ("noughts and crosses" as it's 
+    called in some countries). The game is played on a 3x3 board and the first person to get three
+    of their marks in a row in any direction wins:</p>
+   
+   <p><div class="c"><img src="images/lessonImages/ttt.png"></div></p>
+   
+   <p>We're not going to play the 
+    game, we'll just represent the board. Create <b>game.pl</b> in your <b>/perl3</b> folder 
+    as shown:</p>
+   
+<div class="listingBox"><div class="listingTitle">CODE TO TYPE:</div><div class="listing"><pre>#!/usr/bin/perl
+use strict;
+use warnings;
+
+my @board = ( [ qw(O X O) ],
+              [ qw(X O X) ],
+              [ qw(O X X) ]);
+
+print_board( \@board );
+
+sub print_board
+{
+  my $board_ref = shift;
+
+  print "-" x 13, "\n";
+  for my $row ( @$board_ref )
+  {
+    for my $column ( @$row )
+    {
+      print "| $column ";
+    }
+    print "|\n";
+  }
+  print "-" x 13, "\n";
+}</pre></div></div>
+   
+   <p><img src="images/coderunner/checksyntax.JPG"> and run it as shown:</p>
+   
+<div class="interactiveBox"><div class="interactiveTitle">INTERACTIVE SESSION:</div><div class="interactive"><pre>cold:~/perl3$ <ins>./game.pl</ins>
+-------------
+| O | X | O |
+| X | O | X |
+| O | X | X |
+-------------
+</pre></div></div>
+   
+   <p>Somehow <b>O</b> has managed to outwit <b>X</b>! Notice that we passed a reference to <b>@board</b> in order to
+    <b>print_board</b>; we could have passed <b>@board</b> itself instead, as long as
+    we wrote <b>print_board</b> to expect an array instead of an array ref. The programs you write will reflect your own
+    subroutine interface design preferences.</p>
+   
+   <p>Our board has been represented as an array of references to arrays. If we designate positions on the 
+    board according to the intersections of rows and columns numbered from 1 to 3, we 
+    can then add code to indicate specific locations. (Remember that Perl's arrays are indexed from 
+    zero, not one.) Let's give that a try. Modify <b>game.pl</b> as shown:</p>
+   
+<div class="listingBox"><div class="listingTitle">CODE TO TYPE:</div><div class="listing"><pre>#!/usr/bin/perl
+use strict;
+use warnings;
+
+my @board = ( [ qw(O X O) ],
+              [ qw(X O X) ],
+              [ qw(O X X) ]);
+
+print_board( \@board );
+
+<ins>set_board( \@board, 2, 3, 'O' );
+
+print_board( \@board );
+
+sub set_board
+{
+  my ($board_ref, $row, $column, $piece) = @_;
+
+  $board_ref-&gt;[$row-1]-&gt;[$column-1] = $piece;
+}</ins>
+
+sub print_board
+{
+  my $board_ref = shift;
+
+  print "-" x 13, "\n";
+  for my $row ( @$board_ref )
+  {
+    for my $column ( @$row )
+    {
+      print "| $column ";
+    }
+    print "|\n";
+  }
+  print "-" x 13, "\n";
+}</pre></div></div>
+   
+   <p><img src="images/coderunner/checksyntax.JPG"> and run it as shown:</p>
+   
+<div class="interactiveBox"><div class="interactiveTitle">INTERACTIVE SESSION:</div><div class="interactive"><pre>cold:~/perl3$ <ins>./game.pl</ins>
+-------------
+| O | X | O |
+| X | O | X |
+| O | X | X |
+-------------
+-------------
+| O | X | O |
+| X | O | O |
+| O | X | X |
+-------------
+</pre></div></div>
+   
+   <p>Success! We changed the mark at the end of the middle row.</p>
+   
+   <p>Perl doesn't actually have a two-dimensional array as a proper type like 
+    many languages do. Instead, Perl lets you put anything you want into a one-dimensional array, including 
+    references to other one-dimensional arrays. An array that contains references to other arrays that 
+    are all of the same size is functionally equivalent to a two-dimensional array; but nothing stops you 
+    from changing that at any point during run-time. It's up to you to make sure the arrays are the correct size.</p>
+  
+  </div></div>
+  <a name="s_02"></a><div id="s_02"><div class="subheading">Multidimensional Syntax Optimization</div><div class="subheadingText">
+    
+   <p>Perl may not have real multidimensional arrays, but you can still benefit from their syntactical 
+    advantages!  Make this slight modification to <b>game.pl</b>:</p>
+       
+<div class="listingBox"><div class="listingTitle">CODE TO TYPE:</div><div class="listing"><pre>#!/usr/bin/perl
+use strict;
+use warnings;
+
+my @board = ( [ qw(O X O) ],
+              [ qw(X O X) ],
+              [ qw(O X X) ]);
+
+print_board( \@board );
+
+set_board( \@board, 2, 3, 'O' );
+
+print_board( \@board );
+
+sub set_board
+{
+  my ($board_ref, $row, $column, $piece) = @_;
+
+  $board_ref-&gt;[$row-1]<del>-&gt;</del>[$column-1] = $piece;
+}
+
+sub print_board
+{
+  my $board_ref = shift;
+
+  print "-" x 13, "\n";
+  for my $row ( @$board_ref )
+  {
+    for my $column ( @$row )
+    {
+      print "| $column ";
+    }
+    print "|\n";
+  }
+  print "-" x 13, "\n";
+}</pre></div></div>
+    
+   <p>That's right, remove the arrow. <img src="images/coderunner/checksyntax.JPG"> and run it. 
+    The results are unchanged. This is a nice piece of <i>syntactic sugar</i> from Perl:</p>
+
+   <p><div class="c"><table class="noteBox fBox pBox "><tr><td class="noteTitle">Note</td><td class="note">When there are two pairs of subscripting brackets or braces separated by only an arrow, 
+    the arrow can be omitted.</td></tr></table></div></p>
+    
+   <p>So, you could represent a 3-D structure with, say, an array <b>@cube</b> of references to 
+    <i>references</i> to arrays. Then, addressing any cell in the cube would look like this: 
+    <b>$cube[$x][$y][$z]</b>. As you saw in our example above, when we <i>iterate through</i> 
+    or <i>traverse</i> a multidimensional structure, we usually extract each aggregate reference into a 
+    separate scalar as we go, so that we expand the next level with code like <b>@$ref</b> and not, 
+    for example, <b>@{ $cube[$x][$y] }</b>, which is harder to read.</p>
+      
+  </div></div>
+ </div>
+ <a href="Perl3-09.html" name="schwartzian_transform"></a>
+ <a name="h_03"></a><div class="heading">The Schwartzian Transform</div><div class="headingText">
+  
+  <p>I think you're ready to learn an elegant optimization for sorting certain lists. The 
+   <i>Schwartzian Transform</i> is named after famed Perl guru, Randal Schwartz. It reduces the time 
+   required for sorting. You only use it when you're pressed to save time sorting, but really, you'd save even 
+   more time by using a CPAN module like Sort::Maker with the 
+   Guttman-Rosler Transform. In any case, you don't want to get into anything that complicated unless 
+   it's absolutely necessary.</p>
+  
+  <p>So then, if this isn't the preferred way to sort, why am I showing it to you?  Because the Schwartzian Transform is an excellent example of 
+   thinking through Perl, in this case, using references and <span class="darkgreen">map()</span> together. Randal came up with 
+   it extemporaneously. With enough practice, you'll be able to come up with time-saving 
+   constructions of your own when you need them.</p>
+  
+  <p>We can't always sort things in our programs just by passing them to <span class="darkgreen">sort()</span>. Some things don't lend themselves to 
+    being sorted, like dates: </p>
+  
+<div class="observeBox"><div class="observeTitle">OBSERVE: Dates</div><div class="observe"><pre>
+1/10/10
+4/9/08
+12/31/99
+5/23/09
+12/17/07
+</pre></div></div>
+  
+  <p>Those aren't plain numbers, and sorting them as strings doesn't give us what we want either. Create 
+   <b>sort.pl</b> in your <b>/perl3</b> folder as shown:</p>
+  
+<div class="listingBox"><div class="listingTitle">CODE TO TYPE:</div><div class="listing"><pre>#!/usr/bin/perl
+use strict;
+use warnings;
+
+chomp( my @dates = &lt;DATA&gt; );
+print "Before:\n", map { "\t$_\n" } @dates;
+@dates = sort @dates;
+print "After:\n", map { "\t$_\n" } @dates;
+
+__END__
+1/10/10
+4/9/08
+12/31/99
+5/23/09
+12/17/07
+</pre></div></div>
+  
+  <p><img src="images/coderunner/checksyntax.JPG"> and run it:</p>
+  
+<div class="interactiveBox"><div class="interactiveTitle">INTERACTIVE SESSION:</div><div class="interactive"><pre>cold:~/perl3$ <ins>./sort.pl</ins>
+Before:
+        1/10/10
+        4/9/08
+        12/31/99
+        5/23/09
+        12/17/07
+After:
+        1/10/10
+        12/17/07
+        12/31/99
+        4/9/08
+        5/23/09
+</pre></div></div>
+  
+  <p><i>We</i> know how we want to sort those dates, but we have to explain it to the computer. 
+    So let's modify <b>sort.pl</b> like this:</p>
+  
+<div class="listingBox"><div class="listingTitle">CODE TO TYPE:</div><div class="listing"><pre>#!/usr/bin/perl
+use strict;
+use warnings;
+
+chomp( my @dates = &lt;DATA&gt; );
+print "Before:\n", map { "\t$_\n" } @dates;
+@dates = sort <ins>bydate</ins> @dates;
+print "After:\n", map { "\t$_\n" } @dates;
+
+<ins>sub bydate
+{
+  date2str($a) cmp date2str($b);
+}
+
+sub date2str  # 4/9/08 -&gt; 20080409
+{
+  my $date = shift;
+  my ($month, $day, $year) = split m!/!, $date;
+  $year += $year &gt; 50 ? 1900 : 2000;
+  return sprintf "%d%02d%02d", $year, $month, $day
+}</ins>
+__END__
+1/10/10
+4/9/08
+12/31/99
+5/23/09
+12/17/07
+</pre></div></div>
+  
+  <p><img src="images/coderunner/checksyntax.JPG"> and run it:</p>
+  
+<div class="interactiveBox"><div class="interactiveTitle">INTERACTIVE SESSION:</div><div class="interactive"><pre>cold:~/perl3$ <ins>./sort.pl</ins>
+Before:
+        1/10/10
+        4/9/08
+        12/31/99
+        5/23/09
+        12/17/07
+After:
+        12/31/99
+        12/17/07
+        4/9/08
+        5/23/09
+        1/10/10
+</pre></div></div>
+  
+  <p>The <span class="blue">date2str</span> routine converts the date into a form that will sort in the order that we 
+   want. But let's think about how sorting happens; the <i>comparison function</i> (in this case,
+   <span class="blue">bydate</span>) gets called by Perl's <span class="darkgreen">sort()</span> function every time it needs to 
+    compare two elements to determine whether they're in the right order as it builds the result. <span class="darkgreen">sort()</span>
+     is going to call that comparison function more than once for at least some of the dates (technically, an 
+   optimum sort function requires <i>n log n</i> comparisons). But the comparison function has to call 
+   the <i>conversion</i> function <span class="blue">date2str</span>, which means that <span class="blue">date2str</span> gets 
+   called more than once with the same input, which is a waste, because it's going to produce the same 
+   output each time. </p>
+  
+  <p>The Schwartzian Transform <i>caches</i> the results of calling the conversion routine for every item 
+   in the input list, uses those cached values for the sort, then recovers the original list values. 
+   With our example using dates, the conversion routine isn't particularly expensive; it doesn't eat up time and resources. 
+   But if the input list was 
+   something that required going to the system or the network, like looking up file modification times or 
+   doing a DNS query, then this conversion routine would become more of a concern. </p>
+  
+   <p>Let's apply the Schwartzian Transform to our program. Modify <b>sort.pl</b> as shown: </p>
+  
+<div class="listingBox"><div class="listingTitle">CODE TO TYPE:</div><div class="listing"><pre>#!/usr/bin/perl
+use strict;
+use warnings;
+
+chomp( my @dates = &lt;DATA&gt; );
+print "Before:\n", map { "\t$_\n" } @dates;
+<del>@dates = sort bydate @dates;</del>
+<ins>@dates = map  { $_-&gt;[0] }
+         sort { $a-&gt;[1] cmp $b-&gt;[1] }
+         map  { [ $_, date2str($_) ] } @dates;
+</ins>
+print "After:\n", map { "\t$_\n" } @dates;
+
+<del>sub bydate
+{
+  date2str($a) cmp date2str($b);
+}
+</del>
+sub date2str  # 4/9/08 -&gt; 20080409
+{
+  my $date = shift;
+  my ($month, $day, $year) = split m!/!, $date;
+  $year += $year &gt; 50 ? 1900 : 2000;
+  return sprintf "%d%02d%02d", $year, $month, $day
+}
+__END__
+1/10/10
+4/9/08
+12/31/99
+5/23/09
+12/17/07
+</pre></div></div>
+  
+  <p><img src="images/coderunner/checksyntax.JPG"> and run it. You get exactly the same 
+    result as before. How does this work? Take a look at the Schwartzian Transform in action: </p>
+  
+<div class="observeBox"><div class="observeTitle">OBSERVE:</div><div class="observe"><pre>
+<span class="red">@dates</span> = <span class="darkgreen">map</span>  { $_-&gt;[0] }
+       <span class="green">sort</span> { <span class="red">$a</span>-&gt;[1] cmp <span class="red">$b</span>-&gt;[1] }
+       <span class="darkgreen">map</span>  { [ <span class="purple">$_</span>, <span class="blue">date2str</span>(<span class="purple">$_</span>) ] } @dates;
+</pre></div></div>
+  
+  <p>Remember the conveyor belt metaphor we saw earlier? It illustrated the way list items flow from right to left. 
+    So, elements come from 
+   <span class="red">@dates</span> and go into the first <span class="darkgreen">map()</span> statement, which turns them into an 
+   arrayref pointing to two elements: the <span class="purple">original element</span>, and the result of calling 
+   <span class="blue">date2str</span> on it. Then the conveyor belt moves things through the <span class="green">sort()</span> function; in 
+   its comparison block each <span class="red">$a</span> and <span class="red">$b</span> is an arrayref, and we can compare them by 
+   dereferencing the second element of each one (the result of calling <span class="blue">date2str</span>). Then, the 
+   list of arrayrefs (sorted in the correct order) passes into the final <span class="darkgreen">map()</span> 
+   statement, which extracts the first element from each arrayref, which is the original (date) element.
+   Here's a picture of that process:</p>
+  
+  <p><div class="c"><img src="images/lessonImages/schwartzian.png"></div></p>
+  
+  <p>Most of the transform routine remains the same no matter what is being sorted, that's where our program is saving time.</p>
+   
+  <p>Study this example, play around, and have fun with it! We're getting into some really deep Perl here, and 
+    you're getting better and better at data manipulation. Great work so far! </p>
+  
+ </div>
+ 
+ <p>Once you finish the lesson, go back to the syllabus to complete the homework.</p>
+
+<div class="footer"><div id="timeSurvey"></div>				
+				Copyright © 1998-2014 O'Reilly Media, Inc.<br><img src="https://courses.oreillyschool.com/common/cclicense.png"><br>
+				This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 Unported License.<br>
+				See <a href="http://creativecommons.org/licenses/by-sa/3.0/legalcode">http://creativecommons.org/licenses/by-sa/3.0/legalcode</a> 
+				for more information.
+				</div><iframe id="t" width="1" height="1" border="0" style="display:none"></iframe><script language="javascript">bodyLoaded();</script><script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+  ga('create', 'UA-44720547-1', 'oreillyschool.com');
+  ga('send', 'pageview');
+</script></body></html>

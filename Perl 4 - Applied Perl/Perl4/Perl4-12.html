@@ -1,0 +1,304 @@
+<html><!-- Copyright (c) 1998-2014 O'Reilly Media, Inc.
+			This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 Unported License.
+			See http://creativecommons.org/licenses/by-sa/3.0/legalcode for more information.
+            --><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"><link rel="stylesheet" type="text/css" href="../common/Lab.css"><script type="text/javascript" src="../common/Lab.js"></script><script language="javascript"></script><title>Sending Email</title></head><body id="body"><a name="top"></a><div class="title">Sending Email</div><div class="resize"><a href="Perl4-12.html#top" onclick="changeSize('smaller');" class="aS" title="Keep clicking to make fonts smaller">A</a><a href="Perl4-12.html#top" onclick="changeSize('larger');" class="aL" title="Keep clikcing to make fonts larger">A</a><a href="Perl4-12.html#top" onclick="lv()" class="lv" title="Adjust Page for High Contrast">HC</a><div id="fh"><p>Click on <span class="aS">A</span> to make all fonts on the page smaller.</p><p>Click on <span class="aL">A</span> to make all fonts on the page larger.</p><p>Click on <span class="lv">HC</span> to toggle high contrast mode. When you move your mouse over 
+                 some bold words in high contrast mode, related words are automatically highlighted. Text is shown
+                 in black and white. 
+             </p></div></div><hr>
+ 
+ 
+ <div class="goalTitle">Lesson Objectives</div><div class="goals">
+ When you complete this lesson, you will be able to:
+ 
+  <ul><li><a href="Perl4-12.html#sending_plain_email">Send Plain Email</a>.</li><li>send <a href="Perl4-12.html#multimedia_mail">Multimedia Mail</a>.</li></ul> 
+ </div><hr>
+ 
+ <p>Most people receive excessive amounts of email. We're going to learn how to send them even more, 
+  but the email we'll send can make their lives easier. For instance, an email message that lets someone know that their 
+  bank balance has just dipped into the negative could be really useful.</p>
+ 
+ <p>Note that one of the more common use cases for sending email may not require that you know anything about 
+  sending email. If you want a Unix <b>cron</b> job running under your username to send you email, then it 
+  already will: anything written to standard output by a cron job is emailed to the user it is running as. 
+  All you need is a ~/.forward file to send it to your server and you're set.</p>
+  
+ <p>This lesson includes these topics:</p>
+ <ul><li><a href="Perl4-12.html#sending_plain_email">Sending Plain Email</a></li><li><a href="Perl4-12.html#multimedia_mail">Multimedia Mail</a></li></ul> 
+ 
+ <a href="Perl4-12.html" name="sending_plain_email"></a>
+ <a name="h_01"></a><div class="heading">Sending Plain Email</div><div class="headingText">
+  
+  <p>Even if you enjoy email replete 
+   with multimedia and attractive embedded images, there are many people who 
+   detest receiving such mail and automatically delete anything that isn't plain text. From a programming perspective, plain text can 
+   be extracted, parsed, and searched much more easily. Since plain text is the most basic kind of email, 
+   we'll start there.</p>
+  
+  <p>Let's explore the structure of an email message. It has a lot in common with HTTP. 
+   An email message consists of a <i>header</i>, a blank line, and a <i>body</i>. The header 
+   consists of lines that start with a tag, a colon, and a value (or lines that continue the value of a 
+   previous line—confusingly perhaps, these lines are also called, "headers.") When you see an email 
+   message in a mail reading client, it is typically displayed with a separate header (though usually not every 
+   header line is displayed, because there may be lots of them, including those that describe the path the message has taken to get there). 
+   The headers "From" 
+   and "To" are usually present, though instead of—"To," you can use "Cc" 
+   (Carbon copy) or "Bcc" (Blind carbon copy). </p>
+  
+  <p>A basic email transaction consists of the sending party making a connection over TCP port 25 
+   to a mail exchanging host, sending a few SMTP (Simple Mail Transfer Protocol) commands that indicate who the message is from, who it is 
+   for, and the content of the message itself.</p>
+  
+  <p>You may notice some redundancy there. The email message and the SMTP command both identify the recipient. 
+   This apparent redundancy is necessary though because the email message may be addressed to multiple 
+   recipients, each reached using different mail exchanging hosts; each of those hosts will be the target of a separate SMTP 
+   transaction. But still, even though the SMTP recipient ought to be the same as the email message recipient, it isn't required. 
+   (And unfortunately, this feature often enables spam.)</p>
+    
+  <a name="s_01"></a><div id="s_01"><div class="subheading">sendmail</div><div class="subheadingText">
+   
+   <p>I'll illustrate mail sending with a program found on nearly every Unix host: 
+    <b>sendmail</b>. This incredibly complex program accepts a mail message, figures out the correct mail exchanging 
+    host(s) to connect to, sends the SMTP commands to them, and if it can't reach them, automatically queues 
+    and retries the messages until it succeeds or is forced to give up and return the message to the sender, 
+    marked as undeliverable. To take advantage of all of those features, we just pass an email 
+    message to sendmail's standard input. Let's do that now! Create a new file called <b>/perl4/sendmail.pl</b> in the CodeRunner editor:</p>
+         
+<div class="listingBox"><div class="listingTitle">CODE TO TYPE:</div><div class="listing"><pre>#!/usr/local/bin/perl
+use strict;
+use warnings;
+
+print "Enter your email address: ";
+chomp( my $to = &lt;STDIN&gt; );
+
+chomp( my $from = "$ENV{USER}\@" . `hostname` );
+my $msg = join '', &lt;DATA&gt;;
+$msg = eval qq{"$msg"};
+
+open my $fh, "|-", "sendmail -t" or die "Can't pipe to sendmail: $!\n";
+
+print {$fh} $msg;
+
+
+__END__
+From: $from
+To: $to
+Subject: Email from Perl 4 Course
+
+Hello, $ENV{USER}!  Congratulations on making it this far through
+the course!  There's more to come!
+
+Sincerely,
+
+The Management.
+</pre></div></div>
+     
+   <p><img src="images/coderunner/save.gif"> Save and run it:</p>
+   
+<div class="interactiveBox"><div class="interactiveTitle">INTERACTIVE TERMINAL SESSION: Command to type</div><div class="interactive"><pre>cold:~$ <ins>cd perl4</ins>
+cold:~/perl4$ <ins>./sendmail.pl</ins>
+Enter your email address: <ins>(your email address)</ins></pre></div></div>
+     
+   <p>There is no error checking, so make sure you enter your email address correctly. 
+    Now, go and check in your email client to see if you've received a 
+    message. (If you haven't, check your spam folder and whitelist <i>your_username</i>@cold1.useractive.com.)</p>
+     
+   <p>One technique illustrated in this program is the <i>double string eval,</i> a quick-and-dirty (very 
+    quick and very dirty) method of including variables in a string. We could have achieved the same effect 
+    with a double-quoted heredoc, but I wanted to place the message at the end of the program in a data 
+    block.</p>
+     
+   <p>As straightforward as this approach is, it's fraught with risk. Any mistake in the format of the email message 
+    and our message might disappear without notification or be redirected to the wrong address. Fortunately, there are 
+    modules to help with that.</p>
+   
+  </div></div>
+  <a name="s_02"></a><div id="s_02"><div class="subheading">Email::Sender</div><div class="subheadingText">
+   
+   <p>Let's install the modules we need for this section now:</p>
+   
+<div class="interactiveBox"><div class="interactiveTitle">INTERACTIVE TERMINAL SESSION: Command to type</div><div class="interactive"><pre>cold:~/perl4$ <ins>PERL5LIB=~/mylib/lib/perl5 cpan Email::Sender Email::Stuff</ins>
+[output omitted]</pre></div></div>
+   
+   <p>Email::Sender will allow us to send the basic messages we're working on now, as well as the more complex messages we'll devise later. 
+    Create a new file named <b>sender.pl</b> as shown below:</p>
+   
+<div class="listingBox"><div class="listingTitle">CODE TO ENTER:</div><div class="listing"><pre>#!/usr/local/bin/perl
+use strict;
+use warnings;
+
+use lib "$ENV{HOME}/mylib/lib/perl5";
+use Email::Sender::Simple;
+use Email::Simple;
+use Email::Simple::Creator;
+use Sys::Hostname;
+
+print "Enter your email address: ";
+chomp( my $to = &lt;STDIN&gt; );
+my $user  = $ENV{USER};
+my $gecos = (getpwnam $user)[6];
+my $from  = "$user\@" . hostname();
+my $email = Email::Simple-&gt;create(
+    header =&gt; [
+        To      =&gt; qq{"$gecos" &lt;$to&gt;},
+        From    =&gt; qq{"$gecos" &lt;$from&gt;},
+        Subject =&gt; "Welcome to the next level",
+    ],
+    body =&gt; "Congratulations, you're now sending mail with Perl modules!\n",
+  );
+
+Email::Sender::Simple-&gt;send( $email );</pre></div></div>
+ 
+  <p><img src="images/coderunner/save.gif"> Save and run it:</p>
+  
+<div class="interactiveBox"><div class="interactiveTitle">INTERACTIVE TERMINAL SESSION: Command to type</div><div class="interactive"><pre>cold:~/perl4$ <ins>./sender.pl</ins>
+Enter your email address: <ins>(your email address)</ins></pre></div></div>
+  
+   <p>We're using the <b>send</b> method of the <b>Email::Sender</b> module, which takes as argument an 
+    <b>Email::Simple</b> object representing an email message. We load in the <b>Email::Simple::Creator</b> module to 
+    help us create that message, which has a header (an <b>arrayref</b>) and a body as shown.</p>
+  
+   <p>This time, we used the <b>Sys::Hostname</b> module, a more portable and reliable method to get our 
+    hostname. (Not that there's anything
+   particularly useful about using the <b>from</b> address that we have,
+   but it involves the least amount of lying.) <b>getpwnam</b> is a Perl <i>builtin</i>, and we use it to fetch the 
+    full version of your name from the /etc/passwd file on this machine. The (quirky) name for this field is 
+    <a href="http://en.wikipedia.org/wiki/Gecos_field" target="_blank">GECOS</a>.</p>
+   
+  </div></div> 
+ </div>
+ <a href="Perl4-12.html" name="multimedia_mail"></a> 
+ <a name="h_02"></a><div class="heading">Multimedia Mail</div><div class="headingText">
+   
+  <p>Of course, sometimes you'll want to send email that contains attachments, or HTML formatting, or both, so let's give that a try. 
+   We'll need an attachment to send, so fetch this one into your current directory:</p>
+   
+  <div class="interactiveBox"><div class="interactiveTitle">INTERACTIVE TERMINAL SESSION: Command to type</div><div class="interactive"><pre>cold:~/perl4$ <ins>wget http://perl4.oreillyschool.com/ost-mirror/images/illinois.jpg</ins>
+ [...output omitted...]
+ 17:33:57 (122.22 MB/s) - `illinois.jpg' saved [4897/4897]
+</pre></div></div>
+     
+  <a name="s_01"></a><div id="s_01"><div class="subheading">Email::Stuff</div><div class="subheadingText">
+   
+   <p>Sending HTML email used to be a longer, more complicated process to learn until Ricardo Signes wrote <b>Email::Stuff</b>. 
+    We'll use it now and see just how streamlined the process has become. Create a new file as shown:</p>
+   
+<div class="listingBox"><div class="listingTitle">CODE TO ENTER:</div><div class="listing"><pre>#!/usr/local/bin/perl
+use strict;
+use warnings;
+
+use lib "$ENV{HOME}/mylib/lib/perl5";
+use Email::Stuff;
+use LWP::Simple;
+use HTML::TreeBuilder;
+use Sys::Hostname;
+
+print "Enter your email address: ";
+chomp( my $to = &lt;STDIN&gt; );
+my $from    = "$ENV{USER}\@" . hostname();
+my $subject = 'Multimedia email test from Perl 4 course';
+my $text    = &lt;&lt;"EOT";
+This is the text part of the message.  Your mail reader may not
+even show it to you until you explicitly request it.
+EOT
+
+my $url = 'http://perl4.oreillyschool.com/ost-mirror/courses/index.html';
+my $tree = HTML::TreeBuilder-&gt;new;
+$tree-&gt;parse( get( $url ) );
+
+my $target_element = $tree-&gt;look_down( _tag =&gt; 'div', class =&gt; 'right-content' );
+
+my $html = $target_element-&gt;as_HTML;
+
+Email::Stuff-&gt;to( $to )
+            -&gt;from( $from )
+            -&gt;subject( $subject )
+            -&gt;text_body( $text )
+            -&gt;html_body( $html )
+            -&gt;attach_file( 'illinois.jpg' )
+            -&gt;send;</pre></div></div>
+      
+   <p>Save it as <b>/perl4/send_fancy.pl</b> and run it. Now check your email client. (We saved 
+    ourselves the trouble of writing lots of fancy HTML by borrowing a bit from a page someone else wrote.)</p>
+      
+   <p>This ilustrates another Perl object-oriented idiom: <i>method chaining</i>. Each of the methods you see 
+    called at the end (with the exception of <b>send</b>) returns the object upon which an operation is being performed. You 
+    could write your own versions of these with something like this:</p>
+      
+<div class="observeBox"><div class="observeTitle">OBSERVE:</div><div class="observe"><pre>
+sub to
+{
+  my ($what, @args) = @_;
+
+  unless ( ref $what )
+  {
+    $what = $what-&gt;new;
+  }
+  $what-&gt;set_to( @args );
+  return $what;
+}</pre></div></div>
+      
+   <p>The <b>subject</b> method, for instance, would be the same, only <b>to</b> would be replaced by 
+    <b>subject</b>. (Of course, you wouldn't repeat them; you'd use method generation to avoid duplication.) 
+    The <b>set_to</b> method is defined elsewhere to do whatever is required to parse the arguments and set 
+    the appropriate attribute of the object. </p>
+      
+   <p>All of these methods can be called in any order. They can be called multiple times (if you have, say, 
+    multiple attachments, or multiple recipients). There are other possibilities not shown here (see 
+    <a href="http://search.cpan.org/perldoc?Email::Stuff" target="_blank">http://search.cpan.org/perldoc?Email::Stuff</a>). And you don't need to use all the ones we used in this example, either.</p>
+ 
+  </div></div>
+  <a name="s_02"></a><div id="s_02"><div class="subheading">Caveats</div><div class="subheadingText">
+   
+   <p>When sending email for the first time from a particular machine, you could encounter random problems that may 
+    have little to do with Perl. Errors may not be readily visible or located in inaccessible places that only root can read, such as a 
+    /var/log/maillog file. </p>
+   
+   <p>Some errors are due to sendmail being inaccessible. For instance, I discovered that
+    sendmail is misconfigured on the machine where I developed this material before testing it on 
+    the student machine; all my messages got saved to a dead.letter file. (Solving this problem required 
+    delving into sendmail configuration files, a topic way outside the scope of this course.)</p>
+     
+   <p>But before you call out for a system administrator to help, there are a few possible solutions to errors you can try. The modules 
+     we use can send mail without using <b>sendmail</b>. For instance, they can make direct SMTP connections 
+    if you have the address of a host that will relay mail for you. Generally, such a host is provided
+    by your ISP. In <b>send_fancy.pl</b>, you would call <b>using</b> to help: </p>
+     
+<div class="observeBox"><div class="observeTitle">OBSERVE: Code fragment</div><div class="observe"><pre>...-&gt;subject( $subject )
+-&gt;using( SMTP =&gt; $mail_relay_host )
+-&gt;text_body...</pre></div></div>
+     
+   <p>In the <b>Email::Sender</b> program, you would create a <i>transport</i> object to replace the default 
+    sendmail transport object, and pass it in the <b>send</b> call: </p>
+     
+<div class="observeBox"><div class="observeTitle">OBSERVE: Code fragment</div><div class="observe"><pre>...
+use Email::Sender::Transport;
+my $transport = Email::Sender::Transport::SMTP-&gt;new({
+    host =&gt; $mail_relay_host,
+    port =&gt; $mail_relay_port,  # Only include this line if $mail_relay_host uses a port other than 25
+});
+
+Email::Sender::Simple-&gt;send( $email, { transport =&gt; $transport } );</pre></div></div>
+  </div></div>
+   
+  <p>As with all of the applied topics we discuss, learning the details of the underlying protocol 
+   will pay off with time saved. Knowing how email gets sent—the basic functionality of SMTP, 
+   the envelope, header, body structure of messages, how mail relays work—can save you lots of time troubleshooting in 
+   situations where the basic approaches don't work.</p>
+   
+ </div>
+ 
+ <p>Once you finish the lesson, go back to the syllabus to complete the homework.</p>
+   
+<div class="footer"><div id="timeSurvey"></div>				
+				Copyright © 1998-2014 O'Reilly Media, Inc.<br><img src="https://courses.oreillyschool.com/common/cclicense.png"><br>
+				This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 Unported License.<br>
+				See <a href="http://creativecommons.org/licenses/by-sa/3.0/legalcode">http://creativecommons.org/licenses/by-sa/3.0/legalcode</a> 
+				for more information.
+				</div><iframe id="t" width="1" height="1" border="0" style="display:none"></iframe><script language="javascript">bodyLoaded();</script><script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+  ga('create', 'UA-44720547-1', 'oreillyschool.com');
+  ga('send', 'pageview');
+</script></body></html>

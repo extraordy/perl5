@@ -1,0 +1,438 @@
+<html><!-- Copyright (c) 1998-2014 O'Reilly Media, Inc.
+			This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 Unported License.
+			See http://creativecommons.org/licenses/by-sa/3.0/legalcode for more information.
+            --><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"><link rel="stylesheet" type="text/css" href="../common/Lab.css"><script type="text/javascript" src="../common/Lab.js"></script><script language="javascript"></script><title>Regular Expressions: Anchors and Captures</title></head><body id="body"><a name="top"></a><div class="title">Regular Expressions: Anchors and Captures</div><div class="resize"><a href="Perl2-07.html#top" onclick="changeSize('smaller');" class="aS" title="Keep clicking to make fonts smaller">A</a><a href="Perl2-07.html#top" onclick="changeSize('larger');" class="aL" title="Keep clikcing to make fonts larger">A</a><a href="Perl2-07.html#top" onclick="lv()" class="lv" title="Adjust Page for High Contrast">HC</a><div id="fh"><p>Click on <span class="aS">A</span> to make all fonts on the page smaller.</p><p>Click on <span class="aL">A</span> to make all fonts on the page larger.</p><p>Click on <span class="lv">HC</span> to toggle high contrast mode. When you move your mouse over 
+                 some bold words in high contrast mode, related words are automatically highlighted. Text is shown
+                 in black and white. 
+             </p></div></div><hr>
+ 
+ <div class="goalTitle">Lesson Objectives</div><div class="goals">
+  
+  
+  When you complete this lesson, you will be able to:
+  
+  <ul><li>use regex anchors to mark the boundary between a string of digits and something that isn't a 
+    string of digits.</li><li>use regex captures.</li></ul>
+ </div><hr>
+ 
+  <p>The key concepts we need to learn here are <i>anchors</i> (how to match a <i>place</i> rather 
+   than a <i>thing</i>), and <i>captures</i> (how to get at what part of a regex matched).</p>
+  
+  <a name="h_01"></a><div class="heading">Anchors</div><div class="headingText">
+   
+   <p>Until now, we've had difficulty telling Perl where to stop matching. 
+    For instance, looking for a US zip code with the regex <span class="orange">/\d{5}</span> worked fine for input 
+    like <span class="orange">"Sebastopol, CA 94572"</span>, but it also matched when the input was 
+    <span class="orange">"Pi is about 3.14159265"</span>. That may not matter—it could be that 
+    for the problem you're solving, all inputs that contain five consecutive digits will 
+    always contain only zip codes, so your regex is adequate. But what if that's not the case? Suppose you want to 
+    "match five consecutive digits, but no more"?</p>
+   
+   <p>We can solve this problem already—kind of. Consider the regex <span class="orange">/\D\d{5}\D/</span>. "Match
+    a non-digit, followed by 5 digits, followed by a non-digit." That'll successfully discriminate against 
+    our Pi example above, because every group of five digits is either preceded or succeeded by a digit. But 
+    what about certain inputs that <i>should</i> match, like <span class="orange">"Sebastopol, CA 94572"</span>? That 
+    no longer matches, because the five digits are not followed by a non-digit—they're not followed by 
+    anything at all!</p>
+   
+   <p>Instead, we want to say, "Match five digits that are not preceded by a digit and not followed by a 
+    digit." Do you see the difference between that and the regex we had before? We need to allow for the 
+    possibility that the string will start with the five digits or end with the five digits, or maybe even be 
+    composed exactly of five digits.</p>
+   
+   <p>In short, we need to match a <i>place</i>, rather than a character, on each end of our five digits; we 
+    want to indicate that a specific place marks the boundary between a string of digits and something that isn't a 
+    string of digits. Perl lets us do that in the form of an <i>anchor</i> called the 
+    <i>word boundary</i>, expressed with the sequence <span class="orange">\b</span>. Let's try an example to see this in 
+    action. Create <span class="darkred">reg_boundary.pl</span> as shown:</p>
+
+<div class="listingBox"><div class="listingTitle">CODE TO TYPE: reg_boundary.pl</div><div class="listing"><pre><ins>#!/usr/bin/perl
+use strict;
+use warnings;
+
+my @regexes = qw( \d{5} \D\d{5}\D \b\d{5}\b );
+printf "%40s%10s%10s%10s\n", 'Regex:', @regexes;
+
+while ( my $line = &lt;DATA&gt; )
+{
+  chomp $line;
+  printf "%40s", $line;
+  foreach my $regex ( @regexes )
+  {
+    if ( $line =~ /$regex/ )
+    {
+      printf "%10s", "   X   ";
+    }
+    else
+    {
+      printf "%10s", "";
+    }
+  }
+  print "\n";
+}
+
+__END__
+Sebastopol, CA 94572
+20500 is the zip code of the White House
+Pi is about 3.14159265, give or take
+The Statue of Liberty is at 10004-1467
+2147483647 is MAXINT on my machine
+</ins></pre></div></div>
+   
+   <p><img src="images/coderunner/checksyntax.JPG"> and run it. You should see something like this:</p>
+   
+   <div class="c"><table class="tbl" border=""><tr><th align="RIGHT">Regex:</th><th align="CENTER">\d{5}</th><th align="CENTER">\D\d{5}\D</th><th align="CENTER">\b\d{5}\b</th></tr><tr><td align="LEFT">Sebastopol, CA 94572</td><td align="CENTER">X</td><td>&nbsp;</td><td align="CENTER">X</td></tr><tr><td align="LEFT">20500 is the zip code of the White House</td><td align="CENTER">X</td><td>&nbsp;</td><td align="CENTER">X</td></tr><tr><td align="LEFT">Pi is about 3.14159265, give or take</td><td align="CENTER">X</td><td>&nbsp;</td><td>&nbsp;</td></tr><tr><td align="LEFT">The Statue of Liberty is at 10004-1467</td><td align="CENTER">X</td><td align="CENTER">X</td><td align="CENTER">X</td></tr><tr><td align="LEFT">2147483647 is MAXINT on my machine</td><td align="CENTER">X</td><td>&nbsp;</td><td>&nbsp;</td></tr></table></div>
+   
+   <p>The last regex is the only one to correctly match what we want and nothing more, in all
+    cases. The <span class="orange">\b</span> <i>word boundary</i> anchor matches a <i>place</i> (something that 
+    has no width, contains no characters) that can be described like this: "On one side is a word 
+    character, and on the other side is not a word character." Keep in mind that "not a word character" is 
+    <i>not</i> the same as "a character that isn't a word character." Also, remember that a word character is 
+    the character class of letters, digits, and the underscore character. Look over the results in the table, 
+    make sure you understand them, and play with changing the program until you're comfortable with it.</p>
+   
+   <p>There isn't a special anchor that only matches the boundary between digits and not-digits, so we used 
+    the closest thing, which worked for all our above examples. Just to make sure you understand its 
+    limitations as well, make this change to the code:</p>
+   
+<div class="listingBox"><div class="listingTitle">CODE TO EDIT: reg_boundary.pl</div><div class="listing"><pre>#!/usr/bin/perl
+use strict;
+use warnings;
+
+my @regexes = qw( \d{5} \D\d{5}\D \b\d{5}\b );
+printf "%40s%10s%10s%10s\n", 'Regex:', @regexes;
+
+while ( my $line = &lt;DATA&gt; )
+{
+  chomp $line;
+  printf "%40s", $line;
+  foreach my $regex ( @regexes )
+  {
+    if ( $line =~ /$regex/ )
+    {
+      printf "%10s", "   X   ";
+    }
+    else
+    {
+      printf "%10s", "";
+    }
+  }
+  print "\n";
+}
+
+__END__
+Sebastopol, CA 94572
+20500 is the zip code of the White House
+Pi is about 3.14159265, give or take
+The Statue of Liberty is at 10004-1467
+2147483647 is MAXINT on my machine
+<ins>My zip is _98362_</ins></pre></div></div> 
+   
+   <p><img src="images/coderunner/checksyntax.JPG"> and run it.</p>
+   
+   <p><span class="orange">/\b\d{5}\b/</span> 
+    does <i>not</i> match the last input. Because underscore is a word character, we do 
+    not have a word boundary on either side of the five digits; <span class="orange">_9</span> is a word
+    character (<span class="orange">_</span>) followed by another word character (<span class="orange">9</span>), and 
+    <span class="orange">2_</span> is a word character (<span class="orange">2</span>) followed by another word
+    character (<span class="orange">_</span>). Either one of those is sufficient for the regex to fail to match.</p>
+   
+   <p>All of these failing examples may make you wonder whether 
+    you could ever write a regex that will match right. Don't worry. Our exploration of 
+    regexes and consequences is meant to get you in the habit of 
+    thinking about them correctly, that way, when you have a real problem to solve, you'll be able to 
+    craft an appropriate regex. Most real problems are not as vexing as the examples we've come up with for you to wrestle with in these 
+    lessons—after all, how often do you encounter zip codes with underscores on each end?</p>
+   
+   <p>Also, you've seen the substitution operator in our examples of regular expressions so far, but it isn't always going to be there.
+    It's actually more common to match than to 
+    substitute; we've used substitutions primarily as a teaching aid, but that's going to change. 
+    Substituting wouldn't be as instructive where anchors are involved because they match 
+    <i>places</i>, not <i>characters</i>. </p>
+   
+   <p>Alright then. Here are two anchors that are likely to be even more useful to you than <span class="orange">\b</span>.</p>
+   
+   <ul><li>Match beginning of string: <span class="orange">\A</span>. This sequence matches the place that is the 
+     beginning of the string. Whatever comes next in the regex will only match successfully if it is at 
+     the beginning of the string. <span class="orange">\A</span> should always be at the beginning of a regex (or at 
+     the beginning of an alternation group, which we'll get into shortly) to be meaningful.</li><li>Match ending of string: <span class="orange">\z</span>. Yes, that's a <i>little</i> z. This sequence matches 
+     the place that is the ending of the string. Whatever comes before it in the regex will only match
+     successfully if it is at the ending of the string. <span class="orange">\z</span> should always be at 
+     the end of a regex (or at the end of an alternation group) to be meaningful.</li></ul>
+   
+   <p>Let's see these in action! Create <span class="darkred">reg_edges.pl</span>:</p>
+   
+<div class="listingBox"><div class="listingTitle">CODE TO TYPE: reg_edges.pl</div><div class="listing"><pre><ins>#!/usr/bin/perl
+use strict;
+use warnings;
+
+my @regexes = qw( \A[aeiou] [aeiou]\z \A[aeiou]+\z );
+printf "%40s%13s%13s%13s\n", 'Regex:', @regexes;
+
+while ( my $line = &lt;DATA&gt; )
+{
+  chomp $line;
+  printf "%40s", $line;
+  foreach my $regex ( @regexes )
+  {
+    if ( $line =~ /$regex/i )
+    {
+      printf "%13s", "   X   ";
+    }
+    else
+    {
+      printf "%13s", "";
+    }
+  }
+  print "\n";
+}
+
+__END__
+Neither beginning nor ending in a vowel
+A line that starts in a vowel
+There's a vowel on the end of this line
+A vowel at the start and end here
+IOU</ins>
+</pre></div></div>
+   
+   <p><img src="images/coderunner/checksyntax.JPG"> and run it. You should see something like this:</p>
+   
+  <div class="c"><table class="tbl" border=""><tr><th align="RIGHT">Regex:</th><th align="CENTER">\A[aeiou]</th><th align="CENTER">[aeiou]\z</th><th align="CENTER">\A[aeiou]+\z</th></tr><tr><td align="LEFT">Neither beginning nor ending in a vowel</td><td align="CENTER"></td><td>&nbsp;</td><td align="CENTER"></td></tr><tr><td align="LEFT">A line that starts in a vowel</td><td align="CENTER">X</td><td>&nbsp;</td><td align="CENTER"></td></tr><tr><td align="LEFT">This line has a vowel here</td><td>&nbsp;</td><td align="CENTER">X</td><td>&nbsp;</td></tr><tr><td align="LEFT">A vowel at the start and end here</td><td align="CENTER">X</td><td align="CENTER">X</td><td>&nbsp;</td></tr><tr><td align="LEFT">IOU</td><td align="CENTER">X</td><td align="CENTER">X</td><td align="CENTER">X</td></tr></table></div> 
+   
+   <p>The line that starts and ends with a vowel does <i>not</i> match <span class="orange">/\A[aeiou]+\z/</span> 
+    because that regex reads, "Match start of string, one or more vowels, end of string", and after matching 
+    the start of the string and the first vowel, what follows is neither a vowel nor the end of the string. 
+    That regex will only match strings that consist only of vowels (the <span class="orange">+</span> 
+    quantifier means that there must be at least one vowel, so an empty string will not count).</p>
+   
+   <p>We're using the <span class="orange">/i</span> modifier so that the vowel character class matches the 
+    capital <span class="orange">'A'</span>. </p>
+   
+   <p>Remember that scalars interpolate inside regexes, so if <span class="red">$regex</span> is 
+    <span class="orange">'\A[aeiou]'</span>, then <span class="orange">/$regex/</span> is the same as typing 
+    <span class="orange">/\A[aeiou]/</span>.  It's pretty uncommon to interpolate scalars inside of regular 
+    expressions; I'm doing it here to produce those nice tables. But eventually, when you work your way up to building 
+    complex regular expressions from smaller pieces, you may choose to put those pieces in scalars for 
+    much the same reason you would use Perl code inside a named subroutine.</p>
+  
+  </div>
+  <a name="h_02"></a><div class="heading">Captures</div><div class="headingText">
+   
+   <p>
+    We've devoted lots of time and energy learning how to determine whether an input matches a regular expression, but we 
+    still haven't learned how to identify the part of the input that's been matched. We'll definitely want to be 
+    able to do that. And we can, using one of the most useful features of regular expressions: <b>captures</b>.
+    Here's how: </p>
+   
+   <p><div class="c"><table class="noteBox fBox pBox "><tr><td class="noteTitle">Note</td><td class="note">Place parentheses around the part of the regex that has the match you want to identify. If the match 
+    succeeds, the part of the input that matched the part of the regex in parentheses will be placed in the 
+    special variable <span class="red">$1</span>.</td></tr></table></div></p>
+   
+   <p>You may remember that the list of "special" characters in a regex includes <span class="orange">(</span> and 
+    <span class="orange">)</span>. Now you're going to find out why. Let's learn by doing! Create 
+    <span class="darkred">reg_capture.pl</span> as shown:</p>
+   
+<div class="listingBox"><div class="listingTitle">CODE TO TYPE: reg_capture.pl</div><div class="listing"><pre><ins>#!/usr/bin/perl
+use strict;
+use warnings;
+
+while ( my $line = &lt;DATA&gt; )
+{
+  chomp $line;
+  if ( $line =~ /\b(\d{5})\b/ )
+  {
+    print "Captured: $1\n";
+  }
+  else
+  {
+    print "No match for '$line'\n";
+  }
+}
+__END__
+Sebastopol, CA 94572
+20500 is the zip code of the White House
+Pi is about 3.14159265, give or take
+The Statue of Liberty is at 10004-1467
+2147483647 is MAXINT on my machine
+</ins></pre></div></div>
+   
+   <p><img src="images/coderunner/checksyntax.JPG"> and run it.</p>
+   <p>Now you can see not only <i>when</i> 
+    the regex matched, but <i>what</i> it matched! For the sake of clarity, the 
+    <span class="orange">\b</span> anchors were placed outside of the capturing parentheses, but since they match a place (which has 
+    zero width), it would have made no difference if we had put them inside. Usually you will only have capturing 
+    parentheses around part of a regex, while the rest of the regex sets up the context for that part.</p>
+   
+   <p><i>Capturing is a tremendously useful feature of regular expressions.</i> It doesn't change 
+    <i>what</i> you match, it makes available the parts of the input that <i>did</i> match.</p>
+   
+   <p>You may be wondering what happens if you have more than one set of parentheses, or whether there's 
+    a <span class="red">$2</span> variable. Good! I'm glad you're curious. In fact, the capturing feature is much more general than 
+    <span class="red">$1</span>: You can have multiple sets of capturing parentheses, and they will capture to variables 
+    named <span class="red">$2</span>, <span class="red">$3</span>, and so on, for as many capturing parentheses as you have.</p>
+   
+   <p>You can even <i>nest</i> the parentheses so that one match is a subset of another. (It's not too common 
+    in practice, but I know you're wondering about it!) If you do that, you'll want to be able to 
+    determine which parentheses capture to <span class="red">$1</span> and which capture to <span class="red">$2</span>. 
+    Here's the way to remember: The first (leftmost) left parenthesis starts a group that captures to 
+    <span class="red">$1</span>. The second left parenthesis captures a group that captures to <span class="red">$2</span>, and so on.</p>
+   
+   <p>So, let's do another example that shows us the awesome power of multiple capturing parentheses! Create 
+    <span class="darkred">reg_capture2.pl</span> as shown:</p>
+   
+<div class="listingBox"><div class="listingTitle">CODE TO TYPE: reg_capture2.pl</div><div class="listing"><pre><ins>#!/usr/bin/perl
+use strict;
+use warnings;
+
+while ( defined( my $line = &lt;DATA&gt; ) )
+{
+  chomp $line;
+  if ( $line =~ /((\d{1,3})\.(\d{1,3})\.(\d{1,3})\.(\d{1,3}))/ )
+  {
+    print "Found an IP address: $1\n";
+    print "First  octet: $2\n";
+    print "Second octet: $3\n";
+    print "Third  octet: $4\n";
+    print "Fourth octet: $5\n";
+  }
+  else
+  {
+    print "No match for '$line'\n";
+  }
+}
+
+__END__
+www.oreillyschool.com is 63.171.219.89
+This line won't match
+208.201.239.101 is www.perl.com</ins>
+</pre></div></div>
+   
+   <p><img src="images/coderunner/checksyntax.JPG"> and run it.</p>
+   <p>Look it over and make sure you understand where 
+    <span class="red">$1</span>, <span class="red">$2</span>, and the other capture variables came from.</p>
+   
+   <p>Now let's take a quick detour into system programming to demonstrate some <i>real</i> Perl power. 
+    Create <span class="darkred">reg_capture3.pl</span> as shown:</p>
+   
+<div class="listingBox"><div class="listingTitle">CODE TO TYPE: reg_capture3.pl</div><div class="listing"><pre><ins>#!/usr/bin/perl
+use strict;
+use warnings;
+
+use Socket;
+
+while ( my $line = &lt;DATA&gt; )
+{
+  chomp $line;
+  if ( $line =~ /(\S+)\s+is\s+(\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})/ )
+  {
+    my ($name, $ip) = ($1, $2);
+    my $cname = gethostbyaddr( inet_aton( $ip ), AF_INET );
+    print "$name -&gt; $ip -&gt; $cname\n";
+  }
+  elsif ( $line =~ /(\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})\s+is\s+(\S+)/ )
+  {
+    my ($ip, $name) = ($1, $2);
+    my $lookup;
+    if ( defined( $lookup = gethostbyname( $name ) ) )
+    {
+      $lookup = inet_ntoa( $lookup );
+    }
+    else
+    {
+      $lookup = "Couldn't resolve!";
+    }
+    print "$ip -&gt; $name -&gt; $lookup\n";
+  }
+  else
+  {
+    print "No match for '$line'\n";
+  }
+}
+
+__END__
+www.oreillyschool.com is 63.171.219.89
+This line won't match
+208.201.239.101 is www.perl.com
+157.166.226.25 is cnn.com</ins></pre></div></div>
+   
+   <p><img src="images/coderunner/checksyntax.JPG"> and run it.</p>
+   <p>You're executing forward and reverse DNS lookups on data parsed from text! The <span class="darkgreen">gethostbyname()</span> and 
+    <span class="darkgreen">gethostbyaddr()</span> functions are built-in to Perl. You can read the <b>perldoc -f</b> documentation 
+    for those functions and copy what it says to do, even though you may not know what statements like <span class="darkred">use Socket</span> 
+    do. In fact, that's how I devised the program in our last example.</p>
+   
+   <p>You can read from the variables like <span class="red">$1</span>, 
+    but you are not allowed to write to them. Don't try to declare them with <span class="purple">my</span>, because they don't belong to you; 
+    Perl creates them. A 
+    good practice is to copy those numbered variables into named variables like we did in our example, and then use the 
+    named variables.</p>
+     
+   <p>Note the <i>list assignment</i> <span class="purple">my</span> (<span class="red">$ip, $name</span>) = (<span class="red">$1, $2</span>), which assigns multiple 
+    corresponding variables.</p> 
+   
+   <p>Okay, one more example! Create <span class="darkred">reg_capture4.pl</span> as shown:</p>
+   
+<div class="listingBox"><div class="listingTitle">CODE TO TYPE: reg_capture4.pl</div><div class="listing"><pre><ins>#!/usr/bin/perl
+use strict;
+use warnings;
+
+while ( my $line = &lt;DATA&gt; )
+{
+  chomp $line;
+  if ( $line =~ /(.*),\s+(\w\w)\s+(\d{5})/)
+  {
+    my ($city, $state, $zip) = ($1, $2, $3);
+    printf "City: %-20s; State: $state; Zip: $zip\n", $city;
+  }
+}
+__END__
+O'Reilly School of Technology
+1005 Gravenstein Highway
+Sebastopol, CA 95472
+
+O'Reilly Media
+10 Fawcett Street
+Cambridge, MA  02138
+
+PSDT
+136 E. 8th Street #232
+Port Angeles, WA 98362</ins>
+</pre></div></div>
+   
+   <p><img src="images/coderunner/checksyntax.JPG"> and run it.</p>
+   
+   <p>If we assume that in any 
+    address line that contains a city, that city's name will be followed by a comma, we can match the city 
+    using the trivial regex <span class="orange"><b>.*</b></span>. The regex engine will start matching by swallowing 
+    all of the characters in the line for that component, but when it reaches the end of the string and then
+    sees that the regex requires the next character to be a comma, it backtracks until it has unswallowed 
+    the comma. A benefit of using <span class="orange"><b>.*</b></span> is that we can match city names containing any characters (except 
+    commas); if we'd used a regex like 
+    <span class="orange">\S+</span>, it wouldn't have matched <span class="orange">"Port Angeles"</span>, which contains a 
+    space.</p>
+   
+   <p><div class="c"><table class="noteBox fBox pBox "><tr><td class="noteTitle">Note</td><td class="note">It's a common mistake to perform a regex match and then use the numbered variables <i>without 
+    checking to see if the match was successful</i>. If you do that and the regex match was <i>not</i> 
+    successful, but you use <span class="red">$1</span> anyway, its value will be whatever it had from the last successful 
+    match with capturing parentheses. This will cause chaos in your programs. <i>Always</i> check to see whether a 
+    match succeeded (using any of the three forms of conditional statements you have learned) before using 
+    <span class="red">$1</span> or other numbered variables.</td></tr></table></div></p>
+  
+  </div>
+ <br><br><br><br>
+  <p>Once you finish this lesson, go back to the syllabus page by clicking on the page tab above and do
+   the assignments. See you in the next lesson!</p>
+ 
+<div class="footer"><div id="timeSurvey"></div>				
+				Copyright © 1998-2014 O'Reilly Media, Inc.<br><img src="https://courses.oreillyschool.com/common/cclicense.png"><br>
+				This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 Unported License.<br>
+				See <a href="http://creativecommons.org/licenses/by-sa/3.0/legalcode">http://creativecommons.org/licenses/by-sa/3.0/legalcode</a> 
+				for more information.
+				</div><iframe id="t" width="1" height="1" border="0" style="display:none"></iframe><script language="javascript">bodyLoaded();</script><script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+  ga('create', 'UA-44720547-1', 'oreillyschool.com');
+  ga('send', 'pageview');
+</script></body></html>

@@ -1,0 +1,460 @@
+<html><!-- Copyright (c) 1998-2014 O'Reilly Media, Inc.
+			This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 Unported License.
+			See http://creativecommons.org/licenses/by-sa/3.0/legalcode for more information.
+            --><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"><link rel="stylesheet" type="text/css" href="../common/Lab.css"><script type="text/javascript" src="../common/Lab.js"></script><script language="javascript"></script><title>Regular Expressions: Quantifiers</title></head><body id="body"><a name="top"></a><div class="title">Regular Expressions: Quantifiers</div><div class="resize"><a href="Perl2-06.html#top" onclick="changeSize('smaller');" class="aS" title="Keep clicking to make fonts smaller">A</a><a href="Perl2-06.html#top" onclick="changeSize('larger');" class="aL" title="Keep clikcing to make fonts larger">A</a><a href="Perl2-06.html#top" onclick="lv()" class="lv" title="Adjust Page for High Contrast">HC</a><div id="fh"><p>Click on <span class="aS">A</span> to make all fonts on the page smaller.</p><p>Click on <span class="aL">A</span> to make all fonts on the page larger.</p><p>Click on <span class="lv">HC</span> to toggle high contrast mode. When you move your mouse over 
+                 some bold words in high contrast mode, related words are automatically highlighted. Text is shown
+                 in black and white. 
+             </p></div></div><hr>
+ 
+ <div class="goalTitle">Lesson Objectives</div><div class="goals">
+  
+  
+  When you complete this lesson, you will be able to:
+  
+  <ul><li>use regex quantifiers.</li></ul>
+ </div><hr>
+ 
+ <a name="h_01"></a><div class="heading">Regular Expressions: Quantifiers</div><div class="headingText">
+   
+  <p>"You can't quantify love." -Emily Giffin</p>
+   
+  <p>If you've ever been frustrated when you run into the gap between what you've wanted to do with regular expressions and 
+   what you can do, that's about to change. This lesson introduces the concept of the regex 
+   <i>quantifier</i>, which lets you vary the <i>number</i> of things you are able to match.</p>
+   
+  <p>So far, everything you've seen that can go into a regex, matches one, and only one, character, or the 
+   regex fails to match. When the regex does match, you've had ordinary characters like <span class="orange">'Q'</span> and 
+   <span class="orange">'!'</span> that match literally, or you have a character class in square 
+   brackets, or a shortcut for a character class.</p>
+   
+  <p>The <i>quantifier</i> is not a new kind of thing to match. (By the way, the technical term for a 
+   unit of matching in a regex is not "thing" but an "atom"; I'll use that term from now on because I think you're 
+   ready for advanced terminology now.) A quantifier modifies an atom in a regex by saying that you want to match 
+   some number of that atom (occurring consecutively at that point in the input) that is not necessarily
+   exactly one.</p>
+   
+  <p>We learned earlier that regular expressions were invented by mathematicians, so it comes as no surprise now
+   to learn that the majority of quantifiers are expressed with single (and cryptic) characters. Before 
+   I introduce them, let's take a quick look at some examples of where and why you might want to use 
+   quantifiers.</p>
+   
+  <ul><li><b>Optional presence:</b> You are matching a word that may or may not be present in the plural form 
+    by the addition of the letter <span class="orange">'s'</span> (example inputs: <span class="orange">'apple'</span> and 
+    <span class="orange">'apples'</span>). <b>Or</b>: You are matching a number that may or may not have a decimal point in 
+    the middle (examples: <span class="orange">3.14159</span> and <span class="orange">42</span>).</li><li><b>Zero or more:</b> You are matching a number again, and after the decimal point there may be any 
+    number of digits, including zero (examples: <span class="orange">17.</span> and <span class="orange">101.7</span>). <b>Or</b>: You 
+    are picking apart text containing mathematical expressions and there may or may not be white space 
+    characters surrounding binary operators like <span class="blue">=</span> and <span class="blue">+</span>; in fact, it could be 
+    any amount of white space, or none at all (examples: <span class="orange">E = m * c**2</span> and 
+    <span class="orange">s=d*t**2/2</span>).</li><li><b>One or more:</b> You are matching a number again. This one has at least one digit before 
+    the decimal point, possibly more (for example, <span class="orange">2.71828</span> and <span class="orange">98.4</span>). <b>Or</b>: 
+    You are matching a word; it contains one or more letters, but you see no need to go to the Guinness 
+    Book of Records to find out the length of the longest word in existence just so you can limit the range 
+    of the match; you know that the input is well-behaved enough that "infinite" will do as a maximum length 
+    specification.</li><li><b>Exact number:</b> You're matching an airline ticket locator code like we did in the last lesson.
+    Rather than repeat the specification for each character 6 times, you want to say, "Match this (character 
+    specification) 6 times."  <b>Or</b>: You have a report containing FedEx tracking numbers that are exactly 22 
+    digits long.</li><li><b>Length range:</b> You're creating a crossword puzzle and you want to select words from the 
+    dictionary that are between 3 and 10 letters long. <b>Or</b>: You are matching an IP address (version 4) and 
+    each octet is a decimal number one to three digits long (examples: <span class="orange">63.171.219.89</span> and 
+    <span class="orange">208.201.239.101</span>).</li></ul>
+   
+  <p>And now...here are the quantifiers themselves. They are placed <i>after</i> the atom that they 
+   quantify in a regex. So instead of a regex reading like the (more intuitive) "<i>this many</i> of 
+   <i>this</i>," it calls for, "<i>this thing</i>, <i>this many</i> times." </p>
+   
+ <div class="c"> <table class="tbl" border=""><tr><th>Quantifier</th><th>Interpretation</th><th>Example</th><th>Meaning</th></tr><tr><td><span class="orange">?</span></td><td>Optional (zero or one)</td><td><span class="orange">/apples? and bananas?/</span></td><td>Match <span class="orange">'apple and banana'</span> or <span class="orange">'apples and banana'</span>or 
+      <span class="orange">'apple and bananas'</span> or <span class="orange">'apples and bananas'</span>.</td></tr><tr><td><span class="orange">*</span></td><td>Zero or more</td><td><span class="orange">/\d\.\d*/</span></td><td>Match a single digit, a period, and then zero or more digits.</td></tr><tr><td><span class="orange">+</span></td><td>One or more</td><td><span class="orange">/\w+/</span></td><td>Match one or more consecutive "word" characters.</td></tr><tr><td><span class="orange">{<i>n</i>}</span></td><td>Exact match (<i>n</i> times)</td><td><span class="orange">/[A-HJ-NP-Z2-9]{6}/</span></td><td>Same as the airline locator code regex in the previous lesson.</td></tr><tr><td><span class="orange">{<i>m</i>,<i>n</i>}</span></td><td>Range match (from <i>m</i> to <i>n</i> times inclusive)</td><td><span class="orange">/\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}/</span></td><td>Match an IPV4 address.</td></tr><tr><td><span class="orange">{,<i>n</i>}</span></td><td>Range match (from 0 to <i>n</i> times)</td><td><span class="orange">/,\d{,6},/</span></td><td>A comma, optionally followed by a number up to 999999, followed by another comma.</td></tr><tr><td><span class="orange">{<i>m</i>,}</span></td><td>Range match (<i>m</i> or more times)</td><td><span class="orange">/\n{2,}/</span></td><td>Require a gap of at least two blank lines.</td></tr></table></div>
+   
+  <p>Okay, enough lecture; it's time to try some of these out! Create <span class="darkred">reg_quantifiers.pl</span> by typing the code below
+   as shown:</p>
+   
+<div class="listingBox"><div class="listingTitle">CODE TO TYPE: reg_quantifiers.pl</div><div class="listing"><pre><ins>#!/usr/bin/perl
+use strict;
+use warnings;
+
+while ( defined( my $line = &lt;DATA&gt; ) )
+{
+  chomp $line;
+  print "'$line' contains a zip code\n"
+    if $line =~ s/\d{5}/*****/;
+  print "'$line' contains an air ticket locator\n"
+    if $line =~ s/[A-HJ-NP-Z2-9]{6}/*****/;
+  print "'$line' contains a floating point number\n"
+    if $line =~ s/\d+\.\d+/*****/;
+  print "'$line' contains an IP address\n"
+    if $line =~ s/\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}/*****/;
+  print "'$line' contains fruit\n"
+    if $line =~ s/\d+\s+apples?.*\d+\s+bananas?/*****/;
+}
+
+__END__
+Not a float by this standard: 12.
+Neither is this: .34
+But this is: 12.34
+O'Reilly School of Technology, Sebastopol, CA 95472
+My reservation is N2QVYX
+www.oreillyschool.com is at 63.171.219.89
+Not an IP address: 12.123.1234.12
+Not a valid reservation code: ABC10I
+I have 1 apple and 12 bananas
+</ins></pre></div></div>
+   
+  <p><img src="images/coderunner/checksyntax.JPG"> and run it:</p>
+   
+<div class="interactiveBox"><div class="interactiveTitle">INTERACTIVE TERMINAL SESSION:</div><div class="interactive"><pre>cold:~$ <ins>cd perl2</ins>
+cold:~/perl2$ <ins>./reg_quantifiers.pl</ins>
+'But this is: *****' contains a floating point number
+'O'Reilly School of Technology, Sebastopol, CA *****' contains a zip code
+'My reservation is *****' contains an air ticket locator
+'www.oreillyschool.com is at *****.219.89' contains a floating point number
+'Not an IP address: *****.1234.12' contains a floating point number
+'I have *****' contains fruit
+cold:~/perl2$ 
+</pre></div></div>
+   
+  <p>The lines that contain either correct and incorrect IP addresses each match the pattern for a 
+   floating point number, because they contain digits followed by a period, followed by digits. But 
+   <span class="orange">12.123.1234.12</span> does <i>not</i> match the pattern for an IP address, because there are 
+   four digits in the third octet, while the pattern says there can be at most 3. Because the pattern must 
+   still match something more (a period) after that third octet, the match fails. </p>
+   
+  <p>The quantifiers are what we call <i>greedy</i>: they will match as much as they can. As long as they 
+   can keep finding something in the input to match, they will keep matching. People often think 
+   that means the quantifiers find the longest possible match in the input. That is <i>not</i> true. As long as a
+   successful match can be found, the regex will match the <i>first</i> one that it finds, scanning from 
+   left to right. For instance, the regex:</p>
+   
+<div class="observeBox"><div class="observeTitle">OBSERVE: Regex</div><div class="observe"><pre><span class="orange">/[A-Z]+\d*/</span>
+</pre></div></div>
+   
+  <p>...when applied to the input:</p>
+   
+<div class="observeBox"><div class="observeTitle">OBSERVE: Input</div><div class="observe"><pre><span class="orange">"I am THX1138"</span>
+</pre></div></div>
+   
+  <p>...will match <span class="orange">'I'</span>, <i>not</i> <span class="orange">'THX1138'</span>. It needs at least one 
+   upper-case letter; <span class="orange">'I'</span> qualifies, so it matches; there are no more letters, so next it 
+   needs zero or more digits; there are no digits, but that's okay, because zero is a valid number to match, 
+   and so it stops.</p>
+   
+  <p>This is an important point and worth exploring in depth. Suppose the regex had been:</p>
+   
+<div class="observeBox"><div class="observeTitle">OBSERVE: Regex</div><div class="observe"><pre><span class="orange">/\w+\d+/</span>
+</pre></div></div>
+   
+  <p>...and the input had been:</p>
+   
+<div class="observeBox"><div class="observeTitle">OBSERVE: Input</div><div class="observe"><pre><span class="orange">"Robert Duvall is THX1138"</span>
+</pre></div></div>
+   
+  <p>In this case, the regex engine starts matching with the <span class="orange">'R'</span>, and keep matching letters greedily,
+   until it comes to the first space, at which point it can no longer match <span class="orange">\w+</span>, so it 
+   looks to see whether it can match the <i>next</i> thing, which is <span class="orange">\d+</span>. That requires 
+   <i>at least</i> one digit, and there isn't one. The regex engine then <i>backtracks,</i> unwinding each 
+   character it matched, looking for a digit, but does not find one. It backtracks all the way to the 
+   beginning without success, and then it moves the pointer forward by one character and starts again. 
+   (This may sound inefficient, but the regex engine is full of optimizations to make this process faster.)</p>
+   
+  <p>The regex engine continues in that way (reading <span class="orange">'Duvall'</span> and <span class="orange">'is'</span> as 
+   matches against <span class="orange">\w+</span> but not finding a match for <span class="orange">\d+</span>) until it matches 
+   <span class="orange">\w+</span> with <span class="orange">'THX1138'</span>. Why does that whole string match 
+   <span class="orange">\w+</span>? Because <span class="orange">\w</span> <i>includes</i> digits in its specification! At this 
+   point, the regex engine sees that it has reached the end of the string, so it starts backtracking. It 
+   unwinds by one character—<span class="orange">'8'</span>—and tries again to see if it has a match for 
+   <span class="orange">\d+</span>. It <i>does</i>. Then it tries matching more digits greedily, but it has 
+   reached the end of the input. It looks at the regex and finds that there is nothing more to be
+   matched. It has found a match—the <span class="orange">\w+</span> matched <span class="orange">'THX113'</span>, and the 
+   <span class="orange">\d+</span> matched <span class="orange">'8'</span>—so it returns success.</p>
+  
+  <p>Okay, so you can tell <i>whether</i> an input string is matched by a 
+   regex, but not exactly <i>what</i> matched that regex. And just knowing that there's (for example) a part number or a zip code 
+   in a string may not be good enough; you may want to know the specific part number, without resorting to using 
+   <span class="darkgreen">index()</span> and <span class="darkgreen">substr()</span>. If the regex engine could find the 
+   match for you, shouldn't it be able to tell you which part matched? Yes, it should, and it will. That's coming in the 
+   next lesson!</p>
+   
+ </div>
+ <a name="h_02"></a><div class="heading">Regex Crafting</div><div class="headingText">
+   
+  <p>Picking the right regex for a particular problem is something of an art. Rarely is it necessary to 
+   craft a regex that matches just what you need and nothing else. For instance, the pattern we used above for an 
+   IP address can still match an invalid address like <span class="orange">1.2.999.3</span> (it matches because each octet has 1 to 3 digits; 
+   it is invalid because the biggest octet should be 254), but usually 
+   when you are looking for an IP address the input will be sufficiently constrained. 
+   Under some circumstances, any input containing just 
+   digits will be an IP address because all other possibilities <i>in the problem domain you are 
+    solving</i> are exhausted. The 
+   complete regex that matches <i>only</i> valid IPV4 addresses is much more complicated. However, there are 
+   modules that you can use, notably <b>Regexp::Common::net</b>, that encapsulate that complexity for you. 
+   Once you learn how to download and use modules, you can choose whether you want to adopt that approach 
+   for regexes for common patterns. There's nothing to be gained from using a regex that's longer than necessary, and you will lose 
+   readability, so think carefully before making a complex regex just for the sake of it.</p>
+    
+  <p>Take a look at the last regex in <span class="darkred">reg_quantifiers.pl</span>:</p>
+    
+<div class="observeBox"><div class="observeTitle">OBSERVE: Regex</div><div class="observe"><pre>
+/\d+\s+apples?.*\d+\s+bananas?/
+</pre></div></div>
+    
+  <p>That's a common idiom: match something you want, followed by some arbitrary number of 
+   characters that you don't care about, followed by something else that you want. You'll end up using this pattern a 
+   lot. Now, I know that <span class="orange">.</span> matches any character <i>except</i> <span class="orange">\n</span>, and you 
+   might wonder why it doesn't just match any character. Most of the time you'll be 
+   matching against a single line that you've read in and <span class="darkgreen">chomp</span>ed, so it won't mater. 
+   Also, when matching against multiline text, it's far more common to want to constrain your
+   matches to within a single line than not, so this implementation of <span class="orange">.</span> is intentional.</p>
+    
+  <p>Let's do another example!  Create <span class="darkred">reg_email.pl</span>:</p>
+    
+<div class="listingBox"><div class="listingTitle">CODE TO TYPE: reg_email.pl</div><div class="listing"><pre><ins>#!/usr/bin/perl
+use strict;
+use warnings;
+
+while ( defined( my $line = &lt;DATA&gt; ) )
+{
+  chomp $line;
+  print "'$line' contains an email address\n"
+    if $line =~ s/\w+\@\w+\.\w\w\w/*****/;   # Won't match all possible email addresses! 
+}
+
+__END__
+From: peter@psdt.com
+To: scott@oreilly.com
+Subject: Intermediate Perl lessons
+Cc: president@whitehouse.gov
+
+Hi Scott!  I've just uploaded the latest content for the
+Intermediate Perl course.  Barack, I think you'll have fun
+with the regular expression lessons.  By the way, can we use
+your private address of yeswecan2008@h0tmail.com for all
+future correspondence?  We're having trouble getting past
+the government spam filters.  Thanks!</ins>
+</pre></div></div>
+    
+  <p><img src="images/coderunner/checksyntax.JPG"> and run it, and see what lines match. No surprises 
+   there. But that regular expression is intentionally crippled so you're not tempted to try to use it for 
+   matching <i>any</i> email address. It only matches one 
+   or more word characters, followed by an <span class="orange">@</span> sign, followed by one or more word characters, 
+   a period, and three word characters. It won't match, 
+   for instance, <span class="orange">'fred@slateco.cc'</span>, or <span class="orange">'wilma-@bedrock.edu'</span> (why?). 
+   Verify that for yourself:</p>
+    
+<div class="listingBox"><div class="listingTitle">CODE TO EDIT: reg_email.pl</div><div class="listing"><pre>
+#!/usr/bin/perl
+use strict;
+use warnings;
+
+while ( defined( my $line = &lt;DATA&gt; ) )
+{
+  chomp $line;
+  print "'$line' contains an email address\n"
+    if $line =~ s/\w+\@\w+\.\w\w\w/*****/;    # Won't match all possible email addresses!
+}
+
+__END__
+From: peter@psdt.com
+To: scott@oreilly.com
+Subject: Intermediate Perl lessons
+Cc: president@whitehouse.gov
+
+Hi Scott!  I've just uploaded the latest content for the
+Intermediate Perl course.  Barack, I think you'll have fun
+with the regular expression lessons.  By the way, can we use
+your private address of yeswecan2008@h0tmail.com for all
+future correspondence?  We're having trouble getting past
+<del>the government spam filters.  Thanks!</del>
+<ins>the government spam filters.  We don't have any problem reaching,
+for instance, fred@slateco.cc, or wilma-@bedrock.edu.  Thanks!</ins>
+</pre></div></div>
+    
+  <p>
+   The email address <span class="orange">'*@example.com'</span> is perfectly legal; some people 
+   have addresses like that. Still, they are rejected by most of the email validation code on the web. Before 
+   you decide on a regex for matching email addresses, you need to think about what you're trying to 
+   accomplish and what the tradeoffs are for your choices. The regular expression that <i>technically</i> matches the legal 
+   specification for an email address is a <i>page</i> long, and it probably isn't what you really want 
+   anyway. To get the current best advice on solving this problem, run <b>perldoc perlfaq9</b> and see the 
+   section titled "How do I check a valid mail address?"</p>
+    
+  <p><div class="c"><table class="noteBox fBox pBox "><tr><td class="noteTitle">Note</td><td class="note">The <span class="orange">@</span> in the regex does not <i>need</i> to be escaped, because it is followed 
+   by a backslash. But it's worth doing consistently anyway, because if it were followed by, for example, a letter, 
+   let's say <span class="orange">'q'</span>, Perl would think that we were trying to interpolate an array named 
+   <span class="red">@q</span>, and we'd get into trouble.</td></tr></table></div></p>
+    
+ </div>
+ <a name="h_03"></a><div class="heading">Food for Thought</div><div class="headingText">
+  
+  <p>Using regular expressions requires understanding lots of subtle details—you're learning a whole new language after all! 
+   For instance, matching something 
+   optional—for example, the <span class="orange">s?</span> in <span class="orange">/apples?/</span>—only makes 
+   sense if you're matching something else after that. Otherwise, it's pointless, because you've already found a match with everything that 
+   came before the optional part; you get exactly the same outcome regardless of whether the optional part is present, 
+   because it can always match nothing. </p>
+   
+  <p>Creating regexes that can match nothing is a common mistake. 
+   Let's say a programmer (not you, of course) tries to write a regex that will match any kind of number at 
+   all, and thinks to himself, "it can have digits before and after a decimal point, like 
+   <span class="orange">12.34</span>, so I'll have a regex of <span class="orange">/\d+\.\d+/</span>. But wait, the digits before 
+   the decimal point are optional: I could have a number like <span class="orange">.12</span>, so my regex is really 
+   <span class="orange">/\d*\.\d+/</span>. No, wait, the digits after the decimal point are optional too, because I 
+   could have a number like <span class="orange">12.</span>, so my regex is really <span class="orange">/\d*\.\d*/</span>. But 
+   wait, I could have a number like <span class="orange">1234</span> so the decimal point is optional there too, and that 
+   means my regex is really <span class="orange">/\d*\.?\d*/</span>."</p>
+  
+  <p>There's the problem with that logic, and it's worth seeing it in action. 
+   Create <span class="darkred">reg_number.pl</span> as shown:</p> 
+   
+<div class="listingBox"><div class="listingTitle">CODE TO TYPE: reg_number.pl</div><div class="listing"><pre><ins>#!/usr/bin/perl
+use strict;
+use warnings;
+
+while ( defined( my $line = &lt;DATA&gt; ) )
+{
+  chomp $line;
+  print "'$line' contains a number\n"
+    if $line =~ s/\d*\.?\d*/*****/;
+}
+__END__
+One kind of number: 12.
+Another kind of number: .34
+A third kind of number: 12.34
+A plain integer: 1234
+No number in this line, not even a period
+Or in this one
+</ins></pre></div></div>
+   
+  <p><img src="images/coderunner/checksyntax.JPG"> and run it.  What is the output? Why do you think 
+   that happened?</p>
+   
+  <p>The problem is that this regex can match <i>nothing:</i> no digits, followed by no period, followed by 
+   no digits. And every possible input can always satisfy that immediately; each one has 'nothing' before 
+   the first character ever appears. Add a blank line in the inputs:</p>
+
+<div class="listingBox"><div class="listingTitle">CODE TO EDIT: reg_number.pl</div><div class="listing"><pre>
+#!/usr/bin/perl
+use strict;
+use warnings;
+
+while ( defined( my $line = &lt;DATA&gt; ) )
+{
+  chomp $line;
+  print "'$line' contains a number\n"
+    if $line =~ s/\d*\.?\d*/*****/;
+}
+__END__
+One kind of number: 12.
+Another kind of number: .34
+A third kind of number: 12.34
+A plain integer: 1234
+<ins>(Insert a blank line here.)</ins>
+No number in this line, not even a period
+Or in this one
+</pre></div></div>
+   
+  <p><img src="images/coderunner/checksyntax.JPG"> and run it.</p>
+  
+  <p>Even the blank line matches!  
+   Because we have <span class="darkgreen">chomp</span>ed off the newline character, we really <i>are</i> matching 
+   against the empty string (zero length), and Perl can always find the empty string at the beginning of 
+    every input.</p>
+   
+  <p>The easiest way to fix this particular case is with multiple regexes. There are 
+   several ways to do that; here's one:</p>
+  
+<div class="listingBox"><div class="listingTitle">CODE TO EDIT: reg_number.pl</div><div class="listing"><pre>
+#!/usr/bin/perl
+use strict;
+use warnings;
+
+while ( defined( my $line = &lt;DATA&gt; ) )
+{
+  chomp $line;
+  print "'$line' contains a number\n"
+<del>    if $line =~ s/\d*\.?\d*/*****/;</del>
+<ins>    if $line =~ s/\d+\.\d*/*****/
+    || $line =~ s/\d*\.\d+/#####/
+    || $line =~ s/\d+/~~~~~/;</ins>
+}
+__END__
+One kind of number: 12.
+Another kind of number: .34
+A third kind of number: 12.34
+A plain integer: 1234
+
+No number in this line, not even a period
+Or in this one
+</pre></div></div>
+   
+  <p><img src="images/coderunner/checksyntax.JPG"> and run it:</p>
+  
+<div class="interactiveBox"><div class="interactiveTitle">INTERACTIVE TERMINAL SESSION:</div><div class="interactive"><pre>cold:~/perl2$ <ins>./reg_number.pl</ins>
+'One kind of number: *****' contains a number
+'Another kind of number: #####' contains a number
+'A third kind of number: *****' contains a number
+'A plain integer: ~~~~~' contains a number
+cold:~/perl2$ 
+</pre></div></div>
+   
+  <p>The <i>ordering</i> of the regex tests is important here. What would have happened if the third test 
+   had been tried first? Try it:</p>
+   
+<div class="listingBox"><div class="listingTitle">CODE TO EDIT: reg_number.pl</div><div class="listing"><pre>
+#!/usr/bin/perl
+use strict;
+use warnings;
+
+while ( defined( my $line = &lt;DATA&gt; ) )
+{
+  chomp $line;
+  print "'$line' contains a number\n"
+    if $line =~ <del>s/\d+\.\d*/*****/</del><ins>s/\d+/~~~~~/</ins>
+    || $line =~ s/\d*\.\d+/#####/
+    || $line =~ <del>s/\d+/~~~~~/</del><ins>s/\d+\.\d*/*****/</ins>;
+}
+__END__
+One kind of number: 12.
+Another kind of number: .34
+A third kind of number: 12.34
+A plain integer: 1234
+
+No number in this line, not even a period
+Or in this one
+</pre></div></div>
+   
+  <p><img src="images/coderunner/checksyntax.JPG"> and run it.</p>
+  
+<div class="interactiveBox"><div class="interactiveTitle">INTERACTIVE TERMINAL SESSION:</div><div class="interactive"><pre>cold:~/perl2$ <ins>./reg_number.pl</ins>
+'One kind of number: ~~~~~.' contains a number
+'Another kind of number: .~~~~~' contains a number
+'A third kind of number: ~~~~~.34' contains a number
+'A plain integer: ~~~~~' contains a number
+cold:~/perl2$ 
+</pre></div></div>
+   
+  <p>Why did that happen? Think it over.</p>
+     
+  <p>The quantifier is both concise and powerful, and provides the foundation for regular expressions. 
+   If your understanding of any part of this lesson is still fuzzy, go back and study it some more. Play with the examples, 
+   modify them, and ask your instructor for clarification where necessary.</p>
+   
+  <p>In the next lesson, we'll build on what you've learned so far to quantify a literal character or 
+   something matching a single character, and eventually quantify something even longer!</p>
+ </div> 
+ <br><br><br><br>
+  <p>Once you finish the lesson, go back to the syllabus page by clicking on the page tab above and do
+   the assignments.</p>
+  
+<div class="footer"><div id="timeSurvey"></div>				
+				Copyright © 1998-2014 O'Reilly Media, Inc.<br><img src="https://courses.oreillyschool.com/common/cclicense.png"><br>
+				This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 Unported License.<br>
+				See <a href="http://creativecommons.org/licenses/by-sa/3.0/legalcode">http://creativecommons.org/licenses/by-sa/3.0/legalcode</a> 
+				for more information.
+				</div><iframe id="t" width="1" height="1" border="0" style="display:none"></iframe><script language="javascript">bodyLoaded();</script><script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+  ga('create', 'UA-44720547-1', 'oreillyschool.com');
+  ga('send', 'pageview');
+</script></body></html>

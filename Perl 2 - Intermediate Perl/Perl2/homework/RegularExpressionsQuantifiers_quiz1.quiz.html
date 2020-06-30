@@ -1,0 +1,58 @@
+<html>
+   <!-- Copyright (c) 1998-2014 O'Reilly Media, Inc. Unauthorized use is strictly
+                prohibited. None of this code or content can by copied without the express written
+                permission from O'Reilly Media, Inc. -->
+   <head>
+      <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+      <link rel="stylesheet" type="text/css" href="http://archive.oreilly.com/oreillyschool/courses/Perl2/common/Lab.css">
+      <title>Regular Expressions: Quantifiers - Quiz 1</title>
+   </head>
+   <body id="body">
+      <h2>Regular Expressions: Quantifiers - Quiz 1</h2> 
+      
+      
+      
+      
+      <p>The regular expression <b>/\d*\s*/</b> matches the string "WORD." Why? What part of that string is it matching?</p>
+      
+        
+      
+      
+      <p>It matches because it is capable of matching nothing, since it is composed entirely of atoms with quantifiers that are allowed
+         to match zero items.
+      </p>
+      
+      
+      <p><b>Grading Criteria:</b> Student should demonstrate knowledge of some interesting side effects to using * as a quantifier in a regular expression.</p>
+      
+      
+      
+      
+      
+      
+      <p>When the regex <b>/\w+\w*\w+/</b> is applied to the string <b>freedom</b>, what part does the first <b>\w+</b> match, what 
+         part does the <b>\w*</b> match, and what part does the second <b>\w+</b> match?
+      </p>
+      
+      
+      
+      
+      <p>\w+ 'freedo'<br>
+         \w* ''<br>
+         \w+ 'm'
+      </p>
+      
+      
+      <p>If the student is confused, explain that this is an example of <a href="http://perldoc.perl.org/perlre.html#Backtracking" target="_blank">backtracking</a>.
+      </p>
+      
+      
+      <p><b>Grading Criteria:</b> Student should demonstrate knowledge of how a regular expression will often backtrack through a 
+         string to try and find a match.
+      </p>
+      
+      
+      
+      
+   </body>
+</html>

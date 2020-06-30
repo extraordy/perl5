@@ -1,0 +1,1393 @@
+<html><!-- Copyright (c) 1998-2014 O'Reilly Media, Inc.
+			This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 Unported License.
+			See http://creativecommons.org/licenses/by-sa/3.0/legalcode for more information.
+            --><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"><link rel="stylesheet" type="text/css" href="../common/Lab.css"><script type="text/javascript" src="../common/Lab.js"></script><script language="javascript"></script><title>Final Wrap-Up</title></head><body id="body"><a name="top"></a><div class="title">Final Wrap-Up</div><div class="resize"><a href="Perl3-15.html#top" onclick="changeSize('smaller');" class="aS" title="Keep clicking to make fonts smaller">A</a><a href="Perl3-15.html#top" onclick="changeSize('larger');" class="aL" title="Keep clikcing to make fonts larger">A</a><a href="Perl3-15.html#top" onclick="lv()" class="lv" title="Adjust Page for High Contrast">HC</a><div id="fh"><p>Click on <span class="aS">A</span> to make all fonts on the page smaller.</p><p>Click on <span class="aL">A</span> to make all fonts on the page larger.</p><p>Click on <span class="lv">HC</span> to toggle high contrast mode. When you move your mouse over 
+                 some bold words in high contrast mode, related words are automatically highlighted. Text is shown
+                 in black and white. 
+             </p></div></div><hr>
+  
+  <div class="goalTitle">Lesson Objectives</div><div class="goals"> 
+    
+    When you complete this lesson, you will be able to:
+    <ul><li>write a program to solve the <i>Eight Queens Problem</i>.</li></ul>
+  </div><hr>
+
+ <p>Welcome to the final lesson of <b>Advanced Perl!</b> You've come a long way since the 
+  beginning of this course; take a moment to review and reflect on everything you've learned. 
+  You've made some serious progress.</p>
+ 
+ <a href="Perl3-15.html" name="putting_it_all_together"></a>
+ <a name="h_01"></a><div class="heading">Putting It All Together</div><div class="headingText">
+   
+  <a name="s_01"></a><div id="s_01"><div class="subheading">The Eight Queens Problem</div><div class="subheadingText">
+   
+    <p>In this lesson, we'll write a program to solve the <i>Eight Queens Problem</i>. The <i>Eight Queens Problem</i> 
+      is a traditional programming exercise. Our goal is to print all the ways 
+      that 8 queens can be placed on a chess board such that no queen can attack another queen. We will ignore
+      any solution that is a reflection (about the vertical or horizontal dividing lines) or rotation (by 
+      90, 180, or 270 degrees) of one that has already been printed. Queens attack horizontally, vertically, and 
+      diagonally:</p>
+   
+    <p><div class="c"><img src="images/lessonImages/queen_attacks.png"></div></p>
+   
+    <p>We'll develop this program incrementally, applying lessons we've learned throughout the course. 
+      The strategy we'll use, while not the most efficient one out there, is clear and easy to understand. 
+      We'll use a <i>recursive</i> approach, understanding that there must be a queen in every row: For 
+      each of the 8 squares in the first row. Then we'll place a queen on the first square in the next row that meets our conditions, 
+      and so on, until we have either placed 8 queens (in which case we have a 
+      solution provided it isn't a transformation of an existing one) or we have run out of places to place 
+      another queen. Here we go! Create <b>queens.pl</b> in your <b>/perl3</b> folder as shown:</p>
+    
+<div class="listingBox"><div class="listingTitle">CODE TO TYPE:</div><div class="listing"><pre>#!/usr/bin/perl
+use strict;
+use warnings;
+
+run( 8 );
+
+my $TEMP_COUNTER;
+
+sub run
+{
+  my $size = shift;
+
+  my $solution = [];
+  my $row = 0;
+  try( $size-1, $solution, $row );
+}
+
+sub try
+{
+  my ($max_cell, $solution, $row) = @_;
+
+  if ( $row &gt; $max_cell )
+  {
+    print_solution( $max_cell, $solution ) if unique( $solution );
+    exit if $TEMP_COUNTER++ &gt; 15;
+  }
+  else
+  {
+    for my $column ( 0 .. $max_cell )
+    {
+      next if attacked( $solution, $row, $column );
+      my $new_solution = copy( $solution );
+      put_queen_at( $new_solution, $row, $column );
+      try( $max_cell, $new_solution, $row + 1 );
+    }
+  }
+}
+
+sub unique
+{
+  return 1;  # Temporary
+}
+
+sub attacked
+{
+  return 0;  # Temporary
+}
+
+sub put_queen_at
+{
+  my ($solution, $row, $column) = @_;
+
+  $solution-&gt;[$row][$column] = 'Q';
+}
+
+sub copy
+{
+  my $solution = shift;
+
+  my @rows;
+  push @rows, [ @$_ ] for @$solution;
+  return \@rows;
+}
+
+sub print_solution
+{
+  my ($max_cell, $solution) = @_;
+
+  for my $row ( @$solution )
+  {
+    for my $column ( 0 .. $max_cell )
+    {
+      print $row-&gt;[$column] ? " Q " : " . ";
+    }
+    print "\n";
+  }
+  print "\n";  # Extra blank line for spacing
+}</pre></div></div>
+   
+    <p><img src="images/coderunner/checksyntax.JPG"> and run it; this is the most basic program we could create  
+      and still get some output. This program will end up being about 200 lines long, but you'll be able to manage it by 
+      breaking it down into smaller chunks. Run it by typing the commands you see below:</p>
+    
+<div class="interactiveBox"><div class="interactiveTitle">INTERACTIVE SESSION:</div><div class="interactive"><pre>cold:~$ <ins>cd perl3</ins>
+cold:~/perl3$ <ins>./queens.pl</ins>
+ Q  .  .  .  .  .  .  . 
+ Q  .  .  .  .  .  .  . 
+ Q  .  .  .  .  .  .  . 
+ Q  .  .  .  .  .  .  . 
+ Q  .  .  .  .  .  .  . 
+ Q  .  .  .  .  .  .  . 
+ Q  .  .  .  .  .  .  . 
+ Q  .  .  .  .  .  .  . 
+
+ Q  .  .  .  .  .  .  . 
+ Q  .  .  .  .  .  .  . 
+ Q  .  .  .  .  .  .  . 
+ Q  .  .  .  .  .  .  . 
+ Q  .  .  .  .  .  .  . 
+ Q  .  .  .  .  .  .  . 
+ Q  .  .  .  .  .  .  . 
+ .  Q  .  .  .  .  .  . 
+
+ Q  .  .  .  .  .  .  .
+ Q  .  .  .  .  .  .  .
+ Q  .  .  .  .  .  .  .
+ Q  .  .  .  .  .  .  .
+ Q  .  .  .  .  .  .  .
+ Q  .  .  .  .  .  .  .
+ Q  .  .  .  .  .  .  .
+ .  .  Q  .  .  .  .  .
+
+ Q  .  .  .  .  .  .  .
+ Q  .  .  .  .  .  .  .
+ Q  .  .  .  .  .  .  .
+ Q  .  .  .  .  .  .  .
+ Q  .  .  .  .  .  .  .
+ Q  .  .  .  .  .  .  .
+ Q  .  .  .  .  .  .  .
+ .  .  .  Q  .  .  .  .
+  <i>(results abbreviated to save space)</i> 
+</pre></div></div>
+ 
+    <p>Here's what's going on: we parameterize the size of the board from the beginning, because we don't 
+      want or need to  <a href="http://stackoverflow.com/questions/1895789/what-does-hard-coded-mean" target="_blank">hard-code</a> the number 8 throughout the program. Parameterizing will allow us to solve the 
+      problem for other board sizes later as well.</p>
+
+<div class="observeBox"><div class="observeTitle">OBSERVE:</div><div class="observe"><pre>sub <span class="blue">run</span>
+{
+  my $size = shift;
+
+  my <span class="darkgreen">$solution</span> = [];
+  my $row = 0;
+  try( $size-1, $solution, $row );
+}
+</pre></div></div>    
+    
+    <p>We represent a (potential or actual) <span class="darkgreen">solution()</span> with an arrayref. It will start 
+      out empty, as in <span class="blue">run</span>. Each time we put a queen in it, we will 
+      <a href="http://en.wikipedia.org/wiki/Autovivification" target="_blank">autovivify</a> it by 
+      treating the arrayref as if it were pointing to a 2-D array (see <b>put_queen_at</b>).</p>
+    
+<div class="observeBox"><div class="observeTitle">OBSERVE:</div><div class="observe"><pre>sub try
+{
+  my (<span class="red">$max_cell</span>, $solution, $row) = @_;
+
+  if ( <span class="darkblue">$row &gt; $max_cell</span> )
+  {
+    <span class="orange">print_solution(</span> $max_cell, $solution <span class="orange">)</span> if <span class="darkgreen">unique(</span> $solution <span class="darkgreen">)</span>;
+    exit if $TEMP_COUNTER++ &gt; 15;
+  }
+  else
+  {
+    <span class="darkred">for my $column ( 0 .. $max_cell )</span>
+    {
+      <span class="green">next if attacked(</span> $solution, $row, $column <span class="green">)</span>;
+      my <span class="blue">$new_solution = copy( $solution )</span>;
+      put_queen_at( $new_solution, $row, $column );
+      <span class="purple">try( $max_cell, $new_solution, $row + 1 )</span>;
+    }
+  }
+}
+</pre></div></div>    
+    
+    <p><b>try</b> is the recursive routine. It's first called on row number 0 from <span class="blue">run</span>, 
+      and will <span class="purple">call itself with the next higher row</span>. <span class="red">$max_cell</span> is set to one 
+      less than the size of the board. When <b>try</b> is called with 
+      <span class="darkblue">$row &gt; $max_cell</span> (in this case, $row = 8), the solution being passed must be 
+      full (because it now has rows 0 through 7 populated with queens), so we 
+      <span class="darkgreen">test the solution to see if it is unique</span> (not a rotation or 
+      reflection of an existing one), and if so, <span class="orange">print it</span>.</p>
+    
+    <p>If we're in the middle of recursing (<span class="darkblue">$row <i>is not</i> &gt; $max_cell</span>), we 
+      <span class="darkred">iterate through each column in the current row</span>. We see whether a queen at the proposed 
+      location would be attacked by an existing one, and if it would, we <span class="green">loop</span>. Otherwise we 
+      make a <span class="blue">new solution that is a copy </span>of the one we're working on, so that we can pass that 
+      to <b>try</b> without that call altering the solution we're currently working toward. Then we add the 
+      queen to the new solution and recurse.</p>
+    
+<div class="observeBox"><div class="observeTitle">OBSERVE:</div><div class="observe"><pre>sub print_solution
+{
+  my ($max_cell, $solution) = @_;
+
+  for my <span class="darkred">$row</span> ( @$solution )
+  {
+    for my <span class="darkblue">$column</span> ( 0 .. $max_cell )
+    {
+      <span class="darkgreen">print $row-&gt;[$column] ? " Q " : " . ";</span>
+    }
+    print "\n";
+  }
+  print "\n";  # Extra blank line for spacing
+}      
+</pre></div></div>    
+    
+    <p>Because each row of a solution will only have as many elements as the last queen in each row, 
+      <b>print_solution</b> needs to know the size of the board (the number of <span class="darkred">rows</span> multiplied by number of 
+      <span class="darkblue">columns</span>) so it can <span class="darkgreen">print()</span> the full width of each row.</p>
+    
+<div class="observeBox"><div class="observeTitle">OBSERVE:</div><div class="observe"><pre>sub copy
+{
+  my $solution = shift;
+
+  my <span class="red">@rows</span>;
+  push @rows, [ @$_ ] for <span class="darkred">@$solution</span>;
+  return \@rows;
+}
+</pre></div></div>    
+
+    <p>The <b>copy</b> subroutine has to make a copy of a 2-D array, so it starts with a new array 
+      <span class="red">@rows</span> and for each row in the <span class="darkred">solution</span>, pushes onto it an anonymous 
+      arrayref containing the contents of that row; study that line until you understand how that works. 
+      You'll make <a href="http://en.wikipedia.org/wiki/Object_copy#Deep_copy" target="_blank">deep copies</a> or "clones" of data structures frequently.</p>
+    
+    <p>The routines that tell whether a solution is unique or whether a queen is attacked by another are 
+      stubbed out. So we added a counter to limit the number of "solutions" printed; otherwise,
+      our program would print every possible permutation of 8 queens on the board.</p>
+    
+    <p>Now let's rework our program 
+      to figure out whether a configuration is valid. Modify <b>queens.pl</b> as shown:</p>
+   
+<div class="listingBox"><div class="listingTitle">CODE TO TYPE:</div><div class="listing"><pre>#!/usr/bin/perl
+use strict;
+use warnings;
+
+run( 8 );
+
+my $TEMP_COUNTER;
+
+sub run
+{
+  my $size = shift;
+
+  my $solution = [];
+  my $row = 0;
+  try( $size-1, $solution, $row );
+}
+
+sub try
+{
+  my ($max_cell, $solution, $row) = @_;
+
+  if ( $row &gt; $max_cell )
+  {
+    print_solution( $max_cell, $solution ) if unique( $solution );
+<del>    exit if $TEMP_COUNTER++ &gt; 15;</del>
+<ins>    print " *** ", ++$TEMP_COUNTER, "\n";</ins>
+  }
+  else
+  {
+    for my $column ( 0 .. $max_cell )
+    {
+      next if attacked( $solution, $row, $column );
+      my $new_solution = copy( $solution );
+      put_queen_at( $new_solution, $row, $column );
+      try( $max_cell, $new_solution, $row + 1 );
+    }
+  }
+}
+
+sub unique
+{
+  return 1;  # Temporary
+}
+
+<ins>sub attacked  # Is queen at proposed position attacked in this solution?
+{
+  my ($solution, $proposed_row, $proposed_column) = @_;
+
+  for my $row ( 0 .. $#$solution )
+  {
+    my $elements_ref = $solution-&gt;[$row];
+    for my $column ( grep { defined $solution-&gt;[$row][$_] } 0 .. $#$elements_ref )
+    {
+      return 1 if attacks( $row, $column, $proposed_row, $proposed_column );
+    }
+  }
+  return 0;
+}
+
+sub attacks
+{
+  my ($r1, $c1, $r2, $c2) = @_;
+
+  my $row_diff = abs( $r1 - $r2 );
+  my $col_diff = abs( $c1 - $c2 );
+  return $row_diff == $col_diff || $row_diff == 0 || $col_diff == 0;
+}</ins>
+  
+sub put_queen_at
+{
+  my ($solution, $row, $column) = @_;
+
+  $solution-&gt;[$row][$column] = 'Q';
+}
+
+sub copy
+{
+  my $solution = shift;
+
+  my @rows;
+  push @rows, [ @$_ ] for @$solution;
+  return \@rows;
+}
+
+sub print_solution
+{
+  my ($max_cell, $solution) = @_;
+
+  for my $row ( @$solution )
+  {
+    for my $column ( 0 .. $max_cell )
+    {
+      print $row-&gt;[$column] ? " Q " : " . ";
+    }
+    print "\n";
+  }
+  print "\n";  # Extra blank line for spacing
+}
+</pre></div></div>
+    
+    <p><img src="images/coderunner/checksyntax.JPG"> and run it. The output starts like this:</p>
+    
+<div class="interactiveBox"><div class="interactiveTitle">INTERACTIVE SESSION:</div><div class="interactive"><pre>cold:~/perl3$ <ins>./queens.pl</ins>
+ Q  .  .  .  .  .  .  . 
+ .  .  .  .  Q  .  .  . 
+ .  .  .  .  .  .  .  Q 
+ .  .  .  .  .  Q  .  . 
+ .  .  Q  .  .  .  .  . 
+ .  .  .  .  .  .  Q  . 
+ .  Q  .  .  .  .  .  . 
+ .  .  .  Q  .  .  .  . 
+
+ *** 1
+</pre></div></div>
+    
+    <p>We're printing the counter out now and no longer limiting it, because now the program prints only
+      the valid solutions, including rotations and reflections; you see 92 of them.</p>
+    
+    <p>To fully understand this change, first let's look at the <b>attacks</b> subroutine:</p>
+      
+<div class="observeBox"><div class="observeTitle">OBSERVE:</div><div class="observe"><pre>sub attacks
+{
+  my (<span class="darkred">$r1</span>, <span class="darkblue">$c1</span>, <span class="darkred">$r2</span>, <span class="darkblue">$c</span>2) = @_;
+
+  my $row_diff = abs( $r1 - $r2 );
+  my $col_diff = abs( $c1 - $c2 );
+  return <span class="purple">$row_diff == $col_diff</span> || <span class="darkgreen">$row_diff == 0</span> || <span class="darkgreen">$col_diff == 0</span>;
+}      
+</pre></div></div>        
+    
+    <p>The <b>attacks</b> subroutine takes two (<span class="darkred">row</span>, <span class="darkblue">column</span>) pairs, representing two queens, 
+      and determines whether they can attack each other. We compute the differences between the two rows and 
+      the two columns; <span class="darkgreen">if either one is zero</span>, the two pieces can attack 
+      horizontally or vertically. <span class="purple">If the absolute differences are equal</span>, the two pieces 
+      can attack along a diagonal (try a couple of examples).</p>
+    
+    <p>Now let's look at the <b>attacked</b> subroutine:</p>
+    
+<div class="observeBox"><div class="observeTitle">OBSERVE:</div><div class="observe"><pre>sub attacked  # Is queen at proposed position attacked in this solution?
+{
+  my (<span class="red">$solution</span>, $proposed_row, $proposed_column) = @_;
+
+  for my $row ( 0 .. <span class="red">$#$solution</span> )
+  {
+    my $elements_ref = <span class="red">$solution</span>-&gt;[$row];
+    for my $column ( grep { defined <span class="red">$solution</span>-&gt;[$row][$_] } 0 .. $#$elements_ref )
+    {
+      return 1 if <span class="blue">attacks(</span> $row, $column, $proposed_row, $proposed_column <span class="blue">)</span>;
+    }
+  }
+  return 0;
+}
+</pre></div></div>    
+    
+    <p>It goes through the position of every queen currently in the solution and calls 
+      <span class="blue">attacks</span> with that position and the position of the candidate queen. This code looks 
+      pretty challenging; remember that <span class="red">$solution</span> is a reference to an array of 
+      references to arrays that contain either <b>undef</b> or <b>Q</b> in each 
+      slot.</p>
+    
+    <p>Now we'll add code to check for rotations and reflections. Let's do that in stages. 
+    Modify <b>queens.pl</b> as shown:</p>
+    
+<div class="listingBox"><div class="listingTitle">CODE TO TYPE:</div><div class="listing"><pre>#!/usr/bin/perl
+use strict;
+use warnings;
+
+run( 8 );
+
+my $TEMP_COUNTER;
+<ins>my @Solutions;</ins>
+
+sub run
+{
+  my $size = shift;
+
+  my $solution = [];
+  my $row = 0;
+  try( $size-1, $solution, $row );
+}
+
+sub try
+{
+  my ($max_cell, $solution, $row) = @_;
+
+  if ( $row &gt; $max_cell )
+  {
+    <del>print_solution( $max_cell, $solution ) if unique( $solution );</del>
+    <ins>return unless unique( $solution );
+    print_solution( $max_cell, $solution );</ins>
+    print " *** ", ++$TEMP_COUNTER, "\n";
+    <ins>push @Solutions, $solution;</ins>
+  }
+  else
+  {
+    for my $column ( 0 .. $max_cell )
+    {
+      next if attacked( $solution, $row, $column );
+      my $new_solution = copy( $solution );
+      put_queen_at( $new_solution, $row, $column );
+      try( $max_cell, $new_solution, $row + 1 );
+    }
+  }
+}
+
+sub unique
+{
+<ins>  my $solution = shift;
+
+  for my $so_far ( @Solutions )
+  {
+    return 0 if is_like( $so_far, $solution );
+  }</ins>
+  return 1;<del>  # Temporary</del>
+}
+<ins>
+sub is_like
+{
+  return 1;  # Temporary
+}</ins>
+
+sub attacked  # Is queen at proposed position attacked in this solution?
+{
+  my ($solution, $proposed_row, $proposed_column) = @_;
+
+  for my $row ( 0 .. $#$solution )
+  {
+    my $elements_ref = $solution-&gt;[$row];
+    for my $column ( grep { defined $solution-&gt;[$row][$_] } 0 .. $#$elements_ref )
+    {
+      return 1 if attacks( $row, $column, $proposed_row, $proposed_column );
+    }
+  }
+  return 0;
+}
+sub attacks
+{
+  my ($r1, $c1, $r2, $c2) = @_;
+
+  my $row_diff = abs( $r1 - $r2 );
+  my $col_diff = abs( $c1 - $c2 );
+  return $row_diff == $col_diff || $row_diff == 0 || $col_diff == 0;
+}
+  
+sub put_queen_at
+{
+  my ($solution, $row, $column) = @_;
+
+  $solution-&gt;[$row][$column] = 'Q';
+}
+
+sub copy
+{
+  my $solution = shift;
+
+  my @rows;
+  push @rows, [ @$_ ] for @$solution;
+  return \@rows;
+}
+
+sub print_solution
+{
+  my ($max_cell, $solution) = @_;
+
+  for my $row ( @$solution )
+  {
+    for my $column ( 0 .. $max_cell )
+    {
+      print $row-&gt;[$column] ? " Q " : " . ";
+    }
+    print "\n";
+  }
+  print "\n";  # Extra blank line for spacing
+}
+</pre></div></div>
+
+    <p><img src="images/coderunner/checksyntax.JPG"> and run it. Now it prints only one solution. 
+      We're not done yet; I just didn't want to add too much all at once. Here's what's going on: we've 
+      added a global array <span class="red">@Solutions</span> to keep track of the ones we've found so far. Whenever 
+      we have a candidate solution, we see if it's unique, and if so, print it and add it to 
+      <span class="red">@Solutions</span>. <b>unique</b> compares the candidate solution against all of those in 
+      <span class="red">@Solutions</span>; only the first one gets printed because the stub for 
+      <b>is_like</b> is always true.</p>
+    
+    <p>Now let's add the rest of the code. Modify <b>queens.pl</b> as shown:</p>
+    
+<div class="listingBox"><div class="listingTitle">CODE TO TYPE:</div><div class="listing"><pre>#!/usr/bin/perl
+use strict;
+use warnings;
+
+<ins>init( 8 );</ins>
+run( 8 );
+
+<ins>my @Transforms;</ins>
+my $TEMP_COUNTER;
+my @Solutions;
+
+sub run
+{
+  my $size = shift;
+
+  my $solution = [];
+  my $row = 0;
+  try( $size-1, $solution, $row );
+}
+
+<ins>sub init
+{
+  my $size = shift;
+  my $max = $size - 1;
+
+  push @Transforms,
+    sub { (        $_[1],        $_[0] ) },
+    sub { ( $max - $_[1], $max - $_[0] ) },
+    sub { ( $max - $_[0],        $_[1] ) },
+    sub { (        $_[0], $max - $_[1] ) },
+    sub { ( $max - $_[1],        $_[0] ) },
+    sub { ( $max - $_[0], $max - $_[1] ) },
+    sub { (        $_[1], $max - $_[0] ) };
+}</ins>
+  
+sub try
+{
+  my ($max_cell, $solution, $row) = @_;
+
+  if ( $row &gt; $max_cell )
+  {
+    return unless unique( $solution );
+    print_solution( $max_cell, $solution );
+    print " *** ", ++$TEMP_COUNTER, "\n";
+    push @Solutions, $solution;
+  }
+  else
+  {
+    for my $column ( 0 .. $max_cell )
+    {
+      next if attacked( $solution, $row, $column );
+      my $new_solution = copy( $solution );
+      put_queen_at( $new_solution, $row, $column );
+      try( $max_cell, $new_solution, $row + 1 );
+    }
+  }
+}
+
+sub unique
+{
+  my $solution = shift;
+
+  for my $so_far ( @Solutions )
+  {
+    return 0 if is_like( $so_far, $solution );
+  }
+  return 1;
+}
+
+sub is_like
+{
+<ins>  my ($sol1, $sol2) = @_;
+
+  for my $func ( @Transforms )
+  {
+    return 1 if same( $sol1, transform( $func, $sol2 ) )
+  }
+  return 0;</ins>
+<del>  return 1;  # Temporary
+</del>}
+
+<ins>sub same
+{
+  my ($sol1, $sol2) = @_;
+
+  return string_of( $sol1 ) eq string_of( $sol2 );
+}
+
+sub transform
+{
+  my ($func, $solution) = @_;
+
+  my $new_solution = [];
+  for my $row ( 0 .. $#$solution )
+  {
+    my $elements_ref = $solution-&gt;[$row];
+    for my $column ( grep { defined $solution-&gt;[$row][$_] } 0 .. $#$elements_ref )
+    {
+      my ($new_row, $new_column) = $func-&gt;( $row, $column );
+      put_queen_at( $new_solution, $new_row, $new_column );
+    }
+  }
+  return $new_solution;
+}
+
+sub string_of
+{
+  my $solution = shift;
+
+  my $string = '';
+  for my $row ( @$solution )
+  {
+    $string .= join '', map { defined($_) ? 'Q' : ' ' } @$row;
+    $string .= "x";
+  }
+
+  return $string;
+}</ins>
+
+sub attacked  # Is queen at proposed position attacked in this solution?
+{
+  my ($solution, $proposed_row, $proposed_column) = @_;
+
+  for my $row ( 0 .. $#$solution )
+  {
+    my $elements_ref = $solution-&gt;[$row];
+    for my $column ( grep { defined $solution-&gt;[$row][$_] } 0 .. $#$elements_ref )
+    {
+      return 1 if attacks( $row, $column, $proposed_row, $proposed_column );
+    }
+  }
+  return 0;
+}
+
+sub attacks
+{
+  my ($r1, $c1, $r2, $c2) = @_;
+
+  my $row_diff = abs( $r1 - $r2 );
+  my $col_diff = abs( $c1 - $c2 );
+  return $row_diff == $col_diff || $row_diff == 0 || $col_diff == 0;
+}
+
+sub put_queen_at
+{
+  my ($solution, $row, $column) = @_;
+
+  $solution-&gt;[$row][$column] = 'Q';
+}
+
+sub copy
+{
+  my $solution = shift;
+
+  my @rows;
+  push @rows, [ @$_ ] for @$solution;
+  return \@rows;
+}
+
+sub print_solution
+{
+  my ($max_cell, $solution) = @_;
+
+  for my $row ( @$solution )
+  {
+    for my $column ( 0 .. $max_cell )
+    {
+      print $row-&gt;[$column] ? " Q " : " . ";
+    }
+    print "\n";
+  }
+  print "\n";  # Extra blank line for spacing
+}
+</pre></div></div>
+    
+    <p><img src="images/coderunner/checksyntax.JPG"> and run it. It prints 12 solutions, then pauses 
+      for a bit while it checks some redundant possibilities before finishing. Okay, now that's a big
+      change! Let's break it down piece by piece. First, the <b>string_of</b> subroutine:</p>
+    
+<div class="observeBox"><div class="observeTitle">OBSERVE:</div><div class="observe"><pre>sub string_of
+{
+  my $solution = shift;
+
+  my $string = '';
+  for my $row ( <span class="darkred">@$solution</span> )
+  {
+    <span class="darkblue">$string</span> .= join '', map { defined($_) ? 'Q' : ' ' } @$row;
+    $string .= "<span class="orange">x</span>";
+  }
+
+  return $string;
+}
+</pre></div></div>    
+    
+    <p><b>string_of()</b> generates a <span class="darkblue">string</span> from a <span class="darkred">solution</span> so we can compare 
+      two solutions with <span class="blue">eq</span> in the <span class="darkgreen">same()</span> subroutine below. It makes a 
+      representation of each row and joins them together 
+      with the letter <span class="orange">x</span>.</p>
+    
+<div class="observeBox"><div class="observeTitle">OBSERVE:</div><div class="observe"><pre>sub same
+{
+  my ($sol1, $sol2) = @_;
+
+  return <span class="blue">string_of(</span> <span class="darkgreen">$sol1</span> <span class="blue">)</span> eq <span class="blue">string_of(</span> <span class="darkgreen">$sol2</span> <span class="blue">)</span>;
+}
+</pre></div></div>    
+    
+    <p>The <b>same()</b> routine uses the <span class="blue">string_of</span> results to check whether two 
+     <span class="darkgreen">solutions</span> are identical.</p>
+    
+<div class="observeBox"><div class="observeTitle">OBSERVE:</div><div class="observe"><pre>
+sub is_like
+{
+  my ($sol1, $sol2) = @_;
+
+  for my $func ( <span class="purple">@Transforms</span> )
+  {
+    return 1 <span class="green">if same(</span> $sol1, <span class="orange">transform(</span> $func, <span class="red">$sol2</span> <span class="orange">)</span> <span class="green">)</span>
+  }
+  return 0;
+}
+</pre></div></div>    
+    
+    <p><b>is_like()</b> now iterates through each of the seven <span class="purple">transformations</span> 
+      representing rotations and reflections (more on that in a moment), <span class="orange">transforms</span> 
+      one of the <span class="red">solutions</span> and determines <span class="green">if they are the same</span>; that is, whether the result matches the other 
+        solution.</p>
+    
+<div class="observeBox"><div class="observeTitle">OBSERVE:</div><div class="observe"><pre>sub transform
+{
+  my ($func, $solution) = @_;
+
+  my <span class="darkred">$new_solution</span> = [];
+  <span class="darkblue">for my $row ( 0 .. $#$solution )</span>
+  {
+    my $elements_ref = $solution-&gt;[$row];
+    for my $column ( grep { defined $solution-&gt;[$row][$_] } 0 .. $#$elements_ref )
+    {
+      my ($new_row, $new_column) = $func-&gt;( $row, $column );
+      <span class="darkgreen">put_queen_at( $new_solution, $new_row, $new_column )</span>;
+    }
+  }
+  return $new_solution;
+}
+</pre></div></div>    
+    
+    <p>The <b>transform()</b> subroutine creates a <span class="darkred">new blank solution</span> and then 
+      <span class="darkblue">iterates through the queens</span> in the solution that is passed, calling the 
+      transformation routine that was passed to 
+      <span class="darkgreen">insert a queen into the new solution</span> at the transformed location. We're 
+      using the same looping code we used in <span class="blue">attacked</span> to do the iteration.</p>
+    
+    <p>Each transformation routine takes two arguments, a row and a column, and returns a row and column 
+      that represent where a queen at that row and column winds up after the transformation. There are 
+      7 such transformations, and they are put into the array <span class="red">@Transforms</span> by the new 
+      <span class="blue">init</span> routine. For example, the list 
+      <b>( $max - $_[1], $_[0] ) </b> represents this transformation:</p>
+    
+    <p><div class="c"><img src="images/lessonImages/queen_transform.png"></div></p>
+    
+    <p>That is, a 90-degree counter-clockwise rotation.</p>
+    
+    <p>The coderefs in <span class="red">@Transforms</span> are <i>closed over</i> <span class="red">$max</span>. This means 
+      they are used in the subroutine, but defined outside if it. </p>
+    
+    <p>We now have a working program! But it's not polished yet. For one thing, we have duplicated 
+      code between the <b>attacked</b> and <b>transform</b> routines. We can remove that by 
+      using a <i>callback</i>. Modify <b>queens. pl</b> like this:</p>
+    
+<div class="listingBox"><div class="listingTitle">CODE TO TYPE:</div><div class="listing"><pre>#!/usr/bin/perl
+use strict;
+use warnings;
+
+init( 8 );
+run( 8 );
+
+my @Transforms;
+my $TEMP_COUNTER;
+my @Solutions;
+
+sub run
+{
+  my $size = shift;
+
+  my $solution = [];
+  my $row = 0;
+  try( $size-1, $solution, $row );
+}
+
+sub init
+{
+  my $size = shift;
+  my $max = $size - 1;
+
+  push @Transforms,
+    sub { (        $_[1],        $_[0] ) },
+    sub { ( $max - $_[1], $max - $_[0] ) },
+    sub { ( $max - $_[0],        $_[1] ) },
+    sub { (        $_[0], $max - $_[1] ) },
+    sub { ( $max - $_[1],        $_[0] ) },
+    sub { ( $max - $_[0], $max - $_[1] ) },
+    sub { (        $_[1], $max - $_[0] ) };
+}
+
+sub try
+{
+  my ($max_cell, $solution, $row) = @_;
+
+  if ( $row &gt; $max_cell )
+  {
+    return unless unique( $solution );
+    print_solution( $max_cell, $solution );
+    print " *** ", ++$TEMP_COUNTER, "\n";
+    push @Solutions, $solution;
+  }
+  else
+  {
+    for my $column ( 0 .. $max_cell )
+    {
+      next if attacked( $solution, $row, $column );
+      my $new_solution = copy( $solution );
+      put_queen_at( $new_solution, $row, $column );
+      try( $max_cell, $new_solution, $row + 1 );
+    }
+  }
+}
+
+sub unique
+{
+  my $solution = shift;
+
+  for my $so_far ( @Solutions )
+  {
+    return 0 if is_like( $so_far, $solution );
+  }
+  return 1;
+}
+
+sub is_like
+{
+  my ($sol1, $sol2) = @_;
+
+  for my $func ( @Transforms )
+  {
+    return 1 if same( $sol1, transform( $func, $sol2 ) )
+  }
+  return 0;
+}
+
+sub same
+{
+  my ($sol1, $sol2) = @_;
+
+  return string_of( $sol1 ) eq string_of( $sol2 );
+}
+
+sub transform
+{
+  my ($func, $solution) = @_;
+
+  my $new_solution = [];
+  <del>for my $row ( 0 .. $#$solution )
+  {
+    my $elements_ref = $solution-&gt;[$row];
+    for my $column ( grep { defined $solution-&gt;[$row][$_] } 0 .. $#$elements_ref )
+    {
+      my ($new_row, $new_column) = $func-&gt;( $row, $column );
+      put_queen_at( $new_solution, $new_row, $new_column );
+    }
+  }</del>
+  <ins>for_row_col( $solution, sub {
+        my ($row, $column) = @_;
+        my ($new_row, $new_column) = $func-&gt;( $row, $column );
+        put_queen_at( $new_solution, $new_row, $new_column );
+      } );</ins>
+  return $new_solution;
+}
+
+<ins>sub for_row_col
+{
+  my ($solution, $callback) = @_;
+
+  for my $row ( 0 .. $#$solution )
+  {
+    my $elements_ref = $solution-&gt;[$row];
+    for my $column ( grep { defined $solution-&gt;[$row][$_] } 0 .. $#$elements_ref )
+    {
+      $callback-&gt;( $row, $column );
+    }
+  }
+}</ins>
+  
+sub string_of
+{
+  my $solution = shift;
+
+  my $string = '';
+  for my $row ( @$solution)
+  {
+    $string .= join '', map { defined($_) ? 'Q' : ' ' } @$row;
+    $string .= "x";
+  }
+
+  return $string;
+}
+
+sub attacked  # Is queen at proposed position attacked in this solution?
+{
+  my ($solution, $proposed_row, $proposed_column) = @_;
+
+  <del>for my $row ( 0 .. $#$solution )
+  {
+    my $elements_ref = $solution-&gt;[$row];
+    for my $column ( grep { defined $solution-&gt;[$row][$_] } 0 .. $#$elements_ref )
+    {
+      return 1 if attacks( $row, $column, $proposed_row, $proposed_column );
+    }
+  }
+  return 0;</del>
+  <ins>eval {
+    for_row_col( $solution, sub {
+        my ($row, $column) = @_;
+        die 1 if attacks( $row, $column, $proposed_row, $proposed_column );
+      } );
+  };
+  return $@;</ins>
+}
+
+sub attacks
+{
+  my ($r1, $c1, $r2, $c2) = @_;
+
+  my $row_diff = abs( $r1 - $r2 );
+  my $col_diff = abs( $c1 - $c2 );
+  return $row_diff == $col_diff || $row_diff == 0 || $col_diff == 0;
+}
+
+sub put_queen_at
+{
+  my ($solution, $row, $column) = @_;
+
+  $solution-&gt;[$row][$column] = 'Q';
+}
+
+sub copy
+{
+  my $solution = shift;
+
+  my @rows;
+  push @rows, [ @$_ ] for @$solution;
+  return \@rows;
+}
+
+sub print_solution
+{
+  my ($max_cell, $solution) = @_;
+
+  for my $row ( @$solution )
+  {
+    for my $column ( 0 .. $max_cell )
+    {
+      print $row-&gt;[$column] ? " Q " : " . ";
+    }
+    print "\n";
+  }
+  print "\n";  # Extra blank line for spacing
+}
+
+</pre></div></div>
+    <p><img src="images/coderunner/checksyntax.JPG"> and run it; the output will be the same as before. 
+      Let's go over the <b>for_row_col</b> subroutine first:</p>
+    
+<div class="observeBox"><div class="observeTitle">OBSERVE:</div><div class="observe"><pre>
+sub for_row_col
+{
+  my ($solution, $callback) = @_;
+
+  for my $row ( 0 .. $#$solution )
+  {
+    my $elements_ref = $solution-&gt;[$row];
+    for my $column ( grep { defined $solution-&gt;[$row][$_] } 0 .. $#$elements_ref )
+    {
+      $callback-&gt;( $row, $column );
+    }
+  }
+}
+</pre></div></div>    
+    
+    <p><b>for_row_col</b> performs the same iteration that we duplicated before in the <b>transform</b> and <b>attacked</b> routines, 
+      but calls a callback inside the loop.</p>
+    
+    <p>Now look at the <b>transform()</b> subroutine:</p>
+      
+<div class="observeBox"><div class="observeTitle">OBSERVE:</div><div class="observe"><pre>sub transform
+{
+  my ($func, $solution) = @_;
+
+  my $new_solution = [];
+  <b>for_row_col(</b> <span class="red">$solution</span>, sub {
+        my ($row, $column) = @_;
+        my ($new_row, $new_column) = <span class="red">$func</span>-&gt;( $row, $column );
+        put_queen_at( <span class="red">$new_solution</span>, $new_row, $new_column );
+      } <span class="blue">)</span>;
+  return $new_solution;
+}
+
+</pre></div></div>    
+    
+    <p><b>transform()</b> calls <b>for_row_col</b>, passing a coderef that does the same thing inside the loop 
+      that it did before. The callback is closed over <span class="red">$func</span>, <span class="red">$solution</span>, and 
+      <span class="red">$new_solution</span>.</p>
+    
+    <p>Now let's look at the <span class="blue">attacked</span> subroutine:</p>  
+    
+<div class="observeBox"><div class="observeTitle">OBSERVE:</div><div class="observe"><pre>sub attacked  # Is queen at proposed position attacked in this solution?
+{
+  my ($solution, $proposed_row, $proposed_column) = @_;
+
+  <span class="orange">eval {</span>
+    <b>for_row_col(</b> $solution, sub {
+        my ($row, $column) = @_;
+        <span class="darkred">die</span> 1 if <span class="darkgreen">attacks(</span> $row, $column, $proposed_row, $proposed_column <span class="darkgreen">)</span>;
+      } <span class="blue">)</span>;
+  <span class="orange">}</span>;
+  <span class="purple">return</span> <span class="red">$@</span>;
+}
+</pre></div></div>    
+    
+    <p>The code that was originally inside the loop <span class="purple">return</span>s from 
+      <span class="blue">attacked</span> if the result of <span class="darkgreen">attacks</span> is true. But putting 
+      <span class="purple">return</span> inside a callback will do no good; it will just return from the callback. 
+      We need a way of doing something similar—jumping out of the callback at that point. This 
+      suggests that we should raise an exception, so we'll use <span class="darkred">die</span> instead of <b>return</b>, and 
+      wrap the call to <span class="blue">for_row_col</span> in an <span class="orange">eval</span> block, so that we can test 
+      <span class="red">$@</span> afterward. If it is no longer undef, then the code <span class="darkred">die</span>d.</p>
+    
+    <p>We may not have reduced the line count, but we have removed duplication of functionality, so that
+      if we change the way we iterate through a solution in the future, we only need to change it in one 
+      place.</p>
+    
+    <p>We can still simplify our code even more. The result of <span class="blue">string_of</span> is very close to 
+      the output of <span class="blue">print_solution</span>; if we made <span class="blue">string_of</span> return a printable 
+      board representation, we could eliminate <span class="blue">print_solution</span> altogether. And while we're at it, let's
+      make the board size an option. We can do all of that. Modify <b>queens.pl</b> as shown: </p>
+   
+<div class="listingBox"><div class="listingTitle">CODE TO TYPE:</div><div class="listing"><pre>#!/usr/bin/perl
+use strict;
+use warnings;
+
+<ins>use Getopt::Long;
+
+my $size = 8;
+GetOptions( 'size:i' =&gt; \$size );</ins>
+
+init( <del>8</del> <ins>$size</ins> );
+run( <del>8</del> <ins>$size</ins> );
+
+my @Transforms;
+<del>my $TEMP_COUNTER;</del>
+my @Solutions;
+<ins>my $String_Func;</ins>
+
+sub run
+{
+  my $size = shift;
+
+  my $solution = [];
+  my $row = 0;
+  try( $size-1, $solution, $row );
+}
+
+sub init
+{
+  my $size = shift;
+  my $max = $size - 1;
+
+  push @Transforms,
+    sub { (        $_[1],        $_[0] ) },
+    sub { ( $max - $_[1], $max - $_[0] ) },
+    sub { ( $max - $_[0],        $_[1] ) },
+    sub { (        $_[0], $max - $_[1] ) },
+    sub { ( $max - $_[1],        $_[0] ) },
+    sub { ( $max - $_[0], $max - $_[1] ) },
+    sub { (        $_[1], $max - $_[0] ) };
+
+  <ins>$String_Func = sub { string_of( $max, @_ ) };</ins>
+}
+
+sub try
+{
+  my ($max_cell, $solution, $row) = @_;
+
+  if ( $row &gt; $max_cell )
+  {
+    return unless unique( $solution );
+    <del>print " *** ", ++$TEMP_COUNTER, "\n";</del>
+    <del>print_solution( $max_cell, $solution );</del>
+    <ins>print $String_Func-&gt;( $solution );</ins>
+    push @Solutions, $solution;
+  }
+  else
+  {
+    for my $column ( 0 .. $max_cell )
+    {
+      next if attacked( $solution, $row, $column );
+      my $new_solution = copy( $solution );
+      put_queen_at( $new_solution, $row, $column );
+      try( $max_cell, $new_solution, $row + 1 );
+    }
+  }
+}
+
+sub unique
+{
+  my $solution = shift;
+
+  for my $so_far ( @Solutions )
+  {
+    return 0 if is_like( $so_far, $solution );
+  }
+  return 1;
+}
+
+sub is_like
+{
+  my ($sol1, $sol2) = @_;
+
+  for my $func ( @Transforms )
+  {
+    return 1 if same( $sol1, transform( $func, $sol2 ) )
+  }
+  return 0;
+}
+
+sub same
+{
+  my ($sol1, $sol2) = @_;
+
+  return <del>string_of( $sol1 ) eq string_of( $sol2 ); </del><ins>$String_Func-&gt;( $sol1 ) eq $String_Func-&gt;( $sol2 );</ins>
+}
+
+sub transform
+{
+  my ($func, $solution) = @_;
+
+  my $new_solution = [];
+  for_row_col( $solution, sub {
+        my ($row, $column) = @_;
+        my ($new_row, $new_column) = $func-&gt;( $row, $column );
+        put_queen_at( $new_solution, $new_row, $new_column );
+      } );
+  return $new_solution;
+}
+
+
+sub for_row_col
+{
+  my ($solution, $callback) = @_;
+
+  for my $row ( 0 .. $#$solution )
+  {
+    my $elements_ref = $solution-&gt;[$row];
+    for my $column ( grep { defined $solution-&gt;[$row][$_] } 0 .. $#$elements_ref )
+    {
+      $callback-&gt;( $row, $column );
+    }
+  }
+}
+
+sub string_of
+{
+<del>  my $solution = shift;
+</del><ins>  my ($max_cell, $solution) = @_;</ins>
+
+  my $string = '';
+  for my $row ( @$solution )
+  {
+<del>    $string .= join '', map { defined($_) ? 'Q' : ' ' } @$row;
+    $string .= "x";</del>
+<ins>    my @temp = @$row;
+    $#temp = $max_cell;
+    $string .= join '', map { defined($_) ? ' Q ' : ' . ' } @temp;
+    $string .= "\n";</ins>
+  }
+
+<del>  return $string;</del>
+<ins>  return "$string\n";  # Extra newline for spacing
+</ins>}
+
+sub attacked  # Is queen at proposed position attacked in this solution?
+{
+  my ($solution, $proposed_row, $proposed_column) = @_;
+
+  eval {
+    for_row_col( $solution, sub {
+        my ($row, $column) = @_;
+        die 1 if attacks( $row, $column, $proposed_row, $proposed_column );
+      } );
+  };
+  return $@;
+}
+
+sub attacks
+{
+  my ($r1, $c1, $r2, $c2) = @_;
+
+  my $row_diff = abs( $r1 - $r2 );
+  my $col_diff = abs( $c1 - $c2 );
+  return $row_diff == $col_diff || $row_diff == 0 || $col_diff == 0;
+}
+
+sub put_queen_at
+{
+  my ($solution, $row, $column) = @_;
+
+  $solution-&gt;[$row][$column] = 'Q';
+}
+
+sub copy
+{
+  my $solution = shift;
+
+  my @rows;
+  push @rows, [ @$_ ] for @$solution;
+  return \@rows;
+}
+
+<del>sub print_solution
+{
+  my ($max_cell, $solution) = @_;
+
+  for my $row ( @$solution )
+  {
+    for my $column ( 0 .. $max_cell )
+    {
+      print $row-&gt;[$column] ? " Q " : " . ";
+    }
+    print "\n";
+  }
+  print "\n";  # Extra blank line for spacing
+}</del>
+</pre></div></div>
+    
+    <p><img src="images/coderunner/checksyntax.JPG"> and run it as shown:</p>
+    
+<div class="interactiveBox"><div class="interactiveTitle">INTERACTIVE SESSION:</div><div class="interactive"><pre>cold:~/perl3$ <ins>./queens.pl --size=7</ins>
+ Q  .  .  .  .  .  .
+ .  .  Q  .  .  .  .
+ .  .  .  .  Q  .  .
+ .  .  .  .  .  .  Q
+ .  Q  .  .  .  .  .
+ .  .  .  Q  .  .  .
+ .  .  .  .  .  Q  .
+                    
+ Q  .  .  .  .  .  .
+ .  .  .  Q  .  .  .
+ .  .  .  .  .  .  Q
+ .  .  Q  .  .  .  .
+ .  .  .  .  .  Q  .
+ .  Q  .  .  .  .  .
+ .  .  .  .  Q  .  .
+                   
+ .  Q  .  .  .  .  .
+ .  .  .  Q  .  .  .
+ Q  .  .  .  .  .  .
+ .  .  .  .  .  .  Q
+ .  .  .  .  Q  .  .
+ .  .  Q  .  .  .  .
+ .  .  .  .  .  Q  . 
+                    
+ .  Q  .  .  .  .  .
+ .  .  .  .  Q  .  .
+ Q  .  .  .  .  .  .
+ .  .  .  Q  .  .  .
+ .  .  .  .  .  .  Q
+ .  .  Q  .  .  .  .
+ .  .  .  .  .  Q  .
+                    
+ .  Q  .  .  .  .  .
+ .  .  .  .  Q  .  .
+ .  .  .  .  .  .  Q
+ .  .  .  Q  .  .  .
+ Q  .  .  .  .  .  .
+ .  .  Q  .  .  .  .
+ .  .  .  .  .  Q  . 
+                        
+ .  Q  .  .  .  .  .
+ .  .  .  .  .  Q  .
+ .  .  Q  .  .  .  .
+ .  .  .  .  .  .  Q
+ .  .  .  Q  .  .  .
+ Q  .  .  .  .  .  .
+ .  .  .  .  Q  .  .
+</pre></div></div>
+
+    <p>(We ran it for a different-sized board—the default size is 8—to reduce the amount of output.) 
+      We created the function to get the string representation 
+      through <i>currying;</i> the <span class="blue">string_of</span> routine now needs to know the width of a row in order to print out cells 
+      all the way across (otherwise it will stop at the last queen). But passing the 
+      <span class="red">$max_cell</span> parameter to it would mean that we'd need to pass that parameter to 
+      <span class="blue">same</span>, which would mean we'd have to pass it to <span class="blue">is_like</span>, and that's just plain
+      tedious! Instead, we created a reference in <span class="blue">init</span> to a routine that calls  
+      <span class="blue">string_of</span> with the <span class="red">$max_cell</span> parameter, since the variable <span class="red">$max_cell</span> is 
+      accessible inside the routine <span class="blue">init</span>.</p>
+    
+    <p>Even though we added the option parsing code, the program is still shorter, weighing in at around 175 lines. 
+      That's pretty good, considering all that it does.</p>
+    
+
+  </div></div>
+  <a name="s_02"></a><div id="s_02"><div class="subheading">Congratulations!</div><div class="subheadingText">
+     
+    <p>That was a fairly long and complicated example, but I knew you'd be up to the challenge! It's good to have gone through a typical 
+      development cycle and see the stages of development for a complex program like that.</p>
+   
+  </div></div>
+   
+   <br>
+   
+   <p>And congratulations on reaching the end of <b>Advanced Perl</b>! You have learned some truly 
+     important skills that are way beyond those of the average programmer. We encourage you to go on to 
+     our fourth Perl course, where you'll learn how to apply those skills to practical domains such as 
+     sending email, visiting websites, processing web forms, and querying databases.</p>
+   
+   <p>Now pause for a moment. Revel in your accomplishments, and give yourself a well-deserved pat 
+     on the back! It's been great working with you, I hope to work with you again 
+     soon. Thanks for being here and for your 
+     commitment to becoming a conscientious and excellent Perl programmer!
+     Good luck with your final project and beyond!</p>
+   
+   <p>Once you finish the lesson, go back to the syllabus to complete the homework.</p>
+   
+ </div>
+<div class="footer"><div id="timeSurvey"></div>				
+				Copyright © 1998-2014 O'Reilly Media, Inc.<br><img src="https://courses.oreillyschool.com/common/cclicense.png"><br>
+				This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 Unported License.<br>
+				See <a href="http://creativecommons.org/licenses/by-sa/3.0/legalcode">http://creativecommons.org/licenses/by-sa/3.0/legalcode</a> 
+				for more information.
+				</div><iframe id="t" width="1" height="1" border="0" style="display:none"></iframe><script language="javascript">bodyLoaded();</script><script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+  ga('create', 'UA-44720547-1', 'oreillyschool.com');
+  ga('send', 'pageview');
+</script></body></html>

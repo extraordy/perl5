@@ -1,0 +1,469 @@
+<html><!-- Copyright (c) 1998-2014 O'Reilly Media, Inc.
+			This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 Unported License.
+			See http://creativecommons.org/licenses/by-sa/3.0/legalcode for more information.
+            --><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"><link rel="stylesheet" type="text/css" href="../common/Lab.css"><script type="text/javascript" src="../common/Lab.js"></script><script language="javascript"></script><title>grep() and map()</title></head><body id="body"><a name="top"></a><div class="title">grep() and map()</div><div class="resize"><a href="Perl3-05.html#top" onclick="changeSize('smaller');" class="aS" title="Keep clicking to make fonts smaller">A</a><a href="Perl3-05.html#top" onclick="changeSize('larger');" class="aL" title="Keep clikcing to make fonts larger">A</a><a href="Perl3-05.html#top" onclick="lv()" class="lv" title="Adjust Page for High Contrast">HC</a><div id="fh"><p>Click on <span class="aS">A</span> to make all fonts on the page smaller.</p><p>Click on <span class="aL">A</span> to make all fonts on the page larger.</p><p>Click on <span class="lv">HC</span> to toggle high contrast mode. When you move your mouse over 
+                 some bold words in high contrast mode, related words are automatically highlighted. Text is shown
+                 in black and white. 
+             </p></div></div><hr>
+ <div class="goalTitle">Lesson Objectives</div><div class="goals"> 
+  
+  When you complete this lesson, you will be able to:
+  <ul><li>use the <a href="Perl3-05.html#grep">grep()</a> function to select the elements from a list that match some 
+    criteria.</li><li>use the <a href="Perl3-05.html#map">map()</a> fucntion.</li></ul>
+ </div><hr>
+  
+ <p><div class="c">"The human animal differs from the lesser primates in his passion for lists."<br>
+  -H. Allen Smith </div></p>
+  
+ <p>Welcome to a new lesson, where you'll use the Perl skills you've learned so far, and incorporate some new ones to 
+  manipulate lists at a whole new level! In this 
+  lesson we'll add two important functions to your tool chest: <span class="darkgreen">grep()</span> and <span class="darkgreen">map()</span>.  
+ Both of these functions take a list as input, and provide a list as output. These tools 
+ will allow you to transform lists using simple expressions rather than whole blocks of code. Sounds great, right? Let's get 
+  going!</p>
+ <ul><li><a href="Perl3-05.html#grep">grep()</a></li><li><a href="Perl3-05.html#map">map()</a></li></ul>
+ 
+ <a href="Perl3-05.html" name="grep"></a>
+ <a name="h_01"></a><div class="heading">grep()</div><div class="headingText">
+   
+  <p>If you've used the Unix program called <b>grep</b>—and we built a simplified version of it in 
+   Perl&nbsp;2—you may be tempted to think that the <span class="darkgreen">grep()</span> function in Perl does the same thing. 
+   Well, it's 
+   kind of related, except that Perl's <span class="darkgreen">grep()</span> 
+   really has nothing to do with regular expressions.</p>
+   
+  <p>The <span class="darkgreen">grep()</span> function is used to select the elements of a list that match some 
+   criteria. And it lets you write less code than you would building a loop and a temporary array to serve that same purpose. 
+   Let's try executing that task without using <span class="darkgreen">grep()</span> first. Create <b>tracks.pl</b> in your 
+   <b>/perl3</b> folder as shown:</p>
+
+<div class="listingBox"><div class="listingTitle">CODE TO TYPE:</div><div class="listing"><pre>#!/usr/bin/perl
+use strict;
+use warnings;
+
+my $MINUTE = 60;   # Seconds therein
+
+my %length;
+
+while ( &lt;DATA&gt; )
+{
+  next unless /\A\d+\.\s+"(.*?)".*\s(\d+):(\d+)/;
+  my ($title, $min, $sec) = ($1, $2, $3);
+  $length{$title} = $min * $MINUTE + $sec;
+}
+
+my $limit = shift || 3;
+my @long_tracks;
+for my $title ( sort keys %length)
+{
+  push @long_tracks, $title if $length{$title} &gt; $limit * $MINUTE;
+}
+report( $limit, @long_tracks );
+
+sub report
+{
+  my $limit = shift;
+
+  print "Tracks over $limit minutes long:\n";
+  print "$_\n" for @_;
+}
+
+__END__
+Sgt. Pepper's Lonely Hearts Club Band (Track listing from Wikipedia)
+Side one
+No.	Title	Length
+1.	"Sgt. Pepper's Lonely Hearts Club Band"  	2:00
+2.	"With a Little Help from My Friends"  	2:43
+3.	"Lucy in the Sky with Diamonds"  	3:26
+4.	"Getting Better"  	2:47
+5.	"Fixing a Hole"  	2:35
+6.	"She's Leaving Home"  	3:33
+7.	"Being for the Benefit of Mr. Kite!"  	2:35
+Side two
+No.	Title	Length
+1.	"Within You Without You" (George Harrison)	5:05
+2.	"When I'm Sixty-Four"  	2:37
+3.	"Lovely Rita"  	2:41
+4.	"Good Morning Good Morning"  	2:42
+5.	"Sgt. Pepper's Lonely Hearts Club Band (Reprise)"  	1:19
+6.	"A Day in the Life"  	5:04
+</pre></div></div>
+   
+  <p>Our program <b>tracks.pl</b> takes an optional argument to report the minimum length of a track in minutes. 
+   <img src="images/coderunner/checksyntax.JPG"> and run it:</p>
+  
+<div class="interactiveBox"><div class="interactiveTitle">INTERACTIVE SESSION:</div><div class="interactive"><pre>code:~$ <ins>cd perl3</ins>
+cold:~/perl3$ <ins>./tracks.pl</ins>
+Tracks over 3 minutes long:
+A Day in the Life
+Lucy in the Sky with Diamonds
+She's Leaving Home
+Within You Without You
+cold:~/perl3$ <ins>./tracks.pl 4</ins>
+Tracks over 4 minutes long:
+A Day in the Life
+Within You Without You
+</pre></div></div>
+   
+  <p>The goal in this program was to construct the array <b>@long_tracks</b> and have it contain the titles we 
+   wanted. We could have reported them one at a time in the loop, but imagine that we need 
+   that array for something else later in the program. Now let's change the program and try something else. Modify your code as shown:</p>
+  
+<div class="listingBox"><div class="listingTitle">CODE TO TYPE:</div><div class="listing"><pre>#!/usr/bin/perl
+use strict;
+use warnings;
+
+my $MINUTE = 60;   # Seconds therein
+
+my %length;
+
+while ( &lt;DATA&gt; )
+{
+  next unless /\A\d+\.\s+"(.*?)".*\s(\d+):(\d+)/;
+  my ($title, $min, $sec) = ($1, $2, $3);
+  $length{$title} = $min * $MINUTE + $sec;
+}
+
+my $limit = shift || 3;
+my @long_tracks<ins> = grep { $length{$_} &gt; $limit * $MINUTE } sort keys %length</ins>;
+<del>for my $title ( sort keys %length)
+{
+  push @long_tracks, $title if $length{$title} &gt; $limit * $MINUTE;
+}</del>
+report( $limit, @long_tracks );
+
+sub report
+{
+  my $limit = shift;
+
+  print "Tracks over $limit minutes long:\n";
+  print "$_\n" for @_;
+}
+
+__END__
+Sgt. Pepper's Lonely Hearts Club Band (Track listing from Wikipedia)
+Side one
+No.	Title	Length
+1.	"Sgt. Pepper's Lonely Hearts Club Band"  	2:00
+2.	"With a Little Help from My Friends"  	2:43
+3.	"Lucy in the Sky with Diamonds"  	3:26
+4.	"Getting Better"  	2:47
+5.	"Fixing a Hole"  	2:35
+6.	"She's Leaving Home"  	3:33
+7.	"Being for the Benefit of Mr. Kite!"  	2:35
+Side two
+No.	Title	Length
+1.	"Within You Without You" (George Harrison)	5:05
+2.	"When I'm Sixty-Four"  	2:37
+3.	"Lovely Rita"  	2:41
+4.	"Good Morning Good Morning"  	2:42
+5.	"Sgt. Pepper's Lonely Hearts Club Band (Reprise)"  	1:19
+6.	"A Day in the Life"  	5:04
+</pre></div></div>
+   
+  <p><img src="images/coderunner/checksyntax.JPG"> and run it. You'll see exactly the same output as 
+   before.</p>
+   
+  <p>So how does it work?  The <span class="darkgreen">grep()</span> function's general form looks like this:</p>
+   
+<div class="observeBox"><div class="observeTitle">OBSERVE:</div><div class="observe"><pre>
+<span class="purple">RESULT_LIST</span> = <span class="darkgreen">grep</span> { <span class="darkblue">EXPRESSION</span> } <span class="darkred">LIST</span>
+</pre></div></div>
+
+     <p>Or, in our example:</p>
+  
+<div class="observeBox"><div class="observeTitle">OBSERVE:</div><div class="observe"><pre>
+<span class="purple">my @long_tracks</span> = <span class="darkgreen">grep</span> { <span class="darkblue">$length{$_} &gt; $limit * $MINUTE</span> } <span class="darkred">sort keys %length</span>
+</pre></div></div>
+   
+  <p>Your chosen <span class="darkblue">EXPRESSION</span> goes inside the curly braces; Perl evaluates it 
+   in Boolean context once for each element of the input list <span class="darkred">LIST</span>. <span class="red">$_</span> 
+   is set equal to each element in turn (this is much like the postfixed foreach statement). If the result of 
+   <span class="darkblue">EXPRESSION</span> is true, the element being evaluated is added to  
+   <span class="purple">RESULT_LIST</span>; if not, it is ignored. </p>
+  
+  <p>So <span class="darkgreen">grep()</span> works as a filter; any elements of the input that pass the test in 
+   <span class="darkblue">EXPRESSION</span> go through to the result.</p>
+    
+  <p>The braces delimit a block of code; you can have multiple statements within them (separated by 
+   semicolons). The value of the last statement or expression in the block of code will be used for the test. 
+   So this description of <span class="darkgreen">grep()</span> is equally valid:</p>
+      
+<div class="observeBox"><div class="observeTitle">OBSERVE:</div><div class="observe"><pre>
+<span class="purple">RESULT_LIST</span> = <span class="darkgreen">grep</span> { <span class="darkblue">CODE</span> } <span class="darkred">LIST</span>
+</pre></div></div>
+   
+  <p>You could, for example, replace the code <b>{ $length{$_} &gt; $limit * $MINUTE }</b> in the program 
+   above with <b>{ my $len = $length{$_}; $len / $MINUTE &gt; $limit }</b> and 
+   it would perform exactly the same function.</p>
+   
+  <p>I like to think of a conveyor belt metaphor for <span class="darkgreen">grep()</span>: </p>
+ 
+  <p><div class="c"><img src="images/lessonImages/conveyor_grep_small.png"></div></p>
+   
+  <p>As each element of the input list passes (from right to left) through the expression/code block, it either 
+   makes it out the other end into the result, or is rejected.</p>
+   
+  <p>Here's an example of a common use of <span class="darkgreen">grep()</span>. The <span class="darkgreen">readdir()</span> 
+   function for returning a list of filenames in a directory corresponding to a directory handle opened by 
+   <span class="darkgreen">opendir()</span> always returns the two directories "." and ".." as part of the list, because 
+   those entries are always in every directory. Since they correspond to the current directory and parent 
+   directory respectively, it is almost never useful to process those elements. Let's take a look. Create 
+   <b>directory.pl</b> in your <b>/perl3</b> folder as shown: </p>
+
+<div class="listingBox"><div class="listingTitle">CODE TO TYPE:</div><div class="listing"><pre>#!/usr/bin/perl
+use strict;
+use warnings;
+
+opendir my $dh, '.' or die "Can't open . $!\n";
+my @files = readdir $dh;
+print "$_\n" for sort @files;
+</pre></div></div>
+   
+  <p><img src="images/coderunner/checksyntax.JPG"> and run it. Near the top, the lines "." and 
+   ".." are printed. Those elements 
+   are almost certainly going to get in the way, regardless of the purpose we put <b>@files</b> to in our program. </p>
+   
+  <p>Here's how we usually solve this problem. Modify <b>directory.pl</b> as follows:</p>
+  
+<div class="listingBox"><div class="listingTitle">CODE TO TYPE:</div><div class="listing"><pre>#!/usr/bin/perl
+use strict;
+use warnings;
+
+opendir my $dh, '.' or die "Can't open . $!\n";
+my @files = <ins>grep { ! /\A\.\.?\z/ } </ins>readdir $dh;
+print "$_\n" for sort @files;
+</pre></div></div>
+   
+  <p><img src="images/coderunner/checksyntax.JPG"> and run it. The "." and ".." lines are no longer 
+   printed. Because <b>$_</b> is set in the block to the current element being considered, we can include 
+   a match expression that is implicitly bound to <b>$_</b>, as we have done here. Do you understand the 
+   regex? It means:</p>
+   
+ <div class="c"> <table class="tbl" border=""><tr><td>!</td><td>Negation</td></tr><tr><td>\A</td><td>Must start with</td></tr><tr><td>\.</td><td>Literal period</td></tr><tr><td>\.?</td><td>Followed by zero or one literal periods</td></tr><tr><td>\z</td><td>Must end here</td></tr></table></div>
+   
+  <p>We'll be using regexes of increasing complexity in our programs from now on. If you don't understand 
+   them, review the corresponding material from earlier lessons, in the <b>Intermediate Perl</b> course, or 
+   ask your instructor. </p>
+ 
+ </div>
+ <a href="Perl3-05.html" name="map"></a>
+ <a name="h_02"></a><div class="heading">map()</div><div class="headingText">
+   
+  <p><span class="darkgreen">map()</span> is like <span class="darkgreen">grep()</span>, only it's even cooler! It has the same general 
+   form:</p>
+         
+<div class="observeBox"><div class="observeTitle">OBSERVE:</div><div class="observe"><pre>
+<span class="purple">RESULT_LIST</span> = <span class="darkgreen">map</span> { <span class="darkblue">EXPRESSION or CODE</span> } <span class="darkred">LIST</span>
+</pre></div></div>
+   
+  <p>And just like with 
+   <span class="darkgreen">grep()</span>, with <span class="darkgreen">map()</span>the block is 
+    executed once for each element of the input <span class="darkred">LIST</span>, 
+   with <span class="red">$_</span> being set to each element in turn. But in this case, the result of the block is not used 
+   to decide whether to pass the element through, but is used <i>as</i> the output element!</p>
+   
+  <p>Let's try some examples. Create <b>miles.pl</b> in your <b>/perl3</b> folder as shown:</p>
+
+<div class="listingBox"><div class="listingTitle">CODE TO TYPE:</div><div class="listing"><pre>#!/usr/bin/perl -C2
+use strict;
+use warnings;
+
+my @squares = map { $_ ** 2 } 1 .. 10;
+print "@squares\n";
+
+my %main_tank    = ( humvee =&gt; 30, voyager =&gt; 0, moped =&gt; 1 );
+my %reserve_tank = (humvee =&gt; 0, voyager =&gt; 400, moped =&gt; 0.1 );
+my %mpg          = (humvee =&gt; 9, voyager =&gt; 25_000/1_100, moped =&gt; 80 );
+my @vehicles     = qw(humvee voyager moped);
+my @miles_left = map { $main_tank{$_} &gt; 0
+                       ? $mpg{$_} * $main_tank{$_}
+                       : $mpg{$_} * $reserve_tank{$_}
+                     } @vehicles;
+print "@miles_left\n";
+
+my @x_axis = map { $_ * 0.3 } -10 .. 10;
+my @y_axis = map { cos $_ } @x_axis;
+print map { '*' x (40 + 30 * $_), "\n" } @y_axis;
+
+my %char = ( eacute =&gt; 233, cedilla =&gt; 231, agrave =&gt; 224 );
+$_ = chr for values %char;
+my @words = qw(caf_eacute_ gar_cedilla_on d_eacute_j_agrave_);
+print map { s/_(.*?)_/$char{$1}/g; "$_\n" } @words;
+</pre></div></div>
+  
+  <p><img src="images/coderunner/checksyntax.JPG"> and run it as shown:</p>
+   
+<div class="interactiveBox"><div class="interactiveTitle">INTERACTIVE SESSION:</div><div class="interactive"><pre>cold:~/perl3$ <ins>./miles.pl</ins>
+1 4 9 16 25 36 49 64 81 100
+270 9090.90909090909 80
+**********
+************
+*****************
+************************
+*********************************
+******************************************
+**************************************************
+**********************************************************
+****************************************************************
+********************************************************************
+**********************************************************************
+********************************************************************
+****************************************************************
+**********************************************************
+**************************************************
+******************************************
+*********************************
+************************
+*****************
+************
+**********
+café
+garçon
+déjà
+</pre></div></div>
+   
+  <p>If you didn't get the accents on the last three lines, make sure you have the <b>-C2</b> flag on the 
+   shebang line (that's the first line of a Perl program, by the way—it begins with #!). 
+   This is not usually necessary and is mostly required here due to the complex environment that 
+   brings the terminal window to you through a Java applet.</p>
+   
+  <p>If you're curious about how the cosine wave pattern of asterisks was made, check out 
+   <a href="http://perldoc.perl.org/perlop.html" target="_blank">perldoc perlop</a>
+   for the explanation of the <span class="darkgreen">x</span> (repetition) operator in scalar context.</p>
+   
+  <p>In our code there are several examples of the use of the <span class="darkgreen">map()</span> operator.
+   Go over each one carefully to make sure you understand them; the code in each case is brief and 
+   could easily be overlooked.</p>
+  <p> The <span class="darkgreen">values()</span> 
+   function returns a list of <i>aliases</i> to the actual values, meaning that if I change those values, I 
+   change the actual values in the hash itself. Go to <a href="http://perldoc.perl.org/functions/values.html" target="_blank">perldoc -f values</a> to read about that feature.</p>
+   
+  <p>In the conveyor belt metaphor, the machine that the inputs pass through gets to replace each input with 
+   whatever it wants, usually the result of transforming the input in some way:</p>
+   
+  <p><div class="c"><img src="images/lessonImages/conveyor_map_small.png"></div></p>
+   
+  <p>This is important: the expression (or last statement) in the block is evaluated in <i>list</i>
+   context, so it can return <i>any number</i> of elements. That means that the number of elements in the 
+   output doesn't have to be the same as the number of elements in the input: it can be fewer (if the block 
+   evaluates to an empty list at least some of the time) or more (if the block evaluates to a list containing 
+   two or more elements at least some of the time). </p>
+      
+  <p>For example, we may create a hash merely to test for <i>set existence</i>, because we want to know whether some string is a key in the 
+   hash. We usually make all the values in the hash <b>1</b> in this case. If the hash is created 
+   from a literal list of keys or an array of keys, the code is longer than it has to be. Create 
+   <b>map_hash.pl</b> in your <b>/perl3</b> folder as shown:</p>
+  
+<div class="listingBox"><div class="listingTitle">CODE TO TYPE:</div><div class="listing"><pre>#!/usr/bin/perl
+use strict;
+use warnings;
+
+my %marsupial = (koala =&gt; 1, kangaroo =&gt; 1, possum =&gt; 1, wombat =&gt; 1);
+
+chomp( my @amphibians = &lt;DATA&gt; );
+
+my %amphibian;
+$amphibian{$_} = 1 for @amphibians;
+
+print "Marsupials: ", join( ' ', sort keys %marsupial ), "\n";
+print "Amphibians: ", join( ' ', sort keys %amphibian ), "\n";
+__END__
+frog
+toad
+salamander
+newt
+caecilian
+</pre></div></div>
+  
+   <p><img src="images/coderunner/checksyntax.JPG"> and run it as shown:</p>
+ 
+<div class="interactiveBox"><div class="interactiveTitle">INTERACTIVE SESSION:</div><div class="interactive"><pre>cold:~/perl3$ <ins>./map_hash.pl</ins>
+Marsupials: kangaroo koala possum wombat
+Amphibians: caecilian frog newt salamander toad
+</pre></div></div>
+   
+  <p>I'm always sneaking something extra into these examples! See how this program 
+   <span class="darkgreen">chomp()</span>s every member of an array in one pass? Take a look at 
+   <a href="http://perldoc.perl.org/functions/chomp.html" target="_blank">perldoc -f chomp</a> for further explanation. </p>
+   
+  <p>That program shows two ways of setting a hash: a literal list and 
+   setting from an array of keys. In each case, every value in the hash is <b>1</b>. Now modify <b>map_hash.pl</b> as 
+   shown:</p>
+  
+<div class="listingBox"><div class="listingTitle">CODE TO TYPE:</div><div class="listing"><pre>#!/usr/bin/perl
+use strict;
+use warnings;
+
+<del>my %marsupial = (koala =&gt; 1, kangaroo =&gt; 1, possum =&gt; 1, wombat =&gt; 1);</del>
+<ins>my %marsupial = map { ($_, 1) } qw(koala kangaroo possum wombat);</ins>
+chomp( my @amphibians = &lt;DATA&gt; );
+
+my %amphibian<ins> = map { ($_, 1) } @amphibians</ins>;
+<del>$amphibian{$_} = 1 for @amphibians;</del>
+
+print "Marsupials: ", join( ' ', sort keys %marsupial ), "\n";
+print "Amphibians: ", join( ' ', sort keys %amphibian ), "\n";
+__END__
+frog
+toad
+salamander
+newt
+caecilian
+</pre></div></div>
+   
+  <p><img src="images/coderunner/checksyntax.JPG"> and run it. You get exactly the same output 
+   as before. The result of each <span class="darkgreen">map()</span> block is a two-element list (I put parentheses 
+   around them to make this clearer, but you can actually leave them off): the element from the input list (the
+   desired key) and the literal <b>1</b> (the value).</p>
+   
+  <p>There is always another way to get the same results you would from <span class="darkgreen">grep()</span> and 
+   <span class="darkgreen">map()</span>; but using them may keep your code shorter and more readable. Remember, Perl's 
+   motto is, <i>"There's More Than One Way To Do It"</i>—in fact, that's the subtitle of the book 
+   <a href="http://shop.oreilly.com/product/9780596000271.do">"Programming Perl"</a>
+    published by O'Reilly! </p>
+   
+  <p><div class="c"><img src="images/lessonImages/camel_cover.png"></div></p>
+   
+  <p>A word of warning: sometimes programmers get carried away with the succinctness of <span class="darkgreen">map()</span>
+   and use it where they should be using <b>foreach</b> statements. You can tell that this 
+   is happening is when they are ignoring the output list. For instance: </p>
+   
+<div class="observeBox"><div class="observeTitle">OBSERVE:</div><div class="observe"><pre>
+my $total = 0;
+map { $total += $length{$_} } grep { $length{$_} &gt; $limit * $MINUTE } keys %length;
+</pre></div></div>
+   
+  <p>We call that using <span class="darkgreen">map()</span> in a <i>void context</i>. It may <i>work,</i> but it's not a good practice; it 
+   makes the code harder to understand by another Perl programmer, who will wonder why there is no output list. 
+   And it's not any shorter than the preferred code either: </p>
+   
+<div class="observeBox"><div class="observeTitle">OBSERVE:</div><div class="observe"><pre>my $total = 0;
+$total += $length{$_} for grep { $length{$_} &gt; $limit * $MINUTE } keys %length;
+</pre></div></div>
+   
+  <p>It's not uncommon to see <span class="darkgreen">grep()</span> and <span class="darkgreen">map()</span> blocks that 
+   are several lines long. Just make sure to indent them thoughtfully to help the reader if you're writing code like that. Later on 
+   in this course we'll join a <span class="darkgreen">map()</span>, a 
+   <span class="darkgreen">grep()</span>, and another <span class="darkgreen">map()</span> together in a chain!  There's no reason that one 
+   conveyor belt can't feed into another, after all. </p>
+  
+  <p>We are making really good progress. Keep it going in the next lesson! See you there...</p>
+  
+ </div>
+ 
+ <p>Once you finish the lesson, go back to the syllabus to complete the homework.</p>
+   
+<div class="footer"><div id="timeSurvey"></div>				
+				Copyright © 1998-2014 O'Reilly Media, Inc.<br><img src="https://courses.oreillyschool.com/common/cclicense.png"><br>
+				This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 Unported License.<br>
+				See <a href="http://creativecommons.org/licenses/by-sa/3.0/legalcode">http://creativecommons.org/licenses/by-sa/3.0/legalcode</a> 
+				for more information.
+				</div><iframe id="t" width="1" height="1" border="0" style="display:none"></iframe><script language="javascript">bodyLoaded();</script><script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+  ga('create', 'UA-44720547-1', 'oreillyschool.com');
+  ga('send', 'pageview');
+</script></body></html>

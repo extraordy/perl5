@@ -1,0 +1,61 @@
+<html>
+   <!-- Copyright (c) 1998-2014 O'Reilly Media, Inc. Unauthorized use is strictly
+                prohibited. None of this code or content can by copied without the express written
+                permission from O'Reilly Media, Inc. -->
+   <head>
+      <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+      <link rel="stylesheet" type="text/css" href="http://archive.oreilly.com/oreillyschool/courses/Perl1/common/Lab.css">
+      <title>Formatted Printing and More Looping - Quiz 1</title>
+   </head>
+   <body id="body">
+      <h2>Formatted Printing and More Looping - Quiz 1</h2> 
+      
+      
+      
+      
+      <p>What is the difference between the following code examples?</p>
+      
+      
+      <div class="observeBox">
+         <div class="observeTitle">Observe:</div>
+         <div class="observe"><pre>while (my $x = shift @a )</pre></div>
+      </div>
+      
+      
+      <p>and</p>
+      
+      
+      <div class="observeBox">
+         <div class="observeTitle">Observe:</div>
+         <div class="observe"><pre>foreach my $x ( @a )</pre></div>
+      </div>
+      
+      
+      <p><b>Hint:</b> to test this, create and run a small program. After executing each loop, print the contents of the array.</p>
+      
+        
+      
+      
+      <p>The while example will likely result in an empty array when complete, because it removes values as it goes. The foreach 
+         example does not suffer this side effect.
+      </p>
+      
+      
+      <p><b>Note:</b> It is possible to still have values in @a if one of them is considered false, because the while will stop at the 
+         first false value, though this is often the undef at the 'end' of an array.
+      </p>
+      
+      
+      <p>Often students will say that there is no difference between these two examples because both allow access to each value of
+         the 
+         array individually. Instruct them that while this is true, there are side effects of the loop that are different.
+      </p>
+      
+      
+      <p><b>Grading Criteria:</b> Student should demonstrate understanding of loop constructs and shift.</p>
+      
+      
+      
+      
+   </body>
+</html>

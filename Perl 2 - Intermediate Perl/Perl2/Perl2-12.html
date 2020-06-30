@@ -1,0 +1,516 @@
+<html><!-- Copyright (c) 1998-2014 O'Reilly Media, Inc.
+			This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 Unported License.
+			See http://creativecommons.org/licenses/by-sa/3.0/legalcode for more information.
+            --><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"><link rel="stylesheet" type="text/css" href="../common/Lab.css"><script type="text/javascript" src="../common/Lab.js"></script><script language="javascript"></script><title>More on Numbers and Strings; More on Regular Expressions; More on Hashes</title></head><body id="body"><a name="top"></a><div class="title">More on Numbers and Strings; More on Regular Expressions; More on Hashes</div><div class="resize"><a href="Perl2-12.html#top" onclick="changeSize('smaller');" class="aS" title="Keep clicking to make fonts smaller">A</a><a href="Perl2-12.html#top" onclick="changeSize('larger');" class="aL" title="Keep clikcing to make fonts larger">A</a><a href="Perl2-12.html#top" onclick="lv()" class="lv" title="Adjust Page for High Contrast">HC</a><div id="fh"><p>Click on <span class="aS">A</span> to make all fonts on the page smaller.</p><p>Click on <span class="aL">A</span> to make all fonts on the page larger.</p><p>Click on <span class="lv">HC</span> to toggle high contrast mode. When you move your mouse over 
+                 some bold words in high contrast mode, related words are automatically highlighted. Text is shown
+                 in black and white. 
+             </p></div></div><hr>
+ 
+ <div class="goalTitle">Lesson Objectives</div><div class="goals">
+  
+  
+  When you complete this lesson, you will be able to:
+  
+  <ul><li>use <a href="Perl2-12.html#string_and_number_literals">string and Number Literals</a>.</li><li>use <a href="Perl2-12.html#character_functions">character Functions</a>.</li><li>use <a href="Perl2-12.html#number_functions">number Functions</a>.</li><li>use <a href="Perl2-12.html#split">split()</a>.</li><li>use <a href="Perl2-12.html#hashes_each">hashes: each()</a>.</li><li>use <a href="Perl2-12.html#read">read()</a>.</li><li>use <a href="Perl2-12.html" name="string_and_number_literals"></a>&gt;</li></ul>
+   
+   
+  
+ </div><hr>
+ 
+  
+ 
+ <a name="h_01"></a><div class="heading">String and Number Literals</div><div class="headingText">
+   
+  <p>We've talked before about some of the escape sequences that can be used within strings; we'll go 
+   through them in detail in a minute, but first, a refresher on 
+   number literals. Suppose you are defining the speed of light in meters per second:</p>
+   
+<div class="observeBox"><div class="observeTitle">OBSERVE: c</div><div class="observe"><pre>
+<span class="red">$c</span> = <span class="orange">299792458</span>;
+</pre></div></div>
+   
+  <p>That's difficult to verify visually. It would be all too easy to omit a digit or include an unnecessary 
+   one. If we were writing—rather than coding—a large number like the speed of light, or the 
+   national debt, or O'Reilly's student base, we would put <span class="orange">commas</span> at every third digit, like 
+   this:</p>
+   
+<div class="observeBox"><div class="observeTitle">OBSERVE: c</div><div class="observe"><pre>
+c = 299<span class="orange">,</span>792<span class="orange">,</span>458 m/s
+</pre></div></div>
+   
+  <p>But that won't work in Perl because the comma is already taken. (In a list context, the comma separates list 
+   arguments, and in a scalar context—like this would be—it evaluates the argument on the left 
+   and then returns the argument on the right. If you're in a hurry, you can use a comma in a one-liner to run 
+   multiple statements after an <span class="blue">and</span> or an <span class="blue">or</span> conditional, instead of resorting to an 
+   <span class="purple">if</span> block.)</p>
+   
+  <p>But Perl does have a character you can use instead: the <span class="orange">underscore</span>:</p>
+  
+  <div class="observeBox"><div class="observeTitle">OBSERVE: c</div><div class="observe"><pre>
+<span class="red">$c</span> = 299<span class="orange">_</span>792<span class="orange">_</span>458;
+</pre></div></div>
+   
+  <p>This makes it much less difficult to verify that the number has the right magnitude.</p> 
+   
+  <p>Perl does not check to make sure you inserted underscores every third character; it is quite happy with 
+   numbers like 299_79245_8, or 2_99_79_24_58, or even 2_9_9_7_9_2_4_5_8—this even works in floating 
+   point numbers:</p>
+   
+  <div class="observeBox"><div class="observeTitle">OBSERVE: inappropriate use of underscores</div><div class="observe"><pre>
+<span class="red">$pi</span> = <span class="orange">3.1_415_9</span>;
+</pre></div></div>
+   
+  <p>Perl lets you insert the underscore anywhere except at the beginning, and issues a warning if you have two 
+   underscores in 
+   a row or one at the end. Underscore helps you to verify large 
+   numbers by emulating the comma for grouping digits in threes. You might think that it would be 
+   useful when partitioning numbers in a social security number or a telephone number to reflect their 
+   customary grouping, but there's a problem with that. The grouping would be lost as the value was 
+   passed around (Perl does not remember the location of underscores) and both kinds of numbers are 
+   really strings, not numbers; you don't do arithmetic on them, 
+   so why store them as numbers?</p>
+   
+  <p>You can also specify numbers in scientific notation with the exponent:</p>
+   
+  <div class="observeBox"><div class="observeTitle">OBSERVE: Avagadro's Number</div><div class="observe"><pre>
+<span class="red">$a</span> = <span class="orange">6.0221415E23</span>;
+</pre></div></div>
+   
+  <p>Don't put any spaces around the "E." You can use an upper-case E or a lower-case e.</p>
+   
+  <p>In addition to integers and floating point numbers, there are other types of numeric literals in 
+   the decimal base. Perl allows the specification of numbers in other bases as well:</p>
+   
+  <div class="observeBox"><div class="observeTitle">OBSERVE: alternative bases</div><div class="observe"><pre>
+<span class="red">$signature</span> = <span class="orange">0xfc45</span>;      # Hexadecimal
+<span class="red">$mode</span>      = <span class="orange">0755</span>;        # Octal
+<span class="red">$episode</span>   = <span class="orange">0b11001001</span>;  # Binary
+</pre></div></div>
+   
+  <p>Hexadecimal numbers are introduced by <span class="orange">0x</span>, followed by one or more hexadecimal digits
+   in either upper or lower case. The prefix may <i>not</i> be capitalized to <span class="orange">0X</span>.</p>
+   
+  <p>Octal numbers are introduced by a leading zero followed by one or more octal digits (<span class="orange">0</span>
+   through <span class="orange">7</span>). <i>No letter <span class="orange">'O'</span> follows the zero.</i> The 
+   reason for this apparent inconsistency is actually to be consistent with other languages, like C; the 
+   decision dates back many years to when Perl needed to look familiar to programmers. This has 
+   caused confusion for many novice Perl programmers; let's make sure it doesn't happen to you. 
+   Run this one-liner. Type the code below in the Unix shell as shown:</p>
+  
+<div class="interactiveBox"><div class="interactiveTitle">INTERACTIVE SESSION:</div><div class="interactive"><pre>cold:~$ <ins>perl -le '$x = "0454"; print $x+1; $x = 0454; print $x+1'</ins>
+455
+301
+cold:~$ 
+</pre></div></div>
+   
+  <p>The first <span class="red">$x</span> is a <i>string</i>. Perl's rule for interpreting
+   numbers in a string is based solely on the specification for a decimal number. Leading zeroes are 
+   permitted because we might want to format reports with leading zeroes, and people would freak out if 
+   Perl suddenly interpreted some of those numbers as octal. The second <span class="red">$x</span> is a literal number 
+   (hard-coded in the program); there is no reason to put a leading zero in front of it, therefore Perl uses 
+   the leading zero to denote that it's an octal number.</p>
+   
+  <p><b>String Escapes:</b> There are a number of escape sequences you can put inside of double-quoted strings. 
+   You're already familiar with <span class="orange">\n</span> (newline) and <span class="orange">\t</span> (tab); there are 
+   several others:</p>
+   <br>
+  <div class="c"><table class="tbl" border=""><tr><td>\r</td><td>Carriage return (more on this in the next lesson)</td></tr><tr><td>\f</td><td>Form feed (hardly useful any more)</td></tr><tr><td>\a</td><td>Alarm (ring the bell)</td></tr><tr><td>\e</td><td>The escape character (ESC)</td></tr><tr><td>\b</td><td>Backspace</td></tr><tr><td>\<i>nnn</i></td><td>Octal character <i>nnn</i> (each <i>n</i> is a digit from 0 through 7)</td></tr><tr><td>\x<i>nn</i></td><td>Hexadecimal character <i>nn</i> (each <i>n</i> is a digit from 0 through F, 
+    uppercase or lowercase)</td></tr><tr><td>\c<i>c</i></td><td>Control character <i>c</i> (e.g., \cG is Control-G)</td></tr></table></div>
+  <br> 
+  <p>This list is incomplete; it does not contain Unicode characters, but they are outside the scope of 
+   this course. The complete list can be found in <b>perldoc perlop</b>.</p>
+   
+  <p>These escape sequences only count when they are inside "double-quoted" strings, not 'single-quoted' strings.</p>
+   
+  <p>Some escape sequences don't get turned into control characters, but instead cause Perl to change what 
+   follows them:</p>
+   
+  <ul><li><b>\l</b>: Lowercase next character.</li><li><b>\L</b>: Lowercase all characters until end of string or the sequence <b>\E</b>.</li><li><b>\u</b>: Uppercase next character.</li><li><b>\U</b>: Uppercase all characters until end of string or the sequence <b>\E</b>.</li><li><b>\Q</b>: Quote all regex metacharacters so they match only literally until end of string or the 
+    sequence <b>\E</b>.</li></ul>
+   
+  <p>Escape sequences that don't have another meaning inside a regular expression can be used in a regex. 
+   So, while <span class="orange">\b</span> can't be used to mean backspace in a regex (it's an anchor), 
+   <span class="orange">\0<i>nn</i></span> and others can. Let's see how that works. Type the code below in the Unix shell as shown:</p>
+   
+<div class="interactiveBox"><div class="interactiveTitle">INTERACTIVE SESSION:</div><div class="interactive"><pre>cold:~$ <ins>perl -le 'print "Ding" if "\a" =~ /\cG/'</ins>
+Ding
+cold:~$ 
+</pre></div></div>
+   
+ </div>
+ <a href="Perl2-12.html" name="character_functions"></a>
+ <a name="h_02"></a><div class="heading">Character Functions</div><div class="headingText">
+   
+  <p>There are a couple of character functions that you should know. They aren't often used, but when the 
+   time comes, you'll be glad you learned them.</p>
+   
+  <p><span class="darkgreen">chr( <i>number</i> )</span> returns the character with a numerical value that is
+   <i>number</i>.  For example, <span class="darkgreen">chr( 65 )</span> is the letter <span class="orange">'A'</span> (unless 
+   you're running Perl on an EBCDIC system, in which case you have bigger problems, like remembering where 
+   you left your time machine :-) ). You can use <span class="darkgreen">chr( <i>number</i> )</span> as yet another 
+   mechanism for generating Unicode characters; it's also handy for getting at accented characters in the 
+   ISO Latin-1 extended character set. Try it out in a one-liner by typing the code below in the Unix shell as shown: </p>
+<div class="interactiveBox"><div class="interactiveTitle">INTERACTIVE SESSION:</div><div class="interactive"><pre>cold:~$ <ins>perl -le 'printf "%o: %s\n", $_, chr foreach 0xA0 .. 0xFE'</ins>
+</pre></div></div>
+  
+  
+  <p>It doesn't work right; nothing prints for every character. Welcome to the world of character 
+   encodings and fonts. It's an unfriendly place. The command above will work most places, but not in the 
+   special environment that we have for students. The assembly of shells, SSH connections, Java 
+   applets, and browser windows that combine to make the environment work for you, means that we have to lie to 
+   Perl a little to get the output we want; we tell it that the output stream is in UTF-8 (this is covered in 
+   <b>perldoc perlunitut</b>, but be warned, this is a confusing and complicated topic). Modify the code in the Unix shell as shown:</p>
+  
+<div class="interactiveBox"><div class="interactiveTitle">INTERACTIVE SESSION:</div><div class="interactive"><pre>cold:~$ <ins>perl -CO -le 'printf "%o: %s\n", $_, chr foreach 0xA0 .. 0xFE'</ins>
+</pre></div></div>
+  
+  <p>(FYI, that's the letter O, not a zero, after the big C.)</p>
+   
+  <p>You can see here that the default variable for <span class="darkgreen">chr</span> is, naturally enough, 
+   <span class="red">$_</span>. <span class="darkgreen">printf</span> does not get a newline appended to it by <b>-l</b>, 
+   unlike <span class="darkgreen">print</span>, so we have to include it explicitly. Remember, we use
+   <span class="darkgreen">printf</span> to output a number in an alternative base, like octal, hexadecimal, 
+   or binary.</p>
+   
+  <p>Having found the character code you want, you can then use one of the escape sequences from the
+   table above to print it out. Type the code below in the Unix shell as shown:</p>
+   
+<div class="interactiveBox"><div class="interactiveTitle">INTERACTIVE SESSION:</div><div class="interactive"><pre>cold:~$ <ins>perl -CO -le 'print "Welcome to our Internet caf\351"'</ins>
+</pre></div></div>
+  
+  <p>Once again, if you try that on your own system, leave out the <span class="code">-CO</span>.</p>
+  
+  <p><span class="darkgreen">ord( <i>x</i> )</span> is the inverse of <span class="darkgreen">chr</span>: it returns 
+   the numeric value of the character <i><span class="darkgreen">x</span></i>. (If you supply more than one character in the 
+   string, Perl only looks at the first one.)  Try it in a one-liner by typing the code below in the Unix shell as shown:</p>
+  
+<div class="interactiveBox"><div class="interactiveTitle">INTERACTIVE SESSION:</div><div class="interactive"><pre>cold:~$ <ins>perl -le 'print ord "A"'</ins>
+65
+cold:~$ 
+</pre></div></div>
+ 
+ </div>
+ <a href="Perl2-12.html" name="number_functions"></a>
+ <a name="h_03"></a><div class="heading">Number Functions</div><div class="headingText">
+   
+  <p>If you want to <i>print</i> a number in an alternative base, you use 
+   <span class="darkgreen">printf</span> and the appropriate format descriptor. But what about the inverse? For 
+   example, suppose you read a hexadecimal string in from a core dump, how would you turn it into the 
+   equivalent number? </p>
+   
+  <p>Perl contains some handy functions for converting strings representing numbers in different bases.
+   <span class="darkgreen">hex( <i>string</i> )</span> converts a hexadecimal string to its number. 
+   Try it in a one-liner by typing the code below in the Unix shell as shown: </p>
+ 
+<div class="interactiveBox"><div class="interactiveTitle">INTERACTIVE SESSION:</div><div class="interactive"><pre>cold:~$ <ins>perl -le 'print hex "af"'</ins>
+175
+cold:~$ 
+</pre></div></div>
+   
+  <p>Try some other hexadecimal strings in place of <span class="orange">"af"</span>, like <span class="orange">"0xdd"</span>
+   and <span class="orange">"DeadBeef"</span>.</p>
+   
+  <p><span class="darkgreen">oct( <i>string</i> )</span> converts an octal string to its corresponding number.   
+   Try it in a one-liner by typing the code below in the Unix shell as shown:</p>
+   
+<div class="interactiveBox"><div class="interactiveTitle">INTERACTIVE SESSION:</div><div class="interactive"><pre>cold:~$ <ins>perl -le 'print oct "43"'</ins>
+35
+cold:~$ 
+</pre></div></div>
+   
+  <p>The <span class="darkgreen">oct</span> function can also convert strings with other radixes. 
+   Try it in a one-liner by typing the code below in the Unix shell as shown:</p>
+   
+<div class="interactiveBox"><div class="interactiveTitle">INTERACTIVE SESSION:</div><div class="interactive"><pre>cold:~$ <ins>perl -le 'print oct for qw(0b101001 0755 0xFAA)'</ins>
+41
+493
+4010
+cold:~$ 
+</pre></div></div>
+  
+ </div>
+ <a href="Perl2-12.html" name="split"></a>
+ <a name="h_04"></a><div class="heading">split()</div><div class="headingText">
+   
+  <p>We've talked about <span class="darkgreen">split()</span> before, but always suggesting that its argument determining <i>how</i> to split was a string. 
+   In fact, it's a regular expression; we just happened 
+    to use examples that only contained literal atoms.</p>
+   
+  <p><span class="darkgreen">split()</span> is capable of far more than we've seen. This table describes the different uses of the <span class="darkgreen">split()</span>
+   function: </p>
+  
+ <div class="c"> <table class="tbl" border=""><tr><th>Form</th><th>Explanation</th></tr><tr><td><i>LIST</i> = <span class="darkgreen">split(</span> <i>PATTERN, EXPR, LIMIT</i> <span class="darkgreen">)</span></td><td>Split <i>EXPR</i> on <i>PATTERN</i> at most <i>LIMIT</i> times, leaving the remainder in the last 
+     element of <i>LIST</i>.</td></tr><tr><td><i>LIST</i> = <span class="darkgreen">split(</span> <i>PATTERN, EXPR</i> <span class="darkgreen">)</span></td><td>Split <i>EXPR</i> on <i>PATTERN</i>, putting the results into <i>LIST</i>.</td></tr><tr><td><i>LIST</i> = <span class="darkgreen">split(</span> <i>PATTERN</i> <span class="darkgreen">)</span></td><td>Split <span class="red">$_</span> on <i>PATTERN</i>.</td></tr><tr><td><i>LIST</i> = <span class="darkgreen">split()</span></td><td>Split <span class="red">$_</span> on whitespace.</td></tr></table></div>
+   
+  <p>Let's see some examples.  Create <span class="darkred">split.pl</span> as shown:</p>
+  
+<div class="listingBox"><div class="listingTitle">CODE TO TYPE: split.pl</div><div class="listing"><pre><ins>#!/usr/bin/perl
+use strict;
+use warnings;
+
+while ( &lt;DATA&gt; )
+{
+  chomp;
+  my @tokens;
+
+  @tokens = split /[;:=]+\s*/, $_, 3;
+  print "split P, E, 3\t", markup( @tokens ), "\n";
+
+  @tokens = split /[;:=]+\s*/;
+  print "split P\t\t", markup( @tokens ), "\n";
+
+  @tokens = split;
+  print "split\t\t", markup( @tokens ), "\n"
+}
+
+sub markup
+{
+   '|' . join( '|', @_ ) . '|';
+}
+
+__DATA__
+Part: Cowling==; Cost: $71; Size: 48"
+:peter:100:101:Peter Scott:/home/peter:/bin/tcsh:
+The three virtues of a Perl programmer are: Impatience, Hubris, and Laziness - Larry Wall
+</ins></pre></div></div>
+  
+  <p><img src="images/coderunner/checksyntax.JPG"> and run it.  The output shows the list elements that 
+   <span class="darkgreen">split()</span> created for each input, delimited with vertical bars:</p>
+
+<div class="interactiveBox"><div class="interactiveTitle">INTERACTIVE SESSION:</div><div class="interactive"><pre>cold:~$ <ins>cd perl2</ins>
+cold:~/perl2$ <ins>./split.pl</ins>
+split P, E, 3   |Part|Cowling|Cost: $71; Size: 48"|
+split P         |Part|Cowling|Cost|$71|Size|48"|
+split           |Part:|Cowling==;|Cost:|$71;|Size:|48"|
+split P, E, 3   ||peter|100:101:Peter Scott:/home/peter:/bin/tcsh:|
+split P         ||peter|100|101|Peter Scott|/home/peter|/bin/tcsh|
+split           |:peter:100:101:Peter|Scott:/home/peter:/bin/tcsh:|
+split P, E, 3   |The three virtues of a Perl programmer are|Impatience, Hubris, and Laziness - Larry Wall|
+split P         |The three virtues of a Perl programmer are|Impatience, Hubris, and Laziness - Larry Wall|
+split           |The|three|virtues|of|a|Perl|programmer|are:|Impatience,|Hubris,|and|Laziness|-|Larry|Wall|
+split P, E, 3   ||
+split P         ||
+split           ||
+cold:~/perl2$ 
+</pre></div></div>
+  
+  <p>The output is explained in detail here:</p>
+   
+  <div class="c"><table class="tbl" border=""><tr><td><b>split&nbsp;P,&nbsp;E,&nbsp;3&nbsp;&nbsp;</b></td><td>Part</td><td>Cowling</td><td>Cost: $71; Size: 48"</td></tr><tr><td><b>split&nbsp;P      </b></td><td>Part</td><td>Cowling</td><td>Cost</td><td>$71</td><td>Size</td><td>48"</td></tr><tr><td><b>split&nbsp;       </b></td><td>Part:</td><td>Cowling==;</td><td>Cost:</td><td>$71;</td><td>Size:</td><td>48"</td></tr><tr><td><b>split&nbsp;P, E, 3</b></td><td></td><td>peter</td><td>100:101:Peter Scott:/home/peter:/bin/tcsh:</td></tr><tr><td><b>split&nbsp;P      </b></td><td></td><td>peter</td><td>100</td><td>101</td><td>Peter Scott</td><td>/home/peter</td><td>/bin/tcsh</td></tr><tr><td><b>split&nbsp;       </b></td><td>:peter:100:101:Peter</td><td>Scott:/home/peter:/bin/tcsh:</td></tr><tr><td><b>split&nbsp;P, E, 3</b></td><td>The three virtues of a Perl programmer are</td><td>Impatience, Hubris, and Laziness - Larry Wall</td></tr><tr><td><b>split&nbsp;P      </b></td><td>The three virtues of a Perl programmer are</td><td>Impatience, Hubris, and Laziness - Larry Wall</td></tr><tr><td><b>split&nbsp;       </b></td><td>The</td><td>three</td><td>virtues</td><td>of</td><td>a</td><td>Perl</td><td>programmer</td><td>are:</td><td>Impatience,</td><td>Hubris,</td><td>and</td><td>Laziness</td><td>-</td><td>Larry</td><td>Wall</td></tr></table></div>
+   
+  <p>The first column above uses <b>P</b> and <b>E</b> as abbreviations for the pattern and expression, 
+   respectively. (The pattern is <span class="orange">/[;:=]+\s*/</span> and the expression is 
+   <span class="red">$_</span>.)</p>
+      
+  <p>Did you notice that <span class="blue">__DATA__</span> can be used interchangeably with <span class="blue">__END__</span>?</p>
+   
+  <p>Study that program, its output (as well as the list below) carefully until you understand how each line of 
+   output was produced. You'll use the <span class="darkgreen">split</span> function often, so make sure 
+   you're comfortable with it.</p>
+   
+  <p>There are many special cases in the operation of <span class="darkgreen">split</span>, so many that when we 
+   go through them, it may seem overwhelming. Don't worry—you'll get the hang of them. These special cases serve 
+   to make the operation of <span class="darkgreen">split</span> more intuitive, so in the end, you'll actually 
+   have less to remember. Let's look at the 
+   details of the operation of <span class="darkgreen">split</span>.</p>
+   
+  <ul><li>Empty leading fields are preserved; if I split <span class="orange">"::abc:def"</span> on <span class="orange">/:/</span>, 
+    I'll get four elements in the list, the first two being empty.</li><li>Empty trailing fields are deleted; if I split <span class="orange">"abc:def::"</span> on <span class="orange">/:/</span>, 
+    I'll get two elements in the list, <span class="orange">"abc"</span> and <span class="orange">"def"</span>.</li><li>If all the fields end up being empty, they're all deleted. Type this into the Unix shell as shown: </li></ul>
+  
+<div class="interactiveBox"><div class="interactiveTitle">INTERACTIVE SESSION:</div><div class="interactive"><pre>cold:~/perl2$ <ins>perl -le 'print "-$_-" foreach split /[=;:%&amp;]/, ";::=&amp;%%"'</ins>
+</pre></div></div> 
+   
+  <ul><li>Trailing empty fields are <i>not</i> deleted if a <i>LIMIT</i> is specified.</li><li>If you want to make sure that you get all trailing empty fields and don't want to have to guess at a 
+    large enough <i>LIMIT</i>, use any negative <i>LIMIT</i>, such as <span class="orange">-1</span>. That splits into 
+    as many fields as it would if there were no <i>LIMIT</i>, but leaves in trailing empty fields.</li><li>The empty regex (<span class="orange">//</span>) has a special meaning to <span class="darkgreen">split()</span>: split 
+    the string into its characters. Type this into the Unix shell as shown: </li></ul>
+     
+<div class="interactiveBox"><div class="interactiveTitle">INTERACTIVE SESSION:</div><div class="interactive"><pre>cold:~/perl2$ <ins>perl -le 'print for split //, "Intermediate Perl"'</ins>
+</pre></div></div>
+    
+  <ul><li>If you surround the pattern with grouping parentheses, Perl puts whatever matched the regex in the 
+    output list, interwoven with the usual fields.</li></ul>
+   
+  <p>Let's take a look at that last rule in closer detail, because it describes something very useful: the 
+   ability to save all the parts in between the output fields. Try this one-liner by typing this code into the Unix shell as shown:</p>
+   
+<div class="interactiveBox"><div class="interactiveTitle">INTERACTIVE SESSION:</div><div class="interactive"><pre>cold:~/perl2$ <ins>perl -le 'print foreach split /(\W+)/, "Fred,Bill&amp;Ted-Ten%Each...minimum\$100"'</ins>
+Fred
+,
+Bill
+&amp;
+Ted
+-
+Ten
+%
+Each
+...
+minimum
+$
+100
+cold:~/perl2$ 
+</pre></div></div>
+   
+  <p>Sometimes what comes between the fields needs to be saved as well. This feature of 
+   <span class="darkgreen">split</span> lets you do it.</p>
+  
+ </div>
+ <a href="Perl2-12.html" name="hashes_each"></a>
+ <a name="h_05"></a><div class="heading">Hashes: each()</div><div class="headingText">
+   
+  <p>Now we'll look at a function that can make iterating through a hash a bit more
+   convenient. The <span class="darkgreen">each()</span> function acts as an <i>iterator</i> that returns a 
+   two-element list of a key and its corresponding value. Each time you call it, you'll get a new 
+   (key,value) until you've gone all the way through the hash, at which point it returns the empty list. 
+   (In scalar context, <span class="darkgreen">each()</span> returns a key each time until it reaches the end, at 
+   which point it returns <span class="orange">undef</span>. That won't be very useful.)</p>
+   
+  <p>This can save us an extra step when we want to put the value in its own variable to save on typing.
+   Create <span class="darkred">each.pl</span> as shown:</p>
+   
+<div class="listingBox"><div class="listingTitle">CODE TO TYPE: each.pl</div><div class="listing"><pre><ins>#!/usr/bin/perl
+use strict;
+use warnings;
+
+my (%description, %retail_price, %appearance);
+my $MARKUP = 1.45;
+
+while ( &lt;DATA&gt; )
+{
+  next if /\AItem ID/;
+  my ($id, $desc, $cost, $color) = split /\s*\|\s*\$?/;
+  $description{$id}  = $desc;
+  $retail_price{$id} = $cost * $MARKUP;
+  $appearance{$id}   = $color;
+}
+
+while ( my ($id, $desc) = each %description )
+{
+  printf "$desc : \$%.2f\n", $retail_price{$id};
+}
+
+__DATA__
+Item ID|Description|Cost|Color
+63784|Futon|$125.00|White
+374895 | Tatami mat | $70.00 | Straw
+273643 | Stone fountain | $210.00 | Gray
+349875|Kimono|$743.00|Varies</ins>
+</pre></div></div>
+   
+  <p><img src="images/coderunner/checksyntax.JPG"> and run it:</p>
+  
+<div class="interactiveBox"><div class="interactiveTitle">INTERACTIVE SESSION:</div><div class="interactive"><pre>cold:~/perl2$ <ins>./each.pl</ins>                                                                                                                                                            
+Kimono : $1077.35
+Tatami mat : $101.50
+Futon : $181.25
+Stone fountain : $304.50
+cold:~/perl2$ 
+</pre></div></div>
+  
+  <p>We used the <span class="darkgreen">split</span>'s powerful regular expression to 
+   deal with the inconsistent separator in the input data (sometimes it has space around it 
+   and sometimes it doesn't), and to remove the dollar sign from the cost before multiplying it by 
+   <b>$MARKUP</b>.</p>
+   
+  <p>The impact of <span class="darkgreen">each()</span> here is minimal (it saves us from typing
+   <span class="red">$description{$id}</span>), but in certain programs, the
+   <span class="darkgreen">each</span> function will be essential.</p>
+  <p>Alright then. Good job! We're really picking up steam! See you in the next lesson...</p>
+ 
+ </div>
+  <a href="Perl2-12.html" name="read"></a>
+ <a name="h_06"></a><div class="heading">read()</div><div class="headingText">
+  <p>Our final topic for this lesson is the <span class="darkgreen">read()</span> function.  This is
+   an input function, but it is
+   more primitive than the <span class="darkgreen">readline</span> operator (<span class="darkgreen">&lt;&gt;</span>).
+   Instead of reading until it gets to a newline, it reads a specified number of characters.  Can you think
+   why that might be useful? Right—when reading binary data, the term we use for data that's not
+   line-oriented. Usually it doesn't look like text, either, since text usually has line breaks in it so
+   that people can read it. Binary files, like images, music, or proprietary document format files,
+   usually contain characters that are unprintable and make a mess on your screen if you accidentally
+   try to list them.
+  </p>
+  <p>It's rare that you'd want to read such a file into Perl (without using a module that's specialized
+   to the task of parsing whatever format the file is in), but you need to know about <span class="darkgreen">read()</span>
+   for such occasions.  Because if you read a giant binary file in using <span class="darkgreen">&lt;&gt;</span>,
+   you may use huge amounts of memory unnecessarily since that binary file may not contain any newline characters.
+  </p>
+  <p>To do an interesting example of this requires that we read something from a binary file.  This
+   image from earlier in the course will do. </p>
+  
+  <p><div class="c"><img src="images/lessonImages/regmatch.png"></div></p>
+  
+  <p>We'll extract the width of the image from it. The <a href="http://www.w3.org/TR/PNG/#11IHDR" target="_blank">PNG specification</a> tells us it's near
+   the beginning, contained in the first four bytes after the string "IHDR." We can tell from the specification 
+   that 50 bytes is more than enough
+   to read to make sure we've read in that part of the file.  Create <span class="darkred">read_png.pl</span>:
+  </p>
+<div class="listingBox"><div class="listingTitle">CODE TO TYPE:</div><div class="listing"><pre><ins>#!/usr/bin/perl
+use strict;
+use warnings;
+
+open my $fh, '&lt;', '/software/Perl2/regmatch.png' or die "Couldn't read file: $!\n";
+read $fh, my $buffer, 50;
+$buffer =~ /IHDR(....)/ and print "Width = $1\n";
+</ins></pre></div></div>
+  <p>The <span class="darkgreen">read()</span> function takes three arguments, the first being the filehandle to read from,
+   the second a scalar to put the data into, and the third the number of characters to read.
+   (Because we're not opening this file with a Unicode encoding, each character will be one byte long.)
+   <img src="images/coderunner/checksyntax.JPG"> and run it.  The output should be:
+  </p>
+<div class="interactiveBox"><div class="interactiveTitle">INTERACTIVE SESSION:</div><div class="interactive"><pre>
+cold:~/perl2$ <ins>./read_png.pl</ins>
+Width = ù</pre></div></div>
+  <p>
+   What happened?  Because we're reading binary data, the width is also in binary; it's a 32-bit number.  So 
+   it came out to the terminal as junk.  There's a way
+   we can look at it, using the Unix <b>od</b> utility, which will turn binary data into something we can read:
+   </p>
+  
+<div class="interactiveBox"><div class="interactiveTitle">INTERACTIVE SESSION:</div><div class="interactive"><pre>cold:~/perl2$ <ins>./read_png.pl | od -c</ins>
+0000000   W   i   d   t   h       =      \0  \0 001 371  \n</pre></div></div>
+  
+  <p>There you can see that the width is the four characters with octal  values 0, 0, 1, and 371. We still need
+   to turn it into a number we can read. Perl's <span class="darkgreen">unpack</span> function will do that. It allows
+   all kinds of conversions via <i>conversion specifiers</i> in a format string rather like <span class="darkgreen">printf</span>
+   See the voluminous documentation for those specifiers in <b>perldoc -f pack</b>, which is the inverse function
+   (that could be used for turning numbers into binary). The one we want is <b>%N</b>: "An unsigned long (32-bit) in 
+   "network" (big-endian) order." Edit <span class="darkred">read_png.pl</span>:</p>
+  
+<div class="listingBox"><div class="listingTitle">CODE TO TYPE:</div><div class="listing"><pre>#!/usr/bin/perl
+use strict;
+use warnings;
+
+open my $fh, '&lt;', '/software/Perl2/regmatch.png' or die "Couldn't read file: $!\n";
+read $fh, my $buffer, 50;
+$buffer =~ /IHDR(....)/ and print "Width = <ins>", unpack( "%N", </ins>$1<ins> ), "</ins>\n";
+</pre></div></div>
+  <p><img src="images/coderunner/checksyntax.JPG"> and run it.  The output should be:
+  </p>
+  
+<div class="interactiveBox"><div class="interactiveTitle">INTERACTIVE SESSION:</div><div class="interactive"><pre>cold:~/perl2$ <ins>./read_png.pl</ins>
+Width = 505</pre></div></div>
+ </div>
+ <p>And we're done!  (You can view that image locally to verify that it is indeed 505 pixels wide).
+  (If you really wanted to read PNG files, the proper approach would be to use the module <b>Image::PNG</b>;
+  this was just a simple example to illustrate <span class="darkgreen">read()</span>.)
+ Most people deal with binary data rarely if at all, so we are not going to explore the <span class="darkgreen">pack</span>
+ function further, but feel free to read up on it if you might be one of those people who needs to read or write
+ binary data.</p>
+ <br><br><br><br> 
+ <p>Once you finish this lesson, go back to the syllabus page by clicking on the page tab above and do
+  the assignments.</p>
+<div class="footer"><div id="timeSurvey"></div>				
+				Copyright © 1998-2014 O'Reilly Media, Inc.<br><img src="https://courses.oreillyschool.com/common/cclicense.png"><br>
+				This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 Unported License.<br>
+				See <a href="http://creativecommons.org/licenses/by-sa/3.0/legalcode">http://creativecommons.org/licenses/by-sa/3.0/legalcode</a> 
+				for more information.
+				</div><iframe id="t" width="1" height="1" border="0" style="display:none"></iframe><script language="javascript">bodyLoaded();</script><script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+  ga('create', 'UA-44720547-1', 'oreillyschool.com');
+  ga('send', 'pageview');
+</script></body></html>

@@ -1,0 +1,59 @@
+<html>
+   <!-- Copyright (c) 1998-2014 O'Reilly Media, Inc. Unauthorized use is strictly
+                prohibited. None of this code or content can by copied without the express written
+                permission from O'Reilly Media, Inc. -->
+   <head>
+      <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+      <link rel="stylesheet" type="text/css" href="http://archive.oreilly.com/oreillyschool/courses/Perl2/common/Lab.css">
+      <title>Getting Started - Quiz 2</title>
+   </head>
+   <body id="body">
+      <h2>Getting Started - Quiz 2</h2> 
+      
+      
+      
+      
+      <p>How would you limit the scope of $area to the minimum necessary visibility in the following code:</p>
+      
+      
+      <div class="observeBox">
+         <div class="observeTitle">Observe:</div>
+         <div class="observe"><pre>my $PI = 3.14159265;
+my $radius = 71.5;
+my $area = $PI * $radius ** 2;
+print "Area of circle of radius $radius is $area\n";
+my $volume = 4/3 * $PI * $radius ** 3;
+print "Volume of sphere of radius $radius is $volume\n";
+my $height = 21;
+$volume = $PI * $radius ** 2 * $height;
+print "Volume of cylinder of radius $radius and height $height is $volume\n";</pre></div>
+      </div>
+      
+        
+      
+      
+      <p>By the use of a naked block:</p>
+      
+      
+      <div class="observeBox">
+         <div class="observeTitle">Observe:</div>
+         <div class="observe"><pre>my $PI = 3.14159265;
+my $radius = 71.5;
+{ my $area = $PI * $radius ** 2;
+  print "Area of circle of radius $radius is $area\n";
+}
+my $volume = 4/3 * $PI * $radius ** 3;
+print "Volume of sphere of radius $radius is $volume\n";
+my $height = 21;
+$volume = $PI * $radius ** 2 * $height;
+print "Volume of cylinder of radius $radius and height $height is $volume\n";</pre></div>
+      </div>
+      
+      
+      <p><b>Grading Criteria:</b> Student should demonstrate knowledge of how to properly scope a variable.</p>
+      
+      
+      
+      
+   </body>
+</html>

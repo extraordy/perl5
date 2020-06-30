@@ -1,0 +1,970 @@
+<html><!-- Copyright (c) 1998-2014 O'Reilly Media, Inc.
+			This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 Unported License.
+			See http://creativecommons.org/licenses/by-sa/3.0/legalcode for more information.
+            --><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"><link rel="stylesheet" type="text/css" href="../common/Lab.css"><script type="text/javascript" src="../common/Lab.js"></script><script language="javascript"></script><title>Polymorphism, Inheritance, and Inside-Out Objects</title></head><body id="body"><a name="top"></a><div class="title">Polymorphism, Inheritance, and Inside-Out Objects</div><div class="resize"><a href="Perl4-04.html#top" onclick="changeSize('smaller');" class="aS" title="Keep clicking to make fonts smaller">A</a><a href="Perl4-04.html#top" onclick="changeSize('larger');" class="aL" title="Keep clikcing to make fonts larger">A</a><a href="Perl4-04.html#top" onclick="lv()" class="lv" title="Adjust Page for High Contrast">HC</a><div id="fh"><p>Click on <span class="aS">A</span> to make all fonts on the page smaller.</p><p>Click on <span class="aL">A</span> to make all fonts on the page larger.</p><p>Click on <span class="lv">HC</span> to toggle high contrast mode. When you move your mouse over 
+                 some bold words in high contrast mode, related words are automatically highlighted. Text is shown
+                 in black and white. 
+             </p></div></div><hr>
+  
+  <div class="goalTitle">Lesson Objectives</div><div class="goals">
+    
+    
+    When you complete this lesson, you will be able to:
+    <ul><li>explain and use <a href="Perl4-04.html#polymorphism_and_inheritance">Polymorphism and Inheritance</a>.</li><li><a href="Perl4-04.html#reducing_duplication">Reduce Duplication</a>.</li><li><a href="Perl4-04.html#data_hiding">Hide Data</a>.</li><li>peruse a few <a href="Perl4-04.html#miscellaneous_notes_on_objects">Miscellaneous Notes on Objects</a>.</li></ul>
+  </div><hr>
+ 
+  <p>Welcome back! Your Perl education is really accelerating here as you learn more about objects. In this 
+   lesson, you'll learn more advanced techniques for improving code reuse.</p>
+ 
+
+ <a href="Perl4-04.html" name="#polymorphism_and_inheritance"></a>
+ <a name="h_01"></a><div class="heading">Polymorphism and Inheritance</div><div class="headingText">
+  
+  <p><i>Polymorphism</i> is a fancy word that we introduce here because it's one of the features of an 
+   object-oriented implementation and because people who know about OOP (Object-Oriented Programming) will ask 
+   you about polymorphism, and you'll want to be ready to dazzle them with your knowledge. Polymorhism means that you can have 
+   different classes of objects that are able to do the same thing. One of the ways that polymorphism can be 
+   realized is through <i>inheritance,</i> so let's look at that.</p>
+  
+  <a name="s_01"></a><div id="s_01"><div class="subheading">Inheritance: @ISA</div><div class="subheadingText">
+   
+   <p>One common feature of object classes is that some classes can be considered <i>specializations</i> of 
+    other classes. A Dachshund is a specialization of Dog which is a specialization of Mammal. A Honda is a 
+    specialization of Car which is a specialization of Vehicle. We often abbreviate this to "is-a": A Sundae 
+    is-a Dessert is-a EdibleItem. Be careful not to confuse this with the "has-a" relationship: A Car has tires; 
+    but it is not a type of tire!</p>
+   
+   <p><i>Inheritance</i> provides a means for reducing duplication by taking code that would be common to two 
+    or more classes and putting it into a common <i>superclass</i>. Some classes may have more than one 
+    superclass: A SofaBed may inherit from both Sofa and Bed; an SUV may inherit from Car and from Truck. This 
+    is called <i>multiple inheritance</i>; not all object-oriented languages support it, but Perl does (and Perl 
+     has overcome the problem that causes some languages not to implement multiple inheritance).</p>
+   
+   <p>Remember the maxim "There's less going on than meets the eye?"  Perl implements inheritance with no new syntax 
+    whatsoever. By setting the special <i>package</i> array <span class="red">@ISA</span>, you declare which class(es) that 
+    package (class) inherits from. (Give yourself a pat on the back if you just realized that the inheritance 
+    tree can be changed at <i>runtime</i>... and don't do that, until you become a true wizard of OOP and know 
+    when it's worth writing something that weird!)</p>
+   
+   <p>Let's see this in action. Create this stripped-down version of <b>BankAccount.pm</b> that 
+     implements the <b>statement()</b> method (or copy it from the last lesson's homework):</p>
+   
+<div class="listingBox"><div class="listingTitle">CODE TO ENTER:</div><div class="listing"><pre>package BankAccount;
+use strict;
+use warnings;
+use POSIX qw(strftime);
+
+{
+  my $NEXT_ACCTNO = 10001;
+  sub next_acctno
+  {
+    return $NEXT_ACCTNO++;
+  }
+}
+
+sub new
+{
+  my ($class, %attr) = @_;
+  
+  $attr{account_number} = $class-&gt;next_acctno;
+  my $ref = \%attr;
+  bless $ref, $class;
+  return $ref;
+}
+
+sub balance
+{
+  my $self = shift;
+  
+  $self-&gt;{balance} = shift if @_;
+  return $self-&gt;{balance};
+}
+
+sub account_number
+{
+  my $self = shift;
+  
+  $self-&gt;{account_number} = shift if @_;
+  return $self-&gt;{account_number};
+}
+
+sub transact
+{
+  my ($self, $type, $amount) = @_;
+  
+  my %transaction = ( date =&gt; time, type =&gt; $type, amount =&gt; $amount );
+  push @{ $self-&gt;{transactions} }, \%transaction;
+  $self-&gt;{balance} += $amount;
+}
+
+sub debit
+{
+  my ($self, $amount) = @_;
+  
+  $self-&gt;transact( debit =&gt; -$amount );
+}
+
+sub credit
+{
+  my ($self, $amount) = @_;
+  
+  $self-&gt;transact( credit =&gt; $amount );
+}
+
+sub transfer
+{
+  my ($self, $amount, $target_account) = @_;
+  
+  my $message = "Transfer to " . $target_account-&gt;account_number;
+  $self-&gt;transact( $message, -$amount );
+  $message = "Transfer from " . $self-&gt;account_number;
+  $target_account-&gt;transact( $message, $amount );
+}
+
+sub statement
+{
+  my $self = shift;
+  
+  my $str = '';
+  for my $trans ( @{ $self-&gt;{transactions} } )
+  {
+    my ($time, $type, $amount) = @{$trans}{qw(date type amount)};
+    $str .= strftime( "%d-%b-%Y", localtime $time ) . "\t$type\t$amount\n";
+  }
+  @{ $self-&gt;{transactions} } = ();
+  return $str;
+}
+
+1;
+</pre></div></div>
+   
+   <p><img src="images/coderunner/save.gif"> Save it. Now create a new version of <span class="darkred">usebank.pl</span> as shown:</p>
+
+
+<div class="listingBox"><div class="listingTitle">CODE TO EDIT:</div><div class="listing"><pre>
+#!/usr/local/bin/perl
+use strict;
+use warnings;
+
+use CheckingAccount;
+use SavingsAccount;
+
+my $regular   = CheckingAccount-&gt;new( balance =&gt; 1000 );
+my $piggybank = SavingsAccount-&gt;new( balance =&gt; 5000 );
+
+print $regular-&gt;statement;
+print $piggybank-&gt;balance, "\n";
+</pre></div></div>
+   
+   <p><img src="images/coderunner/save.gif"> Save it. Notice that this program doesn't even use <b>BankAccount</b>. 
+    It needs two other modules instead, so let's create them. First, <b>CheckingAccount.pm</b>: </p>
+   
+<div class="listingBox"><div class="listingTitle">CODE TO ENTER:</div><div class="listing"><pre>package CheckingAccount;
+use strict;
+use warnings;
+
+use BankAccount;
+our @ISA = qw(BankAccount);
+
+1;
+</pre></div></div>
+   
+   <p><img src="images/coderunner/save.gif"> Save it. And now create <b>SavingsAccount.pm</b>:</p>
+   
+<div class="listingBox"><div class="listingTitle">CODE TO ENTER:</div><div class="listing"><pre>package SavingsAccount;
+use strict;
+use warnings;
+
+use BankAccount;
+
+our @ISA = qw(BankAccount);
+
+1;
+</pre></div></div>
+   
+   <p><img src="images/coderunner/save.gif"> Save it. Now run <b>usebank.pl</b> and you should see:</p>
+   
+<div class="interactiveBox"><div class="interactiveTitle">INTERACTIVE TERMINAL SESSION: Expected output</div><div class="interactive"><pre>cold:~$ <ins>cd perl4</ins>
+cold:~/perl4$ <ins>./usebank.pl</ins>
+5000
+</pre></div></div>
+   
+   <p>We haven't defined any new behavior yet for our new <i>subclasses</i>; we just said that they inherit from 
+    <b>BankAccount</b> by setting the package variable <span class="red">@ISA</span> in each one. So let's implement some new 
+    behavior. Change <b>usebank.pl</b> as shown:</p>
+   
+<div class="listingBox"><div class="listingTitle">CODE TO EDIT:</div><div class="listing"><pre>#!/usr/local/bin/perl
+use strict;
+use warnings;
+
+use CheckingAccount;
+use SavingsAccount;
+
+my $regular   = CheckingAccount-&gt;new( balance =&gt; 1000 );
+my $piggybank = SavingsAccount-&gt;new( balance =&gt; 5000 );
+
+<ins>$regular-&gt;write_check( "Greenpeace" =&gt; 250 );</ins>
+print $regular-&gt;statement;
+print $piggybank-&gt;balance, "\n";
+</pre></div></div>
+   
+   <p><img src="images/coderunner/save.gif"> Save it, and then change <b>CheckingAccount.pm</b>:</p>
+   
+<div class="listingBox"><div class="listingTitle">CODE TO EDIT:</div><div class="listing"><pre>package CheckingAccount;
+use strict;
+use warnings;
+
+use BankAccount;
+our @ISA = qw(BankAccount);
+
+<ins>sub write_check
+{
+  my ($self, $recipient, $amount) = @_;
+  $self-&gt;transact( "Check #??? to $recipient", -$amount );
+}</ins>
+ 
+1;
+</pre></div></div> 
+   
+    <p><img src="images/coderunner/save.gif"> Save it and run <b>usebank.pl</b> and you'll see:</p> 
+   
+<div class="interactiveBox"><div class="interactiveTitle">INTERACTIVE TERMINAL SESSION: Expected output</div><div class="interactive"><pre>cold:~/perl4$ <ins>./usebank.pl</ins>
+30-Mar-2011     Check #??? to Greenpeace        -250
+5000
+</pre></div></div>
+   
+    <p>See how a <b>CheckingAccount</b> object can do everything a BankAccount object can do?  We just had to 
+     define the additional functionality of a <b>CheckingAccount</b>. </p>
+   
+    <p>Let's trace through the creation of the <b>$regular</b> object:</p>
+
+   <ol><li><b>usebank.pl</b> calls <b>CheckingAccount-&gt;new</b> in the line:<br> 
+     <b>my $regular = CheckingAccount-&gt;new( balance =&gt; 1000 )</b>.</li><li>The bareword <b>new</b>, right of the arrow, tells Perl that this is a method call, and from the bareword on the left, 
+     that this is a class method call.</li><li>Perl looks for the <b>new()</b> subroutine in the CheckingAccount package. It's not there.</li><li>But before it gives up, Perl looks to see if <b>@CheckingAccount::ISA</b> is defined. It is.</li><li>So Perl looks in that array and finds the name of the BankAccount package.</li><li>Perl repeats the search and finds <b>BankAccount::new</b>.</li><li>Perl calls <b>BankAccount::new</b>, passing the usual "phantom" first argument.</li><li>That first argument is the thing on the left side of the arrow, the string CheckingAccount.</li><li>The object returned by the new method is <b>bless</b>ed into the CheckingAccount package.</li></ol>
+   
+    <p>Do you see how the rules combine to ensure that the object created is <b>bless</b>ed into the correct package? 
+      Now whenever we call a method on <b>$regular</b>, Perl will look in the CheckingAccount package first, and if it 
+    doesn't find that subroutine there, it will look in the BankAccount package next.</p>
+    
+    <p>We're not done yet: that series of question marks (<b>???</b>) reminds us that each account needs to keep a record of the last check number 
+    it issued (we could pass the check number as an argument, but for the purpose of this next exercise, we'll 
+    assume that the <b>write_check</b> method is going to take the next check in the "book"). Modify 
+    <b>CheckingAccount.pm</b> like this:</p>
+   
+   
+<div class="listingBox"><div class="listingTitle">CODE TO EDIT:</div><div class="listing"><pre>package CheckingAccount;
+use strict;
+use warnings;
+
+use BankAccount;
+our @ISA = qw(BankAccount);
+<ins>my $STARTING_CHECK_NUMBER = 100;
+
+sub new
+{
+  my $class = shift;
+  
+  my $object = $class-&gt;SUPER::new( @_ );
+  $object-&gt;{next_check_number} = $STARTING_CHECK_NUMBER;
+  return $object;
+}
+</ins>
+sub write_check
+{
+  my ($self, $recipient, $amount) = @_;
+  
+<del>  $self-&gt;transact( "Check #??? to $recipient", -$amount );
+</del><ins>  my $chkno = $self-&gt;issue_next_check_number;
+  $self-&gt;transact( "Check #$chkno to $recipient", -$amount );
+</ins>}
+  
+<ins>sub issue_next_check_number
+{
+  my $self = shift;
+  
+  return $self-&gt;{next_check_number}++;
+}</ins>
+
+1;</pre></div></div>
+   
+   <p><img src="images/coderunner/save.gif"> Save it. And so that we can see the effect of writing more than one 
+    check, modify <b>usebank.pl</b>:</p>
+   
+
+<div class="listingBox"><div class="listingTitle">CODE TO EDIT:</div><div class="listing"><pre>#!/usr/local/bin/perl
+use strict;
+use warnings;
+
+use CheckingAccount;
+use SavingsAccount;
+
+my $regular   = CheckingAccount-&gt;new( balance =&gt; 1000 );
+my $piggybank = SavingsAccount-&gt;new( balance =&gt; 5000 );
+
+$regular-&gt;write_check( "Greenpeace" =&gt; 250 );
+<ins>$regular-&gt;write_check( "O'Reilly", 395 );</ins>
+print $regular-&gt;statement;
+print $piggybank-&gt;balance, "\n";
+</pre></div></div>
+   
+   <p><img src="images/coderunner/save.gif"> Save and run that program and you will see this:</p>
+   
+<div class="interactiveBox"><div class="interactiveTitle">INTERACTIVE TERMINAL SESSION: Expected output</div><div class="interactive"><pre>cold:~/perl4$ <ins>./usebank.pl</ins>
+30-Mar-2011     Check #100 to Greenpeace        -250
+30-Mar-2011     Check #101 to O'Reilly  -395
+5000
+</pre></div></div>
+    
+   <p>We had to add a new piece of data to the object at construction time: the number of the next check to 
+    write (initialized from class data). That means we had to <i>override</i> the new method. But we still need 
+     to call <b>BankAccount::new</b> to get whatever it does (and we shouldn't assume that we know what it does; maybe 
+    one day someone else will be in charge of that module). In fact, we shouldn't even assume that we know that 
+    the <b>new()</b> method is located in <b>BankAccount</b>, because for all we know, one day <b>BankAccount</b> will be rewritten to 
+     inherit from some other class where it gets its <b>new()</b> method. So calling <b>BankAccount::new</b> directly is out.</p>
+   
+    <p>This is where the special keyword <b>SUPER</b> comes in. It tells Perl to look in $class's superclass and as far 
+     back as it needs to go to find the method <b>new()</b>. We pass to it the same arguments it would have gotten 
+     anyway.  We get back the new object, and then we can stuff our data into the <b>next_check_number</b> entry of the 
+    hash to which it points.</p>
+   
+   <p>Now let's make SavingsAccount into a different kind of account. Modify <b>SavingsAccount.pm</b>:</p>
+   
+   
+<div class="listingBox"><div class="listingTitle">CODE TO EDIT:</div><div class="listing"><pre>package SavingsAccount;
+use strict;
+use warnings;
+
+use BankAccount;
+
+our @ISA = qw(BankAccount);
+<ins>my $INTEREST_RATE = 0.015;</ins>
+
+<ins>sub add_interest
+{
+  my $self = shift;
+  
+  my $pct = $INTEREST_RATE * 100;
+  $self-&gt;transact( "Interest at $pct%", $self-&gt;balance * $INTEREST_RATE );
+}
+</ins>
+1;
+</pre></div></div>
+   
+   <p><img src="images/coderunner/save.gif"> Save it, and modify <b>usebank.pl</b>:</p>
+  
+
+<div class="listingBox"><div class="listingTitle">CODE TO EDIT:</div><div class="listing"><pre>#!/usr/local/bin/perl
+use strict;
+use warnings;
+
+use CheckingAccount;
+use SavingsAccount;
+
+my $regular   = CheckingAccount-&gt;new( balance =&gt; 1000 );
+my $piggybank = SavingsAccount-&gt;new( balance =&gt; 5000 );
+
+$regular-&gt;write_check( "Greenpeace" =&gt; 250 );
+$regular-&gt;write_check( "O'Reilly", 395 );
+print $regular-&gt;statement;
+
+<ins>$piggybank-&gt;add_interest;
+</ins>print $piggybank-&gt;balance, "\n";
+</pre></div></div>
+   
+   <p><img src="images/coderunner/save.gif"> Save it, and you'll see that the balance on the last line has 
+    changed:</p>
+   
+<div class="interactiveBox"><div class="interactiveTitle">INTERACTIVE TERMINAL SESSION: Expected output</div><div class="interactive"><pre>cold:~/perl4$ <ins>./usebank.pl</ins>
+30-Mar-2011     Check #100 to Greenpeace        -250
+30-Mar-2011     Check #101 to O'Reilly  -395
+<span class="purple">5075</span>
+</pre></div></div>
+   
+    <p>The <b>add_interest</b> routine isn't very sophisticated, but neither is our bank.</p>
+      
+   <p>I should mention that some serious object-oriented programmers frown upon inheritance as a tool 
+    for reuse and prefer to use the technique of composing roles, a capability that isn't part of basic Perl OOP, 
+    but is available through the <i>Moose</i> module. (We'll cover that soon.) But, inheritance is relatively 
+    easy to understand and implement for simple cases and is used frequently in the code you'll 
+    encounter. </p>
+ 
+  </div></div>
+ </div>
+ <a href="Perl4-04.html" name="reducing_duplication"></a>
+ <a name="h_02"></a><div class="heading">Reducing Duplication</div><div class="headingText">
+   
+  <p>Remember <b>DRY?</b> As you extend a class to meet new requirements, you'll find duplication creeping into your code. 
+   Have you noticed how similar our accessor methods are?  Most of them look like this:</p>
+     
+<div class="observeBox"><div class="observeTitle">OBSERVE: Generic Accessor Method</div><div class="observe"><pre>sub <i>attribute</i>
+{
+  my $self = shift;
+  
+  $self-&gt;{<i>attribute</i>} = shift if @_;
+  return $self-&gt;{<i>attribute</i>};
+}</pre></div></div>
+     
+  <p>There are several ways to avoid repeating that pattern. Let's look at a couple of them:</p>   
+  
+  <a name="s_01"></a><div id="s_01"><div class="subheading">AUTOLOAD</div><div class="subheadingText">
+   
+    <p><b>AUTOLOAD</b> is a special Perl keyword. If you call a nonexistent routine in a package,
+    after Perl has searched for it in any superclasses, but before it gives up, it will look for a special routine
+    named AUTOLOAD in that package, and if found, Perl will call it. Perl can tell how it was called via
+    the special <i>package variable</i> <b>$AUTOLOAD</b> in the current package, which Perl will set to the name
+    of the routine that the user was actually calling. Instead of just talking about it, let's do it!
+    Modify <b>BankAccount.pm</b> as shown below:</p>
+
+
+<div class="listingBox"><div class="listingTitle">CODE TO EDIT:</div><div class="listing"><pre>package BankAccount;
+use strict;
+use warnings;
+
+use POSIX qw(strftime);
+
+{
+  my $NEXT_ACCTNO = 10001;
+
+  sub next_acctno
+  {
+    return $NEXT_ACCTNO++;
+  }
+}
+
+
+sub new
+{
+  my ($class, %attr) = @_;
+
+  $attr{account_number} = $class-&gt;next_acctno;
+  my $ref = \%attr;
+  bless $ref, $class;
+  return $ref;
+}
+
+<ins>sub AUTOLOAD
+{
+  my $self = shift;
+  
+  (my $method = our $AUTOLOAD) =~ s/.*:://;
+  return if $method eq 'DESTROY';
+  $self-&gt;{$method} = shift if @_;
+  return $self-&gt;{$method};
+}
+</ins>
+<del>sub balance
+{
+  $self-&gt;{balance} = shift if @_;
+  return $self-&gt;{balance};
+}
+
+sub account_number
+{
+  my $self = shift;
+  $self-&gt;{account_number} = shift if @_;
+  return $self-&gt;{account_number};
+}
+</del>
+sub transact
+{
+  my ($self, $type, $amount) = @_;
+
+  my %transaction = ( date =&gt; time, type =&gt; $type, amount =&gt; $amount );
+  push @{ $self-&gt;{transactions} }, \%transaction;
+  $self-&gt;{balance} += $amount;
+}
+
+sub debit
+{
+  my ($self, $amount) = @_;
+
+  $self-&gt;transact( debit =&gt; -$amount );
+}
+
+sub credit
+{
+  my ($self, $amount) = @_;
+
+  $self-&gt;transact( credit =&gt; $amount );
+}
+
+sub transfer
+{
+  my ($self, $amount, $target_account) = @_;
+
+  my $message = "Transfer to " . $target_account-&gt;account_number;
+  $self-&gt;transact( $message, -$amount );
+  $message = "Transfer from " . $self-&gt;account_number;
+  $target_account-&gt;transact( $message, $amount );
+}
+
+sub statement
+{
+  my $self = shift;
+
+  my $str = '';
+  for my $trans ( @{ $self-&gt;{transactions} } )
+  {
+    my ($time, $type, $amount) = @{$trans}{qw(date type amount)};
+    $str .= strftime( "%d-%b-%Y", localtime $time ) . "\t$type\t$amount\n";
+  }
+  @{ $self-&gt;{transactions} } = ();
+  return $str;
+}
+
+1;</pre></div></div>
+   
+   <p><img src="images/coderunner/save.gif"> Save it and then run <b>usebank.pl</b> to verify that it produces the same 
+     result as last time. The value that gets put into <b>$AUTOLOAD</b> is the fully-qualified method name (for example, 
+     <b>CheckingAccount::balance</b>); add some debugging prints if you want to see that value.</p>
+   
+    <p>We have an exception for <b>DESTROY</b> because it's a special internal method that Perl calls—if it's 
+    defined—whenever an object is being destroyed (usually, when it goes out of scope at the end of a 
+    block), and it has nothing to do with our object's attributes. Some other object-oriented languages 
+    require you to define a <i>destructor</i> that specifies what to do when an object goes away, but not Perl: 
+    it reclaims the memory automatically, and there is usually nothing else to do. If, for instance, you have an 
+    object associated with a database then you may define a DESTROY method to close the database connection. We'll 
+    see another example of DESTROY being used in the next section, but you'll rarely need it.</p>
+ 
+  </div></div>
+  <a name="s_02"></a><div id="s_02"><div class="subheading">Dynamic Method Creation</div><div class="subheadingText">
+   
+   <p>Here's another way to create the methods we want using code. Modify <b>BankAccount.pm</b> again:</p>
+   
+
+<div class="listingBox"><div class="listingTitle">CODE TO EDIT:</div><div class="listing"><pre>package BankAccount;
+use strict;
+use warnings;
+
+use POSIX qw(strftime);
+
+{
+  my $NEXT_ACCTNO = 10001;
+
+  sub next_acctno
+  {
+    return $NEXT_ACCTNO++;
+  }
+}
+
+
+sub new
+{
+  my ($class, %attr) = @_;
+
+  $attr{account_number} = $class-&gt;next_acctno;
+  my $ref = \%attr;
+  bless $ref, $class;
+  return $ref;
+}
+
+<ins>
+BEGIN
+{
+  for my $method (qw(balance account_number))
+  {
+    *$method = sub {
+      my $self = shift;
+
+      $self-&gt;{$method} = shift if @_;
+      return $self-&gt;{$method};
+    };
+  }
+}
+</ins>
+<del>sub AUTOLOAD
+{
+  my $self = shift;
+  
+  (my $method = our $AUTOLOAD) =~ s/.*:://;
+  return if $method eq 'DESTROY';
+  $self-&gt;{$method} = shift if @_;
+  return $self-&gt;{$method};
+}
+</del>
+sub transact
+{
+  my ($self, $type, $amount) = @_;
+
+  my %transaction = ( date =&gt; time, type =&gt; $type, amount =&gt; $amount );
+  push @{ $self-&gt;{transactions} }, \%transaction;
+  $self-&gt;{balance} += $amount;
+}
+
+sub debit
+{
+  my ($self, $amount) = @_;
+
+  $self-&gt;transact( debit =&gt; -$amount );
+}
+
+sub credit
+{
+  my ($self, $amount) = @_;
+
+  $self-&gt;transact( credit =&gt; $amount );
+}
+
+sub transfer
+{
+  my ($self, $amount, $target_account) = @_;
+
+  my $message = "Transfer to " . $target_account-&gt;account_number;
+  $self-&gt;transact( $message, -$amount );
+  $message = "Transfer from " . $self-&gt;account_number;
+  $target_account-&gt;transact( $message, $amount );
+}
+
+sub statement
+{
+  my $self = shift;
+
+  my $str = '';
+  for my $trans ( @{ $self-&gt;{transactions} } )
+  {
+    my ($time, $type, $amount) = @{$trans}{qw(date type amount)};
+    $str .= strftime( "%d-%b-%Y", localtime $time ) . "\t$type\t$amount\n";
+  }
+  @{ $self-&gt;{transactions} } = ();
+  return $str;
+}
+
+1;</pre></div></div>
+   
+   <p>Here we're creating the balance and account_number subroutines from code; the notation 
+    <b>*$method = sub { ... }</b> means "Assign to the subroutine slot named $method in the current package 
+    the code in this reference."  Save that file, then run <b>usebank.pl</b> and you'll see this:</p>
+   
+<div class="interactiveBox"><div class="interactiveTitle">INTERACTIVE TERMINAL SESSION: Expected output</div><div class="interactive"><pre>cold:~/perl4$ <ins>./usebank.pl</ins>
+Can't use string ("balance") as a symbol ref while "strict refs" in use at BankAccount.pm line 36.
+BEGIN failed--compilation aborted at BankAccount.pm line 38.
+Compilation failed in require at CheckingAccount.pm line 5.
+BEGIN failed--compilation aborted at CheckingAccount.pm line 5.
+Compilation failed in require at ./usebank.pl line 5.
+BEGIN failed--compilation aborted at ./usebank.pl line 5.
+</pre></div></div>
+   
+   <p>This is one of the extremely rare cases where we want to do something that <span class="purple">use strict</span> 
+    prohibits, but we're justified. So we're going to turn off just the part of use strict that we don't need, 
+    and only in a small lexical scope. Modify <b>BankAccount.pm</b> as shown:</p>
+   
+   
+<div class="listingBox"><div class="listingTitle">CODE TO EDIT:</div><div class="listing"><pre>
+.
+.
+.
+BEGIN
+{
+  for my $method (qw(balance account_number))
+  {
+<ins>    no strict 'refs';</ins>
+    *$method = sub {
+      my $self = shift;
+
+      $self-&gt;{$method} = shift if @_;
+      return $self-&gt;{$method};
+    };
+  }
+}
+.
+.
+.
+</pre></div></div>
+   
+   <p><img src="images/coderunner/save.gif"> Save it and rerun <b>usebank.pl</b>; it should produce the same output 
+     as the last time it ran successfully. Take note of the <i>closure</i> of the anonymous subroutine over <b>$method</b>.</p>
+    
+  </div></div>
+  
+  <p>You can even combine those last two techniques to create the methods you need, by
+   having an AUTOLOAD routine create each method as it happens to get called. That technique, and those 
+   above, don't require constructing strings of code to compile at run time to work. Behold the power of a 
+   truly dynamic language!</p>
+   
+ </div>
+ <a href="Perl4-04.html" name="data_hiding"></a>
+ <a name="h_03"></a><div class="heading">Data Hiding</div><div class="headingText">
+   
+  <p><i>Data hiding</i> is another principle of object-oriented program where objects 
+   <i>encapsulate</i> the data they need to know about themselves and don't reveal it to the world. In Perl, 
+   the convention for many years was that data hiding was done by an informal agreement among programmers. 
+   But you've already seen with the representation of an object as a reference to a hash, that the caller 
+   can violate the encapsulation by treating the object as a hash ref, and 
+   trampling all over its private data. </p>
+  
+  <a name="s_01"></a><div id="s_01"><div class="subheading">Inside-Out Objects</div><div class="subheadingText">
+  
+   <p>In recent years, programmers figured out that not all users could be trusted, and 
+    that their objects needed more protection. Because Perl leaves the representation of an object up to you, the programmer, 
+    this increased protection of objects can be accomplished using a pattern known as <i>inside-out</i> objects. 
+     In this pattern, objects store 
+    <i>no</i> data about themselves whatsoever! Instead, all the data is stored in lexically-scoped hashes in each 
+    object class, keyed off each instance's unique reference string. </p>
+   
+   <p><table class="noteBox fBox pBox "><tr><td class="noteTitle">WARNING</td><td class="note"> The next section contains some of the most complex object-oriented code and concepts of the 
+    entire course. Don't panic! You do not need to understand it all in order to be able to follow the rest of the course. 
+    If it blows your mind, feel free to come back to it later. You can get by well enough in Perl 
+    without understanding how to write inside-out object classes; this section is here to exercise your brain 
+    using OOP techniques and inspire you to imagine the possibilities...</td></tr></table></p>
+   
+    <p>We'll leave <b>usebank.pl</b> as it is. We're going to change the way that 
+      objects are <i>implemented,</i> not the way they're <i>used</i>. Okay, ready? Here we go! Modify <b>BankAccount.pm</b> as shown:</p>
+   
+
+<div class="listingBox"><div class="listingTitle">CODE TO EDIT:</div><div class="listing"><pre>package BankAccount;
+use strict;
+use warnings;
+
+use POSIX qw(strftime);
+
+{
+  my $NEXT_ACCTNO = 10001;
+
+  sub next_acctno
+  {
+    return $NEXT_ACCTNO++;
+  }
+}
+
+<ins>my %Instance_Data;
+</ins>
+sub new
+{
+  my ($class, %attr) = @_;
+
+<del>  $attr{account_number} = $class-&gt;next_acctno;
+</del><ins>  my $ref = \my $dummy;
+</ins><del>  my $ref = \%attr;
+</del>  bless $ref, $class;
+<ins>  $ref-&gt;account_number( $class-&gt;next_acctno );
+  $ref-&gt;transactions( [] );
+  $ref-&gt;$_( $attr{$_} ) for keys %attr;
+</ins>  return $ref;
+}
+
+BEGIN
+{
+<del>  for my $method (qw(balance account_number))
+</del><ins>  sub create_method
+</ins>  {
+    no strict 'refs';
+<ins>    my ($class, $method) = @_;
+</ins>    *$method = sub {
+      my $self = shift;
+
+<del>      $self-&gt;{$method} = shift if @_;
+</del><ins>      $Instance_Data{$method}{$self} = shift if @_;
+</ins><del>      return $self-&gt;{$method};
+</del><ins>      return $Instance_Data{$method}{$self};
+</ins>    };
+  }
+<ins>  for my $method ( qw(balance account_number transactions) )
+  {
+    __PACKAGE__-&gt;create_method( $method );
+  }
+</ins>}
+
+<ins>sub DESTROY
+{
+  my $self = shift;
+  delete $Instance_Data{$_}{$self} for keys %Instance_Data;
+}
+
+</ins>sub transact
+{
+  my ($self, $type, $amount) = @_;
+
+  my %transaction = ( date =&gt; time, type =&gt; $type, amount =&gt; $amount );
+<del>  push @{ $self-&gt;{transactions} }, \%transaction;
+</del><ins>  push @{ $self-&gt;transactions }, \%transaction;
+</ins><del>  $self-&gt;{balance} += $amount;
+</del><ins>  $self-&gt;balance( $self-&gt;balance + $amount );
+</ins>}
+
+sub debit
+{
+  my ($self, $amount) = @_;
+
+  $self-&gt;transact( debit =&gt; -$amount );
+}
+
+sub credit
+{
+  my ($self, $amount) = @_;
+
+  $self-&gt;transact( credit =&gt; $amount );
+}
+
+sub transfer
+{
+  my ($self, $amount, $target_account) = @_;
+
+  my $message = "Transfer to " . $target_account-&gt;account_number;
+  $self-&gt;transact( $message, -$amount );
+  $message = "Transfer from " . $self-&gt;account_number;
+  $target_account-&gt;transact( $message, $amount );
+}
+
+sub statement
+{
+  my $self = shift;
+
+  my $str = '';
+<del>  for my $trans ( @{ $self-&gt;{transactions} } )
+</del><ins>  for my $trans ( @{ $self-&gt;transactions } )
+</ins>  {
+    my ($time, $type, $amount) = @{$trans}{qw(date type amount)};
+    $str .= strftime( "%d-%b-%Y", localtime $time ) . "\t$type\t$amount\n";
+  }
+<del>  @{ $self-&gt;{transactions} } = ();
+</del><ins>  $self-&gt;transactions( [] );
+</ins>  return $str;
+}
+
+1;</pre></div></div>
+   
+   <p><b>new()</b> and <b>statement()</b> now call instance methods to access attributes, 
+    instead of continuing to use our own internal representation of a hash reference. We actually could have 
+    done that with this class from the beginning. In 
+    general, when creating an object class for each method, we do not use the internal representation to access 
+    attributes. Instead we use accessor methods, that way if we change the representation—like we've 
+    done here—we don't have to change anything other than the accessor methods.</p>
+   
+    <p>The other change we made to <b>new()</b> is to create our object not as a reference to an anonymous hash, but as a 
+      reference to a new scalar. In this case, we used <b>$dummy</b> but we have to scope it with <b>my</b>; this gives us a 
+      scalar reference to undef so we can bless it later. We never store anything in that scalar! We don't even need that 
+      piece of storage, but a scalar is the smallest thing we can create and still take a reference to.</p>
+    
+    <p>Now let's take a look at that <b>BEGIN</b> block. Instead of just executing the code to create the accessor 
+      methods, we put it inside a routine called <b>create_method</b>. The <b>for</b> loop calls that routine. 
+      <b> __PACKAGE__</b> is a special Perl keyword that evaluates to the name of the current package; it's as though 
+      we put <b>BankAccount</b> before the arrow instead, but it saves us from repeating the class name and then having to 
+    edit it if we ever change the name of this package. </p>
+   
+    <p>The data is now being stored in the hash <b>%Instance_Data</b>. There is only one instantiation of this hash, 
+    near the top of the file; it is <i>not</i> recreated for each object. The first level of keys in this 
+    hash consist of the names of the attributes that it is storing: balance, transactions, and so forth.  If you want 
+    to add a new attribute, put it in the <b>qw()</b> list.</p>
+   
+   <p>The second level of keys is the result of stringifying the reference of each individual object that we 
+    create. (That's the <b>$self</b> inside the second set of braces.) Hash keys can't be references; they must 
+    be strings. So using a reference as a hash key means it gets turned into a string. But when you stringify a 
+    reference, you get back something that is unique for each reference and can't ever refer to any other piece 
+    of data:</p>
+   
+<div class="interactiveBox"><div class="interactiveTitle">INTERACTIVE TERMINAL SESSION: One-liner</div><div class="interactive"><pre>cold:~/perl4$ <ins>perl -le 'print \%x'</ins>
+HASH(0x8d7d7f0)
+</pre></div></div>
+   
+   <p>So the accessor routine that is created for, say, <b>balance</b> (where $method is 'balance') looks like 
+    this: </p>
+   
+<div class="observeBox"><div class="observeTitle">OBSERVE: balance accessor</div><div class="observe"><pre>sub balance
+{
+  my $self = shift;
+  
+  $Instance_Data{balance}{$self} = shift if @_;
+  return $Instance_Data{balance}{$self};
+}</pre></div></div>
+   
+    <p>This looks up the value corresponding to this object <b>($self)</b>'s stringified reference in the hash pointed 
+     to by <b>$Instance_Data{balance}</b>. And that's how it works!</p>
+   
+    <p>Alright, so before we can get our program to work, we have to change <b>CheckingAccount.pm</b> so it looks like this: </p>
+
+
+<div class="listingBox"><div class="listingTitle">CODE TO EDIT:</div><div class="listing"><pre>package CheckingAccount;
+use strict;
+use warnings;
+
+use BankAccount;
+<ins>BEGIN { </ins>our @ISA = qw(BankAccount);<ins> }</ins>
+
+my $STARTING_CHECK_NUMBER = 100;
+
+sub new
+{
+  my $class = shift;
+
+  my $object = $class-&gt;SUPER::new( @_ );
+<del>  $object-&gt;{next_check_number} = $STARTING_CHECK_NUMBER;
+</del><ins>  $object-&gt;next_check_number( $STARTING_CHECK_NUMBER );
+</ins>  return $object;
+}
+
+<ins>BEGIN
+{
+  __PACKAGE__-&gt;create_method( 'next_check_number' );
+}
+
+</ins>sub write_check
+{
+  my ($self, $recipient, $amount) = @_;
+
+  my $chkno = $self-&gt;issue_next_check_number;
+  $self-&gt;transact( "Check #$chkno to $recipient", -$amount );
+}
+
+sub issue_next_check_number
+{
+  my $self = shift;
+
+<del>  return $self-&gt;{next_check_number}++;
+</del><ins>  $self-&gt;next_check_number( my $next = $self-&gt;next_check_number + 1);
+  return $next;
+</ins>}
+
+1;</pre></div></div>
+   
+   <p><img src="images/coderunner/save.gif"> Save that file, then run <b>usebank.pl</b>, and verify that you get the same 
+    result as last time.</p>
+   
+   <p><b>new()</b> and <b>issue_next_check_number()</b> now use accessor methods
+     instead of internal representation. The assignment to @ISA is now in a BEGIN block because we need it to 
+     happen before the next BEGIN block that calls the same create_method routine that we defined in BankAccount. 
+     __PACKAGE__ evaluates to CheckingAccount, and since there is no create_method routine in the 
+     CheckingAccount package, we need @ISA to be set in order for Perl to look in BankAccount for it.</p>
+   
+    <p>Our subclass (CheckingAccount) is able to add its own attributes to the same 
+      %Instance_Data used by its superclass. A stickler might point out that we aren't certain that 
+        BankAccount doesn't define a next_check_number attribute and we can't guarantee it never will, so in order 
+        to avoid trampling on another class's attributes, we should qualify them with the package 
+    name to which they belong—but I think you've had enough for one lesson! </p>
+ 
+  </div></div>
+  
+  <p><i>Don't</i> be discouraged if you don't fully grasp this last section the first time out! It's very advanced. But come 
+   back to it regularly and see if you can go a bit further with it. If you haven't understood it completely by the end of the course, ask your 
+   instructor for help.</p>
+ 
+ </div>
+ <a href="Perl4-04.html" name="#miscellaneous_notes_on_objects"></a>
+ <a name="h_04"></a><div class="heading">Miscellaneous Notes on Objects</div><div class="headingText">
+  
+  <p>A few other bits and pieces for you before class lets out. Object class (packages and module files) names begin 
+    with uppercase letters. 
+   .pm files that are in lowercase are by convention <i>pragmas</i>, modules that affect the way Perl is
+   compiled (like <span class="purple">use strict</span> and <span class="purple">use warnings</span>). Perl won't complain if 
+   one of your modules starts with a lowercase letter, but some of your users may be confused. And finally, we 
+   often do not put parentheses after method calls that take no arguments. There is no ambiguity 
+   inherent in this.</p>
+   
+   <p>So that's it for this lesson. You've just made it through our most difficult subject matter and you're still standing. Good for you!</p>
+ 
+ </div>
+  
+   <p>Once you finish the lesson, go back to the syllabus to complete the homework.</p>
+   
+<div class="footer"><div id="timeSurvey"></div>				
+				Copyright © 1998-2014 O'Reilly Media, Inc.<br><img src="https://courses.oreillyschool.com/common/cclicense.png"><br>
+				This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 Unported License.<br>
+				See <a href="http://creativecommons.org/licenses/by-sa/3.0/legalcode">http://creativecommons.org/licenses/by-sa/3.0/legalcode</a> 
+				for more information.
+				</div><iframe id="t" width="1" height="1" border="0" style="display:none"></iframe><script language="javascript">bodyLoaded();</script><script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+  ga('create', 'UA-44720547-1', 'oreillyschool.com');
+  ga('send', 'pageview');
+</script></body></html>

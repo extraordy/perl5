@@ -1,0 +1,65 @@
+<html>
+   <!-- Copyright (c) 1998-2014 O'Reilly Media, Inc. Unauthorized use is strictly
+                prohibited. None of this code or content can by copied without the express written
+                permission from O'Reilly Media, Inc. -->
+   <head>
+      <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+      <link rel="stylesheet" type="text/css" href="http://archive.oreilly.com/oreillyschool/courses/Perl1/common/Lab.css">
+      <title>Strings and String Conditionals - Quiz 1</title>
+   </head>
+   <body id="body">
+      <h2>Strings and String Conditionals - Quiz 1</h2> 
+      
+      
+      
+      
+      <p>Explain why <b>1.0 == 1.00</b> but <b>"1.0" ne "1.00"</b>.</p>
+      
+        
+      
+      
+      <p>== is a numeric comparison and 1.0 and 1.00 are the same numeric value.</p>
+      
+      
+      <p>eq is a string comparison and the strings do not have the same length, as one has an extra 0, thus cannot be considered the
+         same.
+      </p>
+      
+      
+      <p><b>Grading Criteria:</b> Student should be able to explain the difference between these comparison operators.</p>
+      
+      
+      
+      
+      
+      
+      <p>If <b>$name1</b> and <b>$name2</b> contain names, how you would compare them while ignoring case?</p>
+      
+      
+      <p>Assume that they contain only characters from the basic ASCII character set.</p>
+      
+      
+      
+      
+      <div class="observeBox">
+         <div class="observeTitle">Observe:</div>
+         <div class="observe"><pre>print 'same' if lc($name1) eq lc($name2);</pre></div>
+      </div>
+      
+      
+      <p>-- or --</p>
+      
+      
+      <div class="observeBox">
+         <div class="observeTitle">Observe:</div>
+         <div class="observe"><pre>print 'same' if uc($name1) eq uc($name2);</pre></div>
+      </div>
+      
+      
+      <p><b>Grading Criteria:</b> Student should be able to explain the use of either lc or uc in comparisons.</p>
+      
+      
+      
+      
+   </body>
+</html>

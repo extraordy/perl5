@@ -1,0 +1,558 @@
+<html><!-- Copyright (c) 1998-2014 O'Reilly Media, Inc.
+			This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 Unported License.
+			See http://creativecommons.org/licenses/by-sa/3.0/legalcode for more information.
+            --><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"><link rel="stylesheet" type="text/css" href="../common/Lab.css"><script type="text/javascript" src="../common/Lab.js"></script><script language="javascript"></script><title>Easy Objects with Moose</title></head><body id="body"><a name="top"></a><div class="title">Easy Objects with Moose</div><div class="resize"><a href="Perl4-06.html#top" onclick="changeSize('smaller');" class="aS" title="Keep clicking to make fonts smaller">A</a><a href="Perl4-06.html#top" onclick="changeSize('larger');" class="aL" title="Keep clikcing to make fonts larger">A</a><a href="Perl4-06.html#top" onclick="lv()" class="lv" title="Adjust Page for High Contrast">HC</a><div id="fh"><p>Click on <span class="aS">A</span> to make all fonts on the page smaller.</p><p>Click on <span class="aL">A</span> to make all fonts on the page larger.</p><p>Click on <span class="lv">HC</span> to toggle high contrast mode. When you move your mouse over 
+                 some bold words in high contrast mode, related words are automatically highlighted. Text is shown
+                 in black and white. 
+             </p></div></div><hr>
+  
+  <div class="goalTitle">Lesson Objectives</div><div class="goals">
+    
+    
+    When you complete this lesson, you will be able to: 
+    <ul><li>install Moose.</li><li>do <a href="Perl4-06.html#a_moose_example">a Moose example</a>.</li><li><a href="Perl4-06.html#extending_the_moose_example">Extend the Moose Example</a>.</li><li><a href="Perl4-06.html#writing_methods_with_moose">Write Methods with Moose</a>.</li><li><a href="Perl4-06.html#roles">Roles</a></li></ul>
+  </div><hr>
+ 
+ <p><div class="c">"Humble, that's me... Mr. Modesty. When it comes to humility, I'm the greatest." <br>
+  -Bullwinkle J. Moose</div></p>
+  
+ <p>Welcome back!  A couple of lessons ago we learned to create object classes and 
+  accessor methods. Accessor methods looked so similar that we came up with some pretty hairy 
+  ways of automating the process? You may have felt that that process was inefficient. You are not alone. In 
+  this lesson, we'll learn about Moose, the most-frequently preferred object-oriented helper framework for the 
+  modern Perl programmer.</p>
+ 
+  
+ <a href="Perl4-06.html" name="introduction_to_moose"></a>
+ <a name="h_01"></a><div class="heading">Introduction to Moose</div><div class="headingText">
+
+  <p><div class="c">"I write less code thanks to Moose, I write better code thanks to Moose. Basically I am a happier 
+   person all around because Moose takes much of the drudge work out of my day."<br>
+   -Ben Hengst</div></p>
+  
+  <p>Moose allows you to focus more on your solution and less on erecting "scaffolding" 
+   (lengthy pieces of code for performing basic operations) when 
+   you create your own object classes. Moose lets you 
+   leave out much of that scaffolding.</p>
+    
+  <p>Behind the scenes, objects are being created as hash references, and 
+   methods are still subroutines in classes that are packages, but Moose gives you a nicer syntax with much 
+   less code duplication. Moose is also 
+   <i>extensible</i>; there is a variety of modules available that extend the functionality of Moose. 
+   For instance, if you want your objects to be opaque to your users, you can use a Moose extension for 
+   inside-out objects.</p>
+   
+  <p>Moose doesn't come with the core Perl distribution (at least not yet) so we have to install it. You do it like this:</p>
+
+<div class="interactiveBox"><div class="interactiveTitle">INTERACTIVE SESSION:</div><div class="interactive"><pre>cold:~$ <ins>cd perl4</ins>
+cold:~/perl4$ <ins>PERL5LIB=~/mylib/lib/perl5 cpan Moose</ins></pre></div></div>
+   
+  <p>Sit back and observe while a whole slew of modules is downloaded and installed for you (this big event is one of the 
+   reasons it's not part of the Perl core yet). You may be asked whether or not you want to install particular items 
+   permanently. You can answer <b>yes</b> or <b>no</b> to continue. When it finishes, verify the installation like this:</p>
+   
+<div class="interactiveBox"><div class="interactiveTitle">INTERACTIVE SESSION:</div><div class="interactive"><pre>cold:~$ <ins>perl -I ~/mylib/lib/perl5 -MMoose -le 'print $Moose::VERSION'</ins>
+2.0001 <i># Or something higher as Moose gets updated</i>
+</pre></div></div>
+   
+  <p>You can access the local documentation via <b>PERL5LIB=~/mylib/lib/perl5 perldoc Moose</b>, but there is so
+    much documentation that it's easy to get lost and not know where to begin; even the Moose introduction 
+    manual has fifteen sections! This lesson will give you the starting point.</p>
+ 
+ </div>
+ <a href="Perl4-06.html" name="a_moose_example"></a>
+ <a name="h_02"></a><div class="heading">A Moose Example</div><div class="headingText">
+   
+  <p>Let's write our first class using Moose! Right-click your <b>/perl4</b> folder and select 
+   <b>New folder...</b> to create a <b>/Music</b> subfolder. Then, create this file in the CodeRunner editor:</p>
+     
+<div class="listingBox"><div class="listingTitle">CODE TO ENTER:</div><div class="listing"><pre>package Music::Song;
+
+use lib qw(<i>your_home_directory</i>/mylib/lib/perl5);
+      
+use Moose;
+
+has artist =&gt; ( isa =&gt; 'Str', is =&gt; 'rw' );
+has title  =&gt; ( isa =&gt; 'Str', is =&gt; 'rw' );
+has length =&gt; ( isa =&gt; 'Num', is =&gt; 'rw' );
+has id     =&gt; ( isa =&gt; 'Int', is =&gt; 'ro' );
+
+1;
+</pre></div></div>
+  
+  <p>Replace <i>your_home_directory</i> with the appropriate path; for this site, it would be 
+   "/users/" plus your O'Reilly School login—for example, <b>/users/pscott</b>.</p>
+  
+  <p><img src="images/coderunner/save.gif"> Save it in your <b>/perl4/Music</b> folder as <b>Song.pm</b>.</p>
+     
+  <p>And there it is—a complete class! It doesn't have <i>behavior</i>, of course—Moose is not 
+   psychic—but it does have a surprising amount of <i>accessor functionality</i>, as we'll see in a 
+   moment. You don't even need to <b>use strict</b> and <b>use warnings</b> because Moose does them for you (you do 
+   still need to use those pragmas in programs that use Moose-ified modules though). Let's see what this class 
+   can do with a quick program. Create a new Perl program in the CodeRunner editor:</p>
+     
+<div class="listingBox"><div class="listingTitle">CODE TO ENTER:</div><div class="listing"><pre>#!/usr/local/bin/perl
+use strict;
+use warnings;
+
+use Music::Song;
+
+my $pop = Music::Song-&gt;new( id     =&gt; 12345,
+                            artist =&gt; 'Rick Dees',
+                            title  =&gt; 'Disco Duck',
+                          );
+$pop-&gt;length( 3*60 + 17 );
+print $pop-&gt;title, ' by ', $pop-&gt;artist, ' is ', $pop-&gt;length, " seconds long\n";
+$pop-&gt;id( 54321 );
+</pre></div></div>
+     
+  <p><img src="images/coderunner/save.gif"> Save it in your <b>/perl4</b> folder as <b>use_song.pl</b> and run 
+   it:</p>
+
+<div class="interactiveBox"><div class="interactiveTitle">INTERACTIVE SESSION:</div><div class="interactive"><pre>cold:~/perl4$ <ins>./use_song.pl</ins>
+Disco Duck by Rick Dees is 197 seconds long
+Cannot assign a value to a read-only accessor at ./use_song.pl line 13
+</pre></div></div>    
+     
+  <p>Notice that not only has Moose provided accessor methods for everything we defined with the <b>has</b> 
+   keyword, but it also allowed us to specify that one of them was <i>read-only,</i> that is, it could only
+   be set during object construction and not changed later.</p>
+     
+  <p>In addition, Moose allows us to specify <i>types</i> for our attributes. Now let's see what happens when we pass a value 
+   of the wrong type for an attribute. Change the value of <b>id</b> from an integer to a string in 
+   <b>use_song.pl</b> as shown:</p>
+     
+<div class="listingBox"><div class="listingTitle">CODE TO EDIT:</div><div class="listing"><pre>#!/usr/local/bin/perl
+use strict;
+use warnings;
+
+use Music::Song;
+
+my $pop = Music::Song-&gt;new( <del>id     =&gt; 12345,</del> <ins>id     =&gt; 'XXX',</ins>
+                            artist =&gt; 'Rick Dees',
+                            title  =&gt; 'Disco Duck',
+                          );
+$pop-&gt;length( 3*60 + 17 );
+print $pop-&gt;title, ' by ', $pop-&gt;artist, ' is ', $pop-&gt;length, " seconds long\n";
+$pop-&gt;id( 54321 );</pre></div></div>
+ 
+     <p><img src="images/coderunner/save.gif"> Save and run it:</p>
+      
+<div class="interactiveBox"><div class="interactiveTitle">INTERACTIVE SESSION:</div><div class="interactive"><pre>cold:~/perl4$ <ins>./use_song.pl</ins>
+Attribute (id) does not pass the type constraint because: Validation failed for 'Int' with value XXX at /usr/local/lib/perl5/site_perl/5.11.4/i686-linux/Moose/Meta/Attribute.pm line 883
+[Remainder of output omitted]     </pre></div></div>
+     
+  <div class="c"><table class="noteBox fBox pBox "><tr><td class="noteTitle">Note</td><td class="note"> You'll see slightly different directory paths in the error messages on your system.</td></tr></table></div>
+  
+  <p>Okay, so it's a tad wordy, but the first line of the error message (as shown 
+   above) is clear.</p>
+     
+  <p>Change <b>use_song.pl</b> back to its previous version and now modify <b>/Music/Song.pm</b>:</p>
+     
+<div class="listingBox"><div class="listingTitle">CODE TO EDIT:</div><div class="listing"><pre>package Music::Song;
+      
+use Moose;
+
+has artist =&gt; ( isa =&gt; 'Str', is =&gt; 'rw'<ins>, required =&gt; 1</ins> );
+has title  =&gt; ( isa =&gt; 'Str', is =&gt; 'rw'<ins>, required =&gt; 1</ins> );
+has length =&gt; ( isa =&gt; 'Num', is =&gt; 'rw'<ins>, required =&gt; 1</ins> );
+has id     =&gt; ( isa =&gt; 'Int', is =&gt; 'ro' );
+
+1;</pre></div></div>
+     
+  <p><img src="images/coderunner/save.gif"> Save it, and run <b>use_song.pl</b>. You'll see a different error 
+   message:</p>
+     
+<div class="interactiveBox"><div class="interactiveTitle">INTERACTIVE SESSION:</div><div class="interactive"><pre>cold:~/perl4$ <ins>./use_song.pl</ins>
+Attribute (length) is required at /usr/local/lib/perl5/site_perl/5.11.4/i686-linux/Class/MOP/Class.pm line 603
+</pre></div></div>
+     
+  <p>We are now required to specify several attributes at construction time; we didn't specify length, so we 
+   get an error message. We'll fix it now. Modify <b>use_song.pl</b> as shown:</p> 
+  
+<div class="listingBox"><div class="listingTitle">CODE TO EDIT:</div><div class="listing"><pre>#!/usr/local/bin/perl
+use strict;
+use warnings;
+
+use Music::Song;
+
+my $pop = Music::Song-&gt;new( id     =&gt; 12345,
+                            artist =&gt; 'Rick Dees',
+                            title  =&gt; 'Disco Duck',
+                            <ins>length =&gt; 3*60 + 17,</ins>
+                );
+<del>$pop-&gt;length( 3*60 + 17 );
+</del>print $pop-&gt;title, ' by ', $pop-&gt;artist, ' is ', $pop-&gt;length, " seconds long\n";
+<del>$pop-&gt;id( 54321 );
+</del></pre></div></div>
+     
+  <p><img src="images/coderunner/save.gif"> Save and run it to make sure you get this result:</p>
+     
+<div class="interactiveBox"><div class="interactiveTitle">INTERACTIVE SESSION:</div><div class="interactive"><pre>cold:~/perl4$ <ins>./use_song.pl</ins>
+Disco Duck by Rick Dees is 197 seconds long</pre></div></div>
+      
+ </div>
+ <a href="Perl4-06.html" name="extending_the_moose_example"></a>
+ <a name="h_03"></a><div class="heading">Extending the Moose Example</div><div class="headingText">
+   
+  <p>Now let's add another class. Create a new Perl file in the CodeRunner editor:</p>
+  
+<div class="listingBox"><div class="listingTitle">CODE TO ENTER:</div><div class="listing"><pre>package Music::CD;
+
+use lib qw(<i>your_home_directory</i>/mylib/lib/perl5);
+
+use Moose;
+
+has songs =&gt; ( isa =&gt; 'ArrayRef[Music::Song]', is =&gt; 'rw' );
+has title =&gt; ( isa =&gt; 'Str', is =&gt; 'rw' );
+has id    =&gt; ( isa =&gt; 'Int', is =&gt; 'ro' );
+
+1;
+</pre></div></div>
+  
+  <p><img src="images/coderunner/save.gif"> Save it in your <b>/perl4/Music</b> folder as <b>CD.pm</b>.</p> 
+  
+  <p>(See how Music::CD objects have an id and a title attribute, but they are unrelated to the attributes with 
+   the same names in the Music::Song class?) Now let's write a program to use this class. Create another new 
+   Perl file in the CodeRunner editor as shown:</p>
+   
+<div class="listingBox"><div class="listingTitle">CODE TO ENTER:</div><div class="listing"><pre>#!/usr/local/bin/perl
+use strict;
+use warnings;
+
+use Music::CD;
+use Music::Song;
+
+my $pop = Music::Song-&gt;new( id     =&gt; 12345,
+                            artist =&gt; 'Rick Dees',
+                            title  =&gt; 'Disco Duck',
+                            length =&gt; 3*60 + 17,
+                          );
+my $scrump = Music::Song-&gt;new( id     =&gt; 54321,
+                               artist =&gt; 'The Wurzels',
+                               title  =&gt; 'Combine Harvester',
+                               length =&gt; 3*60 + 5,
+                             );
+my $cd = Music::CD-&gt;new( title =&gt; 'Worst Hits of the Seventies',
+                         songs =&gt; [ $pop, $scrump ]);
+print 'Second song title on ', $cd-&gt;title, " is '", $cd-&gt;songs-&gt;[1]-&gt;title, "'\n";
+$cd-&gt;songs( [ bless {}, 'Foo' ] );
+</pre></div></div>
+   
+  <p><img src="images/coderunner/save.gif"> Save it in your <b>/perl4</b> folder as <b>use_cd.pl</b> and run 
+   it. You'll see this:</p>
+   
+<div class="interactiveBox"><div class="interactiveTitle">INTERACTIVE SESSION:</div><div class="interactive"><pre>cold:~/perl4$ <ins>./use_cd.pl</ins>
+Second song title on Worst Hits of the Seventies is 'Combine Harvester'
+Attribute (songs) does not pass the type constraint because: Validation failed for 'ArrayRef[Music::Song]' with value ARRAY(0x9998d98) at ./use_cd.pl line 22
+</pre></div></div>
+   
+  <p>The second line is an error caused by another kind of <i>type violation</i>. We have specified in <b>Music/CD.pm</b> that 
+   the songs attribute must be a reference to an array of <b>Music::Song objects</b>, but the last line of <b>use_cd.pl</b> 
+   attempted to set it to a reference to an array containing a 'Foo' object. We won't get into a complete 
+   explanation of Moose's typing system right now though, this example was just to make you aware that there is one.</p>
+  
+ </div>
+ <a href="Perl4-06.html" name="writing_methods_with_moose"></a>
+ <a name="h_04"></a><div class="heading">Writing Methods with Moose</div><div class="headingText">
+   
+  <p>Objects that have attributes, even attributes that can contain other objects, are nice, and might even be 
+   sufficient for a very few simple applications, but usually we want objects that can <i>do</i> things with 
+   their attributes. You'll see what I mean in this next example. Modify <b>use_cd.pl</b> as shown:</p>
+   
+<div class="listingBox"><div class="listingTitle">CODE TO EDIT:</div><div class="listing"><pre>#!/usr/local/bin/perl
+use strict;
+use warnings;
+
+use Music::CD;
+use Music::Song;
+
+my $pop = Music::Song-&gt;new( id     =&gt; 12345,
+                            artist =&gt; 'Rick Dees',
+                            title  =&gt; 'Disco Duck',
+                            length =&gt; 3*60 + 17,
+                          );
+my $scrump = Music::Song-&gt;new( id     =&gt; 54321,
+                               artist =&gt; 'The Wurzels',
+                               title  =&gt; 'Combine Harvester',
+                               length =&gt; 3*60 + 5,
+                             );
+my $cd = Music::CD-&gt;new( title =&gt; 'Worst Hits of the Seventies',
+                         songs =&gt; [ $pop, $scrump ]);
+<del>print 'Second song title on ', $cd-&gt;title, " is '", $cd-&gt;songs-&gt;[1]-&gt;title, "'\n";
+$cd-&gt;songs( [ bless {}, 'Foo' ] );</del>
+<ins>print 'Total length of songs on "', $cd-&gt;title, '" is ', $cd-&gt;length, " seconds\n";</ins></pre></div></div>
+   
+  <p>Now we need a <b>length</b> method of <b>Music::CD</b> objects that returns the sum of the lengths of all 
+   the songs on the CD. Let's write it now. Modify <b>Music/CD.pm</b> as shown:</p>
+    
+<div class="listingBox"><div class="listingTitle">CODE TO EDIT:</div><div class="listing"><pre>package Music::CD;
+
+use lib qw(<i>your_home_directory</i>/mylib/lib/perl5);
+
+use Moose;
+
+has songs =&gt; ( isa =&gt; 'ArrayRef[Music::Song]', is =&gt; 'rw' );
+has title =&gt; ( isa =&gt; 'Str', is =&gt; 'rw' );
+has id    =&gt; ( isa =&gt; 'Int', is =&gt; 'ro' );
+
+<ins>sub length
+{
+  my $self = shift;
+  my $total = 0;
+  for my $song ( @{ $self-&gt;songs } )
+  {
+    $total += $song-&gt;length;
+  }
+  return $total;
+}
+</ins>1;
+</pre></div></div>
+    
+  <p><img src="images/coderunner/save.gif"> Save that file and run <b>use_cd.pl</b>:</p>
+  
+<div class="interactiveBox"><div class="interactiveTitle">INTERACTIVE SESSION:</div><div class="interactive"><pre>cold:~/perl4$ <ins>./use_cd.pl</ins>
+Total length of songs on "Worst Hits of the Seventies" is 382 seconds
+</pre></div></div>
+    
+  <p>We can continue to add functionality as we need it. Let's make a method that returns a song length 
+   in minutes and seconds. Modify <b>Music/Song.pm</b> as shown:</p>
+    
+<div class="listingBox"><div class="listingTitle">CODE TO EDIT:</div><div class="listing"><pre>package Music::Song;
+
+use Moose;
+
+has artist =&gt; ( isa =&gt; 'Str', is =&gt; 'rw', required =&gt; 1 );
+has title  =&gt; ( isa =&gt; 'Str', is =&gt; 'rw', required =&gt; 1 );
+has length =&gt; ( isa =&gt; 'Num', is =&gt; 'rw', required =&gt; 1 );
+has id     =&gt; ( isa =&gt; 'Int', is =&gt; 'ro' );
+
+<ins>my $ONE_MINUTE = 60;  # seconds
+ 
+sub length_pretty
+{
+  my $self = shift;
+  my $seconds = $self-&gt;length;
+  my $minutes = int( $seconds / $ONE_MINUTE );
+  return sprintf q{%d' %d"}, $minutes, $seconds % $ONE_MINUTE;
+}</ins>
+1;</pre></div></div>
+    
+  <p><img src="images/coderunner/save.gif"> Save it. Now modify <b>use_song.pl</b> to use the new method:</p>
+    
+<div class="listingBox"><div class="listingTitle">CODE TO EDIT:</div><div class="listing"><pre>#!/usr/local/bin/perl
+use strict;
+use warnings;
+
+use lib qw(<i>your_home_directory</i>/mylib/lib/perl5);
+
+use Music::Song;
+
+my $pop = Music::Song-&gt;new( id     =&gt; 12345,
+                            artist =&gt; 'Rick Dees',
+                            title  =&gt; 'Disco Duck',
+                            length =&gt; 3*60 + 17,
+                          );
+print $pop-&gt;title, ' by ', $pop-&gt;artist, ' is ', $pop-&gt;length<ins>_pretty</ins>, " <del>seconds long</del><ins>in length</ins>\n";
+</pre></div></div>
+    
+  <p><img src="images/coderunner/save.gif"> Save and run it and you'll see:</p>
+
+<div class="interactiveBox"><div class="interactiveTitle">INTERACTIVE SESSION:</div><div class="interactive"><pre>cold:~/perl4$ <ins>./use_song.pl</ins>
+Disco Duck by Rick Dees is 3' 17" in length
+</pre></div></div>
+ </div>
+ <a href="Perl4-06.html" name="roles"></a>
+ <a name="h_05"></a><div class="heading">Roles</div><div class="headingText">
+   
+  <p>At this point it would be natural to think, "If <b>Music::Song</b> has a length attribute and a <b>length_pretty</b>
+   method, and <b>Music::CD</b> has a length attribute, then <b>Music::CD</b> ought to have a <b>length_pretty</b> method too." 
+   What does the lazy (remember, we like lazy) programmer do?  Copy and paste the <b>length_pretty</b> method 
+   from <b>Music/Song.pm</b> to <b>Music/CD.pm</b>? No! Many people <i>would</i> do that, but that's <i>false laziness</i>. 
+   Why? Because while it might be fast to copy-and-paste, it'll cost <i>far</i> more time later. If 
+   we ever want to modify that routine, not only would we have to copy-and-paste in two places, but we'd 
+   have to <i>remember</i> where to do it, because there's no tool in place to remind us. </p>
+     
+  <p>The real problem with the copy-and-paste approach is that it makes a two copies of a piece of code where only one copy should 
+    be. But how do we solve this? One possible answer would be to use <i>inheritance</i>. So what exactly should the inheritance tree for this look like? Do 
+   <b>Music::Song</b> and <b>Music::CD</b> both inherit the <b>length_pretty</b> method from some other class and if so, what 
+   should that class be called? <b>Music::Util</b>? <b>Music::Stringify</b>? <b>Music::LengthPretty</b>? This is one of the 
+   situations where inheritance is an unsatisfactory solution. Fortunately, Moose has 
+   a better answer: <i>roles</i>. </p>
+     
+  <p>A role is not a class. A role is a set of attributes and/or methods that you can add to a class. The class 
+   then acts as though those attributes and methods had been defined there all along. Let's see how to use a 
+   role to solve this problem! First, create <b>StringFuncs.pm</b> in the <b>Music</b> folder, then put the 
+    <b>length_pretty method</b> in it as shown:</p>
+     
+<div class="listingBox"><div class="listingTitle">CODE TO ENTER:</div><div class="listing"><pre>package StringFuncs;
+      
+use Moose::Role;
+
+my $ONE_MINUTE = 60;  # seconds
+
+sub length_pretty
+{
+  my $self = shift;
+  my $seconds = $self-&gt;length;
+  my $minutes = int( $seconds / $ONE_MINUTE );
+  return sprintf q{%d' %d"}, $minutes, $seconds % $ONE_MINUTE;
+}</pre></div></div>
+     
+  <p>This may <i>look</i> like a class, but it isn't one (so doesn't need to end with a 1;). It 
+   can't be use-d. It uses <b>Moose::Role</b>, not <b>Moose</b>. We'll see how it gets used now by modifying 
+   <b>Music/Song.pm</b> to say that it uses the StringFuncs role:</p>
+     
+<div class="listingBox"><div class="listingTitle">CODE TO EDIT:</div><div class="listing"><pre>package Music::Song;
+
+use Moose;
+
+has artist =&gt; ( isa =&gt; 'Str', is =&gt; 'rw', required =&gt; 1 );
+has title  =&gt; ( isa =&gt; 'Str', is =&gt; 'rw', required =&gt; 1 );
+has length =&gt; ( isa =&gt; 'Num', is =&gt; 'rw', required =&gt; 1 );
+has id     =&gt; ( isa =&gt; 'Int', is =&gt; 'ro' );
+
+<del>my $ONE_MINUTE = 60;  # seconds
+</del><ins>with 'StringFuncs';
+</ins><del>sub length_pretty
+{
+  my $self = shift;
+  my $seconds = $self-&gt;length;
+  my $minutes = int( $seconds / $ONE_MINUTE );
+  return sprintf q{%d' %d"}, $minutes, $seconds % $ONE_MINUTE;
+}
+</del>
+1;</pre></div></div>
+     
+  <p>The <b>with</b> statement tells us that we should use the roles in the named module. Now modify 
+   <b>Music/CD.pm</b> like this:</p>
+     
+<div class="listingBox"><div class="listingTitle">CODE TO EDIT:</div><div class="listing"><pre>package Music::CD;
+
+use Moose;
+
+has songs =&gt; ( isa =&gt; 'ArrayRef[Music::Song]', is =&gt; 'rw' );
+has title =&gt; ( isa =&gt; 'Str', is =&gt; 'rw' );
+has id    =&gt; ( isa =&gt; 'Int', is =&gt; 'ro' );
+
+<ins>with 'StringFuncs';</ins>
+ 
+sub length
+{
+  my $self = shift;
+
+  my $total = 0;
+  for my $song ( @{ $self-&gt;songs } )
+  {
+    $total += $song-&gt;length;
+  }
+
+  return $total;
+}
+
+1;</pre></div></div>
+     
+  <p>And now let's modify <b>use_cd.pl</b>:</p>
+  
+<div class="listingBox"><div class="listingTitle">CODE TO EDIT:</div><div class="listing"><pre>#!/usr/local/bin/perl
+use strict;
+use warnings;
+
+use lib qw(<i>your_home_directory</i>/mylib/lib/perl5);
+use Music::CD;
+use Music::Song;
+
+my $pop = Music::Song-&gt;new( id     =&gt; 12345,
+                            artist =&gt; 'Rick Dees',
+                            title  =&gt; 'Disco Duck',
+                            length =&gt; 3*60 + 17,
+                          );
+my $scrump = Music::Song-&gt;new( id     =&gt; 54321,
+                               artist =&gt; 'The Wurzels',
+                               title  =&gt; 'Combine Harvester',
+                               length =&gt; 3*60 + 5,
+                             );
+my $cd = Music::CD-&gt;new( title =&gt; 'Worst Hits of the Seventies',
+                         songs =&gt; [ $pop, $scrump ]);
+print 'Total length of songs on "', $cd-&gt;title, '" is ', $cd-&gt;<del>length</del><ins>length_pretty</ins>, "<del> seconds</del>\n";</pre></div></div>
+     
+  <p><img src="images/coderunner/save.gif"> Save and run it:</p>
+     
+<div class="interactiveBox"><div class="interactiveTitle">INTERACTIVE SESSION:</div><div class="interactive"><pre>cold:~/perl4$ <ins>./use_cd.pl</ins>
+Total length of songs on "Worst Hits of the Seventies" is 6' 22"</pre></div></div>
+     
+  <p>And now run <b>use_song.pl</b>; it still produces the same result as it did before:</p>
+  
+<div class="interactiveBox"><div class="interactiveTitle">INTERACTIVE SESSION:</div><div class="interactive"><pre>cold:~/perl4$ <ins>./use_song.pl</ins>
+Disco Duck by Rick Dees is 3' 17" in length</pre></div></div>
+     
+  <p>I've snuck something by you in the <b>length_pretty</b> method:</p>
+     
+<div class="observeBox"><div class="observeTitle">OBSERVE: Code fragment</div><div class="observe"><pre>  my $seconds = $self-&gt;<span class="darkgreen">length</span>;</pre></div></div>
+     
+  <p>Which <span class="darkgreen">length</span> method is being called there? It's the 
+   Music::Song length attribute in the case of use_song.pl and the Music::CD length method in the case of 
+   use_cd.pl. It makes no difference that one is an attribute and one is a method, because Perl uses the same syntax to 
+   access both. This is polymorphism at its finest! (More strictly-typed object-oriented
+   languages make this sort of thing very difficult.)</p>
+     
+  <p>Now, it was pretty convenient that the length attribute method had the same name and definition in both 
+   classes (and you may be assured, that was not an accident on my part). But it would be better if we captured that 
+   dependency in our code somehow, so that if anyone ever changes the name of the length method, we'll know 
+   about it. Moose gives us a way to do that. Go ahead and modify StringFuncs.pm as shown:</p>
+     
+<div class="listingBox"><div class="listingTitle">CODE TO EDIT:</div><div class="listing"><pre>package StringFuncs;
+
+use Moose::Role;
+
+<ins>requires 'length';</ins>
+ 
+my $ONE_MINUTE = 60;  # seconds
+
+sub length_pretty
+{
+  my $self = shift;
+  my $seconds = $self-&gt;length;
+  my $minutes = int( $seconds / $ONE_MINUTE );
+  return sprintf q{%d' %d"}, $minutes, $seconds % $ONE_MINUTE;
+}</pre></div></div>
+     
+  <p>This tells Moose that the StringFuncs role can only be used by classes that provide the method named by 
+   <b>requires</b> (note that this is <b>requires</b>, not to be confused with <b>require</b>).</p>
+     
+ 
+     
+  <p><table class="noteBox fBox pBox "><tr><td class="noteTitle">Note</td><td class="note"> You may have wondered why we don't just set the environment variable PERL5LIB and do away with 
+   the <b>use lib</b> statement in our programs. (Many programmers have taken that shortcut and suffered the 
+   consequences.) But those programs would then depend upon something being set in the environment that was not 
+   guaranteed and instead get set somewhere else, possibly by a 
+   different person. If the programs are run under a different shell—such as a <i>cron</i> job—or 
+   by a different user, they will break. Then someone would have to figure out the problem, someone who probably doesn't know 
+   how the working versions of the programs are being run. The same issues arise 
+   for programs that have been compiled to require the environment variable LD_LIBRARY_PATH to be set.</td></tr></table></p>
+ 
+   <p>So that does it for our introduction to Moose.  Now you have a good foundation for understanding how to create your very 
+   own object-oriented modules! Well done.</p>
+  
+  <p><div class="c"><img src="images/lessonImages/moose.png" height="300"></div></p>
+ 
+ </div>
+  
+  <p>Once you finish the lesson, go back to the syllabus to complete the homework.</p>
+  
+  <p><div class="c"><table class="noteBox fBox pBox "><tr><td class="noteTitle">Note</td><td class="note"> It's important that you do the homework for this lesson in this order: first the quiz questions, 
+   then the project.</td></tr></table></div></p>
+   
+<div class="footer"><div id="timeSurvey"></div>				
+				Copyright © 1998-2014 O'Reilly Media, Inc.<br><img src="https://courses.oreillyschool.com/common/cclicense.png"><br>
+				This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 Unported License.<br>
+				See <a href="http://creativecommons.org/licenses/by-sa/3.0/legalcode">http://creativecommons.org/licenses/by-sa/3.0/legalcode</a> 
+				for more information.
+				</div><iframe id="t" width="1" height="1" border="0" style="display:none"></iframe><script language="javascript">bodyLoaded();</script><script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+  ga('create', 'UA-44720547-1', 'oreillyschool.com');
+  ga('send', 'pageview');
+</script></body></html>

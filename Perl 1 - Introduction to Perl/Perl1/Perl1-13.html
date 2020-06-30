@@ -1,0 +1,298 @@
+<html><!-- Copyright (c) 1998-2014 O'Reilly Media, Inc.
+			This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 Unported License.
+			See http://creativecommons.org/licenses/by-sa/3.0/legalcode for more information.
+            --><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"><link rel="stylesheet" type="text/css" href="../common/Lab.css"><script type="text/javascript" src="../common/Lab.js"></script><script language="javascript"></script><title>Basic Unix Commands and Emacs</title></head><body id="body"><a name="top"></a><div class="title">Basic Unix Commands and Emacs</div><div class="resize"><a href="Perl1-13.html#top" onclick="changeSize('smaller');" class="aS" title="Keep clicking to make fonts smaller">A</a><a href="Perl1-13.html#top" onclick="changeSize('larger');" class="aL" title="Keep clikcing to make fonts larger">A</a><a href="Perl1-13.html#top" onclick="lv()" class="lv" title="Adjust Page for High Contrast">HC</a><div id="fh"><p>Click on <span class="aS">A</span> to make all fonts on the page smaller.</p><p>Click on <span class="aL">A</span> to make all fonts on the page larger.</p><p>Click on <span class="lv">HC</span> to toggle high contrast mode. When you move your mouse over 
+                 some bold words in high contrast mode, related words are automatically highlighted. Text is shown
+                 in black and white. 
+             </p></div></div><hr>
+    
+    <div class="goalTitle">Lesson Objectives</div><div class="goals">
+        
+        
+        When you complete this lesson, you will be able to:
+        
+        <ul><li>use basic Unix commands.</li><li>use wild cards to limit the amount of information displayed.</li><li>copy and remove files.</li><li>use a text editor.</li><li>use emacs.</li></ul>
+    </div><hr>
+    
+ <a name="h_01"></a><div class="heading">Getting Familiar with Unix</div><div class="headingText"> 
+        
+     <p>In this lesson you'll learn the basic functions used to write programs in Unix. After all, you won't 
+         always create programs in the CodeRunner editor; you'll want to create and manipulate your files in 
+         the real world.</p>
+        
+  <a name="s_01"></a><div id="s_01"><div class="subheading">Listing Files</div><div class="subheadingText">
+            
+      <p>Let's get right to it! Click the <b>New Terminal</b> button so you see the Unix prompt: <b>cold:~$</b></p>   
+            
+      <p>Your shell contains all the files that you've saved to your OST account. To see a list of those 
+          files, use the <b>ls</b> command. Most Unix commands have very short names. At first the command 
+          names may not make much sense to you, but they do have meaning. In this case, <b>ls</b> stands 
+          for <b>l</b>ist <b>s</b>tuff. (At least that's how I remember it! Some people say it's just a 
+          shortened version of <b>l</b>i<b>s</b>t.)</p>
+      
+      <p>Let's try using the <b>ls</b> command. Type at the Unix command line as shown (do NOT change directories this time!):</p>
+            
+<div class="interactiveBox"><div class="interactiveTitle">INTERACTIVE TERMINAL SESSION:</div><div class="interactive"><pre>cold:~$ <ins>ls</ins>
+Objective1.txt           cgi/                 index.html               perl1
+cold:~$                                                       
+</pre></div></div>
+            
+      <p>You'll probably see a different list, but even if you've never saved anything to your account, you'll have an 
+          index.html file and a cgi directory. These were created automatically when you signed up with OST. If you've had your 
+          account for a while (and you have) and taken other courses, you probably have quite a few files stored there.</p>
+            
+            <p>Some of the "stuff" listed will have a forward slash (<b>/</b>) following the name (for example, 
+                <b>cgi/</b>). That forward slash tells you it's a directory. Directories provide a way to 
+                organize your files. A directory is structured kind of like a tree. </p>
+            
+            <p>The root directory (indicated by the forward slash <b>/</b>) is the base of the tree. Directories within 
+                the root directory are branches, and they in turn may have branches within them, which may have 
+                branches within them; you can create subdirectories infinitely, and you can store files in the 
+                root directory or in any subdirectory.</p>
+            
+            <p><div class="c"><img src="images/directory.jpg"></div></p>
+            
+            <p>To navigate through the tree structure, you'll use the <b>cd</b> command. This stands for 
+                <b>c</b>hange <b>d</b>irectory. The <b>cd</b> command must be followed by the name of the destination 
+                directory. </p>
+            
+            <p>Try changing to the cgi directory and listing the files there. Type at the Unix command line as shown:</p>
+            
+<div class="interactiveBox"><div class="interactiveTitle">INTERACTIVE TERMINAL SESSION:</div><div class="interactive"><pre>cold:~$ <ins>cd cgi</ins>
+cold:~/cgi$ <ins>ls</ins>
+ajaxlib.pl*  cgi-lib.pl*  counter.pl*  guest.pl*
+cold:~/cgi$ 
+</pre></div></div>
+            
+            <p>You got a list that shows all the files in your cgi directory. 
+            The command prompt changes to <b>cold:~/cgi$</b>. This means you're working in the 
+                cgi directory. If you want to get back to your home directory from here, specify <b>..</b> as 
+                your destination directory. <b>..</b> indicates that you want to go back up just one directory.</p>
+                
+            <p>Now go do some exploring!  Keep in mind that you can be transported back to your home 
+                directory instantly from any location by typing <b>cd</b> with no destination directory.</p>
+            </div></div>
+            <a name="s_02"></a><div id="s_02"><div class="subheading">Wild Cards</div><div class="subheadingText">
+                
+                <p>If you have hundreds of files in your directory, the <b>ls</b> command could return many more 
+                    files than you care to see. You can use <i>wild cards</i> to limit the amount of 
+                    information displayed.</p>
+                
+                <p>Make sure you are in the <b>cgi</b> directory, then type at the Unix 
+                command line as shown:</p>
+                
+<div class="interactiveBox"><div class="interactiveTitle">INTERACTIVE TERMINAL SESSION:</div><div class="interactive"><pre>cold:~/cgi$ <ins>ls c*</ins>
+cgi-lib.pl*  counter.pl*
+cold:~/cgi$
+</pre></div></div>
+                
+                <p>Only the files with names that begin with the letter <b>c</b> are listed.
+                    The asterisk (<b>*</b>) represents the wildcard used to take the place of any number of 
+                    characters.</p>
+                
+                <p><div class="c"><table class="noteBox fBox pBox "><tr><td class="noteTitle">Note</td><td class="note"> Keep in mind that Unix is case-sensitive; it can distinguish between 
+                    upper and lowercase letters.</td></tr></table></div></p>
+            
+            </div></div>
+            
+        <a name="s_03"></a><div id="s_03"><div class="subheading">Directories</div><div class="subheadingText">
+            
+            <p>Create a new directory within your /perl1 directory and name it <b>stuff</b>. You can do that using the 
+                <b>mkdir</b>, or <i>make directory</i>, command. Type at the Unix command line as shown:</p>
+            
+<div class="interactiveBox"><div class="interactiveTitle">INTERACTIVE TERMINAL SESSION:</div><div class="interactive"><pre>cold:~/cgi$ <ins>cd ../perl1</ins>
+cold:~/perl1$ <ins>mkdir stuff</ins>
+cold:~/perl1$
+</pre></div></div>
+            
+            <p>Now if you list your files, you can see the new directory. Type at the Unix command line as shown:</p>
+            
+<div class="interactiveBox"><div class="interactiveTitle">INTERACTIVE TERMINAL SESSION:</div><div class="interactive"><pre>cold:~/perl1$ <ins>ls</ins>
+(you'll see all the programs we've created, with your new <b>stuff/</b> folder appearing in alphabetical order in the list.)
+</pre></div></div>
+            
+            <p>Now, move into the new directory by using the 
+                <i>change directory</i> command, <b>cd</b>. Type at the Unix command line as shown:</p>
+            
+<div class="interactiveBox"><div class="interactiveTitle">INTERACTIVE TERMINAL SESSION:</div><div class="interactive"><pre>cold:~/perl1$ <ins>cd stuff</ins>
+cold:~/perl1/stuff$
+</pre></div></div>
+            
+            <p>List the files in the new directory, using the <b>-a</b> flag with the <b>ls</b> command.
+               A <i>flag</i> is an additional parameter given to a command. 
+               The <b>-a</b> flag is used to display <b>a</b>ll files
+                in a directory. Type at the Unix command line as shown:</p>
+            
+<div class="interactiveBox"><div class="interactiveTitle">INTERACTIVE TERMINAL SESSION:</div><div class="interactive"><pre>cold:~/perl1/stuff$ <ins>ls -a</ins>
+./   ../
+cold:~/perl1/stuff$ 
+</pre></div></div>
+            
+            <p>What?! How can there already be two files in a new directory? And what's with the names? Weird.</p>
+            
+            <p>Well, those "files" are actually directories that are part of the Unix file structure. The single dot represents  
+                the current directory, and the double dots represent the previous, or "parent" directory. This  
+                allows you to use the <b>cd ..</b> command to back "up" to that directory. Type at the Unix 
+                command line as shown:</p>
+            
+<div class="interactiveBox"><div class="interactiveTitle">INTERACTIVE TERMINAL SESSION:</div><div class="interactive"><pre>cold:~/perl1/stuff$  <ins>cd ..</ins>
+cold:~/perl1$
+</pre></div></div>
+            
+        </div></div>
+        <a name="s_04"></a><div id="s_04"><div class="subheading">Copying and Removing Files</div><div class="subheadingText">
+            
+            <p>To copy and remove files, use the <b>cp</b> and <b>rm</b> commands, respectively. Type 
+                at the Unix command line as shown:</p>
+            
+<div class="interactiveBox"><div class="interactiveTitle">INTERACTIVE TERMINAL SESSION:</div><div class="interactive"><pre>cold:~/perl1$ <ins>cp /etc/issue .</ins>
+cold:~/perl1$
+</pre></div></div>
+            
+            <p>This means "copy the file named <b>issue</b> from the <b>/etc</b> directory into the current 
+                directory (<b>.</b>)." Now type at the Unix command line as shown:</p>
+            
+<div class="interactiveBox"><div class="interactiveTitle">INTERACTIVE TERMINAL SESSION:</div><div class="interactive"><pre>cold:~/perl1$ <ins>ls</ins>
+issue  stuff/
+cold:~/perl1$
+</pre></div></div>
+            
+            <p>Again, you'll see the whole list of files you've created in these lessons, and at least the <b>issue</b> file and the 
+                <b>stuff/</b> folder.</p>            
+            
+            <p>Excellent. But you don't really need that file, so let's remove it. Type at the Unix 
+                command line as shown:</p>
+            
+<div class="interactiveBox"><div class="interactiveTitle">INTERACTIVE TERMINAL SESSION:</div><div class="interactive"><pre>cold:~/perl1$ <ins>rm issue</ins>
+cold:~/perl1$ <ins>ls</ins>
+stuff/
+cold:~/perl1$
+</pre></div></div>
+            
+  </div></div>
+ </div>
+ <a name="h_02"></a><div class="heading">Using a Text Editor</div><div class="headingText">
+        
+        <p>So far in the course, we've used the CodeRunner editor to create files. In the real 
+            world, we have the option of using any of a number different editors—use 
+            whichever one you like best. On a Linux-based
+            operating system, you'll usually have access to the Emacs editor.</p>
+        
+  <a name="s_01"></a><div id="s_01"><div class="subheading">Command Keys and the Emacs Window</div><div class="subheadingText">
+                
+      <p>There are various command key sequences in emacs that we use to manipulate, save, search, and exit files. Here are 
+          the basic key command sequence elements explained:</p>
+      
+      <table class="tbl"><tr><td width="5%"><span class="darkblue">C-g</span></td><td width="95%"><span class="darkblue">C</span> represents the Ctrl key. <span class="darkblue">g</span> represents the G key. The 
+                  dash (<span class="darkblue">-</span>) between the C and G signifies that you should press both keys at the 
+                  same time.</td></tr><tr><td><span class="darkblue">M-x</span></td><td><span class="darkblue">M</span> represents the META key. But newer computers no longer have a META key, so when you
+                  see <span class="darkblue">M</span>, press the Esc key instead. Then press the X key. In some instances, you 
+                  need to press the Esc key <i>twice</i> and then press the X key to execute the META function. This may sound 
+                  confusing now, but you'll get the hang of it.</td></tr></table>
+                
+                <p>Emacs is usually accessed from the Unix command line by typing <b>emacs</b>,
+            followed by the name of a file. Type at the Unix command line as shown:</p>
+                
+<div class="interactiveBox"><div class="interactiveTitle">INTERACTIVE TERMINAL SESSION:</div><div class="interactive"><pre>cold:~/perl1$ <ins>emacs myfile.pl</ins>
+cold:~/perl1$
+</pre></div></div>
+                <p>You'll see a screen that looks something like this:</p>
+                
+                <div class="c">
+                    <img src="images/emacs.gif" width="481" height="315">
+                </div><br>
+                
+                
+           <p>There's a top heading highlighted in black, then a blank area in the middle, where you'll type.  
+               At the bottom there's a line highlighted in black, and then a white line below that.</p>
+                
+               <p>The black line at the bottom
+                tells you just about everything you'd ever want to know about the
+                current editing environment.  You'll see the name of the
+                file currently being edited (<b>myfile.pl</b>). Information about the type of file
+                you're editing is located within the  
+                parentheses. In this case you are editing a basic text file, so the parentheses contain the word <b>Text</b>.
+                The <b>L1</b> indicates that your cursor is currently on <b>line 1</b> of
+                the document.  The last bit of information indicates what portion of the file
+                is on your screen.  Right now, it says <b>All</b> because
+                you have the entire thing on your screen.  Often, it will be a
+                percentage of the document or <b>Bot</b> if you happen to be at the end or bottom of your document.</p>
+                
+                   The last line in white is the command line.  Whenever you use command
+                keys, they will be displayed there.  When you complete a command
+                (such as saving), it will show up there as well.
+                <p></p>
+                <p>Type something into the document so you can practice saving and 
+                exiting the file. (Emacs
+                    will not let you save an empty file):</p>
+                <div class="c">
+                    <img src="images/emacs2.gif" width="482" height="314">
+                </div>
+                <div class="c"><table class="noteBox fBox pBox "><tr><td class="noteTitle">Note</td><td class="note">
+                    Because you're using a telnet applet to connect to the server, it does not replicate the emacs program perfectly. 
+                    After typing text into your document, try using the right and left arrow keys to move back and forth along the text. 
+                    Depending on the browser and operating system you're using, you may find that some of the characters disappear. If 
+                    this happens, type <b>C-l</b> and your text will reappear. If you have any questions about this, please email your 
+                    mentor.
+                </td></tr></table></div><br>
+               <p>Now save <b>myfile.pl</b>. Type <b>C-x</b> and then <b>C-s</b>
+                to save the file.  If you make a mistake you can type <b>C-g</b>
+                to start over.  When you're done, you'll see
+                a message that the file was written in the emacs command
+            line.</p>
+                <div class="c">
+                    <img src="images/emacs3.gif" width="481" height="314">
+                </div><br>
+                Exit emacs by typing <b>C-x C-c</b>.  You'll see
+                a Unix command prompt.  Use <b>ls</b> to
+            find out if the file is in your account now. Type at the Unix command line as shown:
+                
+<div class="interactiveBox"><div class="interactiveTitle">INTERACTIVE TERMINAL SESSION:</div><div class="interactive"><pre>
+cold:~/perl1$ <ins>ls myfile.pl</ins>
+myfile.pl
+cold:~/perl1$                
+</pre></div></div>
+                
+            
+            <p>Once you're sure that the file has been created, you can run it. Type at the Unix command line:</p>
+            
+<div class="interactiveBox"><div class="interactiveTitle">INTERACTIVE TERMINAL SESSION:</div><div class="interactive"><pre>cold:~/perl1$ <ins>./myfile.pl</ins>
+-bash: ./myfile.pl: Permission denied
+cold:~/perl1$                
+</pre></div></div>
+            
+            <p>Hey wait—why doesn't this work?  Well, by default, files created in emacs are not created with 
+                permission to execute the files. We can fix this though. Type at the Unix command line as shown:</p>
+            
+<div class="interactiveBox"><div class="interactiveTitle">INTERACTIVE TERMINAL SESSION:</div><div class="interactive"><pre>cold:~/perl1$ <ins>chmod 755 ./myfile.pl</ins>
+cold:~/perl1$                
+</pre></div></div>
+            
+            <p>You're able to run your script now.</p>
+            
+            <p>Keep in mind that emacs provides many commands for editing files. For more information, check out the built-in <b>Emacs 
+                help</b> (by pressing <b>F10</b> and then <b>h</b>) or do a Google search on 
+                <a href="http://www.google.com/search?q=emacs%20commands" target="_blank">emacs commands</a>.</p>
+            
+        </div></div>
+        
+    </div>
+ 
+ <br><br><br>
+  
+<p>In the next lesson we'll learn how to pass arguments to Perl programs at the command line. Good stuff.  
+    See you there!</p>
+  
+<div class="footer"><div id="timeSurvey"></div>				
+				Copyright © 1998-2014 O'Reilly Media, Inc.<br><img src="https://courses.oreillyschool.com/common/cclicense.png"><br>
+				This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 Unported License.<br>
+				See <a href="http://creativecommons.org/licenses/by-sa/3.0/legalcode">http://creativecommons.org/licenses/by-sa/3.0/legalcode</a> 
+				for more information.
+				</div><iframe id="t" width="1" height="1" border="0" style="display:none"></iframe><script language="javascript">bodyLoaded();</script><script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+  ga('create', 'UA-44720547-1', 'oreillyschool.com');
+  ga('send', 'pageview');
+</script></body></html>

@@ -1,0 +1,774 @@
+<html><!-- Copyright (c) 1998-2014 O'Reilly Media, Inc.
+			This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 Unported License.
+			See http://creativecommons.org/licenses/by-sa/3.0/legalcode for more information.
+            --><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"><link rel="stylesheet" type="text/css" href="../common/Lab.css"><script type="text/javascript" src="../common/Lab.js"></script><script language="javascript"></script><title>Multiprocessing and Multitasking</title></head><body id="body"><a name="top"></a><div class="title">Multiprocessing and Multitasking</div><div class="resize"><a href="Perl4-13.html#top" onclick="changeSize('smaller');" class="aS" title="Keep clicking to make fonts smaller">A</a><a href="Perl4-13.html#top" onclick="changeSize('larger');" class="aL" title="Keep clikcing to make fonts larger">A</a><a href="Perl4-13.html#top" onclick="lv()" class="lv" title="Adjust Page for High Contrast">HC</a><div id="fh"><p>Click on <span class="aS">A</span> to make all fonts on the page smaller.</p><p>Click on <span class="aL">A</span> to make all fonts on the page larger.</p><p>Click on <span class="lv">HC</span> to toggle high contrast mode. When you move your mouse over 
+                 some bold words in high contrast mode, related words are automatically highlighted. Text is shown
+                 in black and white. 
+             </p></div></div><hr>
+ 
+ 
+ <div class="goalTitle">Lesson Objectives</div><div class="goals">
+  When you complete this lesson, you will be able to:
+  
+  <ul><li><a href="Perl4-13.html#multiprocessing">Multiprocess</a>.</li><li><a href="Perl4-13.html#multitasking">Multitask</a>.</li></ul>
+ </div><hr>
+ 
+ <p><div class="c">"The shortest way to do many things is to do only one thing at a time." <br> 
+  -Sydney Smiles</div></p>
+ 
+ <p>Welcome back! In this lesson we're going to take a good look at <i>asynchronous processing:</i> code that lies outside 
+  the normal flow of control in your program. You've encountered asynchronous processing before in signal 
+  handlers and exceptions; but now we'll take it a step further by writing code 
+  to create the illusion that your computer is executing more than one task at a time. (Unless your computer uses multiple core processors, 
+  it can't execute more than one task at a time, but it can switch between 
+  tasks rapidly.)</p>
+ 
+
+ <a href="Perl4-13.html" name="multiprocessing"></a>
+ <a name="h_01"></a><div class="heading">Multiprocessing</div><div class="headingText">
+  
+  <p>The process model of computing as implemented on all versions of Unix is fairly straightforward. It 
+   relies on two system functions: <b>fork</b> and <b>exec</b>. <b>fork</b> creates an exact copy of the 
+   current process; <b>exec</b> replaces the image in the current process with one derived from running a given 
+   program. Perl provides interfaces to those functions with the same names. Let's look at those two 
+   functions in detail.</p>
+  
+  <a name="s_01"></a><div id="s_01"><div class="subheading">Using fork()</div><div class="subheadingText">
+   
+   <p>In Christopher Nolan's 2006 movie <i>The Prestige,</i> the protagonist—a magician—uses a 
+    machine to create an exact duplicate of himself, complete with all of his memories and thoughts. 
+    This is a pretty good analogy for how <b>fork()</b> works. After a call to <b>fork</b> 
+    there are two identical processes executing the same code: the original process, which is called the parent, 
+    and a child process, which inherits the data, state, and filehandles of the parent. If the child had a mind, it would 
+    think it had been executing all along, just the way the parent process had. (Whoa—now there's some deep 
+    existentialist thought for you to ponder!)  </p>
+   
+   <p>There is one asymmetry within these processes though: the parent-child relationship. When the child 
+    finishes executing, a signal is delivered to the parent process. The parent needs to call <b>wait</b> to 
+    access the return status of the child process, or the child may become a "zombie," a process that just 
+    hangs around waiting for someone to acknowledge that it is dead (analagous to quite another kind of 
+    movie!). This won't happen on all versions of Unix, but it's good defensive programming to assume 
+    that your code will be run on such a system at some point. </p>
+   
+   <p>When you run an external program via <b>system</b>, Perl does a <b>fork</b>; in the child, Perl does an 
+    <b>exec</b> to replace the process image with that of the target program, then exits. Because the child 
+    inherits the parent's filehandles, anything the child prints goes to the same place that the parent's 
+    standard output goes.</p>
+   
+   <p>The documentation for this section can be found in 
+    <a href="http://perldoc.perl.org/perlipc.html" target="_blank">perldoc perlipc</a> and 
+    <a href="http://perldoc.perl.org/5.12.0/functions/fork.html" target="_blank">perldoc -f fork</a>. This is a 
+    complex and difficult subject; our study of multiprocessing will consist of a broad overview. 
+    If you want to take on more intensive work with process forking, you'll want to study specific issues like
+    signals, filehandles, buffering, and especially race conditions, to be confident in your 
+    implementation.</p>
+   
+   <p>Let's get going and try an example using <b>fork()</b>. Create a new file named <b>/perl4/forktest.pl</b>, as shown:</p>
+   
+<div class="listingBox"><div class="listingTitle">CODE TO ENTER:</div><div class="listing"><pre>#!/usr/local/bin/perl
+use strict;
+use warnings;
+
+print "Before fork\n";
+
+my $pid = fork;
+if ( $pid )                 # Parent
+{
+  print "Parent forked child process $pid\n";
+  for ( my $count = 10; $count; $count-- )
+  {
+    print "Parent ($$) $count\n";
+    sleep 1;
+  }
+}
+elsif ( defined( $pid ) )   # Child
+{
+  for ( my $count = 5; $count; $count-- )
+  {
+    print "\tChild ($$) $count\n";
+    sleep 1;
+  }
+}
+else
+{
+  die "Error in fork: $!\n";
+}
+
+print "After fork, process $$\n";</pre></div></div>
+   
+   <p><img src="images/coderunner/save.gif"> Save and run it:</p>
+   
+<div class="interactiveBox"><div class="interactiveTitle">INTERACTIVE TERMINAL SESSION: Command to type</div><div class="interactive"><pre>cold:~/perl4$ <ins>./forktest.pl</ins>
+Before fork
+        Child (30760) 5
+Parent forked child process 30760
+Parent (30759) 10
+        Child (30760) 4
+Parent (30759) 9
+        Child (30760) 3
+Parent (30759) 8
+        Child (30760) 2
+Parent (30759) 7
+        Child (30760) 1
+Parent (30759) 6
+After fork, process 30760
+Parent (30759) 5
+Parent (30759) 4
+Parent (30759) 3
+Parent (30759) 2
+Parent (30759) 1
+After fork, process 30759
+</pre></div></div>
+   
+   <p>The process IDs that are printed for you will be different, and more importantly, the order of the 
+    lines while both processes are running may be different too. You could run this program 100 times and 
+    see the same order each time, but that doesn't guarantee that the order will be the same the 101st time. 
+    This is one of the fundamental caveats of programming for concurrency: the rates at which concurrent 
+    processes proceed may vary arbitrarily.  The operating system is perfectly within its rights to make 
+    one of those processes wait any amount of time while it handles something more important that's happened.  
+    Most of the time, you won't see noticeable variation, which makes multiprocessing debugging especially 
+    treacherous; one day some variation 
+    will happen, cause a problem, and then you will be unable to reproduce it. The best 
+    defense is to understand about concurrency issues such as deadlock and race conditions, because
+    testing that can flush out those problems is extremely difficult.</p>
+   
+   <p>Keep in mind that the moment <b>fork</b> happens successfully, 
+    there are <i>two</i> processes executing at exactly that same spot in the code: the return of 
+    <b>fork</b>. The only way to tell the difference between them is by the return value of <b>fork</b>, 
+    which is the process id of the child in the parent, and zero in the child (and undef if there was a 
+    problem forking, such as no available process slots—a serious problem). (Actually, there is one 
+    other way to tell; you could save the value of the special variable $$, the current process id, and look 
+    for a change, but we'll keep it simple for now.)</p>
+   
+   <p>Once the child process starts to execute, it has all of the same data as the parent, but they are 
+    <i>copies:</i> if the child changes the value of any variable, that change only happens in the child, 
+    not the parent, and vice-versa.</p>
+   
+   <p>In our example, we didn't <b>wait</b> for the child or trap signals; if the parent process exits 
+    shortly after the child does, it's not necessary. If the parent process exits before the child does, 
+    the operating system will assign the child to another process—a sort of foster home—that will 
+    do the <b>wait</b> for you. Let's see that concept in action with a small change to <b>forktest.pl</b>:</p>
+   
+<div class="listingBox"><div class="listingTitle">CODE TO EDIT:</div><div class="listing"><pre>#!/usr/local/bin/perl
+use strict;
+use warnings;
+
+print "Before fork\n";
+
+my $pid = fork;
+if ( $pid )                  # Parent
+{
+  print "Parent forked child process $pid\n";
+  for ( my $count = <del>10</del> <ins>5</ins>; $count; $count-- )
+  {
+    print "Parent ($$) $count\n";
+    sleep 1;
+  }
+}
+elsif ( defined( $pid ) )    # Child
+{
+  for ( my $count = <del>5</del> <ins>10</ins>; $count; $count-- )
+  {
+    print "\tChild ($$) $count\n";
+    sleep 1;
+  }
+}
+else
+{
+  die "Error in fork: $!\n";
+}
+
+print "After fork, process $$\n";</pre></div></div>
+   
+   <p><img src="images/coderunner/save.gif"> Save and run it:</p>
+   
+<div class="interactiveBox"><div class="interactiveTitle">INTERACTIVE TERMINAL SESSION: Command to type</div><div class="interactive"><pre>cold:~/perl4$ <ins>./forktest.pl</ins>
+Before fork
+        Child (30824) 10
+Parent forked child process 30824
+Parent (30823) 5
+        Child (30824) 9
+Parent (30823) 4
+        Child (30824) 8
+Parent (30823) 3
+        Child (30824) 7
+Parent (30823) 2
+        Child (30824) 6
+Parent (30823) 1
+        Child (30824) 5
+After fork, process 30823
+<span class="red">cold:~/perl4$</span>         Child (30824) 4
+        Child (30824) 3
+        Child (30824) 2
+        Child (30824) 1
+After fork, process 30824</pre></div></div>
+   
+   <p>If you're wondering what's happened to the prompt, it's <span class="red">halfway through the output</span>; that's when the 
+    parent exited. (You could have typed another command then and it would have run.) The child kept going, 
+    continuing to send its output to the same place. Press <b>Enter</b> and you'll get another prompt.</p>
+   
+  </div></div>
+  <a name="s_02"></a><div id="s_02"><div class="subheading">fork() and wait()</div><div class="subheadingText">
+   
+   <p>Even though both processes are executing the same piece of code, 
+    they do not have any mechanism for communicating with each other. Without further effort, there is 
+    precisely one means of <i>interprocess communication</i> available: the child process' exit status. 
+    Modify <b>forktest.pl</b> again:</p>
+   
+<div class="listingBox"><div class="listingTitle">CODE TO EDIT:</div><div class="listing"><pre>#!/usr/local/bin/perl
+use strict;
+use warnings;
+
+print "Before fork\n";
+
+my $pid = fork;
+if ( $pid )                   # Parent
+{
+  print "Parent forked child process $pid\n";
+  for ( my $count = 5; $count; $count-- )
+  {
+    print "Parent ($$) $count\n";
+    sleep 1;
+  }<ins>
+  print "Parent waiting for child\n";
+  my $pid_found = wait;
+  die "wait error" if $pid_found &lt; 0;
+  die "Found a different child process $pid_found!" if $pid_found != $pid;
+  printf "Child exited with code $? (%x) = %d\n", $?, $? &gt;&gt; 8;</ins>
+}
+elsif ( defined( $pid ) )     # Child
+{
+  for ( my $count = 10; $count; $count-- )
+  {
+    print "\tChild ($$) $count\n";
+    sleep 1;
+  }<ins>
+  exit 42;</ins>
+}
+else
+{
+  die "Error in fork: $!\n";
+}
+
+print "After fork, process $$\n";</pre></div></div>
+   
+   <p><img src="images/coderunner/save.gif"> Save and run it:</p>
+
+<div class="interactiveBox"><div class="interactiveTitle">INTERACTIVE TERMINAL SESSION: Command to type</div><div class="interactive"><pre>cold:~/perl4$ <ins>./forktest.pl</ins>
+Before fork
+        Child (31005) 10
+Parent forked child process 31005
+Parent (31004) 5
+        Child (31005) 9
+Parent (31004) 4
+        Child (31005) 8
+Parent (31004) 3
+        Child (31005) 7
+Parent (31004) 2
+        Child (31005) 6
+Parent (31004) 1
+        Child (31005) 5
+Parent waiting for child
+        Child (31005) 4
+        Child (31005) 3
+        Child (31005) 2
+        Child (31005) 1
+Child exited with code 10752 (2a00) = 42
+After fork, process 31004</pre></div></div>
+   
+   <p>When the parent calls <b>wait</b>, it <i>blocks</i> (the technical term for "waits for something to 
+    happen") until the child exits, at which point <b>wait</b> returns with the process id of the child 
+    that just exited. That return code is stored in $?, left shifted by eight bits (the bottom eight bits are 
+    used to store information such as whether the child dumped core, and if it was terminated by a signal, 
+    the number of that signal). $? is also used to store the exit code of any command you run with 
+    <b>system</b> or backticks. (We haven't covered the bit shift operators in our courses, but I'm confident you can find  
+    information on any unfamiliar operators.)</p>
+   
+   <p>Notice that the child no longer prints the "After fork" line—it exited before it got there. You'll 
+    almost always want to call <b>exit</b> in the block of child-specific code. Usually there will be 
+    much more code following the <b>if</b> block that only makes sense for the parent to execute. And if the 
+    <b>fork</b> is in any kind of a loop, continuing to execute that in the child would mean that the child 
+    would then <b>fork</b> a copy of itself, which would eventually <b>fork</b> a copy of itself, and this would continue 
+    until the system ran out of resources to create new processes. This can be a 
+    quick way of crashing a system, so be careful to avoid it!</p>
+   
+   <p>If you want parent and child to be able to exchange more data than the one-way exit code that you see 
+    above, you need to explore <i>interprocess communication</i>. This is an involved and complicated 
+    topic (see <a href="http://perldoc.perl.org/perlipc.html" target="_blank">perldoc perlipc</a>, preferably in small doses). 
+    One of the most common methods of 
+    exchanging data is through <i>bidirectional pipes</i>.</p>
+   
+   <p>Having your parent pause to <b>wait</b> on its child defeats the purpose of parallel 
+    processing somewhat: you'd like the parent to be able to move on to tasks other than blocking. This is 
+    where signals come in handy. Modify <b>forktest.pl</b> again, this time to make the parent continue executing 
+    after the child is done:</p>
+   
+<div class="listingBox"><div class="listingTitle">CODE TO EDIT:</div><div class="listing"><pre>#!/usr/local/bin/perl
+use strict;
+use warnings;
+
+print "Before fork\n";
+
+my $pid = fork;
+if ( $pid )               # Parent
+{
+  print "Parent forked child process $pid\n";
+<ins>  local $SIG{CHLD} = sub {
+    print "In handler, calling wait\n";
+    my $pid_found = wait;
+    die "wait error" if $pid_found &lt; 0;
+    die "Found a different child process $pid_found!" if $pid_found != $pid;
+    printf "Child exited with code $? (%x) = %d\n", $?, $? &gt;&gt; 8;
+  };
+</ins>  for ( my $count = <del>5</del> <ins>10</ins>; $count; $count-- )
+  {
+    print "Parent ($$) $count\n";
+    sleep 1;
+  }
+<del>  print "Parent waiting for child\n";
+  my $pid_found = wait;
+  die "wait error" if $pid_found &lt; 0;
+  die "Found a different child process $pid_found!" if $pid_found != $pid;
+  printf "Child exited with code $? (%x) = %d\n", $?, $? &gt;&gt; 8;
+</del>}
+elsif ( defined( $pid ) )   # Child
+{
+  for ( my $count = <del>10</del> <ins>5</ins>; $count; $count-- )
+  {
+    print "\tChild ($$) $count\n";
+    sleep 1;
+  }
+  exit 42;
+}
+else
+{
+  die "Error in fork: $!\n";
+}
+
+print "After fork, process $$\n";</pre></div></div>
+   
+   <p><img src="images/coderunner/save.gif"> Save and run it:</p>
+
+<div class="interactiveBox"><div class="interactiveTitle">INTERACTIVE TERMINAL SESSION: Command to type</div><div class="interactive"><pre>cold:~/perl4$ <ins>./forktest.pl</ins>
+Before fork
+        Child (31026) 5
+Parent forked child process 31026
+Parent (31025) 10
+        Child (31026) 4
+Parent (31025) 9
+        Child (31026) 3
+Parent (31025) 8
+        Child (31026) 2
+Parent (31025) 7
+        Child (31026) 1
+Parent (31025) 6
+In handler, calling wait
+Child exited with code 10752 (2a00) = 42
+Parent (31025) 5
+Parent (31025) 4
+Parent (31025) 3
+Parent (31025) 2
+Parent (31025) 1
+After fork, process 31025</pre></div></div>
+   
+   <p>When the child process is ready to exit, it sends the CHLD signal to the parent, which causes the 
+    currently running code (counting down) to be interrupted while it runs the signal handler we created 
+    (<b>local</b> ensures that the handler is removed when leaving the current block scope, a good defensive 
+    practice). The signal handler runs, at which point <b>wait</b> can execute without blocking, and then 
+    the parent returns to the code it was previously executing.</p>
+  
+  </div></div>
+  <a name="s_03"></a><div id="s_03"><div class="subheading">exec()</div><div class="subheadingText">
+   
+   <p><b>exec</b> <i>replaces</i> the currently running process with the named program. This means that 
+    control will never return to the point following the <b>exec</b>; if it does, then the <b>exec</b> 
+    failed. The <b>system</b> function works by <b>fork</b>ing a subprocess, <b>exec</b>ing the named 
+    program within it, then doing a blocking <b>wait</b> in the parent process for the child process. This 
+    is why the arguments to <b>system</b> are the same as those for <b>exec</b> (you can see that in 
+    <a href="http://perldoc.perl.org/functions/fork.html" target="_blank">perldoc -f fork</a>).</p>
+    
+   <p>Let's see how that works. Create a new file named <b>/perl4/exectest.pl</b>:</p>
+   
+<div class="listingBox"><div class="listingTitle">CODE TO ENTER:</div><div class="listing"><pre>#!/usr/local/bin/perl
+use strict;
+use warnings;
+
+print "Before fork\n";
+
+my $pid = fork;
+if ( $pid )                 # Parent
+{
+  print "Parent forked child process $pid\n";
+  for ( my $count = 5; $count; $count-- )
+  {
+    print "Parent ($$) $count\n";
+    sleep 1;
+  }
+}
+elsif ( defined( $pid ) )   # Child
+{
+  sleep 2;
+  print "Exec-ing external program\n";
+  exec "uname -a";
+  die "Exec failed: $!\n";
+}
+else
+{
+  die "Error in fork: $!\n";
+}
+
+print "Done\n";
+</pre></div></div>
+   
+   <p><img src="images/coderunner/save.gif"> Save and run it:</p>
+   
+<div class="interactiveBox"><div class="interactiveTitle">INTERACTIVE TERMINAL SESSION: Command to type</div><div class="interactive"><pre>cold:~/perl4$ <ins>./exectest.pl</ins>
+Before fork
+Parent forked child process 2800
+Parent (2799) 5
+Parent (2799) 4
+Exec-ing external program
+Linux cold1.useractive.com 2.6.9-89.0.29.ELsmp #1 SMP Tue Sep 7 18:46:59 EDT 2010 i686 i686 i386 GNU/Linux
+Parent (2799) 3
+Parent (2799) 2
+Parent (2799) 1
+Done</pre></div></div>
+   
+   <p>The line "Done" is only printed once, which indicates that the child process never 
+    returned to our program.</p>
+  
+  </div></div>
+   
+  <p>For more information on multiprocessing with fork and interprocess communication, I  
+   recommend Lincoln Stein's book, "Network Programming with Perl." And in order to 
+   do advanced multiprocessing tasks (like spawning a daemon) you'll need to 
+   understand the underlying process model in more detail than we have gone into here. For that, I recommend  
+   chapters 6, 7, and 11 of "The Design of the Unix Operating System," by Maurice J. Bach.</p>
+   
+  <p><div class="c"><table class="noteBox fBox pBox "><tr><td class="noteTitle">Note</td><td class="note">Even though Windows doesn't follow the process model, Perl is able to emulate 
+   enough of it to make <b>fork</b> work. </td></tr></table></div></p>
+   
+ </div>
+ 
+ <a href="Perl4-13.html" name="multitasking"></a>
+ <a name="h_02"></a><div class="heading">Multitasking</div><div class="headingText">
+   
+  <p>Computer people love to debate the interpretation of terms like 
+   "multitasking." We're going to use the term here in the sense of executing multiple independent tasks within 
+   the same process, without employing threads. An example of this model is the <i>event loop:</i> code that 
+   sets up callbacks to be called when some external event happens, and then loops, waiting for any one of 
+   them to happen. The best example of an event loop is a windowing system like the one you're looking at right 
+   now. This particular windowing process is sitting in a tight loop waiting for you to press a key, move the mouse, or 
+   click a button, at which point it will execute code that determines what to do with that event.</p>
+  
+  <a name="s_01"></a><div id="s_01"><div class="subheading">Beginning POE</div><div class="subheadingText">
+   
+   <p>Now we're ready to explore event loops in Perl with POE, the Perl Object Environment. (It's an odd title, 
+    because POE is more about event processing than objects, but that's what it's called.) Let's install it first:</p>
+   
+<div class="interactiveBox"><div class="interactiveTitle">INTERACTIVE TERMINAL SESSION: Command to type</div><div class="interactive"><pre>cold:~/perl4$ <ins>PERL5LIB=~/mylib/lib/perl5 cpan POE</ins>
+[output omitted]</pre></div></div>
+      
+   <p>When asked, do not install the temporary module, and skip the network tests.</p>
+   
+   <p>POE is <i>huge</i>. It's more of an operating system than a module. So it's best suited for 
+    large, complex applications that are actually more like "systems" than "programs." We won't develop 
+    anything that large in this course; trust me—it would be way too labor intensive for our purposes here.
+    The quintessential POE application is a chat bot that carries on conversations with multiple users while 
+    fetching the answers to their questions about the stock market. You would be pretty annoyed if you had to 
+    type and read that much code!</p>
+   
+   <p>So our examples will look like they use an excessive amount of programming overhead to do something 
+    relatively simple; be aware that when you write something of a more appropriate scale for the use 
+    of POE, that overhead will be more reasonable. </p>
+ 
+  </div></div>
+  <a name="s_02"></a><div id="s_02"><div class="subheading">Using POE</div><div class="subheadingText">
+   
+   <p>At its heart, POE is running off of a <b>select</b> call, which you can look up with 
+    <a href="http://perldoc.perl.org/CGI.html" target="_blank">perldoc -f select</a>. 
+    (There are two different <b>select</b> functions; I'm referring 
+    to the one that takes four arguments.) That means it can wait for input or output from various sources 
+    we have declared. (POE can wait for other types of events, too, such as timers going off.) We can, for 
+    instance, start an I/O request in one task, do something else, and then return to the first task when
+    the input we have requested arrives. If you read the documentation for <b>select</b>, you will be 
+    grateful for anything that makes using it easier!</p>
+     
+   <p>When I said that POE was like an operating system, I was at most half joking. POE has a <i>kernel</i> 
+    that is a finite state machine that receives inputs and dispatches messages. You declare your interest 
+    in certain types of events and specify what code to run when they happen. There is a layer of indirection 
+    involved such that you don't directly link a coderef to an input event, but instead give the name of a
+    "state" that in turn is linked to your coderef. Let's do an example! Create a new file as shown:</p>
+     
+<div class="listingBox"><div class="listingTitle">CODE TO TYPE: poetest.pl</div><div class="listing"><pre>#!/usr/local/bin/perl
+use strict;
+use warnings;
+
+use lib "$ENV{HOME}/mylib/lib/perl5";
+use POE qw(Wheel::FollowTail);
+
+my $file = shift or die "Usage: $0 &lt;file&gt;\n";
+{ open my $fh, '&lt;', $file or die "Cannot open $file: $!\n" }
+
+POE::Session-&gt;create(
+  inline_states =&gt; {
+    _start =&gt; sub {
+      $_[HEAP]{tailer} = POE::Wheel::FollowTail-&gt;new(
+        Filename   =&gt; $_[ARG0],
+        InputEvent =&gt; 'handle_input',
+        ErrorEvent =&gt; 'handle_error',
+        SeekBack   =&gt; 0,
+      );
+    },
+    handle_input =&gt; sub { print "Input: $_[ARG0]\n" },
+    handle_error =&gt; sub { warn shift },
+  },
+  args =&gt; [$file],
+);
+
+$poe_kernel-&gt;run();
+</pre></div></div>
+     
+   <p><img src="images/coderunner/save.gif"> Save it as <b>poetest.pl</b>. This program will monitor a 
+    file for new content and do the equivalent of "tail -f" on it. Before you run the program, open a new 
+    Terminal window by clicking the Terminal icon <img src="images/coderunner/Terminal.png"> and logging in 
+    again. A new terminal window will appear in a new tab labeled <b>Terminal2</b> 
+    (assuming the existing Terminal tab was labeled <b>Terminal1</b>):</p> 
+   
+   <p><div class="c"><img src="images/coderunner/TwoTerminals.gif"></div></p>
+   
+   <p>To differentiate between the two tabs you now have opened, the commands you type in Terminal2 will 
+    be shown in <span class="purple">purple</span>. We'll also change the prompt to give you another visual cue:</p>
+     
+<div class="interactiveBox"><div class="interactiveTitle">INTERACTIVE TERMINAL SESSION: Commands to type</div><div class="interactive"><pre>cold:~$ <span class="purple">PS1="cold:\w(2)\$ "</span>
+cold:~(2)$ <span class="purple">cd perl4</span></pre></div></div>
+     
+   <p>Now, in Terminal1, create the destination file and run the program:</p>
+     
+<div class="interactiveBox"><div class="interactiveTitle">INTERACTIVE TERMINAL SESSION: Commands to type</div><div class="interactive"><pre>cold:~/perl4$ <ins>touch testfile</ins>
+cold:~/perl4$ <ins>./poetest.pl testfile</ins>
+</pre></div></div>
+     
+   <p>At this point, the program in Terminal1 will block. Go to Terminal2 and start appending
+      lines to testfile:</p>
+     
+<div class="interactiveBox"><div class="interactiveTitle">INTERACTIVE TERMINAL SESSION: Commands to type</div><div class="interactive"><pre>cold:~/perl4(2)$ <span class="purple">echo "Hello world" &gt;&gt; testfile</span>
+cold:~/perl4(2)$ <span class="purple">sleep 1</span>
+cold:~/perl4(2)$ <span class="purple">ls -l | head -2 &gt;&gt; testfile</span>
+cold:~/perl4(2)$ <span class="purple">sleep 1</span>
+cold:~/perl4(2)$ <span class="purple">date &gt;&gt; testfile</span></pre></div></div>
+  
+   <p>The output of your commands is echoed in Terminal1 as you run them in Terminal2. 
+    There may be a delay before the first one shows up. We haven't given the POE program a reason to exit, 
+    so stop it with <b>Ctrl+C</b> in Terminal1 when you finish.</p>
+     
+   <p>How does this work?  Take a deep breath, this is going to take a bit of explanation. The <b>use POE</b> statement loads not only the POE module, 
+    but the POE::Wheel::FollowTail module as well; this is a convenient function of POE for reducing the 
+    amount of text you need to type for <b>use</b> statements.</p>
+     
+   <p>We verify that we can open the input file for reading. This statement is inside a naked block so that 
+    the lexical filehandle goes out of scope and automatically closes the file when the block exits—we only 
+    opened the file to make sure that we could.</p>
+     
+   <p>Next, we create a POE <i>session</i> that will listen for and handle the events of content being added 
+    to a file. Rather than create POE code from scratch to accomplish that (which would be prohibitively 
+    tedious for this class), we use the existing module, POE::Wheel:FollowTail. (There POE modules for all kinds of operations
+    that you might want to embed in a POE application; CPAN has over a thousand 
+    of them.) </p>
+     
+   <p>The <b>inline_states</b> parameter specifies the names of events and the code that handles them. The 
+    special event <b>_start</b> is called when the session is created, and is used to initialize the session. 
+    At that point, this session instantiates a new POE::Wheel::FollowTail object; the arguments 
+    to its constructor specify in turn the name of the file to be tailed, the names of the events 
+    corresponding to an input being received and an error occurring, and how far back in the file to look 
+    initially (our example doesn't look back at all). The documentation for this object can be found at 
+    <a href="http://search.cpan.org/perldoc?POE::Wheel::FollowTail" target="_blank">http://search.cpan.org/perldoc?POE::Wheel::FollowTail</a>.</p>
+     
+   <p><b>ARG0</b> is a POE constant that specifies the first user argument passed to a POE callback. POE 
+    uses array offsets instead of named parameters for faster code execution, and names constants like this 
+    one (it's a subroutine that returns an integer) to recover the advantage of addressing parameters by 
+    name instead of number.</p>
+     
+   <p>The next two states are the handle_input and handle_error we just named, and the callbacks to execute 
+    when they occur. Finally, we specify the arguments for the session, which will be passed to the _start 
+    callback when the session is created. The argument we specify is the input filename, which ends up 
+    being $_[ARG0] in the _start handler.</p>
+     
+   <p>The heap (accessed through the parameter $_[HEAP] in any POE callback) is a place to store arbitrary 
+    data. It is a hashref. We store our session on the heap so that it will have the right lifetime (it 
+    will be destroyed when this session finishes). </p>
+     
+   <p>Our last step is (always) to run the POE kernel, which starts the session and waits for events to 
+    dispatch.</p>
+ 
+  </div></div>
+  <a name="s_03"></a><div id="s_03"><div class="subheading">A Second POE Example</div><div class="subheadingText">
+    
+   <p>Now let's see how POE can be used for a different application, a TCP server. We'll implement the most 
+    basic kind of server, one that simply echoes back everything it receives. We can use the Unix 
+    <b>telnet</b> program to test it. Create a new file named <b>/perl4/poe_tcp.pl</b> as shown:</p>
+   
+<div class="listingBox"><div class="listingTitle">CODE TO ENTER:</div><div class="listing"><pre>#!/usr/local/bin/perl
+use strict;
+use warnings;
+
+use lib "$ENV{HOME}/mylib/lib/perl5";
+use POE qw(Component::Server::TCP);
+
+sub S_HND { return POE::Wheel::SocketFactory::MY_SOCKET_HANDLE }
+
+POE::Component::Server::TCP-&gt;new(
+  ClientInput =&gt; sub {
+    my ($heap, $input) = @_[HEAP, ARG0];
+    print "Read from client: $input\n";
+    $heap-&gt;{client}-&gt;put( "You said: $input" );
+  },
+  Started =&gt; sub { my $sock = $_[HEAP]{listener}[S_HND];
+                   my ($port) = Socket::sockaddr_in( getsockname($sock) );
+                   print "Listening on port $port\n" },
+);
+
+$poe_kernel-&gt;run();
+</pre></div></div>
+    
+   <p><img src="images/coderunner/save.gif"> Save and run it in 
+    the Terminal1 tab:</p>
+    
+<div class="interactiveBox"><div class="interactiveTitle">INTERACTIVE TERMINAL SESSION: Command to type</div><div class="interactive"><pre>cold:~/perl4$ <ins>./poe_tcp.pl</ins>
+Listening on port <i>51712</i></pre></div></div>
+    
+   <p>The port number will almost certainly be different now, and will probably change each time you run the program. 
+    In the Terminal2 tab, telnet to that port (enter the number you saw in Terminal1 instead of 
+    the one in <i>italics</i> below):</p>
+    
+<div class="interactiveBox"><div class="interactiveTitle">INTERACTIVE TERMINAL SESSION: Commands to type</div><div class="interactive"><pre>cold:~/perl4(2)$ <span class="purple">telnet localhost <i>51712</i></span>
+Trying 127.0.0.1...
+Connected to localhost.
+Escape character is '^]'.
+<span class="purple">Hello, POE!</span>
+You said: Hello, POE!</pre></div></div>
+    
+   <p>Every line you type in Terminal2 will be repeated back to you by the server, and logged in Terminal1. 
+    Once again, use <b>Ctrl+C</b> in Terminal1 to end the program.</p>
+    
+   <p>How does this work? It looks fairly different than it did before, but many of the same things are 
+    taking place. POE::Component::TCP
+    is at a higher level than a POE session, but it ends up creating a session to listen to a socket. The 
+    ClientInput callback is called when input is received over the socket; the input is passed in $_[ARG0].  
+    On the heap at key <b>client</b> is a POE::Wheel::ReadWrite object representing the socket that we're 
+    listening on; calling the <b>put</b> method on it sends text back to the client. </p>
+   
+   <p>To make the lines of code shorter, I created the S_HND subroutine as an alias to the subroutine 
+    that gives the index of the socket handle in the listener object on the heap. The code for returning the 
+    port we connected on is unnecessarily complex; there really ought to be a method in the component for 
+    returning it, but there isn't one. The examples on the net for this component all use explicitly named 
+    port numbers. But if we did that, and two students ran this program at the same time, one would 
+    get an error, so we don't specify a port number to listen on, which causes the operating system to assign 
+    a free one. We need this advanced code to find out which number has been assigned. </p>
+   
+  </div></div>
+  <a name="s_04"></a><div id="s_04"><div class="subheading">A Combined POE Example</div><div class="subheadingText">
+    
+   <p>Each of the last two examples did just one task at a time. Now we'll get one 
+    program to do two things at once. Edit <b>poetest.pl</b> and paste in the code from <b>poe_tcp.pl</b> as 
+    shown:</p>
+    
+<div class="listingBox"><div class="listingTitle">CODE TO EDIT:</div><div class="listing"><pre>#!/usr/local/bin/perl
+use strict;
+use warnings;
+
+use lib "$ENV{HOME}/mylib/lib/perl5";
+use POE qw(Wheel::FollowTail);
+<ins>use POE qw(Component::Server::TCP);
+
+sub S_HND { return POE::Wheel::SocketFactory::MY_SOCKET_HANDLE }
+
+</ins>my $file = shift or die "Usage: $0 &lt;file&gt;\n";
+{ open my $fh, '&lt;', $file or die "Cannot open $file: $!\n" }
+
+POE::Session-&gt;create(
+  inline_states =&gt; {
+    _start =&gt; sub {
+      $_[HEAP]{tailer} = POE::Wheel::FollowTail-&gt;new(
+        Filename   =&gt; $_[ARG0],
+        InputEvent =&gt; 'handle_input',
+        ErrorEvent =&gt; 'handle_error',
+        SeekBack   =&gt; 0,
+      );
+    },
+    handle_input =&gt; sub { print "Input: $_[ARG0]\n" },
+    handle_error =&gt; sub { warn shift },
+  },
+  args =&gt; [$file],
+);
+<ins>
+POE::Component::Server::TCP-&gt;new(
+  ClientInput =&gt; sub {
+    my ($heap, $input) = @_[HEAP, ARG0];
+    print "Read from client: $input\n";
+    $heap-&gt;{client}-&gt;put( "You said: $input" );
+  },
+  Started =&gt; sub { my $sock = $_[HEAP]{listener}[S_HND];
+                   my ($port) = Socket::sockaddr_in( getsockname($sock) );
+                   print "Listening on port $port\n" },
+);
+
+</ins>$poe_kernel-&gt;run();</pre></div></div>
+    
+   <p>The new code is just the pasted in declaration code from <b>poe_tcp.pl</b>. Save and run that 
+    program in Terminal1:</p>
+   
+<div class="interactiveBox"><div class="interactiveTitle">INTERACTIVE TERMINAL SESSION: Command to type</div><div class="interactive"><pre>cold:~/perl4$ <ins>touch testfile</ins>
+cold:~/perl4$ <ins>./poetest.pl testfile</ins>
+Listening on port 34280</pre></div></div>
+    
+   <p>In Terminal1, you can do <i>both</i> kinds of input like before:</p>
+   
+<div class="interactiveBox"><div class="interactiveTitle">INTERACTIVE TERMINAL SESSION: Commands to type</div><div class="interactive"><pre>cold:~/perl4(2)$ <span class="purple">echo "Hello World" &gt;&gt; testfile</span>
+cold:~/perl4(2)$ <span class="purple">telnet localhost 34280</span>
+Trying http://www.wpclipart.com/household/kitchen/utensils/fork.png127.0.0.1...
+Connected to localhost.
+Escape character is '^]'.
+<span class="purple">Hello, POE!</span>
+You said: Hello, POE!
+<span class="purple">^]</span>
+telnet&gt; <span class="purple">quit</span>
+cold:~/perl4(2)$ <span class="purple">date &gt;&gt; testfile</span></pre></div></div>
+    
+   <p>The command sequence to exit telnet (because we never gave our server any conditions under which to 
+    drop the connection itself) is <b>Ctrl+]</b> to get the telnet prompt, then <b>quit</b> to exit.</p>
+    
+   <p>You can see here that the POE program was able to listen for <i>both</i> kinds of event simultaneously, 
+    and respond to each one as it occurred. Each session did the combined work of the 
+    the previous two individual programs. POE programs are capable of registering for and 
+    responding to arbitrary numbers of event types and events. See how POE is more like an operating 
+    system than a program?</p>
+   
+  </div></div>
+  
+  <p>If you aren't ready to create your own POE programs just yet, that's entirely understandable. This 
+   lesson was intended to give you a feel for what's possible with POE. If you'd like a more in depth exploration of POE, 
+   consider checking out
+   the <i>second</i> edition of "<a href="http://shop.oreilly.com/product/9780596004569.do?sortby=publicationDate" target="_blank">Advanced Perl Programming</a>" from O'Reilly (specifically, chapter 7). </p>
+   
+ </div>
+ 
+ <p>I hope you enjoyed this lesson (not for the weak by any means!), and the new <i>utensils</i> you've acquired from it!</p>
+ 
+ <p><div class="c"><img src="images/lessonImages/fork.png" height="200"></div></p>
+ 
+ <p>Once you finish the lesson, go back to the syllabus to complete the homework.</p>
+ <p>See you in the next lesson!</p>
+<div class="footer"><div id="timeSurvey"></div>				
+				Copyright © 1998-2014 O'Reilly Media, Inc.<br><img src="https://courses.oreillyschool.com/common/cclicense.png"><br>
+				This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 Unported License.<br>
+				See <a href="http://creativecommons.org/licenses/by-sa/3.0/legalcode">http://creativecommons.org/licenses/by-sa/3.0/legalcode</a> 
+				for more information.
+				</div><iframe id="t" width="1" height="1" border="0" style="display:none"></iframe><script language="javascript">bodyLoaded();</script><script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+  ga('create', 'UA-44720547-1', 'oreillyschool.com');
+  ga('send', 'pageview');
+</script></body></html>

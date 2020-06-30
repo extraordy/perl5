@@ -1,0 +1,477 @@
+<html><!-- Copyright (c) 1998-2014 O'Reilly Media, Inc.
+			This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 Unported License.
+			See http://creativecommons.org/licenses/by-sa/3.0/legalcode for more information.
+            --><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"><link rel="stylesheet" type="text/css" href="../common/Lab.css"><script type="text/javascript" src="../common/Lab.js"></script><script language="javascript"></script><title>Parsing Web Pages</title></head><body id="body"><a name="top"></a><div class="title">Parsing Web Pages</div><div class="resize"><a href="Perl4-11.html#top" onclick="changeSize('smaller');" class="aS" title="Keep clicking to make fonts smaller">A</a><a href="Perl4-11.html#top" onclick="changeSize('larger');" class="aL" title="Keep clikcing to make fonts larger">A</a><a href="Perl4-11.html#top" onclick="lv()" class="lv" title="Adjust Page for High Contrast">HC</a><div id="fh"><p>Click on <span class="aS">A</span> to make all fonts on the page smaller.</p><p>Click on <span class="aL">A</span> to make all fonts on the page larger.</p><p>Click on <span class="lv">HC</span> to toggle high contrast mode. When you move your mouse over 
+                 some bold words in high contrast mode, related words are automatically highlighted. Text is shown
+                 in black and white. 
+             </p></div></div><hr>
+ 
+ <div class="goalTitle">Lesson Objectives</div><div class="goals">
+ When you complete this lesson, you will be able to:
+ 
+ 
+  
+   <ul><li>perform <a href="Perl4-11.html#url_manipulation">URL Manipulation</a>.</li><li><a href="Perl4-11.html#parsing_html">Parse HTML</a>.</li></ul>
+   
+   
+  
+ </div><hr>
+ 
+ <p>We've learned to send and receive HTTP messages, now we'll turn our attention to interpreting 
+  the results. Even if you don't plan to do much screen scraping, this lesson will give you
+  a good understanding of parsing markup, which you'll need to have when you parse XML.</p>
+ 
+
+
+ 
+ <a href="Perl4-11.html" name="url_manipulation"></a>
+ <a name="h_01"></a><div class="heading">URL Manipulation</div><div class="headingText">
+  
+  <p>Let's start by going over URLs (Uniform Resource Locators) like this one: 
+   http://www.oreillyschool.com/contact.php. The basic structure of a URL is:</p>
+  
+  <div class="observeBox"><div class="observeTitle">OBSERVE: URL Structure</div><div class="observe"><pre>
+   <span class="darkred">protocol</span>://<span class="darkblue">server</span>/<span class="darkred">request</span>
+   <span class="darkgreen">http</span>://<span class="darkblue">www.oreillyschool.com</span>/<span class="darkred">contact.php</span></pre></div></div>
+  
+  <p>So, should the client use HTTP commands over port 80, or FTP commands over port 21? 
+   The <span class="darkgreen">protocol</span> (or <i>scheme</i>) tells a client which method to use to talk 
+   to the <span class="darkblue">server</span>. 
+   Each protocol has a default port number associated with it that can be overridden by embedding an alternative at the end of the 
+   server after a colon; for example:</p>
+  
+<div class="observeBox"><div class="observeTitle">OBSERVE:</div><div class="observe"><pre><span class="darkgreen">http</span>://<span class="darkblue">www.oreillyschool.com:8080</span>/<span class="darkred">contact.php</span></pre></div></div>
+  
+  <p>The <span class="darkred">request</span> gets sent to the server. <i>Clients</i> may break this 
+   up when using protocols other than HTTP, but when using HTTP, that request is sent to the server exactly as it is. 
+   You may think that because the request looks like, say, <b>/stocks/query.cgi?ticker=ORYL</b>, that it has to 
+   call a program and pass a parameter to it, but in fact, the server can do anything 
+   it wants with that request. It may just serve back an image. A request like <b>/help.html</b> might 
+   look like it's going to return an HTML page, but instead the server might run a program that creates and 
+   returns a PDF document. The server is free to choose, but most servers are configured to take specific actions in response to 
+   requests. The server presumes that there is a certain structure to requests; we'll go over how to 
+   interpret that structure.</p>
+  
+  <a name="s_01"></a><div id="s_01"><div class="subheading">URI.pm</div><div class="subheadingText">
+   
+   <p>While you might be tempted to parse URLs with a regular expression, we have a better module 
+    already installed for this: <a href="http://search.cpan.org/dist/URI/URI.pm" target="_blank">URI</a>, 
+    which stands for Uniform Resource Identifier. Let's create a URL-parsing program using URI. Type the 
+    code below as shown:</p>
+   
+<div class="listingBox"><div class="listingTitle">CODE TO TYPE:</div><div class="listing"><pre>#!/usr/local/bin/perl
+use strict;
+use warnings;
+
+use lib "$ENV{HOME}/mylib/lib/perl5";
+use URI;
+
+while ( &lt;DATA&gt; )
+{
+  chomp( my $url = $_ );
+  print "Analyzing $url:\n";
+  my $uri = URI-&gt;new( $url );
+  for my $method (qw( scheme host port userinfo path query  ) )
+  {
+    printf "%10s\t", $method;
+    print defined($uri-&gt;$method)? $uri-&gt;$method : '&lt;unset&gt;', "\n";
+  }
+}
+
+__END__
+http://www.oreillyschool.com/
+ftp://ftp.oreillyschool.com/support/perl4/files.tgz
+http://www.oreillyschool.com/contact.html
+http://user@www.oreillyschool.com/contact.html
+https://user:password@www.oreillyschool.com/contact.html
+http://www.oreillyschool.com:8080/
+http://www.oreillyschool.com/contact.cgi/more/info
+http://www.oreillyschool.com/contact.cgi?type=compliment&amp;dest=scott
+</pre></div></div>
+  
+   <p><img src="images/coderunner/save.gif"> Save it as <b>/perl4/uri.pl</b> and run it:</p>
+   
+<div class="interactiveBox"><div class="interactiveTitle">INTERACTIVE TERMINAL SESSION: Command to type</div><div class="interactive"><pre>cold:~$ <ins>cd perl4</ins>
+cold:~/perl4$ <ins>./uri.pl</ins>
+Analyzing http://www.oreillyschool.com/:
+    scheme      http
+      host      www.oreillyschool.com
+      port      80
+  userinfo      &lt;unset&gt;
+      path      /
+     query      &lt;unset&gt;
+Analyzing ftp://ftp.oreillyschool.com/support/perl4/files.tgz:
+    scheme      ftp
+      host      ftp.oreillyschool.com
+      port      21
+  userinfo      &lt;unset&gt;
+      path      /support/perl4/files.tgz
+     query      &lt;unset&gt;
+[...]
+</pre></div></div>
+   
+   <p>There are many other methods available, but these are the most useful for parsing URLs. If you're 
+    using code that parses a web page and pulls a URL out of it as a URI.pm object, there is one more method 
+    that you'll want to know about: <b>abs</b>. Let's create another program that uses the <b>abs</b> method:</p>
+   
+<div class="listingBox"><div class="listingTitle">CODE TO ENTER:</div><div class="listing"><pre>#!/usr/local/bin/perl
+use strict;
+use warnings;
+
+use lib "$ENV{HOME}/mylib/lib/perl5";
+use URI;
+
+my $page          = 'http://www.oreillyschool.com/courses/perl4/faq.html';
+my $url_relative  = '../images/camel.png';
+
+my $uri = URI-&gt;new( $url_relative );
+print $uri-&gt;abs( $page ), "\n";
+</pre></div></div>
+   
+   <p><img src="images/coderunner/save.gif"> Save it as <b>/perl4/uri_abs.pl</b> and run it:</p>
+   
+<div class="interactiveBox"><div class="interactiveTitle">INTERACTIVE TERMINAL SESSION: Command to type</div><div class="interactive"><pre>cold:~/perl4$ <ins>./uri_abs.pl</ins>
+http://www.oreillyschool.com/courses/images/camel.png</pre></div></div>
+   
+   <p>Imagine that a program pulled down the content for the page at 
+    <b>http://www.oreillyschool.com/courses/perl4/faq.html</b> and encountered within it, an IMG tag using the relative 
+       URL ../images/camel.png. <b>URI.pm</b> allows you to figure out its corresponding absolute URL, 
+    the URL that a browser would load when looking at that <b>faq.html</b> page.</p>
+  
+  </div></div>
+ </div>
+ <a href="Perl4-11.html" name="parsing_html"></a>
+ <a name="h_02"></a><div class="heading">Parsing HTML</div><div class="headingText">
+   
+  <p>In general, regular expressions are usually inadequate for parsing HTML, because of the possibility of nesting and comments; just try 
+   writing code to extract text from this:</p>
+   
+<div class="observeBox"><div class="observeTitle">OBSERVE: HTML fragment</div><div class="observe"><pre>&lt;P&gt;Come &lt;I&gt;here&amp;#33;&lt;/I&gt; Mr. Watson, &lt;!-- Really need an entity for
+an exclamation mark here?  How about &lt;B&gt;!&lt;/B&gt; 
+instead? --&gt; &lt;A HREF="http://en.wikipedia.org/wiki/Alexander_Graham_Bell"&gt;I&lt;/A&gt; need you.
+</pre></div></div>
+   
+  <p>There's a great possiblity of syntax variation even in well-formed HTML (let alone broken HTML that browsers often render anyway). 
+   If you're writing code to extract text from a web page 
+  that you or a trusted colleague maintains, and you're certain that the format won't 
+   change—then you can go ahead and use regular expressions. You were able 
+   to do the assignment in the last lesson because I made sure that the string you were looking for was the 
+   only thing inside any tag.</p>
+   
+  <p>There are modules designed to do the heavy lifting of HTML parsing for you; we'll look at those 
+   now. First, install the modules you'll need for this lesson. Type the command below as shown:</p>
+   
+<div class="interactiveBox"><div class="interactiveTitle">INTERACTIVE TERMINAL SESSION: Command to type</div><div class="interactive"><pre>cold:~/perl4$ <ins>PERL5LIB=~/mylib/lib/perl5 cpan HTML::Parser HTML::TreeBuilder HTML::TableParser</ins>
+[output omitted]
+/usr/bin/make install -- OK
+</pre></div></div>
+   
+  <a name="s_01"></a><div id="s_01"><div class="subheading">Parsing Tables</div><div class="subheadingText">
+   
+   <p>While the increasing popularity of cascading style sheets has made the &lt;DIV&gt; tag increasingly common, 
+       tables are still the prevalent method for presenting tabular information; let's see how to 
+    parse them. We'll use the HTML::TableParser module in an example. Once again, I've mirrored an 
+    external page to the student machine so you can fetch it. You can bring up 
+     <a href="http://perl4.oreillyschool.com/oscon-mirror/" target="_blank">http://perl4.oreillyschool.com/oscon-mirror/</a> 
+       in your browser and see what it looks like. This was the schedule 
+    for O'Reilly's Open Source Conference in Portland, Oregon, in 2006. Your course author gave a presentation at that conference; let's 
+    write a program to find out exactly where. Create a new file in the CodeRunner editor as shown:</p>
+   
+<div class="listingBox"><div class="listingTitle">CODE TO ENTER:</div><div class="listing"><pre>#!/usr/local/bin/perl
+use strict;
+use warnings;
+
+use lib "$ENV{HOME}/mylib/lib/perl5";
+use HTML::TableParser;
+use WWW::Mechanize;
+
+my $URL = 'http://perl4.oreillyschool.com/oscon-mirror/';
+
+my $mech = WWW::Mechanize-&gt;new;
+$mech-&gt;get( $URL );
+
+my @reqs = ( { cols =&gt; qr/Portland/, hdr =&gt; \&amp;hdr, row =&gt; \&amp;row } );
+my %opts = ( DecodeNBSP =&gt; 1, Trim =&gt; 1, Chomp =&gt; 1, MultiMatch =&gt; 1 );
+my $tp = HTML::TableParser-&gt;new( \@reqs, \%opts );
+$tp-&gt;parse( $mech-&gt;content );
+
+my @Rooms;
+
+sub hdr
+{
+  my ( undef, undef, $cols ) = @_;
+
+  # @$cols contains room names right before we get to session content
+  @Rooms = @$cols;
+}
+
+
+sub row
+{
+  my ( undef, undef, $cols ) = @_;
+  for my $index ( 0 .. $#$cols )
+  {
+    next unless $cols-&gt;[$index] =~ /Peter Scott/;
+    print "Found course author at $cols-&gt;[0] in $Rooms[$index]\n";
+  }
+}
+</pre></div></div>
+   
+   <p><img src="images/coderunner/save.gif"> Save it as <b>/perl4/table_parse.pl</b> and run it. You'll 
+    see my name, Peter Scott, appearing in two sessions, along with times, dates, and room numbers. How 
+    did we do this?</p>
+
+<div class="observeBox"><div class="observeTitle">OBSERVE: table_parse.pl</div><div class="observe"><pre>
+<span class="darkblue">$mech-&gt;get( $URL );</span>
+
+my <span class="darkgreen">@reqs</span> = ( { cols =&gt; qr/Portland/, <span class="orange">hdr =&gt; \&amp;hdr</span>, <span class="green">row =&gt; \&amp;row</span> } );
+my %opts = ( <span class="purple">DecodeNBSP</span> =&gt; 1, Trim =&gt; 1, Chomp =&gt; 1, <span class="darkred">MultiMatch</span> =&gt; 1 );
+my $tp = HTML::TableParser-&gt;new( \@reqs, \%opts );
+$tp-&gt;<span class="blue">parse(</span> $mech-&gt;content <span class="blue">)</span>;
+
+my @Rooms;
+
+sub <span class="orange">hdr</span>
+{
+  my ( undef, undef, $cols ) = @_;
+
+  # @$cols contains room names right before we get to session content
+  @Rooms = @$cols;
+}
+
+
+sub <span class="green">row</span>
+{
+  my ( undef, undef, $cols ) = @_;
+  for my $index ( 0 .. $#$cols )
+  {
+    next unless $cols-&gt;[$index] =~ /Peter Scott/;
+    print "Found course author at $cols-&gt;[0] in $Rooms[$index]\n";
+  }
+}
+</pre></div></div>   
+   
+   <p>First, we fetched the page with WWW::Mechanize (<span class="darkblue">$mech-&gt;get( $URL )</span>). Then, we set 
+    up these <span class="darkgreen">requirements</span> for HTML::TableParser: look for a table with a header column 
+    containing "Portland." That requirement matches the five tables that contain schedule data; the sixth wraps all of them
+    together to form the page and does not have a header containing "Portland." HTML::TableParser would 
+    ordinarily stop when it found the first table matching this requirement, but we want all of them, so we specify 
+    <span class="darkred">MultiMatch</span>. And because the data contains many <b>&amp;nbsp;</b> entities that would 
+    otherwise be turned into characters that don't actually match <b>\s</b>, we specify 
+    <span class="purple">DecodeNBSP</span>. </p>
+   
+   <p>We tell the parser that whenever it encounters a <span class="green">row</span>, it should call the <span class="green">row</span> 
+    callback, and whenever it encounters a <span class="orange">header row</span>, it should call the <span class="orange">hdr</span> 
+    callback. Each of those is called with the same data; we're not interested in the first two arguments so we 
+    assign them to undef.</p>
+   
+   <p>Then we call the <span class="blue">parse</span> method, passing the page content as the HTML to be parsed. This causes 
+    the parser to go through all of the tags on the page, picking the data apart as it goes, and whenever it 
+    encounters a closing <b>&lt;/TR&gt;</b> tag, it will call <span class="orange">hdr</span> (if it finds a 
+    <b>&lt;TH&gt;</b> tag in the row) or else it calls <span class="green">row</span>.</p>
+   
+   <p>Our strategy for finding the room is to save the last header row we see, which contains that information. 
+    (HTML::TableParser merges in the data from the previous header row that spanned across all 
+    columns.) We save that, and then when we find a match for the text we want; the column index 
+    we find it in is also the index of the room description in @Rooms.</p>
+   
+   <p>One final note: The <span class="blue">parse</span> method actually does not come from HTML::TableParser; it comes
+    from a more basic module, HTML::Parser, which derived classes like HTML::TableParser are able to use to  
+    find all the individual tags (tokens delimited by angle brackets, for the most part) in HTML.</p>
+ 
+  </div></div>
+  <a name="s_02"></a><div id="s_02"><div class="subheading">Parsing HTML</div><div class="subheadingText">
+   
+   <p>An HTML page can be seen not just as a string of characters, but also as a hierarchical structure defined
+    by the scope of the tags, or elements, within it. Its tree-like structure looks like this:</p>
+     
+   
+   <p><div class="c"><img src="http://oreilly.com/catalog/jscript4/chapter/js4_1701.gif"></div></p>
+     
+   <p>The HTML::TreeBuilder module turns an HTML page into a data structure like that, where each node in the
+    tree is a member of the HTML::Element class. Let's check out at an example.</p>
+   
+    <p>Go to <a href="http://perl4.oreillyschool.com/oscon-mirror/courses/index.html" target="_blank">http://perl4.oreillyschool.com/oscon-mirror/courses/index.html</a> in your browser, so you'll 
+    have an idea of what we're parsing. Now, create a new file in CodeRunner as shown:</p>
+     
+<div class="listingBox"><div class="listingTitle">CODE TO TYPE:</div><div class="listing"><pre>#!/usr/local/bin/perl
+use strict;
+use warnings;
+
+use lib "$ENV{HOME}/mylib/lib/perl5";
+use HTML::TreeBuilder;
+use LWP::Simple;
+
+my $URL = 'http://perl4.oreillyschool.com/oscon-mirror/courses/index.html';
+
+my $tree = HTML::TreeBuilder-&gt;new;
+$tree-&gt;parse( get( $URL ) );
+
+my @elements = $tree-&gt;look_down( _tag =&gt; "a", \&amp;in_list );
+for my $element ( @elements )
+{
+  print $element-&gt;as_text, "\n";
+}
+
+
+sub in_list
+{
+  my $element = shift;
+
+  my ($parent_tag) = $element-&gt;lineage_tag_names;
+  $parent_tag eq 'li' &amp;&amp; ! $element-&gt;look_up( _tag =&gt; 'div', \&amp;is_nav );
+}
+
+
+sub is_nav
+{
+  my $element = shift;
+
+  my $attr = $element-&gt;attr( 'id' ) || $element-&gt;attr( 'class' );
+
+  return $attr &amp;&amp; $attr =~ /nav/;
+}
+</pre></div></div>
+     
+   <p>Because we don't need to navigate, instead of using the lengthier WWW::Mechanize module,  
+    we used the <b>get()</b> function of LWP::Simple, a module that was installed when you installed 
+    WWW::Mechanize.</p>
+      
+   <p><img src="images/coderunner/save.gif"> Save it as <b>/perl4/course_finder.pl</b> and run it; you'll 
+    see:</p>
+     
+<div class="interactiveBox"><div class="interactiveTitle">INTERACTIVE TERMINAL SESSION: Command to type</div><div class="interactive"><pre>cold:~/perl4$ <ins>./course_finder.pl</ins>
+Perl Programming 3: Advanced Perl
+Python Programming 3: The Python Environment
+Linux/Unix Sysadmin I: The Basics of System Administration
+[...]</pre></div></div>
+     
+   <p>The program has extracted the courses that are links after bullet points. How?</p>
+     
+   <p>The HTML::TreeBuilder object is clever: it inherits not just from HTML::Parser, but also from 
+    HTML::Element. So once you have called the <b>parse</b> method from HTML::Parser, the $tree object becomes 
+    the root element of the tree it just built from the HTML document. Before you go further, take a look at the 
+    documentation for the <b>tag</b> and the <b>look_down</b> and <b>look_up</b> methods of HTML::Element at 
+    <a href="http://search.cpan.org/perldoc?HTML::Element" target="_blank">http://search.cpan.org/perldoc?HTML::Element</a> before you go on.</p>
+   
+   <p>This line:</p>
+     
+<div class="observeBox"><div class="observeTitle">OBSERVE: Code fragment</div><div class="observe"><pre>my <span class="darkblue">@elements</span> = $tree-&gt;<span class="darkgreen">look_down</span>( _tag =&gt; "a", \&amp;<span class="darkred">in_list</span> );
+</pre></div></div>
+     
+   <p>...extracts into <span class="darkblue">@elements</span>, all elements in the tree that are <b>&lt;A&gt;</b> tags, 
+    that also meet the criteria of the <span class="darkred">in_list</span> callback (which must return true). The 
+    <span class="darkgreen">look_down</span> method scans every element, testing to see if it meets these two 
+    criteria. We have decided (after inspecting the HTML) that we want the text from certain links. The 
+    <span class="darkred">in_list</span> callback decides which links: First, the link must be contained within a 
+    <b>&lt;LI&gt;</b> tag. Second, it must <i>not</i> have any ancestors that are <b>&lt;DIV&gt;</b> 
+    tags meeting the criteria of the <b>in_nav</b> callback: either the <b>class</b> or <b>id</b> attribute 
+    of the <b>&lt;DIV&gt;</b> tag contains the string <b>nav</b>. Checking out the HTML source code will help make this logic more clear.</p>
+ 
+  </div></div>
+  <a name="s_03"></a><div id="s_03"><div class="subheading">Transforming HTML</div><div class="subheadingText">
+    
+   <p>HTML::TreeParser and HTML::Element provide elegant ways to interpret HTML, but you've seen
+    how tedious it can be to break apart pages that weren't designed with parsing in
+    mind.  (Our example page has some <b>&lt;DIV&gt;</b> tags that use the attribute <b>ID </b> and some that
+    use the attribute <b>CLASS</b>.)  But HTML::TreeParser and HTML::Element can be great tools to extract and
+    transform HTML.</p>
+   
+    <p>Bring up <a href="http://perl4.oreillyschool.com/conf-mirror/conferences.oreillynet.com/" target="_blank">http://perl4.oreillyschool.com/conf-mirror/conferences.oreillynet.com/</a> (a copy of the 
+    O'Reilly Conferences page) in your browser and look it over. Now suppose we want to replace the 
+    "O'Reilly Conference News" section with the section of HTML containing the course list we just 
+    extracted. Copy and paste the contents of <b>course_finder.pl</b> into
+    a new file in the CodeRunner editor. Modify the code as shown:</p>
+   
+<div class="listingBox"><div class="listingTitle">CODE TO EDIT:</div><div class="listing"><pre>#!/usr/local/bin/perl
+use strict;
+use warnings;
+
+<del>use lib "$ENV{HOME}/mylib/lib/perl5";</del>
+<ins>use lib "../mylib/lib/perl5";
+use CGI qw(header);</ins>
+use HTML::TreeBuilder;
+use LWP::Simple;
+
+  <del>my $URL = 'http://perl4.oreillyschool.com/ost-mirror/courses/index.html';</del>
+  <ins>my $SOURCE = 'http://perl4.oreillyschool.com/ost-mirror/courses/index.html';
+  my $TARGET = 'http://perl4.oreillyschool.com/conf-mirror/conferences.oreillynet.com/';</ins>
+
+my $tree = HTML::TreeBuilder-&gt;new;
+<del>$tree-&gt;parse( get( $URL ) );</del>
+<ins>$tree-&gt;parse( get( $SOURCE ) );</ins>
+ 
+my @elements = $tree-&gt;look_down( _tag =&gt; "a", \&amp;in_list );
+<del>for my $element ( @elements )
+{
+  print $element-&gt;as_text, "\n";
+}</del>
+
+<ins>my $container = find_list_parent( $elements[0] );
+
+my $new_tree = HTML::TreeBuilder-&gt;new;
+$new_tree-&gt;parse( get( $TARGET ) );
+my $h3 = $new_tree-&gt;look_down( _tag =&gt; "h3",
+                        sub { shift-&gt;as_text eq "O'Reilly Conference News" } );
+my $target_element = $h3-&gt;parent;
+$target_element-&gt;delete_content;
+$target_element-&gt;push_content( $container );
+print header, $new_tree-&gt;as_HTML;
+
+
+sub find_list_parent
+{
+  my $element = shift;
+
+  my ($list_element) = $element-&gt;look_up( _tag =&gt; 'ul' );
+  return $list_element-&gt;parent;
+}</ins>
+
+
+sub in_list
+{
+  my $element = shift;
+
+  my ($parent_tag) = $element-&gt;lineage_tag_names;
+  $parent_tag eq 'li' &amp;&amp; ! $element-&gt;look_up( _tag =&gt; 'div', \&amp;is_nav );
+}
+
+
+sub is_nav
+{
+  my $element = shift;
+
+  my $attr = $element-&gt;attr( 'id' ) || $element-&gt;attr( 'class' );
+
+  return $attr &amp;&amp; $attr =~ /nav/;
+}</pre></div></div>
+    
+   <p><img src="images/coderunner/save.gif"> Save it as <b>/perl4/course_extract.cgi</b>, then bring it 
+    up in your browser (using <b>http://<i>your_login</i>.oreillystudent.com/perl4/course_extract.cgi</b>). You'll 
+    see the same page as before, only the O'Reilly Conference listing is replaced by 
+    the course listing. (No disrepect to O'Reilly conferences, of course. We love them!)</p>
+    
+   <p>So, how did this work? At first we found the same elements as before, and reused that code. Then we took just 
+    the first element, and used it to find the parent of the list container (<b>&lt;UL&gt;</b>) that enclosed it. 
+    This is the section tag that holds the block of HTML that we want to copy. Then we parsed the target 
+    page, searched for the <b>&lt;H3&gt;</b> tag that marked the section we wanted to replace, found its 
+    parent, deleted its content, and added as content, the tree we extracted from the previous page. And there you have it!</p>
+      
+  </div></div>
+ </div>
+ 
+ <p>Once you finish the lesson, go back to the syllabus to complete the homework.</p>
+   
+<div class="footer"><div id="timeSurvey"></div>				
+				Copyright © 1998-2014 O'Reilly Media, Inc.<br><img src="https://courses.oreillyschool.com/common/cclicense.png"><br>
+				This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 Unported License.<br>
+				See <a href="http://creativecommons.org/licenses/by-sa/3.0/legalcode">http://creativecommons.org/licenses/by-sa/3.0/legalcode</a> 
+				for more information.
+				</div><iframe id="t" width="1" height="1" border="0" style="display:none"></iframe><script language="javascript">bodyLoaded();</script><script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+  ga('create', 'UA-44720547-1', 'oreillyschool.com');
+  ga('send', 'pageview');
+</script></body></html>

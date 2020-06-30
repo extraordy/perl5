@@ -1,0 +1,611 @@
+<html><!-- Copyright (c) 1998-2014 O'Reilly Media, Inc.
+			This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 Unported License.
+			See http://creativecommons.org/licenses/by-sa/3.0/legalcode for more information.
+            --><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"><link rel="stylesheet" type="text/css" href="../common/Lab.css"><script type="text/javascript" src="../common/Lab.js"></script><script language="javascript"></script><title>Opening Filehandles</title></head><body id="body"><a name="top"></a><div class="title">Opening Filehandles</div><div class="resize"><a href="Perl2-02.html#top" onclick="changeSize('smaller');" class="aS" title="Keep clicking to make fonts smaller">A</a><a href="Perl2-02.html#top" onclick="changeSize('larger');" class="aL" title="Keep clikcing to make fonts larger">A</a><a href="Perl2-02.html#top" onclick="lv()" class="lv" title="Adjust Page for High Contrast">HC</a><div id="fh"><p>Click on <span class="aS">A</span> to make all fonts on the page smaller.</p><p>Click on <span class="aL">A</span> to make all fonts on the page larger.</p><p>Click on <span class="lv">HC</span> to toggle high contrast mode. When you move your mouse over 
+                 some bold words in high contrast mode, related words are automatically highlighted. Text is shown
+                 in black and white. 
+             </p></div></div><hr>
+ 
+ <div class="goalTitle">Lesson Objectives</div><div class="goals">
+  
+  
+  When you complete this lesson, you will be able to:
+  
+  <ul><li>open specific files more efficiently using <i>short-circuiting</i>.</li><li>open a file.</li><li>write and overwrite a datafile.</li></ul>
+ </div><hr>
+  
+  
+  <p>Welcome to lesson two! In this lesson, we'll look at how to open specific files by a much more efficient 
+   mechanism than naming them on the command line or playing games with <span class="red">@ARGV</span>. But first, we'll see 
+   how there is yet another way to express a conditional statement (don't worry, this is directly related to 
+   this lesson's topic, as you will soon see).</p>
+  
+  <a name="h_01"></a><div class="heading">Yet Another Conditional</div><div class="headingText">
+      
+   <p>As we discussed in the last lesson, the postfixed conditional modifiers may <i>look</i> like they're 
+    the wrong way around, but they really aren't; and sometimes we talk that way anyway ("Make me a sandwich, 
+    if you have the time"), so postfixed modifiers can be a natural way of expressing yourself in Perl.</p>
+   
+   <p>But if you still don't like the look of clauses in that order, you don't have to use postfixed 
+    modifiers. Remember Perl's motto: "There's More Than One Way To Do 
+    It" (TMTOWTDI).  There is a <i>third</i> option.  Remember the <span class="blue">&amp;&amp;</span> operator, meaning
+    "and"? </p>
+ 
+<div class="observeBox"><div class="observeTitle">&amp;&amp; example</div><div class="observe"><pre>
+if ( $count &gt; 1 <span class="blue">&amp;&amp;</span> $item eq "cereal" )
+</pre></div></div>     
+   
+   <p>Let's investigate; create <span class="darkred">test_and.pl</span> as shown:</p>
+   
+<div class="listingBox"><div class="listingTitle">CODE TO TYPE: test_and.pl</div><div class="listing"><pre><ins>#!/usr/bin/perl
+use strict;
+use warnings;
+
+my $count = 2;
+if ( $count &lt; 1 &amp;&amp; item_test() )
+{
+  print "Don't expect to see this\n";
+}
+else
+{
+  print "Failed conditional\n";
+}
+
+sub item_test
+{
+  print "Don't expect to see this either\n";
+}
+</ins></pre></div></div>
+   
+   <p><img src="images/coderunner/checksyntax.JPG"> and run it.</p>
+   
+<div class="interactiveBox"><div class="interactiveTitle">INTERACTIVE TERMINAL SESSION</div><div class="interactive"><pre>cold:~$ <ins>cd perl2</ins>
+cold:~/perl2$ <ins>./test_and.pl</ins>                                                                                                                                                        
+Failed conditional
+cold:~/perl2$
+</pre></div></div>
+   
+   <p>Perl didn't even <i>call</i> the <span class="darkgreen">item_test</span> subroutine to find out its 
+    value—it didn't need to know!</p>
+   
+   <p>We call this <i>short-circuiting</i>; Perl does not evaluate the right side if it would make no 
+    difference to the result of the expression. If <span class="red">$count</span> is not less than 1, the result of  
+    <span class="darkgreen">item_test()</span> is irrelevant, so Perl saves time and doesn't bother; it just returns 
+    false as the result of the whole expression straight away.</p>
+
+   <p>Short-circuiting causes <span class="blue">&amp;&amp;</span> to behave just the same as an <span class="purple">if</span> 
+    statement would; if the left side (condition) is true, then evaluate the right side (conditionally executed 
+    block). Even though Perl computes a value for the <span class="blue">&amp;&amp;</span> expression, we don't have to 
+    use it. So we could write our postfixed example from the previous lesson as: </p>
+    
+<div class="observeBox"><div class="observeTitle">OBSERVE: &amp;&amp; for control flow</div><div class="observe"><pre>
+<span class="red">$car_type</span> eq <span class="orange">'hybrid'</span> <span class="blue">&amp;&amp;</span> <span class="darkgreen">print</span> <span class="orange">"Check remaining battery life\n"</span>;
+</pre></div></div>
+   
+   <p>How about that! But there is one change we should consider. There's 
+    another form of the <span class="blue">&amp;&amp;</span> operator that means <i>exactly</i> the same thing: <span class="blue">and</span>. 
+    The change might seem insignificant at first, but there is a crucial 
+    difference between the two options here. The <span class="blue">&amp;&amp;</span> operator has a relatively 
+    high <i>precedence</i>, which means that 
+    Perl will evaluate the <span class="blue">&amp;&amp;</span> operator before many other operators in an expression. 
+    (Precedence is the reason that <span class="blue">4 + 5 * 3</span> evaluates to 19 rather than 27; the 
+    <span class="blue">*</span> has a higher precedence than the <span class="blue">+</span> and hence <span class="blue">5 * 3</span> is computed 
+    before <span class="blue">4 +</span>.)</p>
+   
+   <p>But the <span class="blue">and</span> operator has a very <i>low</i> precedence. In fact, nothing comes lower than 
+    <span class="blue">and</span>. So we'll want to use <span class="blue">and</span> instead of <span class="blue">&amp;&amp;</span> to 
+     control flow (that is, as an alternative to an <span class="purple">if</span> statement), otherwise we 
+    could get into trouble. Suppose we were writing an <span class="blue">&amp;&amp;</span> version of this statement:</p>
+   
+<div class="observeBox"><div class="observeTitle">OBSERVE: if example</div><div class="observe"><pre>
+<span class="purple">if</span> ( <span class="darkgreen">length</span> <span class="red">$title</span> &gt; 1 )
+{
+  <span class="red">$print_title</span> = <span class="red">$TRUE</span>;
+}
+</pre></div></div>
+   
+   <p>If we write that as: </p>
+   
+   <div class="observeBox"><div class="observeTitle">OBSERVE: &amp;&amp; example</div><div class="observe"><pre>
+<span class="darkgreen">length</span> <span class="red">$title</span> &gt; 1 <span class="blue">&amp;&amp;</span> <span class="red">$print_title</span> = <span class="red">$TRUE</span>;
+</pre></div></div>
+   
+   <p>...we get a compilation error. Try it now to see what the error is; create <span class="darkred">and_error.pl</span> as shown:</p>
+
+<div class="listingBox"><div class="listingTitle">CODE TO TYPE: and_error.pl</div><div class="listing"><pre><ins>#!/usr/bin/perl
+use strict;
+use warnings;
+
+my $TRUE = 1;
+my $title = "Intermediate Perl";
+my $print_title;
+
+length $title &gt; 1 &amp;&amp; $print_title = $TRUE;</ins>
+</pre></div></div>
+    
+   <p><img src="images/coderunner/checksyntax.JPG">, saving it in your <b>/perl2</b> folder as 
+    <b>and_error.pl</b>:</p> 
+   
+   <p><div class="c"><img src="images/lessonImages/and_error_debug1.png"></div></p>
+   
+   <p>The problem lies in the high 
+    precedence of <span class="blue">&amp;&amp;</span>. (Of course, we could fix that problem by putting in parentheses, 
+    but if you follow the rule you're about to learn, you won't have to.) Modify <b>and_error.pl</b> as 
+    shown:</p>
+   
+<div class="listingBox"><div class="listingTitle">CODE TO EDIT: and_error.pl</div><div class="listing"><pre>#!/usr/bin/perl
+use strict;
+use warnings;
+
+my $TRUE = 1;
+my $title = "Intermediate Perl";
+my $print_title;
+
+length $title &gt; 1 <ins>and</ins> $print_title = $TRUE;
+</pre></div></div>
+    
+   <p><img src="images/coderunner/checksyntax.JPG"> again. Everything is fine now, because <ins>and</ins> 
+    gets evaluated "late." Now you can write the original example like this: </p>
+    
+<div class="observeBox"><div class="observeTitle">OBSERVE: and instead of postfixed if</div><div class="observe"><pre>
+<span class="red">$car_type</span> eq <span class="orange">'hybrid'</span> <span class="blue">and</span><span class="darkgreen"> print</span> <span class="orange">"Check remaining battery life\n"</span>;
+</pre></div></div>
+   
+   <p>The rule of thumb is, use <span class="blue">&amp;&amp;</span> and <span class="blue">||</span> in expressions (where a value is 
+    being calculated); use <span class="blue">and</span> and <span class="blue">or</span> for changing control flow (that is, instead 
+    of lengthier forms of <span class="purple">if</span> and <span class="purple">unless</span>).</p>
+   
+   
+   <p>To find out more about precedence, run <b>perldoc perlop</b> and look at the table in the section on 
+    Operator Precedence and Associativity.</p>
+ 
+  </div>
+  <a name="h_02"></a><div class="heading">open()</div><div class="headingText">
+   
+   <p>"You cannot open a book without learning something." -Confucius</p>
+   
+   <p>Now we'll look at how to open a file. This is an important topic. Virtually every 
+    program of any utility will require that you read information into it from some source and write 
+    information from it to some destination. The function in Perl that lets us do both is 
+    called <span class="darkgreen">open()</span>.  I recommend that you do <i>not</i> read the <b>perldoc -f</b> 
+    documentation on <span class="darkgreen">open()</span> yet, because it could confuse and overwhelm you.
+    <span class="darkgreen">open()</span> can be used for opening things other than files, and for opening things 
+    in multiple ways; the <b>perldoc -f</b> documentation covers <i>all</i> of them. Save that documentation 
+    for another time. 
+    The 
+    appropriate documentation section to read for this lesson is <b>perldoc perlopentut</b>.</p>
+   
+   <H4>Filehandles</H4>
+   
+   <p>Think about what it takes to read from a file. Every time you ask for more input, Perl has to know 
+    where it left off. Perl also has to remember other, more esoteric, information to do with things like 
+    buffers and such. You don't want to bother with all of that; you just want to get input. The way Perl 
+    remembers everything that it has to know, without bothering us with it, is to hide it all 
+    behind something called a <i>filehandle</i>. 
+    A filehandle <i>looks</i> like a scalar, but you can't do the usual scalar-ish kinds of things with it 
+    (well, you can try, but the results won't be helpful); you can only use it in file reading operations.</p>
+   
+   <p>The same is true for outputting to a file, so we use filehandles for that as well. We create a 
+    filehandle with <span class="darkgreen">open()</span>. There's another important reason 
+    for using 
+   <span class="darkgreen">open()</span>; it gives us a convenient way to find out whether we're 
+    going to be successful at our task. If we're going to read from a file, we ought to find 
+    out first of all whether it exists. But suppose we checked for that, got the answer "yes," and then went 
+    to read from the file, but in between those two operations, someone deleted the file? Hmm. Fortunately,  
+    <span class="darkgreen">open()</span> acts as a kind of contract with the computer; if it is successful, 
+    you won't have to worry about someone deleting the file, because you got there first, and you'll be able 
+    to read from the file until you're done. Some operating systems achieve this by telling anyone who tries 
+    to delete a file that you've opened, that they're not allowed to delete it; some operating systems do it 
+    by deleting the file in name, but letting you continue to read the data from it until you're done, and 
+    only then releasing the space the file occupies. With me so far? Good! 
+    Similarly, if you're going to be writing to a file, you'd 
+    like to know in advance whether you have permission to do so, as that file could be located in a directory 
+    you're not allowed to change. </p>
+   
+   <p>So that's why we have filehandles. We'll make some in a minute. First, let's go over the basic form of 
+    <span class="darkgreen">open()</span>:</p>
+   
+<div class="observeBox"><div class="observeTitle">OBSERVE: generic form of open()</div><div class="observe"><pre>
+<i>boolean</i> = <span class="darkgreen">open</span> <i>filehandle, mode, filename</i>
+</pre></div></div>
+   
+   <p>This is called the <i>three-argument</i> version of <span class="darkgreen">open()</span>. 
+    There are other forms of the <span class="darkgreen">open()</span> function 
+    that have two arguments or even one argument, but we won't be addressing them in depth in this course.
+    The three-argument version is best for many reasons, primarily improved security.  
+    You'll still see programs using the two-argument form in particular, because that version
+    was widely used before the three-argument version became available in 2000. 
+    We want to learn current techniques though, so we'll stick to the <i>three-argument</i> version of <span class="darkgreen">open()</span>.</p>
+   
+   <p><span class="darkgreen">open()</span> is a function like <span class="darkgreen">print()</span>, where we typically
+    leave the parentheses off of the arguments. Put the parentheses on if you like, but most people leave them 
+    off, most of the time.</p>
+   
+   <p>Alright then, let's start creating an example and I'll explain it in detail as we go. Create 
+    <span class="darkred">make_datafile.pl</span> in your /perl2 folder, as shown:</p>
+   
+<div class="listingBox"><div class="listingTitle">CODE TO TYPE: make_datafile.pl</div><div class="listing"><pre><ins>#!/usr/bin/perl
+use strict;
+use warnings;
+
+my $DATA_FILE = 'songs.data';
+
+my $fh;
+if ( open $fh, '&gt;', $DATA_FILE )
+{
+  print {$fh} qq{2'02" Sgt. Pepper's Lonely Hearts Club Band\n};
+  print {$fh} qq{2'44" With A Little Help From My Friends\n};
+  print {$fh} qq{3'29" Lucy In The Sky With Diamonds\n};
+  close $fh;
+}
+else
+{
+  die "Couldn't open $DATA_FILE: $!\n";
+}</ins>
+</pre></div></div>
+   <table class="noteBox pBox "><tr><td class="noteTitle">Note</td><td class="note">
+    Those curly braces around <span class="red">$fh</span> in the <b>print</b> statements are not typos!  There's something unusual going on
+    there that we'll explain fully later on.
+   </td></tr></table>
+   <p><img src="images/coderunner/checksyntax.JPG"> and run it. A text file named  
+    <span class="darkred">songs.data</span> appears in the folder (type the <b>ls</b> 
+    command to list the files there). To see the contents of the file, type this in the Unix shell:</p>
+   
+<div class="interactiveBox"><div class="interactiveTitle">INTERACTIVE TERMINAL SESSION:</div><div class="interactive"><pre>
+cold:~/perl2$ <ins>cat ./songs.data</ins>                                                                                                                                                     
+2'02" Sgt. Pepper's Lonely Hearts Club Band
+2'44" With A Little Help From My Friends
+3'29" Lucy In The Sky With Diamonds
+cold:~/perl2$
+</pre></div></div>
+   
+   <p>Let's take a closer look at this program:</p>
+   
+<div class="observeBox"><div class="observeTitle">OBSERVE: make_datafile.pl</div><div class="observe"><pre>
+#!/usr/bin/perl
+use strict;
+use warnings;
+
+my $DATA_FILE = 'songs.data';
+
+<span class="blue">my</span> <span class="darkred">$fh</span>;
+if ( <span class="darkgreen">open</span> $fh, '&gt;', $DATA_FILE )
+{
+  print {<span class="darkred">$fh</span>} <span class="darkblue">qq</span><span class="purple">{</span>2'02<span class="orange">"</span> Sgt. Pepper's Lonely Hearts Club Band\n<span class="purple">}</span>;
+  print {<span class="darkred">$fh</span>} <span class="darkblue">qq</span><span class="purple">{</span>2'44<span class="orange">"</span> With A Little Help From My Friends\n<span class="purple">}</span>;
+  print {<span class="darkred">$fh</span>} <span class="darkblue">qq</span><span class="purple">{</span>3'29<span class="orange">"</span> Lucy In The Sky With Diamonds\n<span class="purple">}</span>;
+  close <span class="darkred">$fh</span>;
+}
+else
+{
+  die "Couldn't open $DATA_FILE: $!\n";
+}
+</pre></div></div>
+   
+   <p>The <span class="darkblue">qq</span> operator is another way of writing double quotation marks 
+    ("<span class="darkblue">qq</span>" is supposed to remind you of that). The character immediately following 
+    <span class="darkblue">qq</span> is the delimiter for the string. If it's a left character of a 
+    mirrored pair (like <b>()</b>, or <b>&lt;&gt;</b>, <b>{}</b>), the closing delimiter for the string 
+    will be the right character. I used it in this example so I wouldn't have to escape the <span class="orange">"</span> 
+    character inside each string.</p>
+   
+   <p>A filehandle is a scalar, but it's different from scalars we've encountered before. 
+    It's not a number or a string. You can't do anything with it except use it to read from files 
+    opened for reading or write to files opened for writing. Trying to increment one is pointless. The 
+    <span class="darkgreen">open()</span> call will <i>assign</i> to the filehandle even though it's one of the 
+    arguments to <span class="darkgreen">open()</span> (that's okay though; you can write subroutines that overwrite 
+    their arguments, although it's not usually good style). In our example, we've created the filehandle 
+    <span class="darkred">$fh</span>.</p>
+   
+   <p>A filehandle should be a <i>lexical variable</i> (one you declared with <span class="blue">my</span>) that is 
+    undefined. You can make sure of that and save a line of code at the same time by declaring the 
+    filehandle <i>inside</i> the <span class="darkgreen">open()</span> call! This looks weird at first, but 
+    you can put <span class="blue">my</span> before the first appearance of a variable just about anywhere, 
+    not just on a line by itself.  Let's try that. Modify <span class="darkred">make_datafile.pl</span> as shown:</p>
+ 
+<div class="listingBox"><div class="listingTitle">CODE TO EDIT: make_datafile.pl</div><div class="listing"><pre>
+#!/usr/bin/perl
+use strict;
+use warnings;
+
+my $DATA_FILE = 'songs.data';
+
+<del>my $fh;</del>
+if ( open <ins>my</ins> $fh, '&gt;', $DATA_FILE )
+{
+<del>  print {$fh} qq{2'02" Sgt. Pepper's Lonely Hearts Club Band\n};
+  print {$fh} qq{2'44" With A Little Help From My Friends\n};
+  print {$fh} qq{3'29" Lucy In The Sky With Diamonds\n};</del>
+<ins>  print {$fh} &lt;&lt; 'EOF';
+2'02" Sgt. Pepper's Lonely Hearts Club Band
+2'44" With A Little Help From My Friends
+3'29" Lucy In The Sky With Diamonds
+2'48" Getting Better
+EOF</ins>
+  close $fh;
+}
+else
+{
+  die "Couldn't open $DATA_FILE: $!\n";
+}
+</pre></div></div>
+   
+   <p><img src="images/coderunner/checksyntax.JPG"> and run it, and <b>cat ./songs.data</b> again. 
+    The previous data file was overwritten (with the same contents, plus the track we added). 
+    Here's what we did:</p> 
+   
+<div class="observeBox"><div class="observeTitle">OBSERVE: make_datafile.pl</div><div class="observe"><pre>
+#!/usr/bin/perl
+use strict;
+use warnings;
+
+my $DATA_FILE = 'songs.data';
+
+if ( <span class="darkgreen">open</span> my $fh, <span class="orange">'&gt;'</span>, <span class="darkblue">$DATA_FILE</span> )
+{
+  print <span class="purple">{$fh}</span> <span class="darkred">&lt;&lt;</span> 'EOF';
+2'02" Sgt. Pepper's Lonely Hearts Club Band
+2'44" With A Little Help From My Friends
+3'29" Lucy In The Sky With Diamonds
+2'48" Getting Better
+EOF
+  close $fh;
+}
+else
+{
+  <span class="blue">die</span> "Couldn't open $DATA_FILE: <span class="red">$!</span>\n";
+}   
+</pre></div></div>
+      
+   <p>We collapsed all the <span class="darkgreen">print</span> statements into a single one, using a heredoc 
+    (<span class="darkred">&lt;&lt;</span>).</p> 
+   
+   <p>The result of the <span class="darkgreen">open()</span> call is true if the file 
+    can be opened successfully. In this case, the file songs.data is opened for output (that's what the second 
+    parameter, the string <span class="orange">'&gt;'</span> means; we'll see how to do input shortly). The third 
+    parameter (<span class="darkblue">$DATA_FILE</span>) refers to the file name.</p>
+   
+   <p>I said I'd explain the curly braces around <span class="purple">{$fh}</span> in the <b>print</b> statements.
+    The way we output to a filehandle (and it must be one that is open for writing, not reading, or we'll 
+    get an error message) is with the print statement. But because print sends everything to the standard 
+    output by default (technically, it sends it to the currently selected filehandle, which by default is the 
+    standard output), there must be a way to tell print to use a different filehandle. We do that with a 
+    special "argument," which is the filehandle inside curly braces (<span class="purple">{$fh}</span>). It's not an 
+    argument in the usual sense, because there's <i>no comma</i> after it; if you add a comma by mistake, Perl 
+    will just turn the filehandle into a (funny-looking) string and print it to the standard output. The 
+    braces are optional, by the way, but it's a best practice for readability to use them, so we always 
+    will. </p>
+   
+   <p>The <span class="red">$!</span> variable is a special variable in Perl, like <span class="red">@ARGV</span>. If an 
+    <span class="darkgreen">open()</span> call fails (returns false), <span class="red">$!</span> is set to the text of the reason 
+    for the failure.</p>
+   
+   <p>We'll almost always want to call <span class="blue">die</span> when an <span class="darkgreen">open()</span> call fails; 
+    few programs can keep going constructively after being unable to open a file. You saw in the last 
+    lesson how to collapse a whole <b>elsif</b> clause using the <b>and</b> form of conditional when the 
+    statement in the block caused a change of control flow. We can do the same in this 
+    program. Modify <b>make_datafile.pl</b> as shown:</p>
+      
+<div class="listingBox"><div class="listingTitle">CODE TO EDIT: make_datafile.pl</div><div class="listing"><pre>
+#!/usr/bin/perl
+use strict;
+use warnings;
+
+my $DATA_FILE = 'songs.data';
+
+<del>if ( open my $fh, '&gt;', $DATA_FILE )
+{</del>
+<ins>open my $fh, '&gt;', $DATA_FILE or die "Couldn't open $DATA_FILE: $!\n";</ins>
+print {$fh} &lt;&lt;'EOF';
+2'02" Sgt. Pepper's Lonely Hearts Club Band
+2'44" With A Little Help From My Friends
+3'29" Lucy In The Sky With Diamonds
+2'48" Getting Better
+<ins>2'37" Fixing A Hole</ins>
+EOF
+close $fh;
+<del>}
+else
+{
+  die "Couldn't open $DATA_FILE: $!\n";
+}</del>
+</pre></div></div>
+   
+   <p><img src="images/coderunner/checksyntax.JPG"> and run it, and look at songs.data—again, the 
+    output is the same except for the new track.</p> 
+
+   <p>We can do one more thing to make this program more concise. The <span class="darkgreen">close()</span> function 
+    is the converse of <span class="darkgreen">open()</span> (read the <b>perldoc -f</b> 
+    documentation on it if you like). As its name suggests, <span class="darkgreen">close()</span> 
+    causes the file to close; you can no longer use the 
+    filehandle without getting an error message. In particular, all pending output to files opened for writing 
+    is flushed. (If you look at an output file as it's being written by another program running at the same 
+    time, you probably won't see the output show up until some time after the program has printed it. It's 
+    buffered by Perl or the operating system and written in chunks to improve efficiency.)</p>
+    
+   <p>If the lexical variable holding the filehandle is destroyed, Perl calls <span class="darkgreen">close()</span> 
+    right then and we don't need to call it explicitly. (After all, if the filehandle is no longer available 
+    to your program, you can't do anything more with it.) We can cause a lexical variable to be destroyed by 
+    limiting its scope. This is a good use for a naked block. Modify <span class="darkred">make_datafile.pl</span> as 
+    shown:</p>
+      
+<div class="listingBox"><div class="listingTitle">CODE TO EDIT: make_datafile.pl</div><div class="listing"><pre>
+#!/usr/bin/perl
+use strict;
+use warnings;
+
+my $DATA_FILE = 'songs.data';
+
+<ins>{
+  open my $fh, '&gt;', $DATA_FILE or die "Couldn't open $DATA_FILE: $!\n";</ins>
+  print {$fh} &lt;&lt;'EOF';
+2'02" Sgt. Pepper's Lonely Hearts Club Band
+2'44" With A Little Help From My Friends
+3'29" Lucy In The Sky With Diamonds
+2'48" Getting Better
+2'37 Fixing A Hole
+<ins>3'35" She's Leaving Home</ins>
+EOF
+<ins>}</ins>
+<del>close $fh;</del></pre></div></div>
+
+   <p><img src="images/coderunner/checksyntax.JPG"> and run it, and <b>cat ./songs.data</b>. Once 
+    again, the output is the same except for the new track. In this example, that makes no difference 
+    technically, because the program ends at that point and all open filehandles are closed upon program exit 
+    anyway. But it's still a good practice to limit the scope of a filehandle the same way you'd limit the scope of 
+    any other variable.</p>
+   
+   <p>Every time you open a file, you should check to see whether the <span class="darkgreen">open()</span> succeeded. 
+    Every Perl programmer does this using <b>open ... or die ...</b>. So as you can see, the third 
+    alternative form of conditional syntax (... and/or ...) is part of what is likely the most common idiom in Perl.</p>
+   
+   <p>Let's see what happens if the <span class="darkgreen">open()</span> fails. At the Unix shell prompt, type the 
+    command shown:</p>
+   
+<div class="interactiveBox"><div class="interactiveTitle">INTERACTIVE TERMINAL SESSION:</div><div class="interactive"><pre>
+cold:~/perl2$ <ins>chmod -w ./songs.data</ins>
+</pre></div></div>
+   
+   <p>Now <img src="images/coderunner/checksyntax.JPG"> and run it and see what happens.</p>
+
+   <p>To change the rights back, type:</p>
+   
+<div class="interactiveBox"><div class="interactiveTitle">INTERACTIVE TERMINAL SESSION:</div><div class="interactive"><pre>
+cold:~/perl2$ <ins>chmod +w ./songs.data</ins>
+</pre></div></div>
+       
+  </div>
+  <a name="h_03"></a><div class="heading">Reading from filehandles</div><div class="headingText">
+
+   <p>In the Perl 1 course, we discovered the <span class="blue">&lt;&gt;</span> operator, which reads from files named in 
+    <span class="red">@ARGV</span>. But guess what? That's actually a <i>special case</i> of something more general that we'll learn about now. 
+    We'll write another program that will read the <span class="darkred">songs.data</span> 
+    file and total the song lengths. Let's call this one <span class="darkred">read_datafile.pl</span>. Type the code below as shown:</p>
+   
+<div class="listingBox"><div class="listingTitle">CODE TO TYPE: read_datafile.pl</div><div class="listing"><pre><ins>#!/usr/bin/perl
+use strict;
+use warnings;
+
+my $DATA_FILE = 'songs.data';
+
+open my $fh, '&lt;', $DATA_FILE or die "Couldn't open $DATA_FILE: $!\n";
+while ( my $line = &lt;$fh&gt; )
+{
+  chomp $line;
+  my $minute_pos = index $line, "'";
+  my $second_pos = index $line, '"';
+  my $minutes = substr $line, 0, $minute_pos;
+  my $seconds = substr $line, $minute_pos + 1, $second_pos - $minute_pos - 1;
+  my $running_time = $minutes + $seconds / 60;
+  my $title = substr $line, $second_pos + 2;
+  print "$title lasts $running_time minutes\n";
+}
+</ins></pre></div></div>
+   
+   <p><img src="images/coderunner/checksyntax.JPG"> and run it. Now let's take a closer look:</p>
+   
+<div class="observeBox"><div class="observeTitle">OBSERVE: read_datafile.pl</div><div class="observe"><pre>#!/usr/bin/perl
+use strict;
+use warnings;
+
+my $DATA_FILE = 'songs.data';
+
+open my $fh, '&lt;', $DATA_FILE or die "Couldn't open $DATA_FILE: $!\n";
+<span class="purple">while</span> ( my $line = <span class="darkblue">&lt;<span class="darkred">$fh</span>&gt;</span> )
+{
+  chomp $line;
+  my $minute_pos = index $line, "'";
+  my $second_pos = index $line, '"';
+  my $minutes = substr $line, 0, $minute_pos;
+  my $seconds = substr $line, $minute_pos + 1, $second_pos - $minute_pos - 1;
+  my $running_time = $minutes + $seconds / 60;
+  my $title = substr $line, $second_pos + 2;
+  print "$title lasts $running_time minutes\n";
+}
+</pre></div></div>   
+   
+   <p>The <span class="darkblue">&lt;&gt;</span> operator (which we call the <i>readline</i> operator) in this program 
+    is taking an argument, namely, <span class="darkred">$fh</span>.  It works just like the empty form of 
+    <span class="blue">&lt;&gt;</span>, only without the magical behavior of opening successive files named on the command 
+    line. It returns the next line from the filehandle <span class="darkred">$fh</span> in a scalar context, and all of 
+    the remaining lines in a list context.</p>
+   
+   <p>If you took the Perl 1 course and you've been paying exceptionally close attention, you may wonder why 
+    the <span class="purple">while</span> line does not wrap the condition in a <span class="darkgreen">defined</span> test. 
+    Isn't this asking for trouble, if the file contains a line with a string value that would be false? Granted, 
+    there is only one such possible value—a line containing precisely the character 0 (zero) and not 
+    even a newline on the end, which means it would have to be the last line in the file, but still, we don't 
+    want to miss any possible lines.</p>
+   
+   <p>In fact, Perl looks at the condition of a <span class="purple">while</span> statement, and if it consists of 
+    an assignment from the readline operator, then it <i>wraps the condition in a call to 
+     <span class="darkgreen">defined</span> for you.</i>  Pretty helpful, huh? In a few lessons it will get even 
+    better!</p>
+   
+   <p>Also, in this program we had to find the 
+    position of the single and double quote marks that mark the end of the minutes and seconds respectively 
+    in each line, and figure out how far away from those positions to extract the substrings we needed. (This 
+    is necessary because the input data is not in fixed-width columns.) That's clumsy, but there's a better 
+    way of doing it that we'll be learning about in this course.</p>
+   
+   <p>Check out a common error condition now, so you know what it looks like. Delete the file 
+    <span class="darkred">songs.data</span> (don't worry, you can get it back any time by rerunning 
+    <span class="darkred">make_datafile.pl</span>) and then rerun <span class="darkred">read_datafile.pl</span>. Make sure you get 
+    get an error and that you understand it.</p>
+  
+  </div>
+  <a name="h_04"></a><div class="heading">open() modes</div><div class="headingText">
+
+   <p>You've seen that to open a filehandle to read from, you specify a mode of <span class="orange">'&lt;'</span>; and 
+    that to open a filehandle to write to, you specify a mode of <span class="orange">'&gt;'</span>.  There are many
+    other possible modes, and they are detailed in the <b>perldoc -f open</b> documentation, but be 
+    forewarned—most of them are hard to understand and harder still to use correctly. One of the more accessible modes 
+    is <i>append</i>, which is denoted by <span class="orange">'&gt;&gt;'</span>. If the file does not already
+    exist, it will be created; if it already exists, the output will be added to the end of its current
+    contents.</p>
+    
+   <p>Let's give that a test by modifying <b>make_datafile.pl</b> as shown:</p>
+    
+<div class="listingBox"><div class="listingTitle">CODE TO EDIT: make_datafile.pl</div><div class="listing"><pre>
+#!/usr/bin/perl
+use strict;
+use warnings;
+
+my $DATA_FILE = 'songs.data';
+
+{
+  open my $fh, '&gt;<ins>&gt;</ins>', $DATA_FILE or die "Couldn't open $DATA_FILE: $!\n";
+  print {$fh} &lt;&lt;'EOF';
+2'02" Sgt. Pepper's Lonely Hearts Club Band
+2'44" With A Little Help From My Friends
+3'29" Lucy In The Sky With Diamonds
+2'48" Getting Better
+2'37" Fixing A Hole
+3'35" She's Leaving Home
+EOF
+}</pre></div></div>
+     
+   <p><img src="images/coderunner/checksyntax.JPG"> and run it a few times, and see what happens in 
+    <b>songs.data</b>.</p>
+   
+  <p>Excellent. Congratulations on getting through this new and important topic! We'll build on what we've learned
+   here as we go through this course. See you in a bit...</p>
+  </div>
+ <br><br><br><br>
+  <p>Once you finish the lesson, go back to the syllabus page by clicking on the page tab above and do
+   the assignments. </p>
+ 
+
+<div class="footer"><div id="timeSurvey"></div>				
+				Copyright © 1998-2014 O'Reilly Media, Inc.<br><img src="https://courses.oreillyschool.com/common/cclicense.png"><br>
+				This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 Unported License.<br>
+				See <a href="http://creativecommons.org/licenses/by-sa/3.0/legalcode">http://creativecommons.org/licenses/by-sa/3.0/legalcode</a> 
+				for more information.
+				</div><iframe id="t" width="1" height="1" border="0" style="display:none"></iframe><script language="javascript">bodyLoaded();</script><script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+  ga('create', 'UA-44720547-1', 'oreillyschool.com');
+  ga('send', 'pageview');
+</script></body></html>

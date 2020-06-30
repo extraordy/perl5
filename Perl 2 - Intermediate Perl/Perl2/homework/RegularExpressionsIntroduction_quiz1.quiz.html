@@ -1,0 +1,104 @@
+<html>
+   <!-- Copyright (c) 1998-2014 O'Reilly Media, Inc. Unauthorized use is strictly
+                prohibited. None of this code or content can by copied without the express written
+                permission from O'Reilly Media, Inc. -->
+   <head>
+      <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+      <link rel="stylesheet" type="text/css" href="http://archive.oreilly.com/oreillyschool/courses/Perl2/common/Lab.css">
+      <title>Properties - Quiz 1</title>
+   </head>
+   <body id="body">
+      <h2>Properties - Quiz 1</h2> 
+      
+      
+      
+      
+      <p>Choose appropriate delimiters for each of the following regex contents to show what should appear in Perl code after the 
+         <b>=~</b> binding operator (for example, if the contents were <b>tree</b>, you could choose <b>/tree/</b>, but if the 
+         contents were <b>N/A</b>, you would need to either write <b>/N\/A/</b> (using the backslash to escape the forward slash 
+         between N and A) or choose different delimiters): 
+      </p>
+      
+      
+      <ol>
+         <li>/usr/local/bin</li>
+         <li>N/A = "Not Applicable"!</li>
+         <li>(/usr|/opt)(?:/local)?/[bes] (you don't need to know what that does as a regular expression, just delimit it)</li>
+         <li>[=/*]{3,5} </li>
+      </ol>
+      
+        
+      
+      
+      <p>Any delimiter not in the characters in each expression will do. Alphanumeric characters will not work (produce syntax 
+         errors). Every expression should start with 'm' which is required when the delimiter is not /.
+      </p>
+      
+      
+      <p>Here are some good choices:</p>
+      
+      
+      <div class="observeBox">
+         <div class="observeTitle">Observe:</div>
+         <div class="observe"><pre>m(/usr/local/bin)
+m{N/A = "Not Applicable"!}
+m!(/usr|/opt)(?:/local)?/[bes]!
+m&lt;[=/*]{3,5}&gt;</pre></div>
+      </div>
+      
+      
+      <p><b>Grading Criteria:</b> Student should be able to use alternate delimiters to define a regular expression as a way to 
+         improve readability.
+      </p>
+      
+      
+      
+      
+      
+      
+      <p>Assuming that the delimiters are /, which of the following characters need escaping to match literally:</p>
+      
+      
+      <ol>
+         <li>@</li>
+         <li>%</li>
+         <li>:</li>
+         <li>/</li>
+         <li>&gt;</li>
+         <li>{</li>
+         <li>[</li>
+         <li>\</li>
+         <li>&amp;</li>
+         <li>.</li>
+         <li>*</li>
+         <li>?</li>
+      </ol>
+      
+      
+      
+      
+      <ol>
+         <li><b>@</b> - yes</li>
+         <li><b>%</b> - no</li>
+         <li><b>:</b> - no</li>
+         <li><b>/</b> - yes</li>
+         <li><b>&gt;</b> - no</li>
+         <li><b>{</b> - yes</li>
+         <li><b>[</b> - yes</li>
+         <li><b>\</b> - yes</li>
+         <li><b>&amp;</b> - no</li>
+         <li><b>.</b> - yes</li>
+         <li><b>*</b> - yes</li>
+         <li><b>?</b> - yes</li>
+      </ol>  
+      
+      
+      <p><b>Grading Criteria:</b> Student should show they know what characters have special meanings in a regular expression and 
+         thus need to be escaped.
+      </p>
+      
+      
+      
+      
+   </body>
+</html>

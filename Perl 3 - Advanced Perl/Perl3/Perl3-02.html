@@ -1,0 +1,308 @@
+<html><!-- Copyright (c) 1998-2014 O'Reilly Media, Inc.
+			This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 Unported License.
+			See http://creativecommons.org/licenses/by-sa/3.0/legalcode for more information.
+            --><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"><link rel="stylesheet" type="text/css" href="../common/Lab.css"><script type="text/javascript" src="../common/Lab.js"></script><script language="javascript"></script><title>Discovering Properties of Files</title></head><body id="body"><a name="top"></a><div class="title">Discovering Properties of Files</div><div class="resize"><a href="Perl3-02.html#top" onclick="changeSize('smaller');" class="aS" title="Keep clicking to make fonts smaller">A</a><a href="Perl3-02.html#top" onclick="changeSize('larger');" class="aL" title="Keep clikcing to make fonts larger">A</a><a href="Perl3-02.html#top" onclick="lv()" class="lv" title="Adjust Page for High Contrast">HC</a><div id="fh"><p>Click on <span class="aS">A</span> to make all fonts on the page smaller.</p><p>Click on <span class="aL">A</span> to make all fonts on the page larger.</p><p>Click on <span class="lv">HC</span> to toggle high contrast mode. When you move your mouse over 
+                 some bold words in high contrast mode, related words are automatically highlighted. Text is shown
+                 in black and white. 
+             </p></div></div><hr>
+ 
+
+  
+  
+  When you complete this lesson, you will be able to:
+  
+  <div class="goalTitle">Lesson Objectives</div><div class="goals"> 
+   <ul><li>use <a href="Perl3-02.html#filetestoperators">File Test Operators</a>.</li><li>use <a href="Perl3-02.html#statfunction">the stat Function</a>.</li></ul>
+  </div><hr>
+ 
+ <p>Welcome back to your <i>Advanced Perl</i> course! In this lesson we'll learn about two special Perl operators 
+  that test properties of files.</p>
+ 
+ 
+ <a href="Perl3-02.html" name="filetestoperators"></a>
+ <a name="h_01"></a><div class="heading">File Test Operators</div><div class="headingText">
+   
+  <p>Each file has specific properties that you may need to know, like how old it is, or whether
+   it's a directory (folder). Perl has a few different operators that can provide that information. Let's take a look at 
+   those. In your <b>/perl3</b> folder, create a program named <span class="darkred">filetest.pl</span>, then type in  the code 
+   as shown:</p>
+   
+<div class="listingBox"><div class="listingTitle">CODE TO TYPE:</div><div class="listing"><pre>#!/usr/bin/perl
+use strict;
+use warnings;
+
+my $file = shift || $0;
+print "$file exists\n"              if -e $file;
+print "$file is a regular file\n"   if -f $file;
+print "$file is a directory\n"      if -d $file;
+print "$file is a symbolic link\n"  if -l $file;
+print "$file is empty\n"            if -z $file;
+my $size = -s $file;
+print "$file has size $size\n"      if $size;
+my $old = -M $file;
+print "$file is $old days old\n"    if defined $old;
+print "$file is readable\n"         if -r $file;
+print "$file is executable\n"       if -x $file;
+print "$file is special\n"          if -b $file || -c $file;
+</pre></div></div>
+   
+  <p>You can run this program with any filename as its argument; if you don't give it an argument, it will test
+   itself.  Type the following commands in the Terminal window:</p>
+   
+<div class="interactiveBox"><div class="interactiveTitle">INTERACTIVE SESSION:</div><div class="interactive"><pre>
+cold:~$ <ins>cd perl3</ins>
+cold:~/perl3$ <ins>./filetest.pl</ins>
+./filetest.pl exists
+./filetest.pl is a regular file
+./filetest.pl has size 591
+./filetest.pl is 0.0028587962962963 days old
+./filetest.pl is readable
+./filetest.pl is executable
+</pre></div></div>
+  
+  <p>Here's how this program works. Each file test operator appears to be a minus sign (<b>-</b>) followed by a letter.
+    That may seem weird, like there's some kind of subtraction going on—there isn't.</p>
+   
+  <p><div class="c"><table class="noteBox fBox pBox "><tr><td class="noteTitle">Note</td><td class="note">This syntax was chosen to match the syntax used in the Bourne and C shells. The creators of Perl wanted  
+   users of earlier languages to be able to learn Perl quickly, so they incorporated many of their features.</td></tr></table></div></p>
+   
+  <p>There are several additional file test operators in Perl than are shown in that program; you can get a complete 
+   list of them by typing <b>perldoc -f -X</b>. Here are the test operators that we used in <b>filetest.pl</b>:</p>
+   
+  <div class="c"><table class="tbl" border=""><tr><th>Operator</th><th>Meaning</th></tr><tr><td>-e</td><td>Does file exist?</td></tr><tr><td>-f</td><td>Is file a regular file?</td></tr><tr><td>-d</td><td>Is file a directory?</td></tr><tr><td>-l</td><td>Is file a symbolic link?</td></tr><tr><td>-z</td><td>Is file zero length (empty)?</td></tr><tr><td>-s</td><td>How big is file (in bytes)?</td></tr><tr><td>-M</td><td>How old is file (in days)?</td></tr><tr><td>-r</td><td>Is file readable (by current process)?</td></tr><tr><td>-x</td><td>Is file executable (by current process)?</td></tr><tr><td>-b</td><td>Is file a block special file?</td></tr><tr><td>-c</td><td>Is file a character special file?</td></tr></table></div>
+   
+  <p>All of these operators are boolean (return a true or false result), except for <b>-s</b> and <b>-M</b>, 
+   which return integer and floating point numbers, respectively. Of course, you can also use the <b>-s</b> 
+   operator in a boolean context to mean, "does the file have any contents?"</p>
+   
+  <p>Type the commands below to try out a couple more invocations of the program:</p>
+   
+<div class="interactiveBox"><div class="interactiveTitle">INTERACTIVE SESSION:</div><div class="interactive"><pre>
+cold:~/perl3$ <ins>./filetest.pl .</ins>
+cold:~/perl3$ <ins>./filetest.pl /dev/tty</ins>
+</pre></div></div>
+   
+  <p>What other files can you find on the system that will produce different results? What happens if you run 
+   the program on a file that doesn't exist? </p>
+   
+  <p>The operators take a filename as argument; if you don't supply one, then they'll use <span class="red">$_</span> by 
+   default. As of Perl version 5.10, it's possible to chain or stack multiple operators together as a 
+   shorthand way to "AND" them together logically. Modify <span class="darkred">filetest.pl</span> as shown:</p>
+   
+<div class="listingBox"><div class="listingTitle">CODE TO TYPE:</div><div class="listing"><pre>
+#!/usr/bin/perl
+use strict;
+use warnings;
+
+my $file = shift || $0;
+print "$file exists\n"              if -e $file;
+print "$file is a regular file\n"   if -f $file;
+print "$file is a directory\n"      if -d $file;
+print "$file is a symbolic link\n"  if -l $file;
+print "$file is empty\n"            if -z $file;
+my $size = -s $file;
+print "$file has size $size\n"      if $size;
+my $old = -M $file;
+print "$file is $old days old\n"    if defined $old;
+print "$file is readable\n"         if -r $file;
+print "$file is executable\n"       if -x $file;
+print "$file is special\n"          if -b $file || -c $file;
+<ins>print "Perl version is $]\n";
+if ( $] &gt;= 5.010 )
+{
+  print "$file is text, writable (chaining is allowed)\n" if -w -T $file;
+}
+else
+{
+  print "$file is text, writable (chaining is not allowed)\n" if -w $file &amp;&amp; -T $file;
+}</ins>
+</pre></div></div>
+   
+  <p>Here (for Perl version 5.010 or later) we've stacked the two tests <b>-w</b> and <b>-T</b>:</p>
+     
+  <div class="c"><table class="tbl" border=""><tr><th>Operator</th><th>Meaning</th></tr><tr><td>-w</td><td>Is file writeable (by current process)?</td></tr><tr><td>-T</td><td>Is file text (as opposed to binary)?</td></tr></table></div>
+   
+  <p>This form of stacking is more efficient than using <b>-w $file &amp;&amp; -T $file</b>, as you would 
+   have had to do in versions of Perl prior to 5.10. We used the special variable <span class="red">$]</span>, which 
+   contains Perl's version number. The code varies according to which version 
+   of Perl is running.</p>
+  
+  <p><img src="images/coderunner/checksyntax.JPG"> and run it to see which version of Perl we're 
+   using.</p>
+ 
+ </div>
+ <a href="Perl3-02.html" name="statfunction"></a>
+ <a name="h_02"></a><div class="heading">The stat Function</div><div class="headingText">
+   
+  <p>The file test 
+   operators don't tell you everything you want to know about a file though; for example, you may need to know who owns it. 
+   That information (and more) is provided by the built-in function 
+   <span class="darkgreen">stat()</span>: </p>
+   
+<div class="observeBox"><div class="observeTitle">OBSERVE: stat()</div><div class="observe"><pre>
+($dev,$ino,$mode,$nlink,$uid,$gid,$rdev,$size,$atime,$mtime,$ctime,$blksize,$blocks) = stat($filename)
+</pre></div></div>
+   
+  <p>This table contains definitions for the elements in that list:</p>
+   
+  <div class="c"><table class="tbl" border=""><tr><th>Index in list above</th><th>Variable in list above</th><th>Meaning</th></tr><tr><td>0</td><td>$dev</td><td>device number of filesystem</td></tr><tr><td>1</td><td>$ino</td><td>inode number</td></tr><tr><td>2</td><td>$mode</td><td>file mode  (type and permissions)</td></tr><tr><td>3</td><td>$nlink</td><td>number of (hard) links to the file</td></tr><tr><td>4</td><td>$uid</td><td>numeric user ID of file's owner</td></tr><tr><td>5</td><td>$gid</td><td>numeric group ID of file's owner</td></tr><tr><td>6</td><td>$rdev</td><td>the device identifier (special files only)</td></tr><tr><td>7</td><td>$size</td><td>total size of file, in bytes</td></tr><tr><td>8</td><td>$atime</td><td>last access time in seconds since the epoch</td></tr><tr><td>9</td><td>$mtime</td><td>last modify time in seconds since the epoch</td></tr><tr><td>10</td><td>$ctime</td><td>inode change time in seconds since the epoch (*)</td></tr><tr><td>11</td><td>$blksize</td><td>preferred block size for file system I/O</td></tr><tr><td>12</td><td>$blocks</td><td>actual number of blocks allocated</td></tr></table></div>
+   
+  <p>Most of this information is esoteric and rarely useful. 
+   <span class="darkgreen">stat()</span> returns all of 
+   the information that the system call of the same name provides. (Keep in mind that on some operating systems, some of the 
+   information you see in the table is not available.) The attributes that are most often useful are the file mode, its owner, and 
+   the time a file was last modified. (The size is also useful, but you can get that information more directly by using the <b>-s</b> 
+   operator.) Let's see those more useful elements in action. Create a new file named <span class="darkred">stat.pl</span> as shown:</p>
+   
+<div class="listingBox"><div class="listingTitle">CODE TO TYPE:</div><div class="listing"><pre>#!/usr/bin/perl
+use strict;
+use warnings;
+
+my $file = shift || $0;
+my ($mode, $uid, $mtime) = (stat $file)[2,4,9];
+printf "Mode of %s is %o\n", $file, $mode;
+print "UID owning $file is $uid\n";
+print "Modification time of $file is $mtime\n";
+</pre></div></div>
+   
+  <p><img src="images/coderunner/checksyntax.JPG"> and run it as shown below:</p>
+  
+<div class="interactiveBox"><div class="interactiveTitle">INTERACTIVE SESSION:</div><div class="interactive"><pre>
+cold:~/perl3$  <ins>./stat.pl</ins>
+Mode of ./stat.pl is 100755
+UID owning ./stat.pl is 16948
+Modification time of ./stat.pl is 1285169770
+</pre></div></div>
+   
+  <p>Do you see how we used the list slice <b>[2,4,9]</b> to retrieve only the elements we want? (Referring to the indices 
+   in the table above is helpful here. You can get the same table using <b>perldoc -f stat</b>.)</p>
+    
+  <p>The times returned by <span class="darkgreen">stat()</span> are in seconds since midnight, January 1, 1970 (the 
+   "epoch"). This is the same time reference that is returned by the <span class="darkgreen">time()</span> function 
+   and accepted by the <span class="darkgreen">localtime()</span> function. Now let's make the output more 
+   user-friendly. Modify your code as shown by adding the <ins>blue</ins> code and removing the <del>red</del> code as shown:</p>
+   
+<div class="listingBox"><div class="listingTitle">CODE TO TYPE:</div><div class="listing"><pre>
+#!/usr/bin/perl
+use strict;
+use warnings;
+
+my $file = shift || $0;
+my ($mode, $uid, $mtime) = (stat $file)[2,4,9];
+printf "Mode of %s is %o\n", $file, $mode;
+print "UID owning $file is $uid\n";
+<del>print "Modification time of $file is $mtime\n";</del>
+<ins>print "Modification time of $file is " . localtime( $mtime ) . "\n";</ins>
+</pre></div></div>
+   
+  <p><img src="images/coderunner/checksyntax.JPG"> and run it as shown:</p>
+
+<div class="interactiveBox"><div class="interactiveTitle">INTERACTIVE SESSION:</div><div class="interactive"><pre>
+cold:~/perl3$ <ins>./stat.pl</ins>
+Mode of ./stat.pl is 100755
+UID owning ./stat.pl is 16948
+Modification time of ./stat.pl is Wed Sep 22 10:58:09 2010
+</pre></div></div>
+   
+  <p>You get these results because we used <span class="darkgreen">localtime()</span> in a scalar context.</p> 
+  
+  <p>The UID (user ID) is numeric. But having the name of that UID would probably be more useful. We can get that with the 
+   <span class="darkgreen">getpwuid()</span> built-in function. Modify your code as shown: </p>
+   
+<div class="listingBox"><div class="listingTitle">CODE TO TYPE:</div><div class="listing"><pre>
+#!/usr/bin/perl
+use strict;
+use warnings;
+
+my $file = shift || $0;
+my ($mode, $uid, $mtime) = (stat $file)[2,4,9];
+printf "Mode of %s is %o\n", $file, $mode;
+<del>print "UID owning $file is $uid\n";</del>
+<ins>my $owner = getpwuid $uid;
+print "Owner of $file is $owner\n";</ins>
+print "Modification time of $file is " . localtime( $mtime ) . "\n";
+</pre></div></div>
+   
+  <p><img src="images/coderunner/checksyntax.JPG"> and run it as shown here:</p>
+
+<div class="interactiveBox"><div class="interactiveTitle">INTERACTIVE SESSION:</div><div class="interactive"><pre>
+cold:~/perl3$ <ins>./stat.pl</ins>
+Mode of ./stat.pl is 100755
+Owner of ./stat.pl is smiller
+Modification time of ./stat.pl is Wed Sep 22 11:34:07 2010
+cold:~/perl3$ 
+</pre></div></div>
+   
+  <p>So why does the mode of this file display as 100755? Hmm. Run <b>ls -l</b> on the file as shown:</p>
+   
+<div class="interactiveBox"><div class="interactiveTitle">INTERACTIVE SESSION:</div><div class="interactive"><pre>
+cold:~/perl3$ <ins>ls -l ./stat.pl</ins>
+-rwxr-xr-x 1 smiller webusers 290 Sep 22 11:34 <span class="green">./stat.pl</span>
+</pre></div></div>
+    
+  <p>We get a result of <b>-rwxr-xr-x</b>, which is 755. The answer to our earlier question lies in that almost invisible minus sign at
+   the beginning of the <b>ls</b> output.  It indicates which <i>type</i> of file we have. In this case, it's a regular file;
+   other possibilities include <b>d</b> for a directory, <b>l</b> for a symbolic link, and so on.  
+   The information regarding type is included in <b>$mode</b>. The 1000000 bit corresponds to a regular file. Just try 
+   running <span class="darkred">stat.pl</span> on a directory!</p>
+     
+  <p>Let's try a file example for fun. Create a new file named <span class="darkred">oldest.pl</span> in the <b>/perl3</b> folder:</p>
+  
+<div class="listingBox"><div class="listingTitle">CODE TO TYPE:</div><div class="listing"><pre>#!/usr/bin/perl
+use strict;
+use warnings;
+
+my $dir = shift || '.';
+opendir my $dh, $dir or die "opendir $dir: $!\n";
+my %age;
+while ( my $file = readdir $dh )
+{
+  next if $file =~ /\A\.\.?\z/;
+  $age{$file} = -M "$dir/$file";
+}
+
+print "The oldest 50% of files are:\n";
+my $index = 0;
+for my $file ( sort { $age{$b} &lt;=&gt; $age{$a} } keys %age )
+{
+  print "$file ($age{$file} days)\n";
+  $index++; 
+  last if $index &gt;= (keys %age) / 2;
+}
+</pre></div></div>
+  
+  <p>This program prints the names of the older half of the files in the given directory (or the current 
+   directory, by default). Now let's run it on <b>/etc</b>:</p>
+  
+<div class="interactiveBox"><div class="interactiveTitle">INTERACTIVE SESSION:</div><div class="interactive"><pre>
+cold:~/perl3$  <ins>./oldest.pl /etc</ins>
+The oldest 50% of files are:
+urlview.conf (3716.21444444444 days)
+rpc (3294.24068287037 days)
+quotatab (3222.75721064815 days)
+minicom.users (2716.80438657407 days)
+nsswitch.conf (2174.5394212963 days)
+<i>[...etc...]</i>
+</pre></div></div>
+  
+  <p>Read the program carefully and make sure you understand how it works, then experiment with it!</p>
+  <p>Once you feel confident with these properties of files, you're ready to move on to the next lesson where 
+  we'll tackle interacting with the operating system!</p>
+  
+ </div>
+  
+ <p>When you finish this lesson, complete the homework from your syllabus.</p>
+ 
+<div class="footer"><div id="timeSurvey"></div>				
+				Copyright © 1998-2014 O'Reilly Media, Inc.<br><img src="https://courses.oreillyschool.com/common/cclicense.png"><br>
+				This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 Unported License.<br>
+				See <a href="http://creativecommons.org/licenses/by-sa/3.0/legalcode">http://creativecommons.org/licenses/by-sa/3.0/legalcode</a> 
+				for more information.
+				</div><iframe id="t" width="1" height="1" border="0" style="display:none"></iframe><script language="javascript">bodyLoaded();</script><script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+  ga('create', 'UA-44720547-1', 'oreillyschool.com');
+  ga('send', 'pageview');
+</script></body></html>

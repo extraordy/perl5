@@ -1,0 +1,51 @@
+<html>
+   <!-- Copyright (c) 1998-2014 O'Reilly Media, Inc. Unauthorized use is strictly
+                prohibited. None of this code or content can by copied without the express written
+                permission from O'Reilly Media, Inc. -->
+   <head>
+      <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+      <link rel="stylesheet" type="text/css" href="http://archive.oreilly.com/oreillyschool/courses/Perl1/common/Lab.css">
+      <title>Aggregates, Subroutines, and Command-Line Arguments - Quiz 2</title>
+   </head>
+   <body id="body">
+      <h2>Aggregates, Subroutines, and Command-Line Arguments - Quiz 2</h2> 
+      
+      
+      
+      
+      <p>Suppose you wrote a program called terraform.pl that takes command line options (arguments beginning with a hyphen). You might
+         run the program this way:
+      </p>
+      
+      
+      <div class="observeBox">
+         <div class="observeTitle">Observe:</div>
+         <div class="observe"><pre>./terraform.pl -d --jovian "Phase 2 of Invasion Plan" Ganymede Callisto</pre></div>
+      </div>
+      
+      
+      <p>How could you use index() to determine if a given argument was an option like <b>-d</b> or a "plain" argument like <b>Ganymede</b>?</p>
+      
+        
+      
+      
+      <div class="observeBox">
+         <div class="observeTitle">Observe:</div>
+         <div class="observe"><pre>foreach(@ARGV) {
+if(index($_, '-') == 0) { # use index to check to see if the first character is a -
+print "$_ is an option\n";
+}
+else {
+print "$_ is a plain argument\n";
+}
+}</pre></div>
+      </div>
+      
+      
+      <p><b>Grading Criteria:</b> Student should demonstrate understanding of how to parse @ARGV by using index().</p>
+      
+      
+      
+      
+   </body>
+</html>

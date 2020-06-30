@@ -1,0 +1,982 @@
+<html><!-- Copyright (c) 1998-2014 O'Reilly Media, Inc.
+			This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 Unported License.
+			See http://creativecommons.org/licenses/by-sa/3.0/legalcode for more information.
+            --><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"><link rel="stylesheet" type="text/css" href="../common/Lab.css"><script type="text/javascript" src="../common/Lab.js"></script><script language="javascript"></script><title>Regular Expressions: Global Matches and More</title></head><body id="body"><a name="top"></a><div class="title">Regular Expressions: Global Matches and More</div><div class="resize"><a href="Perl3-04.html#top" onclick="changeSize('smaller');" class="aS" title="Keep clicking to make fonts smaller">A</a><a href="Perl3-04.html#top" onclick="changeSize('larger');" class="aL" title="Keep clikcing to make fonts larger">A</a><a href="Perl3-04.html#top" onclick="lv()" class="lv" title="Adjust Page for High Contrast">HC</a><div id="fh"><p>Click on <span class="aS">A</span> to make all fonts on the page smaller.</p><p>Click on <span class="aL">A</span> to make all fonts on the page larger.</p><p>Click on <span class="lv">HC</span> to toggle high contrast mode. When you move your mouse over 
+                 some bold words in high contrast mode, related words are automatically highlighted. Text is shown
+                 in black and white. 
+             </p></div></div><hr>
+ <div class="goalTitle">Lesson Objectives</div><div class="goals"> 
+   
+   When you complete this lesson, you will be able to:
+  <ul><li>make <a href="Perl3-04.html#globalmatches">Global Matches</a>.</li><li><a href="Perl3-04.html#scalarcontext">Match and Substitute in Scalar Context</a>.</li><li><a href="Perl3-04.html#listcontext">Match and Substitute in List Context</a>.</li><li>utilize <a href="Perl3-04.html#globalmatching">Global Matching in Scalar and List Contexts</a>.</li><li>utilize <a href="Perl3-04.html#globalsubstitution">Global Substitution in Scalar and List Contexts</a>.</li><li>perform <a href="Perl3-04.html#nongreedymatching">Nongreedy Matching</a>.</li></ul>
+  </div><hr>
+
+ <a href="Perl3-04.html" name="globalmatches"></a>
+ <a name="h_01"></a><div class="heading">Global Matches</div><div class="headingText">
+
+  <p><div class="c">“It has been said that arguing against globalization is like arguing against the laws of 
+   gravity.”<br>
+   -Kofi Annan</div></p>
+   
+  <p><div class="c"><img src="images/lessonImages/Earth.gif"></div></p>
+   
+  <p>Let's go with the flow, then, and look at what globalization means in Perl. So today, we will think globally (and act locally, right there on your computer). 
+   We're going to introduce a new <i>modifier</i> on regular expressions: the <b>/g</b> or <i>global</i> modifier.</p>
+   
+  <p><b>/g</b> is both simple and powerful. Your code reads it as, "Don't stop with the first match; keep going!" Let's start with 
+   a basic example to get a feel for it. Create <b>g_simple.pl</b> in your 
+   <b>/perl3</b> folder as shown:</p>
+   
+<div class="listingBox"><div class="listingTitle">CODE TO TYPE:</div><div class="listing"><pre>#!/usr/bin/perl
+use strict;
+use warnings;
+
+$_ = "The cad saw far rat map bay\n";
+
+print;
+
+s/a/o/;
+
+print;
+
+s/a/o/g;
+
+print;
+</pre></div></div>
+   
+  <p><img src="images/coderunner/checksyntax.JPG"> and run it as shown:</p>
+  
+<div class="interactiveBox"><div class="interactiveTitle">INTERACTIVE SESSION:</div><div class="interactive"><pre>
+code:~$ <ins>cd perl3</ins>
+cold:~/perl3$ <ins>./g_simple.pl</ins> 
+The cad saw far rat map bay
+The cod saw far rat map bay
+The cod sow for rot mop boy
+</pre></div></div>
+   
+  <p>(Don't worry, it's not supposed to make sense.) The first line is the string (in <b>$_</b>) in its initial 
+   state. The second line is the string after a substitution with no modifiers; the first letter,
+   <b>a</b>, was changed to an <b>o</b>, but the rest remain unchanged. The third line is the 
+   string after a <i>global</i> substitution using the <b>/g</b> modifier; <i>all</i> of the remaining 
+    occurrences of the letter <b>a</b> are changed to <b>o</b>.</p>
+   
+  <p>If you want to specify an additional modifier (for instance <b>/i</b> for case insensitivity), combine 
+   the letters in any order: <b>/.../gi</b> or <b>/.../ig</b> will both work the same way.</p>
+   
+  <p>Now let's take a look at how the match and substitution operators evaluate in different 
+   contexts, and then how they evaluate with the <b>/g</b> modifier.</p>
+  
+ </div>
+ <a href="Perl3-04.html" name="scalarcontext"></a>
+ <a name="h_02"></a><div class="heading">Match and Substitution in Scalar Context</div><div class="headingText">
+   
+  <p>In a scalar context, a match returns true or false depending on whether it succeeded. We'll demonstrate
+   that with an example. Create <b>pig_sing.pl</b> in your <b>/perl3</b> folder as shown:</p>
+   
+<div class="listingBox"><div class="listingTitle">CODE TO TYPE:</div><div class="listing"><pre>#!/usr/bin/perl
+use strict;
+use warnings;
+
+my $line = "Never try to teach a pig to sing.";
+
+my $result = ( $line =~ /\bpig\b/ );
+print "  Successful match result: $result\n";
+   $result = ( $line =~ /jackass/ );
+print "Unsuccessful match result: ", (defined $result ? "'$result'" : 'undef'), "\n";
+
+$_ = "It wastes your time and annoys the pig.";
+$result = /\bpig\b/;
+print "  Successful match result: $result\n";
+
+$result = /jackass/;
+print "Unsuccessful match result: ", (defined $result ? "'$result'" : 'undef'), "\n";
+</pre></div></div>
+  
+  <p><img src="images/coderunner/checksyntax.JPG"> and run it as shown:</p>
+  
+<div class="interactiveBox"><div class="interactiveTitle">INTERACTIVE SESSION:</div><div class="interactive"><pre>cold:~/perl3$ <ins>./pig_sing.pl</ins>
+  Successful match result: 1
+Unsuccessful match result: ''
+  Successful match result: 1
+Unsuccessful match result: ''
+</pre></div></div>
+   
+  <p>A successful match in scalar context yields a true value (Perl uses the number
+    <b>1</b>), and an unsuccessful match in scalar context yields a false value (Perl uses the empty 
+    string). You've been using matches in the conditions of <b>if</b> 
+    and <b>while</b> statements for a while now, but we included it here so you 
+    could see the match operation when it's bound to an explicit variable (<b>$line</b>) and 
+    when implicitly bound to <b>$_</b>.</p>
+   
+   <p>Now let's see what a substitution does in scalar context. Modify <b>pig_sing.pl</b> as 
+   shown:</p>
+  
+<div class="listingBox"><div class="listingTitle">CODE TO TYPE:</div><div class="listing"><pre>#!/usr/bin/perl
+use strict;
+use warnings;
+
+my $line = "Never try to teach a pig to sing.";
+
+my $result = ( $line =~ <ins>s</ins>/\bpig\b/<ins>squirrel/</ins> );
+print "  Successful <ins>substitution</ins> result: $result\n";
+   $result = ( $line =~ <ins>s</ins>/jackass/<ins>zebra/</ins> );
+print "Unsuccessful <ins>substitution</ins> result: ", (defined $result ? "'$result'" : 'undef'), "\n";
+
+$_ = "It wastes your time and annoys the pig.";
+$result = <ins>s</ins>/\bpig\b/<ins>squirrel/</ins>;
+print "  Successful <ins>substitution</ins> result: $result\n";
+
+$result = <ins>s</ins>/jackass/<ins>zebra/</ins>;
+print "Unsuccessful <ins>substitution</ins> result: ", (defined $result ? "'$result'" : 'undef'), "\n";
+</pre></div></div>
+   
+  <p><img src="images/coderunner/checksyntax.JPG"> and run it as shown:</p>
+  
+<div class="interactiveBox"><div class="interactiveTitle">INTERACTIVE SESSION:</div><div class="interactive"><pre>cold:~/perl3$ <ins>./pig_sing.pl</ins>
+  Successful substitution result: 1
+Unsuccessful substitution result: ''
+  Successful substitution result: 1
+Unsuccessful substitution result: ''
+</pre></div></div>
+   
+  <p>A successful substitution in scalar context yields a true value. An unsuccessful 
+   substitution in scalar context yields a false value (again, Perl uses the empty string). Here you can see what the 
+   substitution operation looks like when bound to an explicit variable (<b>$line</b>) and when 
+   implicitly bound to <b>$_</b>.</p>
+  
+ </div>
+ <a href="Perl3-04.html" name="listcontext"></a>
+  <a name="h_03"></a><div class="heading">Match and Substitution in List Context</div><div class="headingText">
+   
+  <p>In a list context, an unsuccessful match returns the empty list; a successful match is a bit more 
+   interesting. Modify <b>pig_sing.pl</b> as shown:</p>
+  
+<div class="listingBox"><div class="listingTitle">CODE TO TYPE:</div><div class="listing"><pre>#!/usr/bin/perl
+use strict;
+use warnings;
+
+my $line = "Never try to teach a pig to sing.";
+
+my <ins>@results</ins> = ( $line =~ <del>s</del>/\bpig\b/<del>squirrel/</del> );
+print "  Successful <ins>match</ins> result: <ins>@results</ins>\n";
+   <ins>@results</ins> = ( $line =~ <del>s</del>/jackass/<del>zebra/</del> );
+print "Unsuccessful <ins>match</ins> result: ", (<del>defined </del><ins>@results</ins> ? "'<ins>@results</ins>'" : '<del>undef</del><ins>&lt;none&gt;</ins>'), "\n";
+
+$_ = "It wastes your time and annoys the pig.";
+<ins>@results</ins> = <del>s</del>/\b<ins>(</ins>pig<ins>)</ins>\b/<del>squirrel/</del>;
+print "  Successful <ins>match</ins> result: <ins>@results</ins>\n";
+
+<ins>@results</ins> = <del>s</del>/<ins>(</ins>jackass<ins>)</ins>/<del>zebra/</del>;
+print "Unsuccessful <ins>match</ins> result: ", (<del>defined</del> <ins>@results</ins> ? "'<ins>@results</ins>'" : '<del>undef</del><ins>&lt;none&gt;</ins>'), "\n";
+
+<ins>@results = /\s(time).*(p.g)/;
+print "  Successful match result: @results\n";</ins>
+</pre></div></div>
+
+  <p><img src="images/coderunner/checksyntax.JPG"> and run it as shown:</p>
+  
+<div class="interactiveBox"><div class="interactiveTitle">INTERACTIVE SESSION:</div><div class="interactive"><pre>
+cold:~/perl3$ <ins>./pig_sing.pl</ins>
+  Successful match result: 1
+Unsuccessful match result: &lt;none&gt;
+  Successful match result: pig
+Unsuccessful match result: &lt;none&gt;
+  Successful match result: time pig
+</pre></div></div>
+   
+  <p>In the first successful match, the result is a list containing the single element <b>1</b>. 
+   In the second successful match, the regex contains a capturing group, and the result is a list 
+   of the portions of the input string that matched the capture: the list <b>($1)</b>. In the third successful match, the 
+   regex contains <i>two</i> capturing groups, and the result is the list of that which matched both 
+   captures: <b>($1, $2)</b>.</p>
+   
+  <p>The general rule is that a successful match in list context returns a list of that which 
+    matched each set of capturing parentheses, and, if there are no captures, it returns the list <b>(1)</b>.</p>
+   
+  <p>Now let's take a brief detour to consider list <i>assignment</i> in <i>scalar</i> 
+   context. We'll examine that using this one-liner:</p>
+
+<div class="interactiveBox"><div class="interactiveTitle">INTERACTIVE SESSION:</div><div class="interactive"><pre>
+cold:~/perl3$ <ins>perl -le '$x = (@y = 6..10); print $x'</ins>
+5
+cold:~/perl3$ 
+</pre></div></div>
+   
+  <p>The list assigned to <b>@y</b> contains five items. We place that list assignment in scalar 
+   context and assign the result to <b>$x</b>. When we print <b>$x</b>, the result is <b>5</b>, 
+   which demonstrates that the result of a list assignment in scalar context is equal to the number of items in the list. Try 
+   another example:</p>
+   
+<div class="interactiveBox"><div class="interactiveTitle">INTERACTIVE SESSION:</div><div class="interactive"><pre>
+cold:~/perl3$ <ins>perl -le '$x = ( ($a,$b,$c) = 6..10 ); print $x'</ins>
+5
+cold:~/perl3$ 
+</pre></div></div>
+   
+    <p>When we combine list assignment in scalar context with the list context result of a match, the  
+    result is a really useful Perl idiom. Modify <b>pig_sing.pl</b> as shown:</p>
+   
+<div class="listingBox"><div class="listingTitle">CODE TO TYPE:</div><div class="listing"><pre>
+#!/usr/bin/perl
+use strict;
+use warnings;
+
+my $line = "Never try to teach a pig to sing.";
+
+<ins>if ( my ($res) = ( $line =~ /\b(pig)\b/ ) )</ins>
+<del>my @results = ( $line =~ /\bpig\b/ );
+print "  Successful match result: @results\n";
+   @results = ( $line =~ /jackass/ );
+print "Unsuccessful match result: ", (@results ? "'@results'" : '&lt;none&gt;'), "\n";
+</del>
+<ins>{
+  print "Successful match result: $res\n";
+}</ins>
+
+$_ = "It wastes your time and annoys the pig.";
+
+<del>@results = /\b(pig)\b/;
+print "  Successful match result: @results\n";
+
+@results = /(jackass)/;
+print "Unsuccessful match result: ", (@results ? "'@results'" : '&lt;none&gt;'), "\n";
+
+@results = /\s(time).*(p.g)/;
+print "  Successful match result: @results\n";</del>
+  
+<ins>if ( my ($nomatch) = /(aardvark)/ )
+{
+  print "You won't see this\n";
+}
+elsif ( my ($first, $second) = /\s(time).*(pig)/ )
+{
+  print "Successful match result: $first, $second\n";
+}</ins>
+</pre></div></div>
+   
+  <p><img src="images/coderunner/checksyntax.JPG"> and run it as shown:</p>
+  
+<div class="interactiveBox"><div class="interactiveTitle">INTERACTIVE SESSION:</div><div class="interactive"><pre>
+cold:~/perl3$ <ins>./pig_sing.pl</ins>
+Successful match result: pig
+Successful match result: time, pig
+</pre></div></div>
+   
+  <p>What's going on here? If the match is successful, there will be a list assignment containing either one 
+   thing (in the first two matches) or two things (in the last match). In a scalar context, that list 
+   assignment will evaluate as <b>1</b> or <b>2</b> respectively, both of which are true. 
+   But if the match is unsuccessful, there will be nothing in the list, so the number of things assigned will 
+   be zero, which is false. Take a look at the result of assigning an empty list in scalar context. 
+   Type the command below as shown:</p>
+   
+<div class="interactiveBox"><div class="interactiveTitle">INTERACTIVE SESSION:</div><div class="interactive"><pre>
+cold:~/perl3$ <ins>perl -le '$x = ( ($a,$b,$c) = () ); print $x'</ins>
+0
+cold:~/perl3$ 
+</pre></div></div>
+   
+  <p>The idiom is of the form: <b>if ( my ($var1, $var2,...) = /...(...)...(...).../ )</b>.</p>
+    
+  <p>This lets us assign the matches to variables with meaningful names at the same time that we test whether 
+   the match was successful. This is more readable than the alternative: </p>
+   
+<div class="observeBox"><div class="observeTitle">OBSERVE:</div><div class="observe"><pre>
+if ( /...(...)...(...).../ )
+{
+  my ($var1, $var2, ...) = ($1, $2, ...);
+</pre></div></div>
+   
+  <p>Now let's see a substitution in list context. Modify 
+   <b>pig_sing.pl</b> as shown:</p>
+   
+<div class="listingBox"><div class="listingTitle">CODE TO TYPE:</div><div class="listing"><pre>
+#!/usr/bin/perl
+use strict;
+use warnings;
+
+my $line = "Never try to teach a pig to sing.";
+
+<del>if ( my ($res) = ( $line =~ /\b(pig)\b/ ) )
+{
+  print "Successful match result: $res\n";
+}</del>
+
+<ins>my ($result) = ( $line =~ s/\bpig\b/squirrel/ );
+print "  Successful substitution result: $result\n";
+   ($result) = ( $line =~ s/jackass/zebra/ );
+print "Unsuccessful substitution result: ", (defined $result ? "'$result'" : 'undef'), "\n";</ins>
+
+$_ = "It wastes your time and annoys the pig.";
+
+<del>if ( my ($nomatch) = /(aardvark)/ )
+{
+  print "You won't see this\n";
+}
+elsif ( my ($first, $second) = /\s(time).*(pig)/ )
+{
+  print "Successful match result: $first, $second\n";
+}</del>
+<ins>($result) = s/\b(pig)\b/squirrel/;
+print "  Successful substitution result: $result\n";
+
+($result) = s/(jackass)/zebra/;
+print "Unsuccessful substitution result: ", (defined $result ? "'$result'" : 'undef'), "\n";</ins>
+
+</pre></div></div>
+  
+  <p><img src="images/coderunner/checksyntax.JPG"> and run it as shown:</p>
+  
+<div class="interactiveBox"><div class="interactiveTitle">INTERACTIVE SESSION:</div><div class="interactive"><pre>
+cold:~/perl3$ <ins>./pig_sing.pl</ins>  
+  Successful substitution result: 1
+Unsuccessful substitution result: ''
+  Successful substitution result: 1
+Unsuccessful substitution result: ''
+</pre></div></div>
+   
+ <p>We get the same result as we did in scalar context.</p>
+  
+ </div>
+ <a href="Perl3-04.html" name="globalmatching"></a>
+ <a name="h_04"></a><div class="heading">Global Matching: Scalar and List Contexts</div><div class="headingText"> 
+    
+  <p>Now let's see the effect of <b>/g</b> in a scalar context. Create <b>g_match_number.pl</b> in
+   your <b>/perl3</b> folder as shown:</p>
+
+<div class="listingBox"><div class="listingTitle">CODE TO TYPE:</div><div class="listing"><pre>#!/usr/bin/perl
+use strict;
+use warnings;
+
+while ( &lt;DATA&gt; )
+{
+  print "Starting to match line: ";
+  while ( /\d+/g )
+  {
+    print "Match! ";
+  }
+  print "\n";
+}
+
+__END__
+Sing a song of 6 pence, a pocket full of rye; 4 and 20 blackbirds, baked in a pie.
+1969: Apollo 11 returns from the Moon after travelling 828743 nautical miles.
+The first five values of Ackermann's function for n=1 are 2, 3, 5, 13, and 65533.
+</pre></div></div>
+     
+  <p><img src="images/coderunner/checksyntax.JPG"> and run it as shown:</p>
+  
+<div class="interactiveBox"><div class="interactiveTitle">INTERACTIVE SESSION:</div><div class="interactive"><pre>
+cold:~/perl3$ <ins>./g_match_number.pl</ins>
+Starting to match line: Match! Match! Match! 
+Starting to match line: Match! Match! Match! 
+Starting to match line: Match! Match! Match! Match! Match! Match! 
+</pre></div></div>
+   
+  <p>We get a match for each number found in each of the lines. The <b>match</b> operator matches each item possible, 
+    in turn, returning true each time it is called, until it can't match any more in the input, at which 
+   point it returns false. Now let's do something more interesting with each number. Modify 
+   <span class="darkred">g_match_number.pl</span> as shown:</p>
+  
+<div class="listingBox"><div class="listingTitle">CODE TO TYPE:</div><div class="listing"><pre>#!/usr/bin/perl
+use strict;
+use warnings;
+
+while ( &lt;DATA&gt; )
+{
+  print "Starting to match line: ";
+  while ( /<ins>(</ins>\d+<ins>)</ins>/g )
+  {
+    print "<del>Match! </del><ins> - $1</ins>";
+  }
+  print "\n";
+}
+
+__END__
+Sing a song of 6 pence, a pocket full of rye; 4 and 20 blackbirds, baked in a pie.
+1969: Apollo 11 returns from the Moon after travelling 828743 nautical miles.
+The first five values of Ackermann's function for n=1 are 2, 3, 5, 13, and 65533.
+</pre></div></div>
+     
+  <p><img src="images/coderunner/checksyntax.JPG"> and run it as shown:</p>
+  
+<div class="interactiveBox"><div class="interactiveTitle">INTERACTIVE SESSION:</div><div class="interactive"><pre>
+cold:~/perl3$ <ins>./g_match_number.pl</ins>
+Starting to match line: - 6 - 4 - 20 
+Starting to match line: - 1969 - 11 - 828743 
+Starting to match line: - 1 - 2 - 3 - 5 - 13 - 65533 
+</pre></div></div>
+   
+  <p>What happened here? Now we have a capturing group (inside the parentheses) in the regex, so just like before, we go through 
+   the <b>while</b> loop every time there is a match, but this time we save whatever 
+   matched <b>\d+</b> into <b>$1</b>.</p>
+   
+  <p>Now we're going to make a mistake on purpose. After our earlier discussion 
+    about saving captures into variables as we do the match, you might be tempted to make 
+   this change (make the changes as shown, but don't run it yet):</p>
+  
+<div class="listingBox"><div class="listingTitle">CODE TO TYPE:</div><div class="listing"><pre>#!/usr/bin/perl
+use strict;
+use warnings;
+
+while ( &lt;DATA&gt; )
+{
+  print "Starting to match line: ";
+  while (<ins> my ($number) = </ins>/(\d+)/g )
+  {
+    <del>print "- $1";</del>
+    <ins>print "- $number";</ins>
+  }
+  print "\n";
+}
+
+__END__
+Sing a song of 6 pence, a pocket full of rye; 4 and 20 blackbirds, baked in a pie.
+1969: Apollo 11 returns from the Moon after travelling 828743 nautical miles.
+The first five values of Ackermann's function for n=1 are 2, 3, 5, 13, and 65533.
+</pre></div></div>
+   
+  <p><img src="images/coderunner/checksyntax.JPG"> and save it, but when you run it, be 
+   prepared to press <b>Ctrl+C</b> as quickly as possible. Okay, ready? Run it, and press 
+   <b>Ctrl+C</b>! (It may take a while to stop running.) See how the program went into an infinite loop? Why 
+   do you suppose that happened?</p>
+   
+  <p>It's because we are no longer using the <b>/g</b> modifier in a <i>scalar</i> context. By assigning 
+    the match to the list containing the single element <b>$number</b>, we have put <b>$number</b> in <i>list</i> 
+   context. And I haven't told you what <b>/g</b> does for a match in list context yet!</p>
+   
+  <p>Let's try that now. Modify <b>g_match_number.pl</b> as shown:</p>
+   
+<div class="listingBox"><div class="listingTitle">CODE TO TYPE:</div><div class="listing"><pre>#!/usr/bin/perl
+use strict;
+use warnings;
+
+while ( &lt;DATA&gt; )
+{
+  print "Starting to match line: ";
+  <del>while ( my ($number) = /(\d+)/g )</del>
+  <ins>for my $number ( /(\d+)/g )</ins>
+  {
+    print " - $number";
+  }
+  print "\n";
+}
+
+__END__
+Sing a song of 6 pence, a pocket full of rye; 4 and 20 blackbirds, baked in a pie.
+1969: Apollo 11 returns from the Moon after travelling 828743 nautical miles.
+The first five values of Ackermann's function for n=1 are 2, 3, 5, 13, and 65533.
+</pre></div></div>
+   
+  <p><img src="images/coderunner/checksyntax.JPG"> and run it. It's similar to the last version that worked. 
+    keep in mind that <b>while</b> imposes scalar context 
+    and <b>for(each)</b> imposes list context. You should see this:</p>
+   
+<div class="interactiveBox"><div class="interactiveTitle">INTERACTIVE SESSION:</div><div class="interactive"><pre>
+cold:~/perl3$ <ins>./g_match_number.pl</ins>
+Starting to match line: - 6 - 4 - 20 
+Starting to match line: - 1969 - 11 - 828743 
+Starting to match line: - 1 - 2 - 3 - 5 - 13 - 65533 
+</pre></div></div>
+   
+   <p>In a list context, a global match returns a list of everything that was matched by the
+   capturing parentheses. Let's explore this functionality some more. Create <b>g_match_number2.pl</b> in your
+   <b>/perl3</b> folder as shown:</p>
+   
+<div class="listingBox"><div class="listingTitle">CODE TO TYPE:</div><div class="listing"><pre><ins>#!/usr/bin/perl
+use strict;
+use warnings;
+
+my $line = "01/30/10 17:30:21 trish.oreilly.com ENABLE /perl1 &amp; 02/01/10 09:10:00 tim.oreilly.com ENROLL /perl1";
+
+my ($date1, $date2) = ( $line =~ m!(\d+/\d+/\d+)!g );
+print "Date: $date1; date: $date2\n";</ins>
+</pre></div></div>
+   
+  <p><img src="images/coderunner/checksyntax.JPG"> and run it as shown:</p>
+   
+<div class="interactiveBox"><div class="interactiveTitle">INTERACTIVE SESSION:</div><div class="interactive"><pre>
+cold:~/perl3$ <ins>./g_match_number2.pl</ins>
+Date: 01/30/10; date: 02/01/10
+</pre></div></div>
+   
+  <p>Here we have a sample log format containing two entries separated by an ampersand (<b>&amp;</b>). Each 
+   entry consists of several fields. We parse out the date by looking for three sets of one or more digits
+   separated by slashes.  In English, <b>/g</b> tells our program that, "once we've matched everything in the regular expression,
+   see if we can match it again. If the regex doesn't match at the new location, advance the point at which 
+   we're testing for a match one character at a time until we get a match or we run out of input."</p>
+   
+  <p>A visual aid may help here. Think of two pointers being advanced as a regex is matched against an input. 
+    Before any matching has taken place, the pointers are in this state:</p>
+  
+  <div class="c"><img src="images/lessonImages/reg_ptr_1.png"></div>
+  
+  <p>After matching the first <b>\d+</b>, the pointers are in this state:</p>
+
+  <div class="c"><img src="images/lessonImages/reg_ptr_2.png"></div>
+   
+  <p>Now the input no longer satisfies the <b>\d+</b> part of the regex, so the regex 
+    engine looks at what comes after the regex pointer, sees a <b>/</b> (forward slash) required, looks at 
+    what comes into the input pointer, sees there is a <b>/</b> there, and advances both pointers:</p>
+
+  <div class="c"><img src="images/lessonImages/reg_ptr_3.png"></div>
+   
+  <p>This keeps going until we reach the end of the regex:</p>
+   
+  <div class="c"><img src="images/lessonImages/reg_ptr_4.png"></div>
+   
+  <p>Except for the <b>/g</b> modifier, we would be finished. But <b>/g</b> instructs us to bring the regex pointer 
+   back to the beginning of the regex and to keep going: </p>
+    
+  <div class="c"><img src="images/lessonImages/reg_ptr_5.png"></div>
+   
+  <p>The input pointer doesn't precede a digit—it's pointing at a space—so we advance it 
+   until we find something that satisfies that part of the regex: </p>
+    
+  <div class="c"><img src="images/lessonImages/reg_ptr_6.png"></div>
+   
+  <p>But after reading in those digits and getting to this point:</p>
+       
+  <div class="c"><img src="images/lessonImages/reg_ptr_7.png"></div>
+  
+  <p>...the regex is still not satisfied; it requires a <b>/</b>, but the input has a <b>:</b> (colon), so 
+   the regex engine <i>backtracks</i>:</p>
+   
+  <div class="c"><img src="images/lessonImages/reg_ptr_8.png"></div>
+  
+  <p>...and tries again. Eventually it will wind up here:</p>
+   
+  <div class="c"><img src="images/lessonImages/reg_ptr_9.png"></div>
+   
+  <p>...having achieved another successful match of the entire regex. The rest of the input has been omitted from the 
+   image for clarity, but in short, the regex engine obeys the <b>/g</b> modifier, resets its 
+   pointer and keeps looking for a match, will match part of the regex, but not the whole thing, and so there are 
+   no more matches. But it has successfully matched <i>twice</i>, so in a scalar context the regex will return 
+   <b>1</b>, and in a list context the match will return either the list <b>(1)</b> (if there 
+   were no capturing parentheses), or the list of all the <b>$1</b>, <b>$2</b>, <b>$3</b>, and so on, that it captured 
+   on each iteration of the regex. </p>
+   
+  <p>Now you can see why the earlier revision of <b>g_match_number.pl</b> went into an infinite 
+   loop! Although the condition of the <b>while</b> statement imposes scalar context, 
+   the assignment to the single-element list <b>($number)</b> imposes <i>list</i> context, and because that 
+   is the innermost part of the expression, that's the context in which the match is evaluated:</p>
+   
+  <div class="c"><img src="images/lessonImages/contexts.png"></div>
+  
+  <p>In a list context, the match returns the list of all the captures. We only save one of them; that capture goes 
+   into <b>$number</b>. Then the list assignment is evaluated in the scalar context imposed by the 
+   <b>while</b> statement. There's one element in the list, so the assignment is true, and the loop is executed. Now 
+   we come back around to test the condition again, but the global match is not being called in scalar context, 
+   so the match is not present in the middle of any iteration through the input—the match finished with that in one round when the match 
+   was called in list context. So the match is ready to run again from the beginning of the input, and that's what the match 
+   does.</p>
+   
+  <p>This excursion through the fine details of regular expression operation may feel a bit tedious, but stick with it—you 
+    need to understand the operation of matches in list and scalar 
+   contexts with and without the <b>/g</b> modifier thoroughly in order to write your own regexes. 
+    For many programmers regular expressions are a total mystery that they never 
+   understand well and only get to work by accident by copying and pasting old pieces of code and hacking 
+   at them until they seem to work. We accept no mysteries in this course! We're better than that! Let's keep going. Modify 
+   <b>g_match_number2.pl</b> as shown: </p>
+   
+<div class="listingBox"><div class="listingTitle">CODE TO TYPE:</div><div class="listing"><pre>#!/usr/bin/perl
+use strict;
+use warnings;
+
+my $line = "01/30/10 17:30:21 trish.oreilly.com ENABLE /perl1 &amp; 02/01/10 09:10:00 tim.oreilly.com ENROLL /perl1";
+
+<del>my ($date1, $date2) = ( $line =~ m!(\d+/\d+/\d+)!g );
+print "Date: $date1; date: $date2\n";</del>
+<ins>my ($date1, $time1, $course1, $date2, $time2, $course2) = ( $line =~ m!([\d/]+)\s+([\d:]+)[^/]*/(\S*)!g );
+print "Date: $date1; time: $time1; course: $course1; Date: $date2; time: $time2; course: $course2\n";</ins>
+</pre></div></div>
+   
+  <p><img src="images/coderunner/checksyntax.JPG"> and run it as shown:</p>
+   
+<div class="interactiveBox"><div class="interactiveTitle">INTERACTIVE SESSION:</div><div class="interactive"><pre>
+cold:~/perl3$ <ins>./g_match_number2.pl</ins>
+Date: 01/30/10; time: 17:30:21; course: perl1; Date: 02/01/10; time: 09:10:00; course: perl1
+</pre></div></div>
+   
+  <p>Here you can see the match operator return two sets of three captures; that is, <b>($1, $2, $3)</b>, 
+   twice. This example is somewhat contrived because we'll rarely have exactly two records in a 
+   single input to process this way; it's much more common to want to iterate through 
+   whatever number of records there might be. We'll try that more common usage out now. Modify 
+   <b>g_match_number2.pl</b> in your <b>/perl3</b> folder as follows:</p>
+   
+<div class="listingBox"><div class="listingTitle">CODE TO TYPE:</div><div class="listing"><pre>#!/usr/bin/perl
+use strict;
+use warnings;
+
+<ins>$_ = "09/26/10 18:23:17 trish.oreilly.com ENABLE /perl2 &amp; 09/27/10 09:16:23 tim.oreilly.com ENROLL /perl2";
+
+while ( m!([\d/]+)\s+([\d:]+)[^/]*/(\S*)!g )
+{
+  my ($date, $time, $course) = ($1, $2, $3);
+  print "Date; $date; time: $time; course: $course\n";
+}</ins>
+<del>my ($date1, $time1, $course1, $date2, $time2, $course2) = ( $line =~ m!([\d/]+)\s+([\d:]+)[^/]*/(\S*)!g );
+print "Date: $date1; time: $time1; course: $course1; Date: $date2; time: $time2; course: $course2\n";</del>
+</pre></div></div>
+   
+  <p><img src="images/coderunner/checksyntax.JPG"> and run it as shown:</p>
+   
+<div class="interactiveBox"><div class="interactiveTitle">INTERACTIVE SESSION:</div><div class="interactive"><pre>
+cold:~/perl3$ <ins>./g_match_number2.pl</ins>
+Date; 09/26/10; time: 18:23:17; course: perl2
+Date; 09/27/10; time: 09:16:23; course: perl2
+</pre></div></div>
+   
+  <p>We are matching on <b>$_</b>, which keeps the code less cluttered. Usually you will  
+   set <b>$_</b> implicitly through a readline operator like 
+   <b>&lt;$fh&gt;</b> or <b>&lt;&gt;</b>.</p>
+   
+  <p>Here's a cool use of matching in a list context where we don't know how many tokens we're going to 
+   match, we just want to match as many as there are. Create <b>g_match_list.pl</b>:</p>
+   
+<div class="listingBox"><div class="listingTitle">CODE TO TYPE:</div><div class="listing"><pre>#!/usr/bin/perl
+use strict;
+use warnings;
+
+$_ = join ' ', split /\n/, &lt;&lt;'END_OF_TEXT';
+This text is embedded in the program in multiple
+lines, but our program splits the heredoc into
+a list of lines (which don't contain the newline
+characters themselves, because those were what was
+split on), and then joins them with single spaces
+to form a single long string.  All in one expression, too!
+END_OF_TEXT
+
+my @words = /(\w+)/g;
+print " - $_ - \n" for @words;
+</pre></div></div>
+   
+  <p><img src="images/coderunner/checksyntax.JPG"> and run it as shown:</p>
+   
+<div class="interactiveBox"><div class="interactiveTitle">INTERACTIVE SESSION:</div><div class="interactive"><pre>
+cold:~/perl3$<ins>./g_match_list.pl</ins>
+- This - 
+- text - 
+- is - 
+- embedded - 
+- in - 
+- the - 
+- program - 
+- in -
+. . . 
+<i>(etc.)</i> 
+</pre></div></div>
+   
+  <p>See if you can improve the regular expression so it does a better job of matching
+    what you think are "words" in the input.</p>
+   
+ </div>
+ <a href="Perl3-04.html" name="globalsubstitution"></a>
+  <a name="h_05"></a><div class="heading">Global Substitution: Scalar and List Contexts</div><div class="headingText"> 
+   
+  <p>Now that we've covered the behavior of global matching, let's make sure you understand 
+   global substitution. Create <b>g_subs.pl</b> in your <b>/perl3</b> folder as shown:</p>
+   
+<div class="listingBox"><div class="listingTitle">CODE TO TYPE:</div><div class="listing"><pre>#!/usr/bin/perl
+use strict;
+use warnings;
+
+while ( &lt;DATA&gt; )
+{
+  print "Before: $_";
+  while ( my $result = s/(['"])(\w+)\1/{$2}/g )
+  {
+    print "  Made $result change(s)\n";
+  }
+  print "After: $_";
+}
+
+__END__
+In this text, "some" words are "quoted", like this: 'quoted'.
+That means they're surrounded by either 'single' quotes
+or "double" quotes.  But an "apostrophe" in a word like "don't"
+doesn't "count".
+</pre></div></div>
+   
+  <p><img src="images/coderunner/checksyntax.JPG"> and run it as shown:</p>
+   
+<div class="interactiveBox"><div class="interactiveTitle">INTERACTIVE SESSION:</div><div class="interactive"><pre>
+cold:~/perl3$ <ins>./g_subs.pl</ins>
+Before: In this text, "some" words are "quoted", like this: 'quoted'.
+  Made 3 change(s)
+After: In this text, {some} words are {quoted}, like this: {quoted}.
+Before: That means they're surrounded by either 'single' quotes
+  Made 1 change(s)
+After: That means they're surrounded by either {single} quotes
+Before: or "double" quotes.  But an "apostrophe" in a word like "don't"
+  Made 2 change(s)
+After: or {double} quotes.  But an {apostrophe} in a word like "don't"
+Before: doesn't "count".
+  Made 1 change(s)
+After: doesn't {count}.
+</pre></div></div>
+   
+  <p>Unlike the match operator, the substitution operator with <b>/g</b> in a scalar 
+   context does <i>not</i> act as an iterator; it does all of the substitutions and then returns the number 
+   of substitutions made.</p>
+   
+  <p>And in a list context, it's the same. Modify <b>g_subs.pl</b> as shown:</p>
+  
+<div class="listingBox"><div class="listingTitle">CODE TO TYPE:</div><div class="listing"><pre>#!/usr/bin/perl
+use strict;
+use warnings;
+
+while ( &lt;DATA&gt; )
+{
+  print "Before: $_";
+  <del>while ( my $result = s/(['"])(\w+)\1/{$2}/g )
+  {
+    print "  Made $result change(s)\n";
+  }</del>
+  <ins>my @results = s/(['"])(\w+)\1/{$2}/g;
+  print "  Made @results change(s)\n";</ins>
+  print "After: $_";
+}
+
+__END__
+In this text, "some" words are "quoted," like this: 'quoted.'
+That means they're surrounded by either 'single' quotation marks
+or "double" quotation marks.  But an "apostrophe" in a word like "don't"
+doesn't "count." Get it?
+</pre></div></div>
+
+  <p><img src="images/coderunner/checksyntax.JPG"> and run it. You'll get exactly the same output as 
+   before. In a list context, we see that a substitution with <b>/g</b> returns a list containing 
+   one element, which is the number of changes made. But evaluating a substitution in list context isn't particularly useful.</p>
+    
+ </div>
+ <a href="Perl3-04.html" name="nongreedymatching"></a>
+ <a name="h_06"></a><div class="heading">Nongreedy Matching</div><div class="headingText">
+   
+  <p><div class="c">"Greed is good"<br>--Gordon Gecko, <i>Wall Street</i></div></p>
+   
+  <p>Every quantifier that we've met so far in our exploration of regular expressions (*, +, ?, and 
+   {<i>m</i>,<i>n</i>} is <i>greedy:</i> it'll match as much of the input as it can. That's useful, but 
+   sometimes we want the opposite: to match as <i>little</i> as possible. (We need to be careful when we do this though. 
+   To "match as little as possible" can result in "match nothing" and that may not be the 
+   outcome we want.)</p>
+   
+  <p>The syntax for nongreedy quantifiers is simple and logical; just add a question mark to the 
+   corresponding greedy quantifier. Let's use, for example, <b>\d</b> as an atom to quantify: 
+   </p>
+   
+  <div class="c"><table class="tbl" border=""><tr><th>Greedy Regex</th><th>Meaning</th><th>Nongreedy Regex</th><th>Meaning</th></tr><tr><td>\d*</td><td>Match zero or more digits, preferably as many as possible</td><td>\d*?</td><td>Match zero or more digits, zero if possible</td></tr><tr><td>\d+</td><td>Match one or more digits, preferably as many as possible</td><td>\d+?</td><td>Match one or more digits, one if possible</td></tr><tr><td>\d?</td><td>Match zero or one digits, preferably one</td><td>\d??</td><td>Match zero or one digits, preferably zero</td></tr><tr><td>\d{3,7}</td><td>Match 3 to 7 digits, preferably 7</td><td>\d{3,7}?</td><td>Match 3 to 7 digits, preferably 3</td></tr></table></div>
+   
+  <p>The difference between greedy and nongreedy matching can be illustrated using this 
+   one-liner: </p>
+   
+<div class="interactiveBox"><div class="interactiveTitle">INTERACTIVE SESSION:</div><div class="interactive"><pre>
+cold:~/perl3$ <ins>perl -le '$_ = "First pig second pig third pig last pig"; s/(.*)pig/$1cow/; print'</ins>
+First pig second pig third pig last cow
+cold:~/perl3$ <ins>perl -le '$_ = "First pig second pig third pig last pig"; s/(.*?)pig/$1cow/; print'</ins>
+First cow second pig third pig last pig
+</pre></div></div>
+   
+  <p>See how <b>.*</b> matched as <i>many</i> characters as possible whereas <b>.*?</b> 
+   matched as <i>few</i> characters as possible? Now let's see that at work in an example. Create 
+   <b>nongreedy.pl</b> in your <b>/perl3</b> folder as shown:</p>
+   
+<div class="listingBox"><div class="listingTitle">CODE TO TYPE:</div><div class="listing"><pre>#!/usr/bin/perl
+use strict;
+use warnings;
+
+$_ = "abc123def 456ghi7";
+
+print "Greedy:    ";
+print for /(c.*[def])/;
+print "\nNongreedy: ";
+print for /(c.*?[def])/;
+print "\n";
+</pre></div></div>
+   
+  <p><img src="images/coderunner/checksyntax.JPG"> and run it:</p>
+   
+<div class="interactiveBox"><div class="interactiveTitle">INTERACTIVE SESSION:</div><div class="interactive"><pre>
+ cold:~/perl3$ <ins>./nongreedy.pl</ins>
+Greedy:    c123def
+Nongreedy: c123d
+</pre></div></div>
+   
+  <p>We use the result of a match containing a capture in a list context to print the
+    match in a really succinct idiom. So why did that happen? In the first expression, the 
+   <b>.*</b> will match as many characters as possible, which initially means that it will match all 
+   the way to the end of the input (because it's being <i>greedy</i>); but then the regex engine will look at 
+   what comes next in the regex and see that it needs a <b>d</b>, <b>e</b>, or 
+   <b>f</b>. There isn't one though, because the regex has arrived at the end of the string, so it'll backtrack, 
+   undoing one character at a time from the greedy match of <b>.*</b> until it finds its input 
+   pointer in front of a <b>d</b>, <b>e</b>, or <b>f</b>.</p>
+   
+  <p>In the second expression, the <b>.*?</b> will match as <i>few</i> characters as possible, which 
+   initially means that it matches <i>zero</i> characters. But then the regex engine sees that it needs a 
+   <b>d</b>, <b>e</b>, or <b>f</b>, and it looks at the next character in the 
+   input and it's a <b>1</b>, which won't do, so it allows the <b>.*?</b> to match one 
+   character, and tries again; but now the next character is a <b>2</b>, which still won't do, so our regex 
+   allows the <b>.*?</b> to match two characters; but now the next character is a 
+   <b>3</b>, which still won't do, so our regex allows the <b>.*?</b> to match three characters, 
+   and now the next character is a <b>d</b>, which <i>will</i> do, and so it has a match.</p>
+   
+  <p>That little description of how the regex engine behaves for a greedy quantifier versus a nongreedy 
+   quantifier contains all you need to know about how the two types of quantifier work. Just remember that a 
+   greedy quantifier means that the regex engine will match as many things as possible and then backtrack as 
+   necessary to match the rest of the regex, while a nongreedy quantifier means that the regex engine will 
+   match as few things as possible and then match more things as necessary to match the rest of the regex.</p>
+   
+  <p>A nongreedy quantifier can often save you from having to create a more complicated regex. For example, 
+   suppose you were parsing some simple HTML. Create <b>match_html.pl</b> in your <b>/perl3</b>
+   folder as shown: </p>
+
+<div class="listingBox"><div class="listingTitle">CODE TO TYPE:</div><div class="listing"><pre>#!/usr/bin/perl
+use strict;
+use warnings;
+
+$_ = join '', &lt;DATA&gt;;
+s/\n//g;
+length and print " - $_ -\n" for split /&lt;(.+?)&gt;/;
+
+__END__
+&lt;HTML&gt;
+&lt;HEAD&gt;&lt;TITLE&gt;Lesson 4&lt;/TITLE&gt;&lt;/HEAD&gt;
+&lt;BODY&gt;
+&lt;H1&gt;Lesson 4: Global Matches&lt;/H1&gt;
+&lt;P&gt;Here we will learn about the &lt;B&gt;/g&lt;/B&gt; modifier.
+&lt;/P&gt;
+&lt;/BODY&gt;
+&lt;/HTML&gt;
+</pre></div></div>
+
+  <p><img src="images/coderunner/checksyntax.JPG"> and run it:</p>
+  
+<div class="interactiveBox"><div class="interactiveTitle">INTERACTIVE SESSION:</div><div class="interactive"><pre>
+cold:~/perl3$ <ins>./match_html.pl</ins>
+- HTML -
+- HEAD -
+- TITLE -
+- Lesson 4 -
+- /TITLE -
+- /HEAD -
+- BODY -
+- H1 -
+- Lesson 4: Global Matches -
+- /H1 -
+- P -
+- Here we will learn about the -
+- B -
+- /g -
+- /B -
+- modifier. -
+- /P -
+- /BODY -
+- /HTML -
+cold:~/perl3$ 
+</pre></div></div>
+   
+  <p>That's a useful start to parsing HTML, but suppose we had used greedy matching instead. Modify
+    the program as shown:</p>
+   
+<div class="listingBox"><div class="listingTitle">CODE TO TYPE:</div><div class="listing"><pre>#!/usr/bin/perl
+use strict;
+use warnings;
+
+$_ = join '', &lt;DATA&gt;;
+s/\n//g;
+length and print " - $_ -\n" for <del>split /&lt;(.+?)&gt;/;</del> <ins>split /&lt;(.+)&gt;/;</ins>
+
+__END__
+&lt;HTML&gt;
+&lt;HEAD&gt;&lt;TITLE&gt;Lesson 4&lt;/TITLE&gt;&lt;/HEAD&gt;
+&lt;BODY&gt;
+&lt;H1&gt;Lesson 4: Global Matches&lt;/H1&gt;
+&lt;P&gt;Here we will learn about the &lt;B&gt;/g&lt;/B&gt; modifier.
+&lt;/P&gt;
+&lt;/BODY&gt;
+&lt;/HTML&gt;
+</pre></div></div>
+   
+  <p><img src="images/coderunner/checksyntax.JPG"> and run it. What is going on with the output? Think about why it 
+   looks that way.</p>
+   
+  <p>You can fix that problem there without resorting to nongreedy quantifiers if you want. This next version of the 
+   program works the same way as the one with the nongreedy quantifier. Modify your code as shown: </p>
+
+<div class="listingBox"><div class="listingTitle">CODE TO TYPE:</div><div class="listing"><pre>#!/usr/bin/perl
+use strict;
+use warnings;
+
+$_ = join '', &lt;DATA&gt;;
+s/\n//g;
+length and print " - $_ -\n" for <del>split /&lt;(.+)&gt;/;</del> <ins>split /&lt;([^&gt;]+)&gt;/;</ins>
+
+__END__
+&lt;HTML&gt;
+&lt;HEAD&gt;&lt;TITLE&gt;Lesson 4&lt;/TITLE&gt;&lt;/HEAD&gt;
+&lt;BODY&gt;
+&lt;H1&gt;Lesson 4: Global Matches&lt;/H1&gt;
+&lt;P&gt;Here we will learn about the &lt;B&gt;/g&lt;/B&gt; modifier.
+&lt;/P&gt;
+&lt;/BODY&gt;
+&lt;/HTML&gt;
+</pre></div></div>
+   
+  <p>But this approach may become difficult to implement when the token that comes after the quantified atom is 
+   more than one character long. So nongreedy quantifiers are definitely worth learning!</p>
+   
+  <p>Here's another example you can try as a one-liner, taking output from the <b>curl</b> program that 
+   fetches a web page:</p>
+ 
+<div class="interactiveBox"><div class="interactiveTitle">INTERACTIVE SESSION:</div><div class="interactive"><pre>
+cold:~/perl3$ <ins>curl -s http://www.oreillyschool.com/certificate-programs | perl -nle '/&lt;li&gt;.*?&gt;(.+?)&lt;/ and print $1'</ins>
+</pre></div></div>
+  
+  <p>Try it! It lists the certificate programs available at the O'Reilly School of Technology (At least, until they change
+    the format of that page... this is one of the problems of web page scraping. At that point, we'll modify 
+    the one-liner!):</p>
+    
+<div class="observeBox"><div class="observeTitle">OBSERVE:</div><div class="observe"><pre>
+C#.NET Programming Certificate
+Client-Side Programming Certificate
+Database Administration Certificate
+Java Programming Certificate
+Linux Systems Administration Certificate
+Open-Source Programming Certificate
+Perl Programming Certificate
+PHP/SQL Programming Certificate
+Python Programming Certificate
+Web Programming Certificate
+</pre></div></div>
+   
+   <p>Notice that a few items that aren't courses were output. (This is also one of the problems of 
+   parsing HTML: it's a language describing presentation, not semantics.) See if you can modify the 
+   regular expression so that it shows only the courses.</p>
+   
+  <div class="c"><table class="noteBox fBox pBox "><tr><td class="noteTitle">WARNING</td><td class="note">In general, this is <i>not</i> the way to parse HTML, because HTML may contain all kinds of 
+   constructions that defeat a basic regex, for example, angle brackets inside comments. The proper 
+   way to parse any kind of HTML is with a module like <b>HTML::Parser</b>. But if you control the HTML that 
+   will be your program's input and can guarantee that it will always be formatted in a way that your 
+   regexes can parse, you can ignore this restriction, because your input is technically not "HTML." It's "a 
+   custom format that is equivalent to a subset of HTML".</td></tr></table></div>
+   
+  <p>Wow. That was one long lesson, but an really important one.  Now your regular expression expertise has 
+    officially reached an 
+   advanced level! Good work! Keep it up and see you in the next lesson...</p>
+  
+ </div>
+   
+ <p>Once you finish the lesson, go back to the syllabus to complete the homework.</p>
+   
+<div class="footer"><div id="timeSurvey"></div>				
+				Copyright © 1998-2014 O'Reilly Media, Inc.<br><img src="https://courses.oreillyschool.com/common/cclicense.png"><br>
+				This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 Unported License.<br>
+				See <a href="http://creativecommons.org/licenses/by-sa/3.0/legalcode">http://creativecommons.org/licenses/by-sa/3.0/legalcode</a> 
+				for more information.
+				</div><iframe id="t" width="1" height="1" border="0" style="display:none"></iframe><script language="javascript">bodyLoaded();</script><script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+  ga('create', 'UA-44720547-1', 'oreillyschool.com');
+  ga('send', 'pageview');
+</script></body></html>

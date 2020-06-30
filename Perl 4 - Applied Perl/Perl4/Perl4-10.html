@@ -1,0 +1,381 @@
+<html><!-- Copyright (c) 1998-2014 O'Reilly Media, Inc.
+			This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 Unported License.
+			See http://creativecommons.org/licenses/by-sa/3.0/legalcode for more information.
+            --><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"><link rel="stylesheet" type="text/css" href="../common/Lab.css"><script type="text/javascript" src="../common/Lab.js"></script><script language="javascript"></script><title>Web Programming, on Web Clients</title></head><body id="body"><a name="top"></a><div class="title">Web Programming, on Web Clients</div><div class="resize"><a href="Perl4-10.html#top" onclick="changeSize('smaller');" class="aS" title="Keep clicking to make fonts smaller">A</a><a href="Perl4-10.html#top" onclick="changeSize('larger');" class="aL" title="Keep clikcing to make fonts larger">A</a><a href="Perl4-10.html#top" onclick="lv()" class="lv" title="Adjust Page for High Contrast">HC</a><div id="fh"><p>Click on <span class="aS">A</span> to make all fonts on the page smaller.</p><p>Click on <span class="aL">A</span> to make all fonts on the page larger.</p><p>Click on <span class="lv">HC</span> to toggle high contrast mode. When you move your mouse over 
+                 some bold words in high contrast mode, related words are automatically highlighted. Text is shown
+                 in black and white. 
+             </p></div></div><hr>
+ 
+ <div class="goalTitle">Lesson Objectives</div><div class="goals">
+ When you complete this lesson, you will be able to:
+ 
+ 
+  <ul><li><a href="Perl4-10.html#browser_emulation_with_www_mechanize">Emulate Browsers with WWW::Mechanize</a>.</li><li>work within the <a href="Perl4-10.html#limitations">Limitations</a> of Mechanize.</li></ul>
+ </div><hr>
+ 
+ <p>You're doing really well so far, so let's dive right into our next lesson! It includes these topics:</p>
+ 
+
+ 
+ <a href="Perl4-10.html" name="browser_emulation_with_www_mechanize"></a>
+ <a name="h_01"></a><div class="heading">Browser Emulation with WWW::Mechanize</div><div class="headingText">
+  
+  <p>The code we developed in the last lesson ran on a web <i>server</i>: an environment where a program like 
+   Apache listening for incoming HTTP requests handed off those requests to our code and then forwarded the 
+   response back over the network to the web browser. Now we're going to program for the <i>other</i> end of 
+   that chain: the web <i>client</i> side. We are going to write code that pretends to be a web browser. The 
+   most common use for this is <i>screen scraping</i>: programs that automatically fetch web pages and parse 
+   their contents, perhaps submitting forms in the process.</p>
+  
+  <p>There are many useful applications for this: programs that fetch your bank balances, or 
+   programs that automatically trade on your brokerage account (you'd better have good security on those); programs 
+   that tell you when a library book is nearly due; or programs that act as your proxy in online auctions. Check 
+   the terms of service of a site before you write a program to interact with it to make sure you're permitted to do so.</p>
+  
+  <a name="s_01"></a><div id="s_01"><div class="subheading">Installing WWW::Mechanize</div><div class="subheadingText">
+   
+   <p>First, we need to install WWW::Mechanize. This process is more challenging than usual because this module naturally 
+    wants to scrape some external sites as part of its tests by default, but the firewall on the student machine
+    prevents most outbound connections. On the bright side, this will give us a chance to illustrate another approach to CPAN module 
+    building, when hands-on attention is required. We can employ a hybrid building process that combines the 
+    helpfulness of CPAN.pm with the flexibility of the manual method:</p>
+
+<div class="interactiveBox"><div class="interactiveTitle">INTERACTIVE TERMINAL SESSION: Commands to type</div><div class="interactive"><pre>cold:~$ <ins>cd perl4</ins>
+cold:~/perl4$ <ins>PERL5LIB=~/mylib/lib/perl5 cpan HTML::TreeBuilder HTTP::Server::Simple</ins>
+[output omitted]
+# If asked "Do you want to run external tests?", press <b>Enter</b> 
+cold:~/perl4$ <ins>PERL5LIB=~/mylib/lib/perl5 cpan</ins>
+<u>cpan[1]&gt;</u> <ins>install HTML::Form LWP</ins>
+[output omitted]<u>cpan[2]&gt;</u> <ins>look WWW::Mechanize</ins>
+[output omitted]
+cold:~/.cpan/build/WWW-Mechanize-1.68-KLJDhN$ <ins>PERL5LIB=~/mylib/lib/perl5 perl Makefile.PL INSTALL_BASE=~/mylib --nolive</ins>
+[output omitted]
+cold:~/.cpan/build/WWW-Mechanize-1.68-KLJDhN$ <ins>make test install</ins>
+[output omitted]
+cold:~/.cpan/build/WWW-Mechanize-1.68-KLJDhN$ <ins>exit</ins>
+Terminal does not support GetHistory.
+Lockfile removed.
+cold1:~/perl4$
+
+
+<u>cpan[3]&gt;</u> <ins>q</ins></pre></div></div>
+   
+   <p>We used the <b>look</b> command within the CPAN.pm <i>shell</i> to get a Unix shell opened inside the 
+    WWW::Mechanize distribution. CPAN.pm did the work of locating the latest version, downloading, and unpacking 
+    it into a temporary directory for us (that's the 'KLJDhN' part of the prompt above; you probably saw a 
+    different string). This gave us the ability to issue the <span class="code">--nolive</span> option to Makefile.PL to 
+    tell <span class="code">make test</span> not to run its tests that depend on outside connectivity. </p>
+  
+  </div></div>
+  <a name="s_02"></a><div id="s_02"><div class="subheading">Fetching Pages with WWW::Mechanize</div><div class="subheadingText">
+   
+   <p>Now we can use WWW::Mechanize to fetch web pages. Let's use it to fetch one that we made in the 
+    last lesson! Create a new file in the CodeRunner editor as shown:</p>
+     
+<div class="listingBox"><div class="listingTitle">CODE TO ENTER:</div><div class="listing"><pre>#!/usr/local/bin/perl
+use strict;
+use warnings;
+
+use lib "$ENV{HOME}/mylib/lib/perl5";
+use WWW::Mechanize;
+
+my $mech = WWW::Mechanize-&gt;new;
+
+my $me = $ENV{USER};
+$mech-&gt;get( "http://$me.oreillystudent.com/perl4/atm_select.cgi" );
+$mech-&gt;success or die $mech-&gt;res-&gt;message;
+my $content = $mech-&gt;content;
+$content =~ /Account number:/ or die "Page contents mismatch";
+$content =~ /First Bank of (.*?)&lt;/ and print "Ready to log on to &lt;$1&gt;!\n";
+</pre></div></div>
+   
+   <p><img src="images/coderunner/save.gif"> Save it as <b>/perl4/fetch_bank.pl</b> and run it. You'll 
+    see this:</p>
+     
+<div class="interactiveBox"><div class="interactiveTitle">INTERACTIVE TERMINAL SESSION: Command to type</div><div class="interactive"><pre>cold:~/perl4$ <ins>./fetch_bank.pl</ins>
+Ready to log on to &lt;O'Reilly&gt;!</pre></div></div>
+ 
+  </div></div>
+  <a name="s_03"></a><div id="s_03"><div class="subheading">Submitting Forms with WWW::Mechanize</div><div class="subheadingText">
+  
+   <p>We create the <b>$mech</b> object as a virtual browser, like Firefox or Safari or Internet 
+    Explorer. We can tell it to do the same kinds of things as a browser, like fetch a URL with <b>get()</b>, 
+    and tell us the content it last fetched with <b>content()</b>. The <b>success</b> method returns true if it 
+    was able to fetch the page. The <b>res</b> method returns an HTTP::Response object which has a 
+    <b>message</b> method that returns a description of the status of a response from a web server.</p>
+  
+   <p>You may have noticed that I've finally saved you the trouble of editing in your home directory... or had you already 
+    written an alias for a one-liner to change <b>your_home_directory</b>? I'm retrieving the home directory from 
+    the environment. I waited until after the CGI lesson to show you this because it will <i>not</i> work in CGI 
+    programs: those programs are executed by the web server process, which is running as the web server user  (<i>not</i> 
+    you) and therefore will have a different home directory (or none at all). Be aware of this whenever you 
+    write a CGI program on the student machine from now on.</p>
+  
+   <p>We know that atm_select.cgi is just the beginning of the website code we wrote; if we were looking at it in a 
+    browser window, we could select an account number, submit the form, and see a new page. WWW::Mechanize can 
+    do that too! Modify fetch_bank.pl as shown:</p>
+  
+<div class="listingBox"><div class="listingTitle">CODE TO EDIT:</div><div class="listing"><pre>#!/usr/local/bin/perl
+use strict;
+use warnings;
+
+use lib "$ENV{HOME}/mylib/lib/perl5";
+use WWW::Mechanize;
+
+my $mech = WWW::Mechanize-&gt;new;
+
+my $me = $ENV{USER};
+$mech-&gt;get( "http://$me.oreillystudent.com/perl4/atm_select.cgi" );
+$mech-&gt;success or die $mech-&gt;res-&gt;message;
+my $content = $mech-&gt;content;
+$content =~ /Account number:/ or die "Page contents mismatch";
+$content =~ /First Bank of (.*?)&lt;/ and print "Ready to log on to &lt;$1&gt;!\n";
+
+<ins>$mech-&gt;set_visible( 10001 );
+$mech-&gt;submit-&gt;is_success or die $mech-&gt;res-&gt;message;
+for ( $content = $mech-&gt;content )
+{
+  s/&lt;.*?&gt;/ /g;
+  s/\s+/ /g;
+  s/(.{1,65})\s/$1\n/g;
+  print;
+}</ins></pre></div></div>
+ 
+   <p><img src="images/coderunner/save.gif"> Save and run it. You'll see this: </p>
+ 
+<div class="interactiveBox"><div class="interactiveTitle">INTERACTIVE TERMINAL SESSION: Command to type</div><div class="interactive"><pre>cold:~/perl4$ <ins>./fetch_bank.pl</ins>
+Ready to log on to &lt;O'Reilly&gt;!
+ First Bank of O'Reilly First Bank of O'Reilly Automated Teller
+Machine Account number 10001 Owner(s) Peter Scott, Grace Scott
+Balance 4800 Date What Amount Ending Balance 2011-04-28 21:34:30
+debit 200 4800</pre></div></div>
+   
+   <p>The additional code calls the <b>set_visible</b> method, which sets input fields. The fields in question 
+    are whatever is in the form in the page that was last fetched and is in <b>$mech-&gt;content</b>. It's called 
+    <b>set_visible</b> because it won't set any inputs of the hidden type. You can use it to set multiple 
+    inputs and it'll set them in the order they appear.</p>
+   
+   <p>Notice here the use of a Perl <i>idiom</i> with the code:</p>
+   
+<div class="observeBox"><div class="observeTitle">OBSERVE: Code fragment</div><div class="observe"><pre><span class="darkblue">for</span> ( <span class="darkred">$content</span> = $mech-&gt;content )</pre></div></div>
+   <p>
+    This sets <span class="darkred">$content</span> and then goes around the <span class="darkblue">for</span> loop exactly once 
+    with $_ <i>aliased</i> to <span class="darkred">$content</span>. Why? Because the four statements in the loop can all 
+    default to $_ and save us from repeating <span class="darkred">$content</span> that many times.</p>
+      
+   <p>Despite our best efforts at reformatting the content for human consumption, the result is still not 
+    pretty. The best general solution to this problem will come in the next lesson. </p>
+   
+  </div></div>
+  <a name="s_04"></a><div id="s_04"><div class="subheading">Link Following with WWW::Mechanize</div><div class="subheadingText">
+   
+   <p>You don't have to know the URL of every page you want to fetch; you can follow links just like someone 
+    with a browser would. Bring up <a href="http://38.229.66.100/CPAN/" target="_blank">the CPAN home page</a> in your browser right now. (That URL is odd because it's one of the few external 
+    sites we can get to from the student machine. Your browser can reach any site, of course, but we're about to 
+    write a program to scrape this one from the student machine. I just want you to see the page in a browser 
+    first.) It should look like this:</p>
+   
+   <p><div class="c"><img src="images/lessonImages/cpan_front.png" width="460"></div></p>
+   
+   <p>However, the statistics and list of recent uploads will be different, because new modules are being 
+    uploaded all the time. Let's suppose you wanted to write a script that would scrape that list for a report. 
+    Create a new file in the CodeRunner editor:</p>
+   
+<div class="listingBox"><div class="listingTitle">CODE TO ENTER:</div><div class="listing"><pre>#!/usr/local/bin/perl
+use strict;
+use warnings;
+
+use lib "$ENV{HOME}/mylib/lib/perl5";
+use WWW::Mechanize;
+
+
+my $URL = 'http://www.cpan.org/CPAN';  # Only goes to right place from OST student machine
+my $mech = WWW::Mechanize-&gt;new;
+$mech-&gt;get( $URL );
+my @links = $mech-&gt;find_all_links( url_regex =&gt; qr/release/ );
+print $_-&gt;text, "\n" for @links;
+</pre></div></div>
+   
+   <p><img src="images/coderunner/save.gif"> Save it as <b>/perl4/cpan_link.pl</b> and run it:</p>
+   
+<div class="interactiveBox"><div class="interactiveTitle">INTERACTIVE TERMINAL SESSION: Command to type</div><div class="interactive"><pre>cold:~/perl4$ <ins>./cpan_link.pl</ins>
+CGI.pm-3.54
+SVN-Simple-Hook-0.215
+Net-Stomp-0.41
+Setup-Unix-User-0.01
+Catalyst-Model-XML-Feed-0.04
+Crypt-Scrypt-0.04
+v6-0.042
+IncomeTax-UK-0.02
+IncomeTax-IND-0.02
+IncomeTax-UK-0.01</pre></div></div>
+   
+   <p>The <b>find_all_links</b> method searches for links in the content using any of a variety of criteria. Here 
+    we have specified that each link's target should contain the <b>~</b> character (<b>qr</b> is the 
+    <i>quote-regex</i> operator; it gives us a regular expression, precompiled). How did we figure this out? By 
+    looking at the source code for the page and realizing that every link to a new distribution contains a tilde 
+    in front of the author's ID, but none of the other links point to an author. This is the type of creative 
+    insight that screen scraping is built upon.</p>
+   
+   <p><b>find_all_links</b> returns a list of <b>WWW::Mechanize::Link</b> objects, which have their own manual 
+    page (see <b>PERL5LIB=~/mylib/lib/perl5 perldoc WWW::Mechanize::Link</b> or 
+    <a href="http://search.cpan.org/perldoc?WWW::Mechanize::Link" target="_blank">search.cpan.org/perldoc?WWW::Mechanize::Link</a>) where we can see which methods we can call
+    on them. The <b>text</b> method returns the visible part of the link that you see in a browser, so we print 
+    that. </p>
+    
+   <p>So much for <i>finding</i> links—now let's <i>follow</i> them. Suppose we want a script that reports the 
+    number of authors currently on CPAN. In your browser, starting at the 
+    <a href="http://38.229.66.100/CPAN/" target="_blank">same page</a> as before, click on the "Modules" link, 
+    and then on the "Authors" link. That takes you to a page containing links to individual authors' pages.</p>
+   
+   <p>But there's a catch: most authors are actually listed in pages that are linked from this one by following 
+    a link for a letter of the alphabet, and then a link that is two characters long. This binning scheme was
+    implemented when the number of authors became larger. Up until then, the authors fit in a top-level 
+    directory, and the authors that were added before that point was reached are the ones you see at the top 
+    level, "grandfathered in."</p>
+   
+   <p>So from the authors page, we'll have to dig down two more levels to do our counting. Create a new file in 
+    the CodeRunner editor:</p>
+<div class="listingBox"><div class="listingTitle">CODE TO ENTER:</div><div class="listing"><pre>#!/usr/local/bin/perl
+use strict;
+use warnings;
+
+use lib "$ENV{HOME}/mylib/lib/perl5";
+use WWW::Mechanize;
+
+my $URL = 'http://www.cpan.org/';  # Only goes to right place from OST student machine
+my $mech = WWW::Mechanize-&gt;new;
+my %dont_count = map { $_, 1 }  ('CHECKSUMS', 'Parent Directory');
+
+$mech-&gt;get( $URL );
+$mech-&gt;follow_link( text =&gt; 'Modules' );
+$mech-&gt;follow_link( text =&gt; 'Authors' );
+
+print count_authors(), " authors on CPAN\n";
+
+
+sub count_authors
+{
+  my $count = 0;
+
+  for my $link ( $mech-&gt;links )
+  {
+    if ( length( $link-&gt;text ) &lt; 3 )
+    {
+      print "Subdirectory: ", $link-&gt;text, "\n";
+      $mech-&gt;get( $link-&gt;url_abs );
+      $count += count_authors();
+      $mech-&gt;back;
+    }
+    else
+    {
+      $count++ unless $dont_count{ $link-&gt;text };
+    }
+  }
+  return $count;
+}
+</pre></div></div>
+   
+   <p><img src="images/coderunner/save.gif"> Save it as <b>/perl4/cpan_authors.pl</b>. Because this code takes 
+    a while to go through all of the pages, it prints out each subdirectory it enters. Run it and you'll see this:</p>
+   
+<div class="interactiveBox"><div class="interactiveTitle">INTERACTIVE TERMINAL SESSION: Command to type</div><div class="interactive"><pre>cold:~/perl4$ <ins>./cpan_authors.pl</ins>
+Subdirectory: A
+Subdirectory: AA
+Subdirectory: AB
+[...]
+Subdirectory: ZW
+Subdirectory: ZZ
+6448 authors on CPAN
+</pre></div></div>
+   
+   <p>The number may be different by the time you run it, of course, but not by much. The number is lower than the 
+    number of authors reported on the front page that you visited in 
+    your browser, because this CPAN mirror leaves out some content. </p>
+   
+   <p>The recursive subroutine follows links that have text of only one or two characters, which denotes a 
+    subdirectory rather than a user. Once we're done following the link, we call the <b>back</b> method of 
+    WWW::Mechanize, which is like hitting the back button on a browser. In each subdirectory there is a link 
+    called CHECKSUMS that we should ignore, and a navigational link to 'Parent Directory' that we should also ignore. </p>
+   
+   <p>Now you have an idea of what's possible with WWW::Mechanize:, virtually any operation you might want to 
+    perform with a browser can be scripted, and tasks that would otherwise involve much mindless clicking and 
+    typing can be automated. </p>
+  
+  </div></div>
+  <a name="s_05"></a><div id="s_05"><div class="subheading">LWP</div><div class="subheadingText">
+   
+   <p>I'd like to share a bit of information about the object classes that WWW::Mechanize is built upon. Before 
+    WWW::Mechanize came out in 2004, the standard module suite for performing this kind of task was <b>LWP</b>, 
+    the Library for Web Programming. It let you create a <b>LWP::UserAgent</b> object that could do much of what 
+    WWW::Mechanize can do, but at a lower level. It did not, for instance, accept and remember cookies the way 
+    WWW::Mechanize does, without explicit coding. It could not submit forms without explicit coding to extract 
+    form actions and set inputs.</p>
+   
+   <p>WWW::Mechanize automated all that by building <i>on top of</i> LWP. A WWW::Mechanize object 
+    <i>inherits</i> from LWP::UserAgent. So whenever you need some low-level functionality that Mechanize 
+    doesn't provide (say, changing the timeout), look for it in LWP. This layering will show up 
+    in other places as well. Remember how the <b>res</b> method of Mechanize returns an HTTP::Response object? That 
+    class is from LWP.</p>
+  </div></div>
+ </div>
+   
+ <a href="Perl4-10.html" name="limitations"></a>
+ <a name="h_02"></a><div class="heading">Limitations</div><div class="headingText">
+    
+  <p>Mechanize is extremely versatile, but they still can't perform all the tasks that browsers do. Any content 
+   that constitutes code that is executed by a special-purpose engine in the browser falls into this category. 
+   Let's look at some examples of that. </p>
+    
+  <a name="s_01"></a><div id="s_01"><div class="subheading">Javascript</div><div class="subheadingText">
+   
+   <p>JavaScript is capable of arbitrary behavior within your browser. Bank sites in particular are notorious 
+    for inserting JavaScript that is very difficult to unravel. Because eventually everything breaks down into 
+    HTTP transactions—which Mechanize can handle—in theory if you stare at the JavaScript long 
+    enough or snoop on the connection to see what's traveling along the wire, you can reverse engineer the code to
+    automate it. In practice, this may take longer than is useful for some (though not many) sites. </p>
+     
+   <p>There is some experimental work being done right now to attempt integration of JavaScript parsing and a
+    JavaScript engine with WWW::Mechanize, but it's not ready for you yet. </p>
+  
+  </div></div>
+  <a name="s_02"></a><div id="s_02"><div class="subheading">Flash</div><div class="subheadingText">
+     
+   <p>Flash and, on Internet Explorer, ActiveX controls, and Silverlight is even harder to figure out—there is no readable
+    code to try and decipher. If a site exploits these technologies to display content or accept input that you
+    are interested in, Mechanize is not likely to be of help.</p>
+    
+  </div></div>
+    
+  <p>As a final note, don't use screen scraping as a tool of first resort. See if there's a proper API for 
+   accessing the information you want. Sometimes it may be obvious from the nature of the content that an API will 
+   not be available, but sometimes it might; it never hurts to check. Remember that web pages are almost 
+   exclusively designed for human consumption, so picking apart HTML with regular expressions (or 
+   even better alternatives, as we are about to see) is a poor substitute for receiving structured data that is 
+   appropriately tagged and typed for your application. This is precisely why, for instance, Google created a 
+   search API to allow people to perform searches from code without having to screen scrape.</p>
+      
+    
+  <p>And that takes us to the end of this lesson! You'll notice that the level of explanation that we provide
+   in each lesson is moving to a higher level as we go along; we are taking into account how you are progressing 
+   in your Perl expertise and assuming that you are by now familiar with pulling up specific documentation 
+   rapidly, comfortable with concise Perl idioms, and able to read object-oriented code. We are 
+   preparing you to be pushed out of the nest, as it were, at the end of the course.</p>
+ 
+ </div>
+  
+ <p>Once you finish the lesson, go back to the syllabus to complete the homework.</p>
+   
+<div class="footer"><div id="timeSurvey"></div>				
+				Copyright © 1998-2014 O'Reilly Media, Inc.<br><img src="https://courses.oreillyschool.com/common/cclicense.png"><br>
+				This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 Unported License.<br>
+				See <a href="http://creativecommons.org/licenses/by-sa/3.0/legalcode">http://creativecommons.org/licenses/by-sa/3.0/legalcode</a> 
+				for more information.
+				</div><iframe id="t" width="1" height="1" border="0" style="display:none"></iframe><script language="javascript">bodyLoaded();</script><script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+  ga('create', 'UA-44720547-1', 'oreillyschool.com');
+  ga('send', 'pageview');
+</script></body></html>

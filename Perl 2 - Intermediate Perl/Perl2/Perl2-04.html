@@ -1,0 +1,406 @@
+<html><!-- Copyright (c) 1998-2014 O'Reilly Media, Inc.
+			This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 Unported License.
+			See http://creativecommons.org/licenses/by-sa/3.0/legalcode for more information.
+            --><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"><link rel="stylesheet" type="text/css" href="../common/Lab.css"><script type="text/javascript" src="../common/Lab.js"></script><script language="javascript"></script><title>Regular Expressions: Introduction</title></head><body id="body"><a name="top"></a><div class="title">Regular Expressions: Introduction</div><div class="resize"><a href="Perl2-04.html#top" onclick="changeSize('smaller');" class="aS" title="Keep clicking to make fonts smaller">A</a><a href="Perl2-04.html#top" onclick="changeSize('larger');" class="aL" title="Keep clikcing to make fonts larger">A</a><a href="Perl2-04.html#top" onclick="lv()" class="lv" title="Adjust Page for High Contrast">HC</a><div id="fh"><p>Click on <span class="aS">A</span> to make all fonts on the page smaller.</p><p>Click on <span class="aL">A</span> to make all fonts on the page larger.</p><p>Click on <span class="lv">HC</span> to toggle high contrast mode. When you move your mouse over 
+                 some bold words in high contrast mode, related words are automatically highlighted. Text is shown
+                 in black and white. 
+             </p></div></div><hr>
+ 
+ <div class="goalTitle">Lesson Objectives</div><div class="goals">
+  
+  
+  When you complete this lesson, you will be able to:
+  
+  <ul><li>embed regular expressions in a Perl program.</li><li>use regular expressions or "regexes."</li><li>integrate <i>regex metacharacters</i>.</li></ul>
+ </div><hr>
+ 
+  <a name="h_01"></a><div class="heading">Introduction to Regular Expressions</div><div class="headingText">
+   
+   <p>"The way is long if one follows precepts, but short... if one follows patterns."&gt;<br> 
+    -Lucius Annaeus Seneca (4 BC - 65 AD)</p>
+   
+   <p>In this lesson we'll learn about one of the most important fundamental operations in Perl—<i>regular 
+    expressions</i>. "Perl" doesn't actually officially 
+    stand for anything, it's not an acronym. That's why it's not written as "PERL". Though Perl's author, Larry Wall, did 
+    once suggest using the acronym "Practical 
+    Extraction and Reporting Language." That acronym fits with Perl's reputation for being 
+    a great language for parsing and manipulating text and unstructured data. In that 
+    respect, the regular expression in Perl and how well it is integrated into the rest of the language, is crucial.</p>
+   
+   <p>First of all, don't let the phrase "regular expression" scare you. The term was invented by 
+    mathematicians before computers ever existed. We may be stuck with the label but not with 
+    the dry mathematical theory. We'll leave that part out of our discussion of regular expressions and explain them in 
+    such a way that mortals without math degrees can understand.</p>
+   
+   <p>Secondly, in the same way that mathematicians and physicists like to create formulas where every character stands
+    for something different, like <b>E = mc<sup>2</sup></b>, regular expressions are their
+    own separate language, where every character represents something. You write what amounts to a little program in 
+    the regular expression language, which gets embedded in a Perl program, and when Perl runs it, it fires up 
+    the <i>regular expression engine</i> to decipher and run your regular expressions.</p>
+   
+   <p>But what do regular expressions <i>do?</i> They're used to find patterns in text. You can also 
+    use them to find patterns in general data that you wouldn't consider text, but it's easier to talk 
+    about regular expressions in terms of parsing text; that's mostly what they're used for anyway.</p>
+   
+   <p>Speaking of simplifying our discussion, "regular expressions" is a bit of a mouthful. Since we're 
+    going to use the term over and over, we'll use the common contraction <i>regex</i>.</p>
+   
+   <p>We'll start out with tasks like determining whether the string "apple" 
+    occurs in the text, or whether there's a vowel or a telephone number in it. Later, we'll look at more 
+    complicated examples. The regex language includes more features than we will cover in this course, 
+    and more than one book has been written just on that language. With all of those powerful features, the 
+    regex language can even be used to parse programs written in languages as complicated as Perl.</p>
+    
+  </div>
+  <a name="h_02"></a><div class="heading">Literal Matching</div><div class="headingText">
+   
+   <p>Let's get started with the basic type of regex, and see how to embed it in a Perl program. 
+    Create <b>reg_literal.pl</b> as shown:</p>
+   
+<div class="listingBox"><div class="listingTitle">CODE TO TYPE : reg_literal.pl</div><div class="listing"><pre><ins>#!/usr/bin/perl
+use strict;
+use warnings;
+
+my $text = "I have three apples and four oranges";
+$text =~ /apple/ and print "Found an apple\n";
+
+$text = "I have two tomatoes and one zucchini";
+$text =~ /apple/ or print "Didn't find an apple\n";</ins>
+</pre></div></div>
+   
+   <p><img src="images/coderunner/checksyntax.JPG"> and run it.</p> 
+   
+<div class="interactiveBox"><div class="interactiveTitle">INTERACTIVE TERMINAL SESSION</div><div class="interactive"><pre>cold:~$ <ins>cd perl2</ins>
+cold:~/perl2$ <ins>./reg_literal.pl</ins>
+Found an apple
+Didn't find an apple
+cold:~/perl2$ 
+</pre></div></div>
+   
+   <p>Our program found an apple in the first string we put in <span class="darkblue">$text</span> ("I have three <b>apple</b>s 
+    and four oranges") and didn't find an apple in the second string we put in <span class="darkblue">$text</span> ("I 
+    have two tomatoes and one zucchini").</p>
+   
+    <p>Let's take a closer look at this program:</p> 
+   
+<div class="observeBox"><div class="observeTitle">OBSERVE: reg_literal.pl</div><div class="observe"><pre>
+#!/usr/bin/perl
+use strict;
+use warnings;
+
+my $text = "I have three apples and four oranges";
+$text =~ /apple/ <span class="purple">and</span> print "Found an apple\n";
+
+$text = "I have two tomatoes and one zucchini";
+<span class="red">$text</span> <span class="darkred">=~</span> <span class="darkblue">/apple/</span> <span class="purple">or</span> print "Didn't find an apple\n";
+</pre></div></div>
+   
+   <p>See how we used <span class="purple">and</span> to mean <i>if</i> and <span class="purple">or</span> to mean <i>unless</i>?</p>
+   
+   <p>Now, imagine that Perl has a function named say, <span class="darkgreen">regmatch()</span>, that returns true or 
+    false, and it works like this: </p>
+   
+<div class="observeBox"><div class="observeTitle">OBSERVE: hypothetical regmatch() example</div><div class="observe"><pre>
+if ( <span class="darkred">regmatch</span>( '<span class="darkblue">apple</span>', <span class="red">$text</span> ) )
+{
+  # ...
+}
+</pre></div></div>
+   
+   <p>The regex would be in the first argument, and the string to match it against would be in the second 
+    one. That makes sense, right? Many languages implement regular expressions just like this. Perl, 
+    however, introduces new syntax so that regexes can appear in the code without the clutter of words like 
+    "regmatch" making it hard to read. That funny expression breaks down like this:</p>
+      
+   <p><div class="c"><img src="images/lessonImages/regmatch.png"></div></p>
+   
+   <p>The <span class="blue">/apple/</span> is the regex, and the <span class="darkred">=~</span> is the <i>binding 
+    operator</i>, which tells Perl that the regex is to be tested against whatever appears to the left of it,
+    in this case, <span class="red">$text</span>. It looks like some sort of assignment because of the equals sign, but 
+    trust me, there's no assignment going on. <span class="darkred">=~</span> simply means, "I have a regex to my right
+    which is to be matched against the string to my left, and the value of the whole expression <b>STRING =~ 
+     REGEX</b> is true if the regex matched the string, and false if it didn't."</p>
+   
+   <p><div class="c"><table class="noteBox fBox pBox "><tr><td class="noteTitle">WARNING</td><td class="note">There is no actual <span class="darkgreen">regmatch</span> function in Perl! I made that up 
+    as a hypothetical equivalent to the new syntax for the sake of explanation.</td></tr></table></div></p>
+      
+   <p>To be ruthlessly precise, technically the regular expression is <span class="blue">apple</span>. The slashes are
+    delimiters <i>around</i> the regular expression. But even with the power of font coloring at our 
+    disposal, it's still awkward to refer to a regex in documentation without delimiters around it; 
+    without them, readers would have a hard time separating the regex (which usually contains punctuation) from 
+    the surrounding text. So now when I refer to "the regular expression, 
+    <span class="blue">/apple/</span>," I trust that you understand that the regex itself is located between the slashes.</p>
+
+   <p>Now, what if we want to match a slash? Modify reg_literal.pl as shown:</p>
+   
+<div class="listingBox"><div class="listingTitle">CODE TO EDIT: reg_literal.pl</div><div class="listing"><pre>#!/usr/bin/perl
+use strict;
+use warnings;
+
+my $text = "I have three apples<ins>/</ins>four oranges";
+$text =~ /apple<ins>s/</ins>/ and print "Found apple<ins>s/</ins>\n";
+
+$text = "I have two tomatoes and one zucchini";
+$text =~ /apple/ or print "Didn't find an apple\n";
+</pre></div></div>
+   
+   <p><img src="images/coderunner/checksyntax.JPG">, and you get compilation errors. Because the slash is 
+    treated as a delimiter, you can't match on it as well.</p> 
+   
+   <p>You can use different delimiters if you like, delimiters that follow the same rules as 
+    <span class="darkgreen">qq</span>, but if you do, you <i>must</i> prefix the first delimiter with the letter 
+    <span class="orange">m</span>. Modify <span class="darkred">reg_literal.pl</span> and see this for yourself:</p>
+ 
+<div class="listingBox"><div class="listingTitle">CODE TO EDIT: reg_literal.pl</div><div class="listing"><pre>
+#!/usr/bin/perl
+use strict;
+use warnings;
+
+my $text = "I have three apples/four oranges";
+$text =~ <ins>m!</ins>apples/<ins>!</ins> and print "Found apples<del>/</del>\n";
+
+$text = "I have two tomatoes and one zucchini";
+$text =~ <ins>m(</ins>apple<ins>)</ins> or print "Didn't find an apple\n";
+</pre></div></div>
+   
+   <p><img src="images/coderunner/checksyntax.JPG"> and run it.</p>
+    
+<div class="interactiveBox"><div class="interactiveTitle">INTERACTIVE SESSION:</div><div class="interactive"><pre>cold:~/perl2$ <ins>./reg_literal.pl</ins>                                                                                                                                                     
+Found apples/
+Didn't find an apple
+cold:~/perl2$ 
+</pre></div></div>    
+    
+    <p>This alternate syntax is useful when a regular expression contains a slash; using this approach, 
+     the slash does not need to be escaped.</p>
+  
+  </div>
+  <a name="h_03"></a><div class="heading">Structure and Execution of Regular Expressions</div><div class="headingText">
+   
+   <p>
+    Now that you've seen a basic example, let's deconstruct it. Remember I said that in a regular expression, 
+    every character had a meaning? Most characters—the vast majority—mean something very simple: 
+    "Match this character." That's what <span class="blue">/apple/</span> means: "Match an <span class="blue">a</span>, then match a 
+    <span class="blue">p</span>, then match another <span class="blue">p</span>, then match an <span class="blue">l</span>, then match an 
+    <span class="blue">e</span>."  You might be tempted to think that this explanation is overkill, and 
+    I could just have said it means, "Match <span class="blue">apple</span>." But it's <i>good</i> to be meticulous when 
+    explaining how regular expressions work. If you're going to be a great Perl programmer, you need to learn 
+    the basic rules of regexes inside and out.</p>
+   
+   <p>So <span class="blue">/apple/</span> causes Perl to look in the string that is bound to the regex via 
+    <span class="darkred">=~</span> first for an <span class="blue">a</span>, scanning each character in the string from left to 
+    right (beginning to end), until it finds an <span class="blue">a</span>.  Looking at the first test (against the string 
+    <span class="blue">"I have three apples and four oranges"</span>), the regex engine finds one when it gets to the 
+    <span class="blue">a</span> in <span class="blue">have</span>, at which point it declares success on that character, and goes on 
+    to the next character in the regex, which says that the next thing in the string must be a <span class="blue">p</span>. 
+    But it isn't. So Perl <i>undoes</i> the match of the <span class="blue">a</span> (this action is known as 
+    <b>backtracking</b>), and moves forward through the string again, looking for another <span class="blue">a</span>. When 
+    it next finds one (in <span class="blue">apples</span>), it tests each succeeding character in the regex against the 
+    next character in the string, and if each of them match in turn, Perl gets to the end of the regex, and 
+    is able to return a true value from the expression.</p>
+   
+   <p>Some characters do not match literally in regexes, which make regexes even more interesting and 
+    powerful. Such characters are known as <i>regex metacharacters</i>:</p>
+   
+<div class="observeBox"><div class="observeTitle">OBSERVE: Regex Metacharacters</div><div class="observe"><pre>
+* ( ) + [ ] { } | . ? ^
+</pre></div></div>
+   
+   <p>If you want to match any of those literally, you have to escape them with a backslash. You'll learn what 
+    they do later, but for now, look at that list closely, and remember that those 
+    characters are special. In addition to those characters, the <b>$</b> character has special meaning when 
+    it's the last character of a regular expression. A regex is like a double-quoted string, so variables 
+    interpolate within it. So a <b>$</b> that <i>isn't</i> at the end of the regex is assumed to be the 
+    start of a scalar variable, and an <b>@</b> is assumed to be the start of an array variable.</p>
+   
+   <p>A slash (<b>/</b>) character in the middle of a regex needs to be escaped with a backslash (<b>\</b>) if 
+    the regex delimiter is a slash. Otherwise, backslashes obey the same rules that they do in double-quoted 
+    strings, with a few exceptions that we will discuss later.</p>
+   
+   <p>That information dump about metacharacters was for those of you who like to know the rules up front. If 
+    you're fretting about how to remember all of that, relax; we'll do plenty of examples with 
+    explanations to make sure that you get (and keep) all of it.</p>
+  
+  </div>
+  <a name="h_04"></a><div class="heading">The /i Modifier</div><div class="headingText">
+   
+   <p>So far, we haven't done anything with regular expressions that couldn't be done with the 
+    <span class="darkgreen">index()</span> function. That's about to change. Certain letters typed in <i>after</i> 
+    a regex (after the last slash or delimiter) are called <i>modifiers</i> because they 
+    modify how the regex engine interprets the regex. The first modifier we'll look at is the <b>/i</b> modifier. 
+    (Technically, it's the <b>i</b> modifier; the <b>/</b> is the 
+    delimiter, but we'll stick 
+    with the convention and call it the <b>/i</b> modifier.)</p>
+   
+   <p>The <b>i</b> modifier tells the regex engine to <b>i</b>gnore the case of letters in the regex. So 
+    <b>/apple/i</b> will still match <span class="blue">"apple"</span>, but will also match <span class="blue">"APPLE"</span>, 
+    <span class="blue">"Apple"</span>, <span class="blue">"ApPlE"</span> and all the other combinations of upper and lower case.</p>
+   
+   <p>Another reason we usually write regexes with the delimiters around them here is to make it clear that we are 
+    applying a modifier like <b>/i</b> to the regex. (There is, in 
+    fact, a way to place something <i>between</i> the slashes that has the same effect as <b>/i</b>, but it is so 
+    hideous that I am not going to show it.)</p>
+   
+   <p>Modify <span class="darkred">reg_literal.pl</span> as shown:</p>
+   
+<div class="listingBox"><div class="listingTitle">CODE TO EDIT: reg_literal.pl</div><div class="listing"><pre>
+#!/usr/bin/perl
+use strict;
+use warnings;
+
+my $text = "<ins>I HAVE THREE APPLES AND FOUR ORANGES</ins>"; 
+$text =~ <ins>/</ins>apple<ins>/i</ins> and print "Found an apple\n";
+    
+$text = "I have two tomatoes and one zucchini";
+$text =~ <ins>m{</ins>apple<ins>}i</ins> or print "Didn't find an apple\n";
+</pre></div></div>
+   
+   <p><img src="images/coderunner/checksyntax.JPG"> and run it. Look over the use and effect of a 
+    modifier with the default delimiters and different delimiters.</p>
+   <p>
+    That program didn't require the use of <span class="blue">{}</span> alternate delimiter syntax, but some programmers 
+    do so routinely because they like the way it looks.  The alternate delimiter syntax is handy when your regex contains
+    slashes.  Modify <span class="darkred">reg_literal.pl</span> as follows:
+   </p>
+<div class="listingBox"><div class="listingTitle">CODE TO EDIT: reg_literal.pl</div><div class="listing"><pre>
+#!/usr/bin/perl
+use strict;
+use warnings;
+
+my $text = "I HAVE THREE APPLES AND FOUR ORANGES"; 
+<del>$text =~ /apple/i and print "Found an apple\n";</del>
+<ins>$text =~ /24\/5\/1819/i and print "Found Queen Victoria's birthday\n";</ins>
+
+$text = "I have two tomatoes and one zucchini";
+<del>$text =~ m{apple}i or print "Didn't find an apple\n";</del>
+<ins>$text =~ m{7/7/1776}i or print "Didn't find American Independence Day\n";</ins>
+</pre></div></div>
+   
+   <p>
+    Do you see how using the default delimiters of <span class="blue">//</span> requires escaping slashes inside of the
+    regular expression, which makes it harder to read?  We call that <i>leaning toothpick syndrome</i>.
+   </p>
+  </div>
+  <a name="h_05"></a><div class="heading">More Regex Examples</div><div class="headingText">
+   
+   <p>Let's get comfortable with what we've learned so far. Create <b>reg_literal2.pl</b> as shown:</p>
+   
+<div class="listingBox"><div class="listingTitle">CODE TO TYPE: reg_literal2.pl</div><div class="listing"><pre><ins>#!/usr/bin/perl
+use strict;
+use warnings;
+
+foreach my $text ( qw(Matt bats the ball at Atticus) )
+{
+  print qq{"$text" };
+  if ( $text =~ /at/ )
+  {
+    print "matches";
+  }
+  else
+  {
+    print "does not match";
+  }
+  print " /at/\n";
+}</ins>
+</pre></div></div>
+   
+   <p><img src="images/coderunner/checksyntax.JPG"> and run it:</p>
+
+<div class="interactiveBox"><div class="interactiveTitle">INTERACTIVE TERMINAL SESSION</div><div class="interactive"><pre>cold:~/perl2$ <ins>./reg_literal2.pl</ins>
+"Matt" matches /at/
+"bats" matches /at/
+"the" does not match /at/
+"ball" does not match /at/
+"at" matches /at/
+"Atticus" does not match /at/
+cold:~/perl2$ 
+</pre></div></div>
+   
+   <p>Do you understand why the program produces that output?</p>
+   
+   <p>For another example, create <b>reg_literal3.pl</b> as shown:</p>
+   
+<div class="listingBox"><div class="listingTitle">CODE TO TYPE: reg_literal3.pl</div><div class="listing"><pre><ins>#!/usr/bin/perl
+use strict;
+use warnings;
+
+foreach my $text ( "Stoplight", "Red Light", "Green means go" )
+{
+  print qq{"$text": };
+  if ( $text =~ /sto/i &amp;&amp; $text =~ /top/ )
+  {
+    print "matches AND clause\n";
+  }
+  elsif ( $text =~ /light/ || $text =~ /light/i )
+  {
+    print "matches OR clause\n";
+  }
+  else
+  {
+    print "matches neither clause\n";
+  }
+}</ins>
+</pre></div></div>
+      
+   <p><img src="images/coderunner/checksyntax.JPG"> and run it:</p>
+   
+<div class="interactiveBox"><div class="interactiveTitle">INTERACTIVE TERMINAL SESSION</div><div class="interactive"><pre>cold:~/perl2$ <ins>./reg_literal3.pl</ins> 
+"Stoplight": matches AND clause
+"Red Light": matches OR clause
+"Green means go": matches neither clause
+cold:~/perl2$ 
+</pre></div></div>
+   
+   <p>Do you understand why that output is printed?</p>
+   
+   <p>Finally, let's try an example of a primitive implementation of the popular Unix <b>grep</b> 
+    program. Create <b>reg_grep.pl</b> as shown:</p>
+   
+<div class="listingBox"><div class="listingTitle">CODE TO TYPE: reg_grep.pl</div><div class="listing"><pre><ins>#!/usr/bin/perl
+use strict;
+use warnings;
+
+my $regex = shift;
+
+while ( $_ = &lt;&gt; )
+{
+  print if $_ =~ /$regex/;
+}</ins>
+</pre></div></div>
+  
+    <p><img src="images/coderunner/checksyntax.JPG"> and run it, using one of your source files as 
+     input:</p>
+   
+<div class="interactiveBox"><div class="interactiveTitle">INTERACTIVE TERMINAL SESSION</div><div class="interactive"><pre>cold:~/perl2$ <ins>./reg_grep.pl light ./reg_literal3.pl</ins>
+foreach my $text ( "Stoplight", "Red Light", "Green means go" )
+  elsif ( $text =~ /light/ || $text =~ /light/i )
+cold:~/perl2$ 
+</pre></div></div>
+   
+   <p>This program takes, as its first argument, a regular expression. We can interpolate a 
+    scalar inside a regex (as I said, a regex behaves like a double-quoted string for the most part); the 
+    result is used as the regex. The remaining arguments are used as filenames to open (if we didn't supply 
+    any, it would work on standard input). The matching lines are printed. We use the default argument ($_) 
+    to print.</p>
+   
+   <p>Congratulations, you've just gotten started on possibly the single most important topic in Perl! And 
+    there's a lot more to come!</p>
+  
+  </div>
+ <br><br><br><br>
+  <p>Once you finish with the lesson, go back to the syllabus page by clicking on the page tab above and do
+   the assignments.</p>
+ 
+<div class="footer"><div id="timeSurvey"></div>				
+				Copyright © 1998-2014 O'Reilly Media, Inc.<br><img src="https://courses.oreillyschool.com/common/cclicense.png"><br>
+				This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 Unported License.<br>
+				See <a href="http://creativecommons.org/licenses/by-sa/3.0/legalcode">http://creativecommons.org/licenses/by-sa/3.0/legalcode</a> 
+				for more information.
+				</div><iframe id="t" width="1" height="1" border="0" style="display:none"></iframe><script language="javascript">bodyLoaded();</script><script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+  ga('create', 'UA-44720547-1', 'oreillyschool.com');
+  ga('send', 'pageview');
+</script></body></html>

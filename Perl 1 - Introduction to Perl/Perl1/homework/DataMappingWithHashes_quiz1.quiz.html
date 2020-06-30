@@ -1,0 +1,53 @@
+<html>
+   <!-- Copyright (c) 1998-2014 O'Reilly Media, Inc. Unauthorized use is strictly
+                prohibited. None of this code or content can by copied without the express written
+                permission from O'Reilly Media, Inc. -->
+   <head>
+      <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+      <link rel="stylesheet" type="text/css" href="http://archive.oreilly.com/oreillyschool/courses/Perl1/common/Lab.css">
+      <title>Data Mapping with Hashes - Quiz 1</title>
+   </head>
+   <body id="body">
+      <h2>Data Mapping with Hashes - Quiz 1</h2> 
+      
+      
+      
+      
+      <p>In what order is the result of the keys() function?</p>
+      
+        
+      
+      
+      <p>Unreliable, inconsistent, unordered, none. Any of these will work.</p>
+      
+      
+      <p>Long form answer: It's not an order that will make any sense to you, it isn't useful for anything, and it can change without
+         
+         warning.
+      </p>
+      
+      
+      <p>The point that the hash won't be in a particular order can't be tested easily by students because it has to do with a number
+         
+         of factors as written about in perldoc -f keys, perldoc perlsec, and perldoc perlrun.
+      </p>
+      
+      
+      <p>The ordering of a hash is only changed if it looks like there's a possible attack occurring and most hashes won't be accessed
+         
+         to the extent to actually show this.
+      </p>
+      
+      
+      <p>In order for the student to see that the hash ordering is indeed random, you can direct them to use the 
+         <b>PERL_HASH_SEED_DEBUG</b> environment variable when running their program.
+      </p>
+      
+      
+      <p><b>Grading Criteria:</b> Student should demonstrate understanding of hashes and the underlying storage of information.</p>
+      
+      
+      
+      
+   </body>
+</html>

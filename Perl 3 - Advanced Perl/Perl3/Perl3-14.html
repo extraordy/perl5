@@ -1,0 +1,477 @@
+<html><!-- Copyright (c) 1998-2014 O'Reilly Media, Inc.
+			This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 Unported License.
+			See http://creativecommons.org/licenses/by-sa/3.0/legalcode for more information.
+            --><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"><link rel="stylesheet" type="text/css" href="../common/Lab.css"><script type="text/javascript" src="../common/Lab.js"></script><script language="javascript"></script><title>Processing Command-Line Options</title></head><body id="body"><a name="top"></a><div class="title">Processing Command-Line Options</div><div class="resize"><a href="Perl3-14.html#top" onclick="changeSize('smaller');" class="aS" title="Keep clicking to make fonts smaller">A</a><a href="Perl3-14.html#top" onclick="changeSize('larger');" class="aL" title="Keep clikcing to make fonts larger">A</a><a href="Perl3-14.html#top" onclick="lv()" class="lv" title="Adjust Page for High Contrast">HC</a><div id="fh"><p>Click on <span class="aS">A</span> to make all fonts on the page smaller.</p><p>Click on <span class="aL">A</span> to make all fonts on the page larger.</p><p>Click on <span class="lv">HC</span> to toggle high contrast mode. When you move your mouse over 
+                 some bold words in high contrast mode, related words are automatically highlighted. Text is shown
+                 in black and white. 
+             </p></div></div><hr>
+ 
+ <div class="goalTitle">Lesson Objectives</div><div class="goals"> 
+  
+  When you complete this lesson, you will be able to:
+  <ul><li>Process <a href="Perl3-14.html#options">Options</a> in Perl.</li><li>use the <a href="Perl3-14.html#getopt_std">Getopt::Std</a> module to handle the parsing of single-letter options.</li><li>use the <a href="Perl3-14.html#getopt_long">Getopt::Long</a> module to handle the parsing of multi-letter options.</li></ul>
+ </div><hr>
+ 
+ <p>Welcome back to your <i>Advanced Perl</i> course. You've come so far! In this lesson we'll learn about a  
+  capability for processing <i>command-line options.</i> 
+  When the Perl interpreter sees a statement, it breaks the statement down into smaller 
+  units of information. Each of these smaller units of information is called a token. As we learned in earlier lessons, when you run a program, 
+  everything you type after the program name on the command line ends up in the array <b>@ARGV</b>. 
+  The shell that interprets your keystrokes decides how to turn your command line into strings that Perl will pick 
+  up in <b>@ARGV</b>. Usually it just does the equivalent of <b>@ARGV = split /\s+/</b>, but certain 
+  shell <i>metacharacters</i> change the interpretation and may add extra tokens through wildcard 
+  expansion or result in fewer tokens, through whitespace quoting. 
+  </p>
+   
+ <p>There are <i>conventions</i>  for what we type after after we type the name of a program: specific ways to 
+  <i>format</i> text that have agreed-upon meanings. These conventions aren't noticed or 
+  implemented by the shell or by Perl.</p> 
+
+ 
+ <a href="Perl3-14.html" name="options"></a>
+ <a name="h_01"></a><div class="heading">Options</div><div class="headingText">
+   
+  <p>The command line is comprised of <i>options</i> and <i>arguments</i>. An option begins 
+   with one or two minus signs and may or may not be followed by a value. An argument follows any and all options, 
+   and does not begin with a 
+   minus sign.</p>
+   
+  <p>In programs available on Unix, some 
+   options may be mandatory and others may be optional. User interface design and consistency 
+   isn't one of Unix's strong points. The correct way to find out how to run a program is to look at its 
+   documentation. Accurate and complete documentation is vital in this respect because it takes 
+   much longer to figure out how a program can be run by reading the source. So, when you write a 
+   program for other people, be sure to provide ample documentation that explains to how run it!</p>
+   
+  <p>Even within established conventions, there is plenty of variation. Some programs support options that 
+   begin with a plus sign (the <b>find</b> command, for example). And options that begin with a single 
+   minus sign are followed by a single letter, while options that begin with a double minus sign are 
+   followed by a word. Single-letter options that take values may be called with or without a space 
+   between the letter and the value; multi-letter options must have a space, or be separated from the 
+   value by an equals sign. Some programs mix single-letter and multi-letter capabilities.</p>
+   
+  <a name="s_01"></a><div id="s_01"><div class="subheading">Option Processing in Perl</div><div class="subheadingText">
+    
+   <p>Of course, we could figure out all the options on a command line in Perl ourselves, by looking at <b>@ARGV</b>, 
+    parsing the contents, and unpacking them into a helpful data structure of some kind (or maybe just a 
+    list of variables), issuing warnings and exceptions where the convention wasn't obeyed. But  
+    that job gets tedious pretty quickly. Fortunately, there are a couple of <i>modules</i> that 
+    come with Perl that we can use to provide functions that make our job easier. </p>
+       
+   <p>Here are a couple of sample calling sequences that we will be able to handle in 
+    this class:</p>
+    
+<div class="observeBox"><div class="observeTitle">OBSERVE:</div><div class="observe"><pre>
+dine -t lunch -dv -b modest me grace scott trish
+dine --type lunch --debug --verbose --budget modest me grace scott trish
+</pre></div></div>
+    
+   <p>Another word for "calling sequence" that you'll see used in documentation is "synopsis."</p>
+    
+   <p>Okay, let's see how to implement the parsing of those styles!</p>
+  
+  </div></div>
+ </div>
+ <a href="Perl3-14.html" name="getopt_std"></a>
+ <a name="h_02"></a><div class="heading">Getopt::Std</div><div class="headingText">
+  
+  <p>The <b>Getopt::Std</b> module handles the parsing of single-letter options. Let's start out with an 
+   example that doesn't use <b>Getopt::Std</b> and then change it to use it. Create 
+   <b>grep2.pl</b> in your <b>/perl3</b> folder as shown:</p>
+  
+<div class="listingBox"><div class="listingTitle">CODE TO TYPE:</div><div class="listing"><pre>#!/usr/bin/perl
+use strict;
+use warnings;
+
+my ($negated, $case_insensitive);
+if ( $ARGV[0] eq '-v' )
+{
+  shift;
+  $negated = 1;
+}
+if ( $ARGV[0] eq '-i' )
+{
+  shift;
+  $case_insensitive = 1;
+}
+
+my $regex = shift;
+
+while ( &lt;&gt; )
+{
+  if ( $case_insensitive )
+  {
+    print if $negated xor /$regex/i;
+  }
+  else
+  {
+    print if $negated xor /$regex/;
+  }
+}
+</pre></div></div>
+   
+  <p>This is an implementation of the homework from one of the Intermediate Perl lessons; it replicates 
+   the <b>-i</b> (ignore case) and <b>-v</b> (invert test) options of the standard Unix <b>grep</b> 
+   program. <img src="images/coderunner/checksyntax.JPG"> and run it as shown:</p>
+  
+<div class="interactiveBox"><div class="interactiveTitle">INTERACTIVE SESSION:</div><div class="interactive"><pre>cold:~$ <ins>cd perl3</ins>
+cold:~/perl3$ <ins>./grep2.pl REGEX ./grep2.pl</ins>
+cold:~/perl3$ <ins>./grep2.pl -i REGEX ./grep2.pl</ins>
+my $regex = shift;
+    print if $negated xor /$regex/i;
+    print if $negated xor /$regex/;
+</pre></div></div>
+  
+  <p>Now modify the program so it looks like this:</p>
+  
+<div class="listingBox"><div class="listingTitle">CODE TO TYPE:</div><div class="listing"><pre>#!/usr/bin/perl
+use strict;
+use warnings;
+
+<ins>use Getopt::Std;
+
+my %Opt;
+getopts( 'iv', \%Opt );</ins>
+   
+my ($negated, $case_insensitive)<ins> = @Opt{ qw(v i) }</ins>;
+<del>if ( $ARGV[0] eq '-v' )
+{
+  shift;
+  $negated = 1;
+}
+if ( $ARGV[0] eq '-i' )
+{
+  shift;
+  $case_insensitive = 1;
+}</del>
+
+my $regex = shift;
+
+while ( &lt;&gt; )
+{
+  if ( $case_insensitive )
+  {
+    print if $negated xor /$regex/i;
+  }
+  else
+  {
+    print if $negated xor /$regex/;
+  }
+}
+</pre></div></div>
+  
+  <p><img src="images/coderunner/checksyntax.JPG"> and run it. It works just like it did before.</p>
+  
+  <p>Pay special attention to the use of the <b>xor</b> operator—it works like this:</p>
+  
+ <div class="c"><table class="tbl" border=""><tr><th>A xor B</th><th>A = 0</th><th>A = 1</th></tr><tr><td>B = 0</td><td>0</td><td>1</td></tr><tr><td>B = 1</td><td>1</td><td>0</td></tr></table></div> 
+  
+  <p>That's what allows us to use the value of <b>$negated</b> to invert the sense of the match 
+   tests. You can experiment with the <b>-v</b> option as well if you like. Type the commands below to create 
+   a <b>test_input</b> file in your <b>/perl3</b> folder and view it as shown:</p>
+  
+<div class="interactiveBox"><div class="interactiveTitle">INTERACTIVE SESSION:</div><div class="interactive"><pre>cold:~/perl3$ <ins>cat &gt; test_input</ins>
+<ins>This string has an oddity.  Can you suss out what it is?
+This sentence is more conventional.</ins>
+<i>(Press <ins><b>[Ctrl+C]</b></ins> here.)</i>
+cold:~/perl3$ <ins>./grep2.pl -v e ./test_input</ins>
+This string has an oddity.  Can you suss out what it is?
+</pre></div></div>
+  
+  <p>That's quite a code bargain for only two options! Here's how it works: <b>Getopt::Std</b>
+   provides the function <span class="darkgreen">getopts()</span>, which takes two arguments:</p>
+  
+<div class="observeBox"><div class="observeTitle">OBSERVE:</div><div class="observe"><pre><span class="darkgreen">getopts(</span> <span class="red">$option_string</span>, \<span class="darkred">%options</span> <span class="darkgreen">)</span>
+</pre></div></div>
+  
+  <p><span class="red">$option_string</span> contains all the letters that you want to be able to parse, and 
+   <span class="darkred">%options</span> is where <span class="darkgreen">getopts</span> will put the results; note that we 
+   pass a <i>reference</i> to a hash there.</p>
+  
+  <p><span class="darkgreen">getopts()</span> runs through <span class="red">@ARGV</span> from the beginning, looking for 
+   anything beginning with a minus sign, and removing it from <span class="red">@ARGV</span> as it sets 
+   <span class="red">%options</span>. So, anything left in <span class="red">@ARGV</span> after <span class="darkred">getopts</span> finishes, will be what we 
+   consider <i>arguments</i>; in this case, the regex and the input filenames (which will be parsed by 
+   the &lt;&gt; operator).</p>
+  
+  <p>Let's see what happens if we run this command:</p>
+  
+<div class="interactiveBox"><div class="interactiveTitle">INTERACTIVE SESSION:</div><div class="interactive"><pre>cold:~/perl3$ <ins>./grep2.pl -f -w -v E ./test_input</ins>
+Unknown option: f
+Unknown option: w
+This string has an oddity. Can you suss out what it is?
+This sentence is more conventional.
+</pre></div></div>
+  
+  <p>That's neat. We get warnings for unknown options, but the valid processing still occurs!</p>
+  
+  <p>Both of the options <b>-v</b> and <b>-i</b> expect no value, which means that if they are set on the 
+   command line, the value in <b>%Opt</b> will be <b>1</b> by default. To require an option 
+   to take a value, follow its letter in <span class="red">$option_string</span> with a colon. Just to illustrate this, 
+   let's make the regex an option instead of an argument. Modify <b>grep2.pl</b> as shown:</p>
+  
+<div class="listingBox"><div class="listingTitle">CODE TO TYPE:</div><div class="listing"><pre>#!/usr/bin/perl
+use strict;
+use warnings;
+
+use Getopt::Std;
+
+<ins>my $USAGE = "Usage: $0 -r regex [-v] [-i] [file...]\n";</ins>
+my %Opt;
+<del>getopts( 'iv', \%Opt );</del>
+<ins>getopts( 'ir:v', \%Opt ) or die $USAGE;</ins>
+
+my ($negated, $case_insensitive) = @Opt{ qw(v i) };
+
+<ins>my $regex = $Opt{r} or die $USAGE;
+</ins><del>my $regex = shift;</del>
+
+while ( &lt;&gt; )
+{
+  if ( $case_insensitive )
+  {
+    print if $negated xor /$regex/i;
+  }
+  else
+  {
+    print if $negated xor /$regex/;
+  }
+}
+</pre></div></div>
+  
+  <p><img src="images/coderunner/checksyntax.JPG"> and run it like this:</p>
+  
+<div class="listingBox"><div class="listingTitle">CODE TO TYPE:</div><div class="listing"><pre>cold:~/perl3$ <ins> ./grep2.pl -f -w -r E ./test_input</ins>
+Unknown option: f
+Unknown option: w
+Usage: ./grep2.pl -r regex [-v] [-i] [file...]
+cold:~/perl3$ <ins>./grep2.pl -v regex ./grep2.pl</ins>
+Usage: ./grep2.pl -r regex [-v] [-i] [file...]
+</pre></div></div>
+  
+  <p>Here, we added the <b>r</b> option to the options string, and by following it with a colon, required 
+   it to take a value; if no value is provided, there will be an error (but if anything were to follow <b>-r</b> 
+   on the command line, that would be taken as the value, so the only way to trigger that error is if 
+   <i>nothing</i> follows <b>-r</b> on the command line).</p>
+  
+  <p>Next, we used the return value from <span class="darkgreen">getopts()</span> to determine whether to quit
+   altogether. <span class="darkgreen">getopts()</span> will return false if it found an error in the options. 
+   Finally, we inserted logic requiring the <b>-r</b> option to be present. (I know that doesn't seem very 
+   "optional," but sometimes programs work like that.) <b>Getopt::Std</b> doesn't have a way to require an 
+   option, so we did it ourselves.</p>
+  
+  <a name="s_01"></a><div id="s_01"><div class="subheading">Option Clustering</div><div class="subheadingText">
+   
+   <p>Now, run the program like this:</p>
+   
+<div class="listingBox"><div class="listingTitle">CODE TO TYPE:</div><div class="listing"><pre>cold:~/perl3$ <ins>./grep2.pl -v -i -r E ./test_input</ins>
+This string has an oddity.  Can you suss out what it is?
+</pre></div></div>
+   
+   <p>You can merge single-letter options together now:</p>
+   
+<div class="listingBox"><div class="listingTitle">CODE TO TYPE:</div><div class="listing"><pre>cold:~/perl3$ <ins>./grep2.pl -vi -r E ./test_input</ins>
+This string has an oddity.  Can you suss out what it is?
+cold:~/perl3$ <ins> ./grep2.pl -iv -r E ./test_input</ins>
+This string has an oddity.  Can you suss out what it is?
+cold:~/perl3$ <ins> ./grep2.pl -ivr E ./test_input</ins>
+This string has an oddity.  Can you suss out what it is?
+</pre></div></div>
+   
+   <p>That's conventional for single-letter options, and here <span class="darkgreen">getopts()</span> takes care of it
+    for you. If you have an option that takes a value (like <b>-r</b>), it must be the 
+    <i>last</i> option in the cluster. </p>
+   
+   <p>And, if you want to, you can leave out the space between an option and its value if it takes one:</p>
+   
+<div class="listingBox"><div class="listingTitle">CODE TO TYPE:</div><div class="listing"><pre>cold:~/perl3$ <ins>./grep2.pl -vi -rE ./test_input</ins>
+This string has an oddity.  Can you suss out what it is?
+</pre></div></div>
+   
+   <p>And although this works, it's going a bit far for readability:</p>
+   
+<div class="listingBox"><div class="listingTitle">CODE TO TYPE:</div><div class="listing"><pre>cold:~/perl3$ <ins>./grep2.pl -virE ./test_input</ins>
+This string has an oddity.  Can you suss out what it is?
+</pre></div></div>
+ 
+  </div></div>
+ </div>
+ <a href="Perl3-14.html" name="getopt_long"></a>
+ <a name="h_03"></a><div class="heading">Getopt::Long</div><div class="headingText">
+   
+  <p>Some programs take so many options that developers ran out of letters to use to represent them (see the 
+   manual page for <b>tar</b> for an example). In those cases developers created options that were more than one letter 
+   long. By convention, such options begin with two minus signs so that you don't think they're 
+   single-letter options that have been clustered. In this course, we'll restrict ourselves 
+   to creating programs that use either single- <i>or</i> multi-letter options, not both.</p>
+    
+  <p>The <b>Getopt::Long</b> module handles the parsing of multi-letter options. Let's try using <b>Getopt::Long</b> with
+   the <b>grep2.pl</b> example we used before so we can compare it with the one 
+   we just made. Save <b>grep2.pl</b> as <b>grep_long.pl</b> and then edit it as shown:</p>
+
+<div class="listingBox"><div class="listingTitle">CODE TO TYPE:</div><div class="listing"><pre>#!/usr/bin/perl
+use strict;
+use warnings;
+<del>use Getopt::Std;</del>
+<ins>use Getopt::Long;</ins>
+
+<del>my $USAGE = "Usage: $0 -r regex [-v] [-i] [file...]\n";</del>
+<ins>my $USAGE = "Usage: $0 --regex regex [--invert] [--ignore-case] [file...]\n";</ins>
+<del>my %Opt;
+getopts( 'ir:v', \%Opt ) or die $USAGE;</del>
+
+
+<del>my ($negated, $case_insensitive) = @Opt{ qw(v i) };</del>
+<ins>my ($regex, $negated, $case_insensitive);</ins>
+<del>my $regex = $Opt{r} or die $USAGE;</del>
+
+<ins>GetOptions( 'regex=s'     =&gt; \$regex,
+            'invert'      =&gt; \$negated,
+            'ignore-case' =&gt; \$case_insensitive
+          ) or die $USAGE;</ins>
+
+
+while ( &lt;&gt; )
+{
+  if ( $case_insensitive )
+  {
+    print if $negated xor /$regex/i;
+  }
+  else
+  {
+    print if $negated xor /$regex/;
+  }
+}
+</pre></div></div>
+  
+  <p><img src="images/coderunner/checksyntax.JPG"> and run it by typing the commands below as shown:</p>
+   
+<div class="listingBox"><div class="listingTitle">CODE TO TYPE:</div><div class="listing"><pre>cold:~/perl3$ <ins>./grep_long.pl --invert --regex e ./test_input</ins>
+This string has an oddity.  Can you suss out what it is?
+cold:~/perl3$ <ins>./grep_long.pl --regex e ./test_input</ins>
+This sentence is more conventional.
+cold:~/perl3$ <ins>./grep_long.pl --invert --ignore-case --regex E ./test_input</ins>
+This string has an oddity.  Can you suss out what it is?
+</pre></div></div>
+   
+  <p>Here's how it works. <b>Getopt::Long</b> provides the function <span class="darkgreen">GetOptions()</span>, 
+   which takes a list of arguments:</p>
+    
+<div class="observeBox"><div class="observeTitle">OBSERVE:</div><div class="observe"><pre><span class="darkgreen">GetOptions(</span> <span class="red">$option_specifier</span>, <span class="red">$scalar_ref</span>, ... <span class="darkgreen">)</span></pre></div></div>
+    
+   <p>Each pair of arguments in the list is a string describing a command-line option, followed by a 
+    reference to a scalar in which to store the value if the option is present on the command line.</p>
+    
+   <p>For options that don't take values (boolean options), the specifier is just the name of the option, that is,
+    whatever follows <b>--</b>. Options that take values are denoted by adding certain 
+    strings after the name of the option: </p>
+    
+  <div class="c"> <table class="tbl" border=""><tr><th>Suffix</th><th>Meaning</th><th>Example</th></tr><tr><td>=s</td><td>Required: Any string</td><td>--name=scott</td></tr><tr><td>=i</td><td>Required: Integer only</td><td>--course=3</td></tr><tr><td>=f</td><td>Required: Floating point number only</td><td>--balance=170.50</td></tr><tr><td>:s</td><td>Value is optional: string</td><td>--owner</td></tr><tr><td>:i</td><td>Value is optional: integer</td><td>--dependents</td></tr><tr><td>:f</td><td>Value is optional: floating-point number</td><td>--debit</td></tr></table></div>
+
+   <p>You can shorten option names to their shortest unambiguous prefixes. Go ahead and type the commands as shown:</p>
+    
+<div class="listingBox"><div class="listingTitle">CODE TO TYPE:</div><div class="listing"><pre>cold:~/perl3$ <ins>./grep_long.pl --invert --ignore-case --regex=E ./test_input</ins>
+This string has an oddity.  Can you suss out what it is?   
+cold:~/perl3$ <ins>./grep_long.pl --in --ig --r=E ./test_input</ins>
+This string has an oddity.  Can you suss out what it is?</pre></div></div>
+  
+  <p>The above lines of code are equivalent.</p>
+   <p>You can also give synonyms for options with a vertical bar between them; for example:</p>
+    
+<div class="observeBox"><div class="observeTitle">OBSERVE:</div><div class="observe"><pre>'ignore_case|case-insensitive' =&gt; \$case_insensitive
+</pre></div></div>
+     
+   <p>And you can specify that an option may take a fixed number or arbitrary number of values rather 
+    than just one. Try this example. Create <b>opt_long.pl</b>:</p>
+    
+<div class="listingBox"><div class="listingTitle">CODE TO TYPE:</div><div class="listing"><pre>#!/usr/bin/perl
+use strict;
+use warnings;
+
+use Getopt::Long;
+
+my $size = 42;
+GetOptions( 'library=s@'       =&gt; \my @libraries,
+            'coordinates=f{2}' =&gt; \my @coordinates,
+            'size:i'           =&gt; \$size,
+          );
+
+print join( "\n\t", "Libraries:", @libraries ), "\n";
+print join( "\n\t", "Coordinates:", @coordinates ), "\n";
+print "Size: $size\n";
+print "Remaining in \@ARGV: @ARGV\n";</pre></div></div>
+    <p>
+     Save and run that program. You'll see this:
+    </p>
+    
+<div class="interactiveBox"><div class="interactiveTitle">INTERACTIVE SESSION:</div><div class="interactive"><pre>cold:~/perl3$ <ins>./opt_long.pl --lib=/etc --lib /var/tmp --lib /tmp --coordinates 1.4 -2.5 --size</ins>
+Libraries:
+        /etc
+        /var/tmp
+        /tmp
+Coordinates:
+        1.4
+        -2.5
+Size: 0
+Remaining in @ARGV: 
+</pre></div></div>
+    
+   <p>We save a line by putting the declarations of <b>@libraries</b> and 
+    <b>@coordinates</b> <i>inside</i> the call to <span class="darkgreen">GetOptions()</span>. That may 
+    seems strange, but bear in mind that <b>my</b> is basically just a kind of qualifier on a 
+    variable and can appear just about anywhere you use a variable. There is no scoping issue because 
+    parentheses don't impose a scoping level; braces do.</p>
+    
+   <p>Also, we don't need to provide an argument to <b>--size</b>; the result is that the 
+    value is set to <b>0</b>. If we omit the option altogether, we get this:</p>
+    
+<div class="interactiveBox"><div class="interactiveTitle">INTERACTIVE SESSION:</div><div class="interactive"><pre>cold:~/perl3$ <ins> ./opt_long.pl --lib=/etc --lib /var/tmp --lib /tmp --coordinates 1.4 -2.5 3.4</ins>
+Libraries:
+        /etc
+        /var/tmp
+        /tmp
+Coordinates:
+        1.4
+        -2.5
+Size: 42
+Remaining in @ARGV: 3.4
+</pre></div></div>
+    
+   <p>...and then it reverts to the default we provided. A third value for the 
+    <b>--coordinates</b> option is ignored because we specified that it takes exactly two. Try providing 
+    only one: </p>
+    
+<div class="interactiveBox"><div class="interactiveTitle">INTERACTIVE SESSION:</div><div class="interactive"><pre>cold:~/perl3$ <ins>./opt_long.pl --lib /var/tmp /tmp --coordinates 1.4   </ins> 
+Insufficient arguments for option coordinates
+Libraries:
+        /var/tmp
+Coordinates:
+        1.4
+Size: 42
+Remaining in @ARGV: /tmp
+</pre></div></div>
+    
+  <p>The <b>--library</b> option must be given for each of its values; <b>--library</b> does not work the same 
+   way as explicitly quantified <b>--coordinates</b>. </p>
+    
+   <p>There are <i>many</i> other features of <span class="darkgreen">GetOptions()</span>; for more information on them, 
+    see <a href="http://perldoc.perl.org/Getopt/Long.html" target="_blank">perldoc Getopt::Long</a>. Just one lesson to go, can you believe it? I can. You're doing some great work!
+   See you in lesson 15...</p>
+ 
+ </div>
+  
+ <p>Once you finish the lesson, go back to the syllabus to complete the homework.</p>
+   
+<div class="footer"><div id="timeSurvey"></div>				
+				Copyright © 1998-2014 O'Reilly Media, Inc.<br><img src="https://courses.oreillyschool.com/common/cclicense.png"><br>
+				This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 Unported License.<br>
+				See <a href="http://creativecommons.org/licenses/by-sa/3.0/legalcode">http://creativecommons.org/licenses/by-sa/3.0/legalcode</a> 
+				for more information.
+				</div><iframe id="t" width="1" height="1" border="0" style="display:none"></iframe><script language="javascript">bodyLoaded();</script><script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+  ga('create', 'UA-44720547-1', 'oreillyschool.com');
+  ga('send', 'pageview');
+</script></body></html>

@@ -1,0 +1,459 @@
+<html><!-- Copyright (c) 1998-2014 O'Reilly Media, Inc.
+			This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 Unported License.
+			See http://creativecommons.org/licenses/by-sa/3.0/legalcode for more information.
+            --><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"><link rel="stylesheet" type="text/css" href="../common/Lab.css"><script type="text/javascript" src="../common/Lab.js"></script><script language="javascript"></script><title>Sorting</title></head><body id="body"><a name="top"></a><div class="title">Sorting</div><div class="resize"><a href="Perl1-15.html#top" onclick="changeSize('smaller');" class="aS" title="Keep clicking to make fonts smaller">A</a><a href="Perl1-15.html#top" onclick="changeSize('larger');" class="aL" title="Keep clikcing to make fonts larger">A</a><a href="Perl1-15.html#top" onclick="lv()" class="lv" title="Adjust Page for High Contrast">HC</a><div id="fh"><p>Click on <span class="aS">A</span> to make all fonts on the page smaller.</p><p>Click on <span class="aL">A</span> to make all fonts on the page larger.</p><p>Click on <span class="lv">HC</span> to toggle high contrast mode. When you move your mouse over 
+                 some bold words in high contrast mode, related words are automatically highlighted. Text is shown
+                 in black and white. 
+             </p></div></div><hr>
+ 
+ <div class="goalTitle">Lesson Objectives</div><div class="goals">
+  
+  
+  When you complete this lesson, you will be able to:
+  
+  <ul><li>incorporate
+    predictability and repeatability into the order of 
+    iteration, using a sorted version of 
+    the output from <span class="darkgreen">keys()</span>.</li><li>use Perl's sort function.</li></ul>
+ </div><hr>
+ 
+  <p><div class="c">"There it was, hidden in alphabetical order."<br>
+   -Rita Holt</div></p>
+  
+  <p>In this lesson, we'll focus on the sorting. Many of the programs we wrote in earlier lessons would have been 
+   better if they had incorporated sorting. Take for example, the output of the 
+   <span class="darkgreen">keys()</span> function. Previously, when we iterated through a 
+   hash, the output was indeterminate. But we can incorporate
+   predictability and repeatability into the order of 
+   iteration, using a sorted version of 
+   the output from <span class="darkgreen">keys()</span>.</p>
+  
+ <a name="h_01"></a><div class="heading">sort()</div><div class="headingText">
+   
+   <p>Sorting is a task that helped define computer engineering, back when computer programmers were obsessed 
+   with sorting algorithms and 
+    code, and computers looked like this:</p>
+   
+   
+   <p><div class="c"><img src="images/computers.jpg"></div></p>
+   
+   <p>Computers were so underpowered back then that in order to sort even modest amounts of 
+    data, careful attention had to be paid to the method used, to make sure that 
+   a task could be completed.</p>
+   
+   <p>These days, only a few people are still obsessed with improving sorting mechanisms; the 
+    rest of us just call the functions that have already been written. The <span class="darkgreen">sort()</span> 
+    function in Perl has been updated over the years to improve its performance, but you don't 
+    need to know what goes on inside of it in order to use it. In general, the <span class="darkgreen">sort()</span> function 
+    works like this:</p>
+   
+<div class="observeBox"><div class="observeTitle">OBSERVE: sort</div><div class="observe"><pre>
+<i>SORTED_LIST</i> = <span class="darkgreen">sort</span> <i>UNSORTED_LIST</i>
+</pre></div></div>
+   
+   <p>There you are. Not so very complicated, right?  Now, let's work on an example. Create a new 
+   file called <b>sort.pl</b> as shown here:</p>
+   
+<div class="listingBox"><div class="listingTitle">CODE TO TYPE:</div><div class="listing"><pre><ins>#!/usr/bin/perl
+use strict;
+use warnings;
+
+my @inventory = qw(pears bananas peaches apples cherries oranges lemons grapefruit);
+foreach my $fruit ( sort @inventory )
+{
+  print "$fruit\n";
+}</ins>
+</pre></div></div>
+
+  <p><img src="images/coderunner/checksyntax.JPG"> and run it. </p>
+  
+<div class="interactiveBox"><div class="interactiveTitle">INTERACTIVE TERMINAL SESSION:</div><div class="interactive"><pre>cold:~$ <ins>cd perl1</ins>
+cold:~/perl1$ <ins>./sort.pl</ins>
+apples
+bananas
+cherries
+grapefruit
+lemons
+oranges
+peaches
+pears   
+cold:~/perl1$    
+</pre></div></div>
+
+   <p>The <i>input</i> to the <span class="darkgreen">sort()</span> function is the array <span class="darkred">@inventory</span>. When the 
+    argument list for <span class="darkgreen">sort()</span> is that straightforward, we usually omit the 
+    parentheses—we can omit parentheses around function arguments <b>if</b> 
+    precedence leads Perl to correctly identify the location of the end of the argument list. 
+    It's common practice is to omit parentheses around the arguments to many built-in 
+    functions.</p>
+    
+   <p>The <i>output</i> from the <span class="darkgreen">sort()</span> function is the list that results 
+    from sorting <span class="darkred">@inventory</span>. Rather than store that output in another array, I'm 
+    using it as the list in a <span class="purple">foreach</span> statement. </p>
+   
+   <p>Let's modify that output, starting with the addition of some uppercase letters:</p>
+   
+<div class="listingBox"><div class="listingTitle">CODE TO TYPE: sort.pl</div><div class="listing"><pre>#!/usr/bin/perl
+use strict;
+use warnings;
+
+<ins>my @inventory = qw(pears bananas Peaches apples Cherries oranges lemons Grapefruit);</ins>
+foreach my $fruit ( sort @inventory )
+{
+  print "$fruit\n";
+}
+</pre></div></div>
+   
+  <p><img src="images/coderunner/checksyntax.JPG"> and run it. </p>
+  
+<div class="interactiveBox"><div class="interactiveTitle">INTERACTIVE TERMINAL SESSION:</div><div class="interactive"><pre>cold:~/perl1$ <ins>./sort.pl</ins>
+Cherries
+Grapefruit
+Peaches
+apples
+bananas
+lemons
+oranges
+pears   
+cold:~/perl1$    
+</pre></div></div>
+
+   <p>The sorting order in Perl is called "ASCIIbetical", meaning that it is not quite
+    alphabetical—as you see by the output you just generated—but instead, it's determined by the
+    <i>ASCII collating sequence</i>. ASCII is the <b>A</b>merican <b>S</b>tandard <b>C</b>ode
+    for <b>I</b>nformation <b>I</b>nterchange, and it's the basis for how characters are stored
+    in computers. (ASCII has been replaced in large part by Unicode, but the
+    transition is still a work in progress and character encoding issues beyond 7-bit
+    ASCII are outside the scope of this course.)</p>
+   
+   <p>The output in our example is in this particular order, because capital letters come before
+    lowercase letters in ASCII. Here are 7-bit printable characters ordered left-to-right by
+    their position in the ASCII collating sequence:</p>
+   
+  <p><div class="c"><b>!"#$%&amp;'()*+,-./0123456789:;&lt;=&gt;?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\]^_`abcdefghijklmnopqrstuvwxyz{|}~</b></div></p>
+   
+   <p>Lots of <i>non</i>printable characters are part of that sequence as well. You can find 
+    out more by typing "man ascii" at the command prompt on a Unix/Linux computer, or by
+    Googling "ASCII."</p>
+   
+   <p>In a moment we'll go over the way to sort that list without regard to the case of the 
+    letters. But first, let's look at a few functions. Create 
+    a new file called <b>sort_numeric.pl</b> as shown:</p>
+   
+<div class="listingBox"><div class="listingTitle">CODE TO TYPE:</div><div class="listing"><pre><ins>#!/usr/bin/perl
+use strict;
+use warnings;
+
+my @numbers;
+foreach my $x ( 1 .. 10 )
+{
+  push @numbers, int(rand 1000);
+}
+foreach my $number ( sort @numbers )
+{
+  print "$number\n";
+}</ins>
+</pre></div></div>
+   
+  <p><img src="images/coderunner/checksyntax.JPG"> and run it. </p>
+  
+<div class="interactiveBox"><div class="interactiveTitle">INTERACTIVE TERMINAL SESSION:</div><div class="interactive"><pre>cold:~/perl1$ <ins>./sort_numeric.pl</ins>
+405
+497
+513
+518
+677
+722
+723
+842
+90
+981   
+cold:~/perl1$    
+</pre></div></div>
+   
+   <p>We have some new functions in this example:</p>
+   
+   <ul><li><span class="darkgreen">rand</span>(<span class="orange"><i>N</i></span>), which produces a random floating 
+     point number greater than or equal to 0, and less than <i>N</i> (that is, the result may 
+     be exactly 0, but will never be exactly <i>N</i>. If you omit <i>N</i>, it uses 
+     <span class="orange">1</span> by default).
+    </li><li><span class="darkgreen">int()</span>, which returns the integer part of its argument (truncates 
+     towards zero).</li></ul>
+   
+   <p>So <span class="darkgreen">int</span>(<span class="darkgreen">rand(</span><span class="orange">1000</span><span class="darkgreen">)</span>) returns 
+    a random integer between 0 and 999.</p>
+   
+   <p>Each time you run that program, you should get different output. Run it as many times as 
+    you need to until the output includes a number that isn't three digits long. Where is it in 
+    the sorted output? Is that where you think it should be?</p>
+   
+   <p>The number is where it <i>should</i> be—Perl doesn't make mistakes—but you 
+    may have had different expectations. That number comes out there 
+    because of ASCIIbetical sorting, which treats every element as a string. That means that 
+    "123" sorts before "35" just the same as "abc" sorts before "de." If you want to sort 
+    numerically, then you have to tell Perl to treat the elements of the 
+    <span class="darkgreen">sort</span> input list as numbers, not strings.</p>
+   
+   <p>We do that by adding a special argument to <span class="darkgreen">sort()</span>. It's
+    special because <span class="darkgreen">sort()</span> already takes a list as its
+    input argument, so there's no room for another argument—if another argument was added, it would
+    look like part of the list to be sorted. There's a special syntax for this
+    special argument; it looks like this:</p>
+   
+<div class="observeBox"><div class="observeTitle">OBSERVE:</div><div class="observe"><pre>
+<i>SORTED_LIST</i> = <span class="darkgreen">sort</span> { <span class="darkred">$a</span> &lt;=&gt; <span class="darkred">$b</span> } <i>UNSORTED_LIST</i>
+</pre></div></div>
+   
+   <p>That's right, the argument appears within curly brackets between 
+    <span class="darkgreen">sort</span> and the input list. And what's inside those brackets must be 
+    <i>exactly</i> what's written above. Modify <b>sort_numeric.pl</b> as shown:</p>
+
+<div class="listingBox"><div class="listingTitle">CODE TO EDIT:</div><div class="listing"><pre>#!/usr/bin/perl
+use strict;
+use warnings;
+
+my @numbers;
+foreach my $x ( 1 .. 10 )
+{
+  push @numbers, int(rand 1000);
+}
+<ins>foreach my $number ( sort { $a &lt;=&gt; $b } @numbers ) </ins>
+{
+  print "$number\n";
+}
+</pre></div></div>
+   
+  <p><img src="images/coderunner/checksyntax.JPG"> and run it. Your
+  output will look something like this:</p>
+  
+<div class="interactiveBox"><div class="interactiveTitle">INTERACTIVE TERMINAL SESSION:</div><div class="interactive"><pre>cold:~/perl1$ <ins>./sort_numeric.pl</ins>
+17
+168
+201
+222
+512
+670
+680
+695
+716
+777   
+cold:~/perl1$    
+</pre></div></div>
+   
+   <p>So that's how you sort numbers. (Want to break it? You 
+    know you do! Try putting something non-numeric in the input list to 
+    <span class="darkgreen">sort()</span> when it has that special argument and see what happens.)</p>
+   
+   <p>Now, this bit of information might satisfy a lesser scholar, but not you! 
+   You want to <i>understand</i> what's going on in detail. So let's dig a little deeper into that special argument.</p>
+   
+   <p>Between those curly brackets is what's called a <i>comparison function</i>. In general, it 
+    looks like this:</p>
+  
+<div class="observeBox"><div class="observeTitle">OBSERVE:</div><div class="observe"><pre>
+<i>SORTED_LIST</i> = <span class="darkgreen">sort</span> { <i>COMPARISON</i> } <i>UNSORTED_LIST</i>
+</pre></div></div>
+   
+   <p>When Perl sorts a list, deep down inside the clever algorithm that does the sorting, it 
+    compares a pair of elements in the list, many times over, for different pairs of elements. 
+    Perl wants to determine whether those two elements are equal, 
+    and if not, whether the first one is "less than" or "greater than" the other. Armed with 
+    that information, the clever algorithm decides how to order those two elements in the 
+    sorted output list it is building.</p>
+   
+  <p>The <b>&lt;=&gt;</b> operator (affectionately known as the "spaceship operator"—think "Star 
+    Wars") is the basic building block of the numeric comparison function. It returns -1 if the 
+    argument on its left is less than the argument on its right, 0 if the arguments are equal, 
+    or 1 if the argument on the left is greater than the argument on the right.</p>
+   
+   <p>There is a <i>default</i> comparison function. If you don't supply one—if you just say 
+    <span class="darkgreen">sort</span>( <span class="darkred">@list</span> )—then it is as if you
+    had written this:</p>
+   
+<div class="observeBox"><div class="observeTitle">OBSERVE: default comparison</div><div class="observe"><pre>
+<span class="darkgreen">sort</span> { <span class="darkred">$a</span> <span class="darkgreen">cmp</span> <span class="darkred">$b</span> } <i>UNSORTED_LIST</i> 
+</pre></div></div>
+   
+  <p>That <span class="darkgreen">cmp</span> operator is to strings what the <b>&lt;=&gt;</b> operator is to 
+    numbers: it returns -1 if the string on its left is less than (like using the 
+    <b>lt</b> operator) the string on its right, 0 if the strings are equal, 
+    or 1 if the string on its left is greater than (like using the <b>gt</b>
+    operator) the string on its right). By the way, you'll almost never see <b>cmp</b> or <b>&lt;=&gt;</b>
+    used outside of sorting comparison functions. </p>
+    
+    <p>Now, what are <span class="darkred">$a</span> and 
+    <span class="darkred">$b</span>?</p>
+   
+   <p>They're the two elements from the input list need to be compared by Perl's internal
+    sorting algorithm! (We engineers call this comparison function
+    a <i>callback</i>.) When Perl is ready to compare two elements in the list, it sets 
+    <span class="darkred">$a</span> and <span class="darkred">$b</span> to those elements, and calls your comparison function
+    (the code between the curly brackets). Perl reads the result, and depending on whether the
+    answer is less than, equal to, or greater than, zero, it determines the way that pair of elements
+    should be ordered.</p>
+   
+   <p>This diagram shows you what's going on:</p>
+   
+   <p><div class="c"><img src="images/sort.png"></div></p>
+  
+  <a name="s_01"></a><div id="s_01"><div class="subheading">Custom Sorting Orders</div><div class="subheadingText">
+   
+   <p>If ASCIIbetical and numeric were the only two ways of sorting lists, we wouldn't have
+    bothered to learn about the comparison function. But there is an <i>infinite</i>
+    number of possible comparison functions! You can write them to sort any way you want.
+    Let's say, for example, that you want to sort strings without regard to their case; in other words,
+    make "apples" sort before "Peaches". Go ahead and modify the code in <b>sort.pl</b> as shown:</p>
+   
+<div class="listingBox"><div class="listingTitle">CODE TO TYPE:</div><div class="listing"><pre>#!/usr/bin/perl
+use strict;
+use warnings;
+
+my @inventory = qw(pears bananas Peaches apples Cherries oranges lemons Grapefruit);
+<ins>@inventory = sort { lc($a) cmp lc($b) } @inventory;
+foreach my $fruit ( @inventory )</ins>
+{
+  print "$fruit\n";
+}
+</pre></div></div>
+   
+   <p><img src="images/coderunner/checksyntax.JPG"> and run it. </p>
+   
+<div class="interactiveBox"><div class="interactiveTitle">INTERACTIVE TERMINAL SESSION:</div><div class="interactive"><pre>cold:~/perl1$ <ins>./sort.pl</ins>
+apples
+bananas
+Cherries
+Grapefruit
+lemons
+oranges
+Peaches
+pears    
+cold:~/perl1$    
+</pre></div></div>
+   
+   <p>The comparison function puts every argument that it's passed into lowercase; so when it is passed
+    "Peaches" and "bananas", it will return the result of  <span class="orange">"peaches"</span> 
+    <span class="darkgreen">cmp</span> <span class="orange">"bananas"</span> (note that "peaches" is now in
+    lowercase). Now Perl's sort function knows that "bananas" goes before 
+    "Peaches" when sorted. Give it a try!</p>
+   
+   <p>I deliberately sorted <span class="darkred">@inventory</span> in place to show you that it could be done;
+    there are no issues with putting the results into the same array as the original input is located.</p>
+   
+   <p>More advanced sorting functions can figure out how to arrange dates typed in this format "29/08/2009" 
+    into something that can be sorted: </p>
+   
+<div class="observeBox"><div class="observeTitle">OBSERVE: Date Sorting</div><div class="observe"><pre>
+<span class="darkgreen">sort</span> { <span class="darkblue">date_to_num</span>( <span class="darkred">$a</span> ) &lt;=&gt; <span class="darkblue">date_to_num</span>( <span class="darkred">$b</span> ) } ...
+<span class="purple">sub</span> <span class="darkblue">date_to_num</span>
+{
+  <span class="purple">my</span> <span class="darkred">$date</span>  = <span class="darkgreen">shift</span>;
+    
+  <span class="purple">my</span> <span class="darkred">$day</span>   = <span class="darkgreen">substr</span> <span class="darkred">$date</span>, 0, 2;
+  <span class="purple">my</span> <span class="darkred">$month</span> = <span class="darkgreen">substr</span> <span class="darkred">$date</span>, 3, 2;
+  <span class="purple">my</span> <span class="darkred">$year</span>  = <span class="darkgreen">substr</span> <span class="darkred">$date</span>, 6, 4;
+    
+  <span class="purple">return</span> "<span class="darkred">$year$month$day</span>";
+}
+</pre></div></div> 
+   
+   <p>Even though we concatenated strings together into another string to be returned from 
+    <span class="darkblue">date_to_str</span>, Perl was still able to sort the result numerically because the strings
+    looked like numbers. However, since the strings are all of the same length, string
+    sorting would have worked equally well (until the year 10,000).</p> 
+   
+   <p>(You may remember <span class="darkgreen">substr()</span> from the homework for lesson 10!)</p>
+    
+   <p>Every comparison function ends up constructing either two numbers compared with 
+    <b>&lt;=&gt;</b> or two strings compared with <b>cmp</b>.</p>
+  
+  </div></div>
+ </div>
+ <a name="h_02"></a><div class="heading">Integrated Example</div><div class="headingText">
+   
+  <p>Let's add sorting to one of our long-running examples. Modify 
+   <b>store_report.pl</b> as shown:</p>
+   
+<div class="listingBox"><div class="listingTitle">CODE TO TYPE:</div><div class="listing"><pre>#!/usr/bin/perl
+use strict;
+use warnings;
+
+my $lines = &lt;&lt;'END_OF_REPORT';
+ 0.95   300   White Peaches
+ 1.45   120   California Avocados
+10.50    10   Durien
+ 0.40  1500   Spartan Apples
+ 1.50   400   Cherry Tomatoes
+END_OF_REPORT
+<ins>
+my (%item_cost, %inventory);</ins>
+foreach my $line ( split "\n", $lines )
+{
+  my ($cost, $quantity, $item) = split " ", $line, 3;
+  <ins>$item_cost{$item} = $cost;
+  $inventory{$item} = $quantity;</ins>
+}
+
+<ins>my %sold = ('White Peaches' =&gt; 12, 'Rainier Cherries' =&gt; 20,
+             Durien         =&gt; -1, 'Spartan Apples'   =&gt; 24);  # One durien returned... too smelly
+
+foreach my $item ( keys %sold )
+{
+  if ( exists $inventory{$item} )
+  {
+    $inventory{$item} -= $sold{$item};
+  }
+  else
+  {
+    warn "*** Sold $sold{$item} of $item, which were not in inventory\n";
+  }
+}
+
+foreach my $item ( sort keys %item_cost )
+{
+  printf "%5.2f %6d %s\n", $item_cost{$item}, $inventory{$item}, $item;
+}</ins>
+</pre></div></div>
+   
+  <p><img src="images/coderunner/checksyntax.JPG"> and run it. </p>
+  
+<div class="interactiveBox"><div class="interactiveTitle">INTERACTIVE TERMINAL SESSION:</div><div class="interactive"><pre>cold:~/perl1$ <ins>./store_report.pl</ins>
+*** Sold 20 of Rainier Cherries, which were not in inventory
+1.45    120 California Avocados
+1.50    400 Cherry Tomatoes
+10.50     11 Durien
+0.40   1476 Spartan Apples
+0.95    288 White Peaches   
+cold:~/perl1$    
+</pre></div></div>
+   
+  <p>Take a gander at these features:</p>
+   
+  <ul><li>The inventory is now captured internally in two hashes—<span class="darkred">%item_cost</span> and 
+    <span class="darkred">%inventory</span>—before processing any transactions. This is a
+    common programming practice: read the external data into internal data structures
+    before manipulating them. (I know, the data in this case isn't really "external,"
+    since it comes from strings inside the program, but we're going to learn
+    how to get data from outside the program in the next lesson!)</li><li>Don't bother sorting the keys of <span class="darkred">%sold</span> when processing the sales. It 
+    wouldn't make any difference, because there is no output from this phase.</li><li><i>Do</i> sort the key of <span class="darkred">%item_cost</span>, because output is being produced, and it's 
+    good practice to produce that output in a 
+    predictable order.</li><li>We didn't apply case-insensitive sorting because we assume that the input data will be 
+    consistent with respect to the use of capital letters. Feel free to change this!</li><li>In this program <span class="darkred">%inventory</span> and <span class="darkred">%item_cost</span> must contain the 
+    same keys. The way that it is structured, this is guaranteed.</li></ul>
+ </div>
+   
+ <br><br><br><br>
+  
+ <p>Can you believe it? We're getting ready to take on our final lesson. See you in there!</p>
+<div class="footer"><div id="timeSurvey"></div>				
+				Copyright © 1998-2014 O'Reilly Media, Inc.<br><img src="https://courses.oreillyschool.com/common/cclicense.png"><br>
+				This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 Unported License.<br>
+				See <a href="http://creativecommons.org/licenses/by-sa/3.0/legalcode">http://creativecommons.org/licenses/by-sa/3.0/legalcode</a> 
+				for more information.
+				</div><iframe id="t" width="1" height="1" border="0" style="display:none"></iframe><script language="javascript">bodyLoaded();</script><script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+  ga('create', 'UA-44720547-1', 'oreillyschool.com');
+  ga('send', 'pageview');
+</script></body></html>

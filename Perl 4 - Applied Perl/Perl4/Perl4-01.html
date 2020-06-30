@@ -1,0 +1,1389 @@
+<html><!-- Copyright (c) 1998-2014 O'Reilly Media, Inc.
+			This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 Unported License.
+			See http://creativecommons.org/licenses/by-sa/3.0/legalcode for more information.
+            --><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"><link rel="stylesheet" type="text/css" href="../common/Lab.css"><script type="text/javascript" src="../common/Lab.js"></script><script language="javascript"></script><title>Introduction: Packages</title></head><body id="body"><a name="top"></a><div class="title">Introduction: Packages</div><div class="resize"><a href="Perl4-01.html#top" onclick="changeSize('smaller');" class="aS" title="Keep clicking to make fonts smaller">A</a><a href="Perl4-01.html#top" onclick="changeSize('larger');" class="aL" title="Keep clikcing to make fonts larger">A</a><a href="Perl4-01.html#top" onclick="lv()" class="lv" title="Adjust Page for High Contrast">HC</a><div id="fh"><p>Click on <span class="aS">A</span> to make all fonts on the page smaller.</p><p>Click on <span class="aL">A</span> to make all fonts on the page larger.</p><p>Click on <span class="lv">HC</span> to toggle high contrast mode. When you move your mouse over 
+                 some bold words in high contrast mode, related words are automatically highlighted. Text is shown
+                 in black and white. 
+             </p></div></div><hr>
+  
+  <p>Welcome to the fourth and final course in the O'Reilly School of Technology's Perl Certificate series! </p>
+  <div class="outcomesTitle">Course Objectives</div><div class="outcomes">
+    <p>When you complete this course, you will be able to:</p>
+    
+    <ul><li>create reusable modules in object-oriented Perl.</li><li>process web page forms.</li><li>interact with a database.</li><li>scrape web pages and parse HTML.</li><li>handle complex data and time.</li><li>implement the Moose O-O system in Perl.</li></ul>
+    
+  </div>
+ <a name="h_01"></a><div class="heading">Introduction</div><div class="headingText">
+  
+  <p>
+   If we haven't already met, please allow me to introduce myself. My name is Peter Scott, and I am the author of the 
+   books "Perl Debugged," "Perl Medic," and the DVD "Perl Fundamentals," as well as the previous three courses in 
+   this series. Throughout this course, you'll have the guidance of your OST instructor. If you 
+   find any part of any lesson to be confusing, ambiguous, or 
+   incorrect, please let your instructor know so we can fix it.</p>
+  </div>
+ 
+    <p>Perl 4: Applied Perl teaches the application of Perl in performing many common complex tasks. You will not only learn 
+    how to use objects in Perl, but also how to make your own, so that you, too, can create reusable code (aka modules). We'll 
+    cover the basics of object-oriented programming in Perl, plus more advanced aspects such as inheritance, polymorphism, 
+    inside-out objects, and use of the Moose O-O system.</p>
+
+   <p>Also, because some of the modules we will need do not come with the standard Perl distribution, we'll show you how to get 
+   any module you want from the Comprehensive Perl Archive Network. All this, plus multiprocessing in Perl and using its 
+   built-in debugger, awaits you in Perl 4.</p>
+    
+ <a name="h_01"></a><div class="heading">Learning with O'Reilly School of Technology Courses</div><div class="headingText">  
+  <p>As with every O'Reilly School of Technology course, we'll take a <i>user-active</i> 
+    approach to learning. This means that you (the user) will be active! You'll learn by doing,  
+    building live programs, testing them and experimenting with them—hands-on!</p>
+  
+  <p>To learn a new skill or technology, you have to experiment. The more you experiment, the more 
+    you learn. Our system is designed to maximize experimentation and help you <i>learn to 
+      learn</i> a new skill.</p>
+  
+  <p>We'll program as much as possible to be sure that the principles sink in and stay with you.</p>
+  
+  <p>Each time we discuss a new concept, you'll put it into code and see what YOU can do with it.  
+   On occasion we'll even give you code that doesn't work, so you can see common mistakes and how 
+   to recover from them. Making mistakes is actually another good way to learn.</p>  
+    
+  <p>Above all, we want to help you to <i>learn to learn</i>. We give you the tools to take control 
+    of your own learning experience. </p>
+
+  <p>When you complete an OST course, you know the subject matter, <i>and</i> you know how to 
+    expand your knowledge, so you can handle changes like software and operating system updates.</p>
+   
+   <p>Here are some tips for using O'Reilly School of Technology courses effectively:</p>
+
+  <ul><li><b>Type the code.</b> Resist the temptation to cut and paste the example code we give you. 
+    Typing the code  
+      actually gives you a feel for the programming task. Then play around with the examples to find out what 
+      else you can make them do, and to check your understanding. It's highly
+      unlikely you'll break anything by experimentation. If you <i>do</i> break something, that's an indication to us that 
+      we need to improve our system!</li><li><b>Take your time.</b> Learning takes time. Rushing can have negative effects on your 
+      progress. Slow down and let your brain absorb the new information thoroughly. 
+      Taking your time helps to maintain a relaxed, positive approach. It also gives you the 
+      chance to try new things and learn more than you otherwise would if you blew 
+      through all of the coursework too quickly.</li><li><b>Experiment.</b> Wander from the path often and explore the possibilities. We can't 
+      anticipate all of your questions and ideas, so it's up to you to experiment and create on 
+      your own. Your instructor will help if you go completely off the rails.</li><li><b>Accept guidance, but don't depend on it.</b> Try to solve problems on your own. Going 
+      from misunderstanding to understanding is the best way to acquire a new skill. Part of what 
+      you're learning is problem solving. Of course, you can always contact your instructor 
+      for hints when you need them.</li><li><b>Use all available resources!</b> In real-life problem-solving, you aren't bound by false 
+      limitations; in OST courses, you are free to use any resources at your disposal to solve
+      problems you encounter: the Internet, reference books, and online help are all fair game.   
+      </li><li><b>Have fun!</b> Relax, keep practicing, and don't be afraid to make mistakes! 
+      Your instructor will keep you at it until you've 
+      mastered the skill. We want you to get that satisfied, "I'm so cool! I did it!"
+      feeling. And you'll have some projects to show off when you're done.</li></ul>
+  </div>   
+ <a name="h_01"></a><div class="heading">Lesson Format</div><div class="headingText">
+        
+    <p>We'll try out lots of examples in each lesson. We'll have you write code, 
+    look at code, and edit existing code. The code will be presented in boxes that will 
+    indicate what needs to be done to the code inside.</p>
+        
+    <p>Whenever you see white boxes like the one below, you'll <i>type</i> the contents into the editor window to try the example yourself. 
+      The CODE TO TYPE bar on top of the white box contains directions for you to follow:</p>
+        
+<div class="listingBox"><div class="listingTitle">CODE TO TYPE:</div><div class="listing"><pre>White boxes like this contain code for you to try out (type into a file to run).
+
+If you have already written some of the code, new code for you to add <ins>looks like this</ins>. 
+    
+If we want you to remove existing code, the code to remove <del>will look like this</del>.
+  
+<span class="gray">We may also include instructive comments that you don't need to type.</span>  
+</pre></div></div>
+   
+   <p>We may run programs and do some other activities in a terminal session in the operating system or other command-line environment. These will be shown 
+     like this:</p>
+   
+<div class="interactiveBox"><div class="interactiveTitle">INTERACTIVE SESSION:</div><div class="interactive"><pre>
+The plain black text that we present in these INTERACTIVE boxes is 
+provided by the system (not for you to type). The commands we want you to type <ins>look like this</ins>.
+</pre></div></div>   
+        
+  <p>Code and information presented in a gray OBSERVE box is for you to <i>inspect</i> and <i>absorb</i>. 
+  This information is often color-coded, and followed by text explaining the code in detail:</p>
+        
+<div class="observeBox"><div class="observeTitle">OBSERVE:</div><div class="observe"><pre>
+Gray "Observe" boxes like this contain <span class="darkred">information</span> (usually code specifics) for you to <i>observe</i>.
+</pre></div></div>
+
+   <p>The paragraph(s) that follow may provide addition details on <span class="darkred">information</span> that was 
+     highlighted in the Observe box.</p>
+   
+   <p>We'll also set especially pertinent information apart in "Note" boxes:</p>      
+   
+   <p><div class="c"><table class="noteBox fBox pBox "><tr><td class="noteTitle">Note</td><td class="note">Notes provide information that is useful, but not absolutely necessary for performing the tasks at hand.</td></tr></table></div> </p>
+   
+   <p><div class="c"><table class="noteBox fBox pBox "><tr><td class="noteTitle">Tip</td><td class="note">Tips provide information that might help make the tools easier for you to use, such as shortcut keys.</td></tr></table></div></p>
+   
+   <p><div class="c"><table class="noteBox fBox pBox "><tr><td class="noteTitle">WARNING</td><td class="note">Warnings provide information that can help prevent program crashes and data loss.</td></tr></table></div></p>
+        
+ </div>   
+ <a name="h_01"></a><div class="heading">The CodeRunner Screen</div><div class="headingText">
+    
+     <p>This course is presented in CodeRunner, OST's self-contained environment. We'll discuss the 
+         details later, but here's a quick overview of the various areas of the screen:</p>
+    
+     <p><div class="c"><img src="../common/images/CodeRunnerScreen.png"></div></p>
+     
+     <p>These videos explain how to use CodeRunner:</p>
+         
+     <p><a href="http://www.youtube.com/watch?v=45sATp529Mw" target="_blank">File Management Demo</a></p>
+     <p><a href="http://www.youtube.com/watch?v=SvbM6vPAG9k" target="_blank">Code Editor Demo</a></p>
+     <p><a href="http://www.youtube.com/watch?v=WmajY8bIXrA" target="_blank">Coursework Demo</a></p>
+
+ </div>
+    
+ <a name="h_02"></a><div class="heading">Retrospective</div><div class="headingText">
+   
+   <p>The courses preceding this one in the Perl Series were:</p>
+   
+   <ul><li><b>Beginning Perl</b> — Introduced the language, its basic data types, operators, and 
+     block-structured syntax: conditionals, loops, and subroutines. </li><li><b>Intermediate Perl</b> — Covered regular expressions, dealing with files, processing directories, and 
+     syntax and functions in greater depth.</li><li><b>Advanced Perl</b> — Introduced references to both data and code; also covered hierarchical data structures,
+     exceptions, list processing, system interaction, command line options, and regular expressions in 
+     greater depth.</li></ul>
+   
+   <p>You can probably tell by looking over the content from those earlier courses, as progress in Perl, 
+     we cover ground faster. 
+     This course continues that trend, so hold on—we are about to hit the accelerator!</p>
+  
+  </div>
+  <a name="h_03"></a><div class="heading">Overview</div><div class="headingText">
+   
+   <p>From here, there are many directions we <i>could</i> go to gain a deeper understanding of Perl: the 
+    symbol table, features added to Perl from version 5.8 onward, functional programming, or any of a number of 
+    features of regular expressions. But we're not going to do any of those things, because at this point 
+    you're advanced enough to research and learn those topics on your 
+    own whenever you need them.</p>
+   
+   <p>Instead, we'll develop <i>applied</i> Perl programming. We'll learn how to do many common and useful tasks 
+    from inside Perl, following, as always, best practices. We will send email, query databases, 
+    and write programs for the World Wide Web. The generic key to all of these tasks is a <i>module</i>: a parcel 
+    of reusable code that your program can use <i>when you load it.</i> Some of the modules we'll use come with 
+    the standard Perl distribution; some of them need to be downloaded from the Comprehensive Perl Archive Network
+    (CPAN). We'll go over how to do that in a bit.</p>
+   
+   <p>But first, because modules are <i>object-oriented,</i> we'll spend some time learning how object-oriented 
+    programming in Perl works, and how to create our own object classes so we can create our own modules. </p>
+   
+   <p>We'll be covering many topics in this course, but none of them in exhaustive depth. 
+    You'll have plenty of opportunity to sharpen your skills in any specific areas you choose, independently. We'll give you 
+    pointers on doing just that. So if, for instance, you find that you really need to work on 
+    database programming in depth, you'll know how to go out and retrieve the tools you need to do it.</p>
+ 
+ </div>
+ <a name="h_04"></a><div class="heading">Review</div><div class="headingText">
+      
+  <p>Because we have so much information to pack in here, it's <i>vital</i> that you're up to speed with the required 
+   level of Perl expertise. We assume that you have taken the three previous courses in this series, or have 
+   equivalent experience. For the benefit of people who haven't taken those courses, we're going to spend a short 
+   amount of time on a review of the necessary skills and knowledge, so you can tell whether you have them. If by 
+   the end of this section you do not feel completely confident in proceeding, contact us at 
+   <a href="mailto:info@oreillyschool.com">info@oreillyschool.com</a> so we can have a conversation about 
+   transferring your tuition to an earlier course. It won't serve you well to try to keep up with a course that 
+   you're not quite ready to tackle, so please pay special attention to what comes next.</p>
+  
+  <p>If you have completed the previous three Perl courses to your own satisfaction, you can 
+   <a href="Perl4-01.html#Packages">skip to the next section</a>, but you might want to read this section anyway; you can 
+   never be too well-versed in the fundamentals!</p>
+
+  <a name="s_01"></a><div id="s_01"><div class="subheading">Prerequisites</div><div class="subheadingText">
+      
+   <p>To be successful in this course, you need a thorough knowledge of these topics:</p> 
+   <ul><li>Use of the <span class="darkred">strict</span> and <span class="darkred">warnings</span> pragmas.</li><li>Scalars, and many operators and functions for manipulating numbers and strings within them.</li><li>Arrays, and ways of inserting and removing elements.</li><li>Hashes, and how to traverse them.</li><li>Block structure: lexical scope and declaration with <span class="purple">my</span>.</li><li>Conditional blocks: <span class="purple">if</span>, <span class="purple">unless</span>, and looping blocks: 
+     <span class="purple">while</span>, <span class="purple">foreach</span>, <span class="purple">for</span>, and their postfixed statement modifier 
+     forms.</li><li>Flow control with <span class="purple">last</span>, <span class="purple">next</span>, and <span class="purple">redo</span>.</li><li>Context: scalar and list, and the use of scalar expressions in numeric or string contexts.</li><li>Input/Output: Reading and writing files and the standard input and output streams. Enumerating directory 
+     contents with <span class="darkgreen">readdir()</span> and <span class="darkgreen">glob()</span>. </li><li>Subroutines: how to pass arguments and return results; styles of parameter passing.</li><li>Regular expressions: character classes, quantifiers (greedy and non-greedy), the match and substitution 
+     operators and their common modifiers, alternation, and capturing <i>vs.</i> noncapturing groups.</li><li>How to form slices of arrays, hashes, and lists.</li><li>References to scalars, arrays, hashes, and their anonymous forms. References to code: callbacks, dispatch 
+     tables, and closures.</li><li>Exception handling with <span class="blue">eval</span> and <span class="blue">die</span>; signal handling with <span class="red">%SIG</span>.</li><li>Command line option processing with <span class="darkred">Getopt::Std</span> and <span class="darkred">Getopt::Long</span>.</li></ul>
+  
+  </div></div>
+  <a name="s_02"></a><div id="s_02"><div class="subheading">Work It</div><div class="subheadingText">
+       
+   <p>Now let's put some of those concepts together working with an example. In our example, we'll 
+     write a program to manage information about stocks.</p>
+   
+   <p>Create a <b>/perl4</b> folder in CodeRunner, to contain your work in this course:</p>
+   
+   <p><div class="c"><img src="images/coderunner/NewFolder.png"><img src="images/coderunner/NewFolderPerl4.png"></div></p> 
+   
+    <p>Now create a new file called <b>review.pl</b> in Perl mode in the CodeRunner editor, and enter the code below as shown:</p>
+  
+<div class="listingBox"><div class="listingTitle">CODE TO ENTER:</div><div class="listing"><pre>#!/usr/local/bin/perl
+use strict;
+use warnings;
+
+# Manage a flat file database of historical share quotes (high, low, close).
+# Retrieve all quotes for a given stock by ticker symbol and/or
+# date range, remove entries by the same criteria, or add new entries.
+# To satisfy some external constraints not enumerated here, we need to
+# put each symbol's data in a separate file named after the symbol.
+
+# Examples:
+# ./review.pl -a -s GOOG -d 2011-02-12 -h 642 -l 610 -c 640   # Add
+# ./review.pl    -s ORYL -d 2011-01-10:2011-01-20             # Fetch
+# ./review.pl    -s APPL
+# ./review.pl            -d 2011-03-11:2011-03-30
+# ./review.pl -r -s GOOG -d 2011-04-09:2011-04-15             # Remove
+
+use Getopt::Std;
+
+run();
+
+
+sub run
+{
+  my %opt = init();
+
+  load_data();
+
+  if ( $opt{a} )
+  {
+    add_item( @opt{ qw(s d h l c)} );
+  }
+  else
+  {
+    ( $opt{r} ? \&amp;remove_items : \&amp;display_items )-&gt;( @opt{ qw(s d) } );
+  }
+
+  save_data() if $opt{a} || $opt{r};
+}
+
+
+sub init
+{
+  my $usage = &lt;&lt;"EOT";
+Usage: $0 [-a -h high -l low -c close|-r] [-s symbol] [-d date|range]
+EOT
+  getopts( 'ac:d:h:l:rs:', \my %opt ) or die $usage;
+  $opt{a} &amp;&amp; $opt{r} and die "Can't have both -a and -r\n";
+  $opt{s} &amp;&amp; $opt{h} &amp;&amp; $opt{l} &amp;&amp; $opt{c}
+    or die "Must have -s, -h, -l, -c with -a\n" if $opt{a};
+  $opt{s} || $opt{d} or die "Must have -s or -d or both\n";
+  if ( $opt{d} )
+  {
+    /\A\d{4}-\d{2}-\d{2}\z/ or die "Invalid date format" for split /:/, $opt{d};
+  }
+  return %opt;
+}
+
+
+sub display_items
+{
+  my ($symbol, $date) = @_;
+
+  my $this_ref = subset_data( $symbol, $date );
+  for my $symbol ( sort keys %$this_ref )
+  {
+    for my $date ( sort keys %{ $this_ref-&gt;{$symbol} } )
+    {
+      my $value_ref = $this_ref-&gt;{$symbol}{$date};
+      print "$symbol $date @$value_ref\n";
+    }
+  }
+}
+
+{
+  my $data_ref;
+
+  sub add_item
+  {
+    my ($symbol, $date, $high, $low, $close) = @_;
+
+    $data_ref-&gt;{$symbol}{$date} = [ $high, $low, $close ];
+  }
+
+
+  sub remove_items
+  {
+    my ($symbol, $date) = @_;
+
+    my $this_ref = subset_data( $symbol, $date );
+    for my $symbol ( keys %$this_ref )
+    {
+      my @keys = keys %{ $this_ref-&gt;{$symbol} };
+      delete @{ $data_ref-&gt;{$symbol} }{ @keys };
+    }
+  }
+
+
+  sub subset_data
+  {
+    my ($symbol, $date) = @_;
+
+    my $this_ref;
+
+    if ( $symbol )
+    {
+      $this_ref-&gt;{$symbol} = $data_ref-&gt;{$symbol};
+    }
+    else
+    {
+      $this_ref = { %$data_ref };  # Copy so we can delete elements
+    }
+
+    if ( $date )
+    {
+      for my $symbol ( keys %$this_ref )
+      {
+    	my ($from, $to)      = date_to_range( $date );
+        my @dates            = grep { $_ ge $from &amp;&amp; $_ le $to }
+                             keys %{ $this_ref-&gt;{$symbol} };
+        $this_ref-&gt;{$symbol} = { map { $_, $this_ref-&gt;{$symbol}{$_} } @dates };
+      }
+    }
+    return $this_ref;
+  }
+
+
+  sub load_data
+  {
+    for my $file ( data_files() )
+    {
+      (my $symbol = $file) =~ s/\.sym//;
+      $data_ref-&gt;{$symbol} = read_file( $file );
+    }
+  }
+
+
+  sub save_data
+  {
+    unlink data_files();
+    while ( my ($symbol, $sym_ref) = each %$data_ref )
+    {
+      next unless keys %$sym_ref;
+      open my $fh, '&gt;', "$symbol.sym" or die "Open $symbol.sym: $!\n";
+      for my $date ( sort keys %$sym_ref )
+      {
+	print {$fh} "$date @{ $sym_ref-&gt;{$date} }\n";
+      }
+    }
+  }
+}
+
+
+sub data_files { return glob "*.sym" }
+
+
+sub date_to_range
+{
+  my $date = shift;
+
+  return $date =~ /(.*):(.*)/ ? ($1, $2) : ($date, $date);
+}
+
+
+sub read_file
+{
+  my $filename = shift;
+
+  my %symbol_data;
+  open my $fh, '&lt;', $filename or die "open $filename: $!\n";
+  while ( &lt;$fh&gt; )
+  {
+    chomp;
+    my ($date, $high, $low, $close) = split;
+    $symbol_data{$date} = [ $high, $low, $close ];
+  }
+  return \%symbol_data;
+}
+ </pre></div></div>
+    
+    <p>Save <b>review.pl</b> program in your <b>/perl4</b> folder. Click the Terminal icon, 
+    log in with your sandbox login and password, and run the program to verify its operation by typing 
+    the command below as shown:</p>
+    
+<div class="interactiveBox"><div class="interactiveTitle">INTERACTIVE TERMINAL SESSION: Running review.pl</div><div class="interactive"><pre>
+cold:~$ <ins>cd perl4</ins>
+cold:~/perl4$ <ins>./review.pl -a -s GOOG -d 2011-02-12 -h 642 -l 610 -c 640</ins>
+cold:~/perl4$ <ins>./review.pl -a -s GOOG -d 2011-02-13 -h 643 -l 611 -c 641</ins>
+cold:~/perl4$ <ins>./review.pl -a -s GOOG -d 2011-02-14 -h 642 -l 610 -c 642</ins>
+cold:~/perl4$ <ins>./review.pl -a -s ORYL -d 2011-02-14 -h 2121.2 -l 2012.1 -c 2099.1</ins>
+cold:~/perl4$ <ins>./review.pl -a -s ORYL -d 2011-02-15 -h 2116.4 -l 2010.7 -c 2091.2</ins>
+cold:~/perl4$ <ins>./review.pl -a -s ORYL -d 2011-02-16 -h 2110.5 -l 2003.4 -c 2084.6</ins>
+cold:~/perl4$ <ins>./review.pl -d 2011-02-13:2011-02-14</ins>
+GOOG 2011-02-13 643 611 641
+GOOG 2011-02-14 642 610 642
+ORYL 2011-02-14 2121.2 2012.1 2099.1
+cold:~/perl4$ <ins>./review.pl -d 2011-02-13:2011-02-14 -s ORYL</ins>
+ORYL 2011-02-14 2121.2 2012.1 2099.1
+cold:~/perl4$ <ins>./review.pl -r -d 2011-02-13 -s GOOG</ins>
+cold:~/perl4$ <ins>./review.pl -d 2011-02-13:2011-02-14</ins>
+GOOG 2011-02-14 642 610 642
+ORYL 2011-02-14 2121.2 2012.1 2099.1
+</pre></div></div>
+    
+   <p>We'll go over parts of the code together, but you should be able to understand 
+    all of it on your own, even if it takes a while. This code creates text files of stock data (when given the 
+    <span class="code">-a</span> option), edits those files (with the <span class="code">-r</span> option), and  
+    reads those files and prints subsets of them according to search criteria. </p>
+   
+   <p>It forms an <i>internal representation</i> of those text files in a data structure that is a hash pointed 
+     to by <b>$data_ref</b>, a variable that is scoped only to the subroutines <b>add_item()</b>, <b>remove_items()</b>, 
+     <b>subset_data()</b>, <b>load_data()</b>, and <b>subset_data()</b> (and so they are <i>closed over</i> <b>$data_ref</b>). Each 
+    entry in the hash is keyed off a stock symbol, and each entry is itself a reference to a hash with a key that is 
+    a date and a value that is a reference to an array of the high, low, and closing values. Graphically, part 
+    of that data structure might look like this:</p>
+   
+   <p><div class="c"><img src="images/lessonImages/review.png"></div></p>
+    
+    <p>Let's look at the <b>subset_data()</b> subroutine, which is used to form a hash of just the data referenced by 
+    a particular symbol and/or a particular date or range of dates separated by a colon:</p>
+   
+<div class="observeBox"><div class="observeTitle">OBSERVE: subset_data() subroutine</div><div class="observe"><pre>
+  sub subset_data
+  {
+    my (<span class="darkblue">$symbol</span>, <span class="darkblue">$date</span>) = @_;
+</pre></div></div>
+
+   <p>Extract the arguments to the subroutine into $symbol and $date (if either one is not specified, its value will be <i>undef</i>).</p>
+     
+<div class="observeBox"><div class="observeTitle">OBSERVE: subset_data() subroutine</div><div class="observe"><pre>
+    my <span class="darkred">$this_ref</span>;
+</pre></div></div>
+    
+   <p><span class="darkred">$this_ref</span> is the reference to the hash we will form that contains a copy of the data in 
+    the master data structure <span class="darkgreen">$data_ref</span>, with the subsets <span class="darkblue">$symbol</span> and/or 
+    <span class="darkblue">$date</span>.</p>
+     
+<div class="observeBox"><div class="observeTitle">OBSERVE: subset_data() subroutine</div><div class="observe"><pre>
+    if ( <span class="darkblue">$symbol</span> )
+    {
+      <span class="darkred">$this_ref</span>-&gt;{<span class="darkblue">$symbol</span>} = <span class="darkgreen">$data_ref</span>-&gt;{<span class="darkblue">$symbol</span>};
+    }
+</pre></div></div>
+    
+   <p>If <span class="darkblue">$symbol</span> is supplied, it will have a true value (we don't have to worry about the 
+    digit zero as a possibility because there can be no such stock symbol), and so we set 
+    <span class="darkred">$this_ref</span> to that part of <span class="darkgreen">$data_ref</span> containing only 
+    <span class="darkblue">$symbol</span>'s data. </p>
+     
+<div class="observeBox"><div class="observeTitle">OBSERVE: subset_data() subroutine</div><div class="observe"><pre>
+    else
+    {
+      <span class="darkred">$this_ref</span> = { %<span class="darkgreen">$data_ref</span> };
+    }
+</pre></div></div>
+    
+   <p>If no <span class="darkblue">$symbol</span> is supplied, we have to set <span class="darkred">$this_ref</span> to be a copy of 
+    the whole data set so that we can subset it by date in the following lines. We can't just say 
+    <span class="code"><span class="darkred">$this_ref</span> = <span class="darkgreen">$data_ref</span></span>. If we did that, when we attempt to 
+    manipulate <span class="darkred">$this_ref</span>, we would actually be changing the hash pointed to by 
+    <span class="darkgreen">$data_ref</span>.</p>
+     
+<div class="observeBox"><div class="observeTitle">OBSERVE: subset_data() subroutine</div><div class="observe"><pre>
+    if ( <span class="darkblue">$date</span> )
+    {
+      for my <span class="darkblue">$symbol</span> ( keys %<span class="darkred">$this_ref</span> )
+      {
+</pre></div></div>
+    
+   <p>Now we're subsetting by date, so we go through each of the second-level hashes and determine which
+     of their dates to keep:</p>
+   
+<div class="observeBox"><div class="observeTitle">OBSERVE: subset_data() subroutine</div><div class="observe"><pre>
+	    my ($from, $to)      = date_to_range( <span class="darkblue">$date</span> );
+</pre></div></div>
+    
+   <p><span class="darkblue">$date</span> may contain a single date, like 2011-03-09, or a date range, like 
+    2011-03-09:2011-03-22, but <span class="darkgreen">date_to_range()</span> will return a list in either 
+    case. If it's a single date, <span class="red">$from</span> and <span class="red">$to</span> will be equal to one another.</p> 
+     
+<div class="observeBox"><div class="observeTitle">OBSERVE: subset_data() subroutine</div><div class="observe"><pre>
+	    my @dates            = grep { $_ ge $from &amp;&amp; $_ le $to }
+	                                keys %{ <span class="darkred">$this_ref</span>-&gt;{<span class="darkblue">$symbol</span>} };
+</pre></div></div>
+    
+   <p>This expression selects date ranges: it finds the keys (dates) in the current second-level hash 
+    that are between the required dates. Because we order our dates as YYYY-MM-DD and use leading zeros
+    on the month and day, this string comparison works without the need for parsing dates.</p>
+   
+    <div class="observeBox"><div class="observeTitle">OBSERVE: subset_data() subroutine</div><div class="observe"><pre>
+	<span class="darkred">$this_ref</span>-&gt;{<span class="darkblue">$symbol</span>} = { map { $_, <span class="darkred">$this_ref</span>-&gt;{<span class="darkblue">$symbol</span>}{$_} } @dates };
+      }
+</pre></div></div>
+    
+   <p>Having found the dates we need, we repopulate the second-level hash with the <i>anonymous hash ref</i>
+     (the outer braces to the right of the equals sign) containing the hash that has the (key, value) pair of the
+     (date, innermost-hash value) for each of those dates.</p>
+   
+    <div class="observeBox"><div class="observeTitle">OBSERVE: subset_data() subroutine</div><div class="observe"><pre>
+    }
+    return <span class="darkred">$this_ref</span>;
+  }
+</pre></div></div>
+    
+   <p>Finally, we return the reference to the data structure we've created.</p>
+     
+   <p>The code uses lots of <i>hash slices:</i> subsets of the values of a hash formed with a 
+     construct like <span class="code">@hash{<i>list of keys</i>}</span>.  Can you find them all?</p>
+   
+   <p>This code isn't designed to be an optimal solution to the problem it's solving. We're using it to 
+     illustrate a number of review concepts and make sure that you're familiar with the necessary material. 
+     For instance, the line:</p>
+    
+    <div class="observeBox"><div class="observeTitle">OBSERVE: Fragment</div><div class="observe"><pre>
+( <span class="darkred">$opt{r}</span> ? \&amp;remove_items : \&amp;display_items )<span class="darkblue">-&gt;</span>( <span class="darkgreen">@opt{ qw(s d) }</span> );
+</pre></div></div>
+    
+    <p>...might be succinct, but it's a poor way to choose between two subroutines. Its purpose here is 
+      to demonstrate an idiom using code references. Can you see how it works? The trinary operator picks 
+      one of two code references depending on the value of <span class="darkred">$opt{r}</span>; that code reference
+      is called using the <span class="darkblue">-&gt;</span> arrow operator, passing the values of 
+      <span class="darkgreen">$opt{s}</span> and <span class="darkgreen">$opt{d}</span>.</p>
+    
+    <p>Hopefully you're questioning the design of the entire program: 
+      It's not maintainable with respect to extending or changing the user 
+      interface, the data structure is not self-explanatory (ask yourself how well you would understand it 
+      without the diagram above), and there is more data copying and passing to subroutines than we would 
+      like. <i>Object-oriented programming</i> was designed to address these kinds of problems. So let's get busy and learn to remedy them!</p>
+   
+  </div></div>
+ </div>
+ <a href="Perl4-01.html" name="Packages"></a>
+ <a name="h_05"></a><div class="heading">Packages</div><div class="headingText">
+  
+   <p>Objects rely on <i>namespaces,</i> so we'll start there. We'll begin by exploring <i>packages</i>,
+      an aspect of Perl that has been around since before
+     version 5 was released in 1994. So far in this course series, the variables that you've learned to use are 
+     <i>lexical</i> variables, declared with the <span class="purple">my</span> keyword:</p>
+  
+   <div class="observeBox"><div class="observeTitle">OBSERVE: my</div><div class="observe"><pre>
+<span class="purple">my</span> $pooch;
+<span class="purple">my</span> (@puppies, %litter_mate);
+for <span class="purple">my</span> $breed ( keys %breeders ) { ... }
+</pre></div></div>
+  
+   <p>But like some shadow universe existing alongside our own, there is a completely different space of 
+     variables in Perl where variables can exist: these are the <i>package</i> or <i>dynamic</i> 
+     variables. Lexical variables were introduced into Perl with version 5 and their behavior is so 
+     conducive to safe programming that best practice is to use <i>only</i> lexical variables wherever 
+     possible. If you were to look at a Perl program written before 1994 (or one written afterward by 
+     someone who wanted to stick to the old rules—there are many such programs and 
+     programmers around still), you would see variables that weren't declared with <span class="purple">my</span>, 
+     yet the programs still work. That's because:</p>
+  
+   <ul><li>When you don't declare a variable with <span class="purple">my</span>, Perl interprets it as a package 
+       variable. </li><li>Those programs don't <b>use strict</b>, which causes Perl to object if you use a package variable 
+       <i>unless you take special precautions</i>. </li></ul>
+  
+  <a name="s_01"></a><div id="s_01"><div class="subheading">Declaring Package Variables</div><div class="subheadingText">
+   
+    <p>We mentioned <i>special precautions</i> above; the way we take those precautions is that whenever we refer to a package 
+      variable, we explicitly declare which package it is in, by putting the name of the package between the <i>sigil</i> 
+      (the <span class="darkblue">$</span>, <span class="darkblue">@</span>, <span class="darkblue">%</span>, etc), and the rest of 
+      the variable name, separated by two colons, like this:</p>
+   
+    <div class="observeBox"><div class="observeTitle">OBSERVE: Package Variables</div><div class="observe"><pre>
+    <span class="darkblue">$</span><span class="darkred">Dog</span>::schnauzer
+    <span class="darkblue">@</span><span class="darkred">Cat</span>::breeds
+    <span class="darkblue">%</span><span class="darkred">Filehandles</span>::zipcode_input
+</pre></div></div>
+   
+    <p>The package names in our example are <span class="darkred">Dog</span>, <span class="darkred">Cat</span>, and 
+      <span class="darkred">Filehandles</span>, respectively. A package can be named anything you want; its purpose is 
+      to create a new namespace so that you can refer to, for example, 
+      <b>$<span class="darkred">HusbandAccount</span>::balance</b> and <b>$<span class="darkred">WifeAccount</span>::balance</b> 
+      as two completely different variables. You don't have to do anything to declare a package; it comes 
+      into existence automatically as soon as you refer to it in a variable name.</p>
+   
+    <p>We're still going to use lexical variables wherever 
+      possible, but learning about package variables first will help us as we learn about packages. Let's try this example; create
+      <b>package.pl</b> in your <b>/perl4</b> folder like this:</p>
+   
+<div class="listingBox"><div class="listingTitle">CODE TO TYPE:</div><div class="listing"><pre>
+#!/usr/local/bin/perl
+use strict;
+use warnings;
+
+my $lexical = "Outer lexical variable";
+{
+  my $lexical = "Inner lexical variable";
+  $main::package = "This is a package variable";
+  my_sub();
+}
+
+sub my_sub
+{
+  print "\$lexical       = $lexical\n";
+  print "\$main::package = $main::package\n";
+}
+</pre></div></div>
+   
+    <p>Save and run that program.  You'll see this:</p>
+    
+    <div class="interactiveBox"><div class="interactiveTitle">INTERACTIVE TERMINAL SESSION:</div><div class="interactive"><pre>
+cold:~/perl4$ <ins>./package.pl</ins>
+$lexical       = Outer lexical variable
+$main::package = This is a package variable
+    </pre></div></div>
+
+    <p>The <b>$lexical</b> declared and assigned inside the naked block ("inner lexical variable") is 
+      not the one printed from <b>mysub()</b>, because that variable isn't in scope by then. But 
+      <b>$main::package</b> <i>is</i> visible from <b>mysub()</b>, because it is always in scope.</p>
+    
+  </div></div>
+  <a name="s_02"></a><div id="s_02"><div class="subheading">package, our</div><div class="subheadingText">
+   
+    <p>Perl has a special keyword, <span class="purple">our</span>, designed to make it easier to refer to package 
+      variables. It's just like <b>my</b>, except it refers to <i>package</i> variables. Okay, if that sounds 
+      weird, just bear with me. Perl features a <i>current package:</i> you can set it with the 
+      keyword <b>package</b>. When you declare a variable with <span class="purple">our</span>, it means you can 
+      refer to that variable in the <i>current package</i> by its name without the package, until the end 
+      of the current <i>lexical</i> scope. The <i>variable</i> will still exist after that scope, but you 
+      can only refer to it by the package-less name <i>within that scope.</i> It'll be easier to understand using an 
+      example. Edit <b>package.pl</b> as shown:</p>
+  
+   
+<div class="listingBox"><div class="listingTitle">CODE TO EDIT:</div><div class="listing"><pre>
+#!/usr/local/bin/perl
+use strict;
+use warnings;
+
+<ins>package main;</ins>
+my $lexical = "Outer lexical variable";
+{
+  my $lexical = "Inner lexical variable";
+<del>  $main::package = "This is a package variable";</del>
+<ins>  our $package = "This is a package variable";</ins>
+  my_sub();
+}
+
+sub my_sub
+{
+  print "\$lexical = $lexical\n";
+<del>  print "\$main::package = $main::package\n";</del>
+<ins>  our $package;
+  print "\$package = $package = $main::package\n";</ins>
+}
+</pre></div></div>
+    
+    <p><img src="images/coderunner/checksyntax.png"> and run it. You'll see this:</p>
+    
+<div class="interactiveBox"><div class="interactiveTitle">INTERACTIVE TERMINAL SESSION:</div><div class="interactive"><pre>
+cold:~$ <ins>./package.pl</ins>
+$lexical = Outer lexical variable
+$package = This is a package variable = This is a package variable
+</pre></div></div>
+    
+   <p>Now go ahead and take out the package statement. Delete the code shown in <del>red</del> as shown:</p>
+   
+   
+<div class="listingBox"><div class="listingTitle">CODE TO EDIT:</div><div class="listing"><pre>
+#!/usr/local/bin/perl
+use strict;
+use warnings;
+
+<del>package main;</del>
+my $lexical = "Outer lexical variable";
+{
+  my $lexical = "Inner lexical variable";
+  our $package = "This is a package variable";
+  my_sub();
+}
+
+sub my_sub
+{
+  print "\$lexical = $lexical\n";
+  our $package;
+  print "\$package = $package = $main::package\n";
+}
+</pre></div></div>
+
+    <p><img src="images/coderunner/checksyntax.png"> and run it again. The program produces the same 
+      output. In fact, the <b>package main</b> statement isn't really necessary because <b>main</b> is the <i>default</i> 
+      package. It's as though every program you write has <b>package main</b> as its first line.</p>
+   
+    <p>So from an <span class="purple">our</span> statement until the end of the current lexical scope, the 
+      variable(s) declared in that statement can be used without a package component in their name, and 
+      they will refer to that variable in the current package. (Don't use a package variable with the same 
+      name as a currently scoped lexical or you might get confused. If you are so inclined, try 
+      experimenting to see what happens in various scoping scenarios.)</p>
+   
+    <p>Go ahead and edit <b>package.pl</b> again as shown:</p>
+    
+   
+<div class="listingBox"><div class="listingTitle">CODE TO EDIT:</div><div class="listing"><pre>
+#!/usr/local/bin/perl
+use strict;
+use warnings;
+
+my $lexical = "Outer lexical variable";
+{
+  my $lexical = "Inner lexical variable";
+  our $package = "This is a package variable";
+  my_sub();
+<ins>  print "After my_sub(), \$package = $package\n";</ins>
+}
+
+sub my_sub
+{
+  print "\$lexical = $lexical\n";
+  our $package;
+<del>  print "\$package = $package = $main::package\n";</del>
+<ins>  print "\$package = $package\n";
+  $package = "Oops";</ins>
+}
+</pre></div></div>
+   
+    <p><img src="images/coderunner/checksyntax.png"> and run it. You'll see this:</p>
+   
+      <div class="interactiveBox"><div class="interactiveTitle">INTERACTIVE TERMINAL SESSION:</div><div class="interactive"><pre>
+cold:~/perl4$ <ins>./package.pl</ins>
+$lexical = Outer lexical variable
+$package = This is a package variable
+After my_sub(), $package = Oops
+      </pre></div></div>
+   
+    <p>Here you can see the key difference between package and lexical variables. The 
+      <span class="purple">our</span> statement inside of <b>my_sub()</b> allows us to refer to <b>$main::package</b> by the 
+      shorthand <b>$package</b> until the end of the subroutine. It's not creating a new <b>$package</b>. When
+      we return from <b>my_sub()</b>, we find that <b>$package</b> (the <i>calling scope's</i> shorthand for 
+      <b>$main::package</b>, thanks to the earlier <span class="purple">our</span> statement) has been changed by the
+      assignment inside <b>my_sub()</b>.</p>
+    
+    <p>The scope of effect of the <b>package</b> statement is lexical.</p>
+   
+  </div></div>
+  <a name="s_03"></a><div id="s_03"><div class="subheading">local</div><div class="subheadingText">
+
+    <p>Okay, now add the code in <ins>blue</ins> to <b>package.pl</b>:</p>
+    
+   
+<div class="listingBox"><div class="listingTitle">CODE TO EDIT:</div><div class="listing"><pre>
+#!/usr/local/bin/perl
+use strict;
+use warnings;
+
+my $lexical = "Outer lexical variable";
+{
+  my $lexical = "Inner lexical variable";
+  our $package = "This is a package variable";
+  my_sub();
+  print "After my_sub(), \$package = $package\n";
+}
+
+sub my_sub
+{
+  print "\$lexical = $lexical\n";
+  our $package;
+  print "\$package = $package\n";
+  <ins>local </ins>$package = "Oops";
+}
+</pre></div></div>
+
+   <p><img src="images/coderunner/checksyntax.png"> and run it, and you'll see this:</p>
+    
+    <div class="interactiveBox"><div class="interactiveTitle">INTERACTIVE TERMINAL SESSION:</div><div class="interactive"><pre>
+cold:~/perl4$ <ins>./package.pl</ins>
+$lexical = Outer lexical variable
+$package = This is a package variable
+After my_sub(), $package = This is a package variable
+    </pre></div></div>
+    
+    <p>What just happened? The <span class="purple">local</span> keyword works like <span class="purple">our</span>, except that it 
+      creates a temporary copy of the variable that lasts until the end of the current lexical scope. That 
+      means that <b>$main::package</b> contains "Oops" only until the end of <b>my_sub()</b>, and afterwards, that 
+      value disappears and the previous value is restored from a stack Perl maintains.</p>
+    
+    <p>You must use either a fully-qualified variable (<b>local $main::package</b>), or one you have 
+      declared a shorthand for with <span class="purple">our</span>.</p>
+    
+    <p>Edit <b>package.pl</b> again, adding the <ins>blue</ins> code as shown:</p>
+    
+   
+<div class="listingBox"><div class="listingTitle">CODE TO EDIT:</div><div class="listing"><pre>
+#!/usr/local/bin/perl
+use strict;
+use warnings;
+
+my $lexical = "Outer lexical variable";
+{
+  my $lexical = "Inner lexical variable";
+  our $package = "This is a package variable";
+  my_sub();
+  print "After my_sub(), \$package = $package\n";
+<ins>  print "And \$global = $main::global\n";</ins>
+}
+
+sub my_sub
+{
+  print "\$lexical = $lexical\n";
+  our $package;
+  print "\$package = $package\n";
+  local $package = "Oops";
+<ins>  $main::global = "See how package variables are global?";</ins>
+}
+</pre></div></div>
+    
+   <p><img src="images/coderunner/checksyntax.png"> and run it.  You'll see this:</p>
+    
+      <div class="interactiveBox"><div class="interactiveTitle">INTERACTIVE TERMINAL SESSION:</div><div class="interactive"><pre>
+cold:~/perl4$ <ins>./package.pl</ins>
+$lexical = Outer lexical variable
+$package = This is a package variable
+After my_sub(), $package = This is a package variable
+And $global = See how package variables are global?
+</pre></div></div>
+   
+    <p>Here we set a package variable inside of <b>my_sub()</b> that had not been referenced anywhere before 
+      that call, yet we are able to get at its value in the calling block afterward.</p>
+    
+    <p>Edit <b>package.pl</b> again as shown:</p>
+    
+   
+<div class="listingBox"><div class="listingTitle">CODE TO EDIT:</div><div class="listing"><pre>
+#!/usr/local/bin/perl
+use strict;
+use warnings;
+
+my $lexical = "Outer lexical variable";
+{
+  my $lexical = "Inner lexical variable";
+  our $package = "This is a package variable";
+  my_sub();
+  print "After my_sub(), \$package = $package\n";
+<ins>  our $global;</ins>
+  print "And \$global = $<del>main::</del>global\n";
+}
+
+sub my_sub
+{
+  print "\$lexical = $lexical\n";
+  our $package;
+  print "\$package = $package\n";
+  local $package = "Oops";
+  $main::global = "See how package variables are global?";
+}
+</pre></div></div>
+    
+    <p><img src="images/coderunner/checksyntax.png"> and run it; you should get the same output as before. 
+      This change demonstrates that the <b>$global</b> declared with <span class="purple">our</span> is the same as  
+      <b>$main::global</b>.</p>
+    
+    <p>Edit <b>package.pl</b> again as shown:</p>
+   
+   
+<div class="listingBox"><div class="listingTitle">CODE TO EDIT:</div><div class="listing"><pre>
+#!/usr/local/bin/perl
+use strict;
+use warnings;
+
+my $lexical = "Outer lexical variable";
+{
+  my $lexical = "Inner lexical variable";
+  our $package = "This is a package variable";
+  my_sub();
+  print "After my_sub(), \$package = $package\n";
+  our $global;
+  print "And \$global = $global\n";
+}
+
+<ins>print "\$global = $global\n";</ins>
+  
+sub my_sub
+{
+  print "\$lexical = $lexical\n";
+  our $package;
+  print "\$package = $package\n";
+  local $package = "Oops";
+  $main::global = "See how package variables are global?";
+}
+</pre></div></div>
+    
+    <p><img src="images/coderunner/checksyntax.png">. You'll see this:</p>
+    
+    
+    <p><div class="c"><img src="images/lessonImages/globalnotimported.png"></div></p>
+    
+    <p>This shows how <span class="purple">our</span> is scoped to its enclosing block; we can't refer to it  
+      as only <b>$global</b> there, but we could refer to it by its always-valid name, 
+      <b>$main::global</b>. Edit <b>package.pl</b> once again as shown:</p>
+    
+   
+<div class="listingBox"><div class="listingTitle">CODE TO EDIT:</div><div class="listing"><pre>
+#!/usr/local/bin/perl
+use strict;
+use warnings;
+
+<del>my $lexical = "Outer lexical variable";</del>
+<ins>$main::global = "This is a saved global variable";</ins>
+{
+<del>  my $lexical = "Inner lexical variable";</del>
+  our $package = "This is a package variable";
+<ins>  local $main::global;</ins>  
+  my_sub();
+  print "After my_sub(), \$package = $package\n";
+<del>  our $global;</del>
+  print "And \$<ins>main::</ins>global = $<ins>main::</ins>global\n";
+}
+
+print "Outside block, \$<ins>main::</ins>global = $<ins>main::</ins>global\n";
+
+sub my_sub
+{
+<del>  print "\$lexical = $lexical\n";</del>  
+  our $package;
+  print "\$package = $package\n";
+  local $package = "Oops";
+  $main::global = "See how package variables are global?";
+}
+</pre></div></div>
+    
+    <p><img src="images/coderunner/checksyntax.png"> and run it. You'll see this:</p>
+    
+      <div class="interactiveBox"><div class="interactiveTitle">INTERACTIVE TERMINAL SESSION:</div><div class="interactive"><pre>
+cold:~/perl4$ <ins>./package.pl</ins>
+$package = This is a package variable
+After my_sub(), $package = This is a package variable
+And $main::global = See how package variables are global?
+Outside block, $main::global = This is a saved global variable
+</pre></div></div>
+    
+    <p>The effect of the <b>local $main::global</b> inside the naked block is to save the current value of 
+      <b>$main::global</b> on a stack; now when <b>my_sub()</b> changes <b>$main::global</b>, it's changing the new 
+      variable created by <span class="purple">local</span>. When we exit the scope of the naked block, the work of 
+      <span class="purple">local</span> is undone and we get back the former value of <b>$main::global</b>.</p>
+  
+  </div></div>
+  <a name="s_04"></a><div id="s_04"><div class="subheading">More on local</div><div class="subheadingText">
+   
+    <p>Some of Perl's variables (the ones we told you not to declare with <span class="purple">my</span> 
+      because they don't belong to you) can be <i>localized</i>, and sometimes, they should. Create 
+      <b>local.pl</b> in your <b>/perl4</b> folder as shown:</p>
+    
+   
+<div class="listingBox"><div class="listingTitle">CODE TO ENTER:</div><div class="listing"><pre>#!/usr/local/bin/perl
+use strict;
+use warnings;
+
+my @WORDS = qw(boil roast flambe saute fry poach toast bake steam sear);
+
+my @ints = ( 0 .. 9 );
+
+for ( @ints )
+{
+  create_report( $_ );
+}
+
+print "Before: @ints\n";
+for ( @ints )
+{
+  print "$_: "; 
+  print_report( $_ );
+}
+print "After: @ints\n";
+unlink glob "*.rpt";
+
+sub print_report
+{
+  my $file = shift;
+
+  open my $fh, '&lt;', "$file.rpt" or die $!;
+  while ( &lt;$fh&gt; )
+  {
+    print;
+  }
+}
+
+sub create_report
+{
+  my $file = shift;
+  open my $fh, '&gt;', "$file.rpt" or die $!;
+  print {$fh} "$WORDS[$file]\n";
+}
+</pre></div></div>
+   
+    <p><img src="images/coderunner/checksyntax.png"> and run it, and you'll get some output, as well as many 
+      warnings:</p>
+    
+    <div class="interactiveBox"><div class="interactiveTitle">INTERACTIVE TERMINAL SESSION:</div><div class="interactive"><pre>cold:~/perl4$ <ins>./local.pl</ins>
+Before: 0 1 2 3 4 5 6 7 8 9
+0: boil
+1: roast
+2: flambe
+3: saute
+4: fry
+5: poach
+6: toast
+7: bake
+8: steam
+9: sear
+Use of uninitialized value $ints[0] in join or string at ./local.pl line 20.
+[Several more lines like that last one]
+</pre></div></div>
+   
+    <p>If you look only at the lines that call <b>print_report()</b>, it doesn't seem quite right that <b>@ints</b> 
+      has been changed. And when you then look at the <b>print_report()</b> code, the reason still doesn't exactly 
+      leap out at you. The problem is that the <span class="purple">while</span> loop in <b>print_report()</b> sets <span class="red">$_</span> 
+      implicitly, and <i>doesn't localize it</i>. So it overwrites <span class="red">$_</span>, which is <i>aliased</i> to the
+      current member of the <b>@ints</b> array we are iterating over.</p>
+   
+    <p>We can fix that. Edit <b>local.pl</b> as shown:</p>
+    
+   
+<div class="listingBox"><div class="listingTitle">CODE TO EDIT:</div><div class="listing"><pre>
+#!/usr/local/bin/perl
+use strict;
+use warnings;
+
+my @WORDS = qw(boil roast flambe saute fry poach toast bake steam sear);
+my @ints = ( 0 .. 9 );
+
+for ( @ints )
+{
+  create_report( $_ );
+}
+
+print "Before: @ints\n";
+for ( @ints )
+{
+  print "$_: "; 
+  print_report( $_ );
+}
+print "After: @ints\n";
+unlink glob "*.rpt";
+
+sub print_report
+{
+  my $file = shift;
+<ins>  local $_;
+</ins>  open my $fh, '&lt;', "$file.rpt" or die $!;
+  while ( &lt;$fh&gt; )
+  {
+    print;
+  }
+}
+
+sub create_report
+{
+  my $file = shift;
+  open my $fh, '&gt;', "$file.rpt" or die $!;
+  print {$fh} "$WORDS[$file]\n";
+}  
+</pre></div></div>
+   
+    <p><img src="images/coderunner/checksyntax.png"> and run it and you should see:</p>
+    
+    <div class="interactiveBox"><div class="interactiveTitle">INTERACTIVE TERMINAL SESSION:</div><div class="interactive"><pre>cold:~/perl4$ <ins>./local.pl</ins>
+Before: 0 1 2 3 4 5 6 7 8 9
+0: boil
+1: roast
+2: flambe
+3: saute
+4: fry
+5: poach
+6: toast
+7: bake
+8: steam
+9: sear
+After: 0 1 2 3 4 5 6 7 8 9
+</pre></div></div>
+   
+    <p>Now the <span class="purple">while</span> loop is overwriting its own copy of <b>$_</b>, and the original <b>$_</b> 
+      alias is restored at the end of <b>print_report()</b>.</p>
+   
+    <p>We can find another use for <span class="purple">local</span> in this program. Edit your code as shown:</p>
+   
+   
+<div class="listingBox"><div class="listingTitle">CODE TO EDIT:</div><div class="listing"><pre>#!/usr/local/bin/perl
+use strict;
+use warnings;
+
+my @WORDS = qw(boil roast flambe saute fry poach toast bake steam sear);
+my @ints = ( 0 .. 9 );
+
+for ( @ints )
+{
+  create_report( $_ );
+}
+
+print "Before: @ints\n";
+for ( @ints )
+{
+  print "$_: "; 
+  print_report( $_ );
+}
+print "After: @ints\n";
+unlink glob "*.rpt";
+
+sub print_report
+{
+  my $file = shift;
+  local $_;
+<del>  open my $fh, '&lt;', "$file.rpt" or die $!;
+</del><ins>  local @ARGV = "$file.rpt";
+</ins><del>  while ( &lt;$fh&gt; )
+</del><ins>  while ( &lt;&gt; )
+</ins>  {
+    print;
+  }
+}
+
+sub create_report
+{
+  my $file = shift;
+  open my $fh, '&gt;', "$file.rpt" or die $!;
+  print {$fh} "$WORDS[$file]\n";
+}</pre></div></div>
+   
+    <p><img src="images/coderunner/checksyntax.png"> and run it and you will get exactly the same output as before. We 
+      just changed the way we get it. We want to take advantage of the magic <span class="blue">&lt;&gt;</span> operator, 
+      which requires one or more filenames in <b>@ARGV</b>, but good programming practice demands that we do not 
+      stomp all over the value of <b>@ARGV</b> for the rest of the program. By <i>localizing</i> our assignment, 
+      we ensure that the previous value of <b>@ARGV</b> is restored once <b>print_report()</b> is done.</p>
+  
+  </div></div>
+  
+   <p>We've already used package variables in a few places, probably without your knowledge. One instance 
+     was during sorting, for instance, when you use <span class="darkred">$a</span> and <span class="darkred">$b</span> in a 
+     <span class="darkgreen">sort</span> comparison block, like this: </p>
+
+   <div class="observeBox"><div class="observeTitle">OBSERVE: sort</div><div class="observe"><pre>
+@sorted = <span class="darkgreen">sort</span> { <span class="darkred">$a</span> &lt;=&gt; <span class="darkred">$b</span> } @numbers
+</pre></div></div>
+  
+   <p>Even though you have not declared <span class="darkred">$a</span> or <span class="darkred">$b</span>, there is no 
+     objection from Perl; they are package variables in that case, but <span class="blue">use strict</span> makes a special 
+     exception only for the variables named <span class="darkred">$a</span> and <span class="darkred">$b</span>.</p>
+  
+   <p>But by far the most common use we've made so far of package variables has been as <i>subroutines</i>. You may not think 
+     of subroutine as a variable, but it has to live <i>somewhere</i>, and that place is in a package.</p>
+    
+   
+ <a name="s_05"></a><div id="s_05"><div class="subheading">More About package</div><div class="subheadingText">
+   
+   <p>Now let's look at the effect of the <span class="purple">package</span> statement. Edit <b>local.pl</b> again as shown:</p>
+   
+
+<div class="listingBox"><div class="listingTitle">CODE TO EDIT:</div><div class="listing"><pre>
+#!/usr/local/bin/perl
+use strict;
+use warnings;
+
+my @WORDS = qw(boil roast flambe saute fry poach toast bake steam sear);
+my @ints = ( 0 .. 9 );
+
+for ( @ints )
+{
+  <ins>main::</ins>create_report( $_ );
+}
+
+print "Before: @ints\n";
+for ( @ints )
+{
+  print "$_: "; 
+  <ins>mypack::</ins>print_report( $_ );
+}
+print "After: @ints\n";
+unlink glob "*.rpt";
+
+sub print_report
+{
+  my $file = shift;
+  local $_;
+  local @ARGV = "$file.rpt";
+  while ( &lt;&gt; )
+  {
+    print;
+  }
+}
+
+sub create_report
+{
+  my $file = shift;
+  open my $fh, '&gt;', "$file.rpt" or die $!;
+  print {$fh} "$WORDS[$file]\n";
+}
+</pre></div></div>
+     
+   <p><img src="images/coderunner/checksyntax.png"> and run it and you will get an error message:</p>
+
+   <div class="interactiveBox"><div class="interactiveTitle">INTERACTIVE TERMINAL SESSION:</div><div class="interactive"><pre>cold:~/perl4$ <ins>./local.pl</ins>
+     Before: 0 1 2 3 4 5 6 7 8 9
+Undefined subroutine &amp;mypack::print_report called at ./local.pl line 17
+</pre></div></div>
+     
+   <p>This program starts out with an <i>implicit</i> <b>package main</b>, so <b>print_report()</b>'s full 
+       name is actually <b>main::print_report</b>, but we've called something else. Modify <b>local.pl</b> as shown:</p>
+     
+
+<div class="listingBox"><div class="listingTitle">CODE TO EDIT:</div><div class="listing"><pre>
+#!/usr/local/bin/perl
+use strict;
+use warnings;
+
+my @WORDS = qw(boil roast flambe saute fry poach toast bake steam sear);
+my @ints = ( 0 .. 9 );
+
+for ( @ints )
+{
+  main::create_report( $_ );
+}
+
+print "Before: @ints\n";
+for ( @ints )
+{
+  print "$_: "; 
+  mypack::print_report( $_ );
+}
+print "After: @ints\n";
+unlink glob "*.rpt";
+
+sub <ins>mypack::</ins>print_report
+{
+  my $file = shift;
+  local $_;
+  local @ARGV = "$file.rpt";
+  while ( &lt;&gt; )
+  {
+    print;
+  }
+}
+
+sub create_report
+{
+  my $file = shift;
+  open my $fh, '&gt;', "$file.rpt" or die $!;
+  print {$fh} "$WORDS[$file]\n";
+}    
+</pre></div></div>
+     
+   <p><img src="images/coderunner/checksyntax.png"> and run it and you'll get the familiar correct output.</p>
+     
+   <p>It's rare to fully qualify a subroutine declaration. This is more common:</p>
+     
+
+<div class="listingBox"><div class="listingTitle">CODE TO EDIT:</div><div class="listing"><pre>#!/usr/local/bin/perl
+use strict;
+use warnings;
+
+my @WORDS = qw(boil roast flambe saute fry poach toast bake steam sear);
+my @ints = ( 0 .. 9 );
+
+for ( @ints )
+{
+  main::create_report( $_ );
+}
+
+print "Before: @ints\n";
+for ( @ints )
+{
+  print "$_: "; 
+  mypack::print_report( $_ );
+}
+print "After: @ints\n";
+unlink glob "*.rpt";
+
+<ins>package mypack;</ins>
+ 
+sub <del>mypack::</del>print_report
+{
+  my $file = shift;
+  local $_;
+  local @ARGV = "$file.rpt";
+  while ( &lt;&gt; )
+  {
+    print;
+  }
+}
+
+sub create_report
+{
+  my $file = shift;
+  open my $fh, '&gt;', "$file.rpt" or die $!;
+  print {$fh} "$WORDS[$file]\n";
+}</pre></div></div>
+     
+   <p><img src="images/coderunner/checksyntax.png"> and run it. Oops, there's an error:</p>
+   
+   <div class="interactiveBox"><div class="interactiveTitle">INTERACTIVE TERMINAL SESSION:</div><div class="interactive"><pre>cold:~/perl4$ <ins>./local.pl</ins>
+Undefined subroutine &amp;main::create_report called at ./local.pl line 10.
+</pre></div></div>
+     
+   <p>The <span class="purple">package</span> statement affected <i>everything</i> that came after it, which means that 
+     <i>both</i> <b>print_report()</b> <i>and</i> <b>create_report()</b> actually have the full names <b>mypack::print_report()</b> 
+     and <b>mypack::create_report()</b> respectively. Let's fix that. Edit your code as shown:</p>
+   
+
+<div class="listingBox"><div class="listingTitle">CODE TO EDIT:</div><div class="listing"><pre>#!/usr/local/bin/perl
+use strict;
+use warnings;
+
+my @WORDS = qw(boil roast flambe saute fry poach toast bake steam sear);
+my @ints = ( 0 .. 9 );
+
+for ( @ints )
+{
+  <del>main</del><ins>mypack</ins>::create_report( $_ );
+}
+
+print "Before: @ints\n";
+for ( @ints )
+{
+  print "$_: "; 
+  mypack::print_report( $_ );
+}
+print "After: @ints\n";
+unlink glob "*.rpt";
+
+package mypack;
+
+sub print_report
+{
+  my $file = shift;
+  local $_;
+  local @ARGV = "$file.rpt";
+  while ( &lt;&gt; )
+  {
+    print;
+  }
+}
+
+sub create_report
+{
+  my $file = shift;
+  open my $fh, '&gt;', "$file.rpt" or die $!;
+  print {$fh} "$WORDS[$file]\n";
+}</pre></div></div>
+     
+   <p><img src="images/coderunner/checksyntax.png"> and run it and you'll see the correct output again.</p>
+     
+   <p>Subroutines may be a kind of package "variable," but you can't use <span class="purple">local</span> or 
+     <span class="purple">our</span> on them.</p>
+   
+ </div></div>
+   
+   <p>We've just covered some fairly complex material that few 
+     Perl programmers ever learn properly. Because best programming practice calls on us to use lexical variables wherever 
+     possible, we won't make much use of package versions of scalars, arrays, or hashes, but understanding that 
+     subroutines live inside packages is <i>crucial</i> to developing excellent object-oriented programming skills.</p>
+   
+   <p>Phew! Give yourself a pat on the back for getting through this challenging lesson, and don't fret: not all our lessons will be this 
+     long! Great work so far! See you in the next lesson...</p>
+
+ </div>
+  <br><br><br><br>
+  
+   <p>Once you finish each lesson, go back to the syllabus to complete the homework:</p>
+   
+   <p><div class="c"><img src="images/coderunner/GettingToHomework1.png"></div></p>
+   <p><div class="c"><img src="images/coderunner/GettingToHomework2.png"></div></p>
+
+<div class="footer"><div id="timeSurvey"></div>				
+				Copyright © 1998-2014 O'Reilly Media, Inc.<br><img src="https://courses.oreillyschool.com/common/cclicense.png"><br>
+				This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 Unported License.<br>
+				See <a href="http://creativecommons.org/licenses/by-sa/3.0/legalcode">http://creativecommons.org/licenses/by-sa/3.0/legalcode</a> 
+				for more information.
+				</div><iframe id="t" width="1" height="1" border="0" style="display:none"></iframe><script language="javascript">bodyLoaded();</script><script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+  ga('create', 'UA-44720547-1', 'oreillyschool.com');
+  ga('send', 'pageview');
+</script></body></html>

@@ -1,0 +1,355 @@
+<html><!-- Copyright (c) 1998-2014 O'Reilly Media, Inc.
+			This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 Unported License.
+			See http://creativecommons.org/licenses/by-sa/3.0/legalcode for more information.
+            --><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"><link rel="stylesheet" type="text/css" href="../common/Lab.css"><script type="text/javascript" src="../common/Lab.js"></script><script language="javascript"></script><title>Conditional Statements in Perl</title></head><body id="body"><a name="top"></a><div class="title">Conditional Statements in Perl</div><div class="resize"><a href="Perl1-03.html#top" onclick="changeSize('smaller');" class="aS" title="Keep clicking to make fonts smaller">A</a><a href="Perl1-03.html#top" onclick="changeSize('larger');" class="aL" title="Keep clikcing to make fonts larger">A</a><a href="Perl1-03.html#top" onclick="lv()" class="lv" title="Adjust Page for High Contrast">HC</a><div id="fh"><p>Click on <span class="aS">A</span> to make all fonts on the page smaller.</p><p>Click on <span class="aL">A</span> to make all fonts on the page larger.</p><p>Click on <span class="lv">HC</span> to toggle high contrast mode. When you move your mouse over 
+                 some bold words in high contrast mode, related words are automatically highlighted. Text is shown
+                 in black and white. 
+             </p></div></div><hr>
+  
+  <div class="goalTitle">Lesson Objectives</div><div class="goals">
+    
+    
+    When you complete this lesson, you will be able to:
+    
+    <ul><li>use conditional statements in Perl.</li><li>use the operator <span class="darkblue">&amp;&amp;</span>.</li><li>write tests in the proper order.</li><li>use Perl's rules to determine whether an expression is true or false.</li></ul>
+  </div><hr>
+
+ <a name="h_01"></a><div class="heading">Conditional Statements in Perl</div><div class="headingText">
+  
+  <p>Life is full of uncertainty.  If it's sunny, we'll go to the beach. If it rains, we'll go to 
+   the movies. If it snows, we'll go skiing.  </p>
+  
+  <p><div class="c"><img src="images/confused.jpg"></div></p>
+  
+  
+  
+  <p>In other words, we're going to change our plans depending on the conditions.</p>
+  
+  <a name="s_01"></a><div id="s_01"><div class="subheading">Perl's if Statement</div><div class="subheadingText">
+  
+   <p>And so it is with computer programs. Suppose we know someone's 
+    <a href="http://en.wikipedia.org/wiki/Body_mass_index">Body Mass Index</a> and we want to make a  
+    value judgement about what that means, according to standardized rules:</p>
+   
+   <div class="c"><table class="tbl" border=""><tr><th>BMI Range</th><th>Meaning</th></tr><tr><td> &lt; 18.5</td><td>Underweight</td></tr><tr><td>18.5 - 25</td><td>Normal</td></tr><tr><td>25 - 30</td><td>Overweight</td></tr><tr><td>&gt; 30</td><td>Obese</td></tr></table></div>
+   
+   <p>We can use Perl's <span class="purple">if</span> statement to accomplish the job. Let's explore. Create a 
+     program called <b>bmi.pl</b> as shown below:</p>
+  
+<div class="listingBox"><div class="listingTitle">CODE TO TYPE:</div><div class="listing"><pre><ins>#!/usr/bin/perl
+use strict;
+use warnings;
+
+my $b_m_i = 23.4;
+
+if ( $b_m_i &lt; 18.5 )
+{
+  print "Underweight\n";
+}
+elsif ( $b_m_i &lt; 25 )
+{
+  print "Normal\n";
+}
+elsif ( $b_m_i &lt; 30 )
+{
+  print "Overweight\n";
+}
+else
+{
+  print "Obese\n";
+}</ins>
+</pre></div></div>
+  
+    <p><img src="images/coderunner/checksyntax.JPG"> and run it:</p>
+    
+<div class="interactiveBox"><div class="interactiveTitle">INTERACTIVE TERMINAL SESSION:</div><div class="interactive"><pre>cold:~$ <ins>cd perl1</ins> 
+cold:~/perl1$ <ins>./bmi.pl</ins>
+Normal
+cold:~$ 
+</pre></div></div>
+    
+     <p>Now, change the program as shown in <ins>blue</ins>:</p>
+
+<div class="listingBox"><div class="listingTitle">CODE TO EDIT:</div><div class="listing"><pre>#!/usr/bin/perl
+use strict;
+use warnings;
+
+my $b_m_i = <ins>14.1</ins>;
+
+if ( $b_m_i &lt; 18.5 )
+{
+  print "Underweight\n";
+}
+elsif ( $b_m_i &lt; 25 )
+{
+  print "Normal\n";
+}
+elsif ( $b_m_i &lt; 30 )
+{
+  print "Overweight\n";
+}
+else
+{
+  print "Obese\n";
+}
+</pre></div></div>
+  
+    <p><img src="images/coderunner/checksyntax.JPG"> and run it:</p>
+    
+<div class="interactiveBox"><div class="interactiveTitle">INTERACTIVE TERMINAL SESSION:</div><div class="interactive"><pre>cold:~/perl1$ <ins>./bmi.pl</ins>
+Underweight
+cold:~/perl1$ 
+</pre></div></div>   
+
+<p>The general form of the <span class="purple">if</span> statement is:</p>
+   
+<div class="observeBox"><div class="observeTitle">OBSERVE:</div><div class="observe"><pre>
+<span class="purple">if</span> ( <span class="orange"><i>condition</i></span> )
+{
+   <span class="orange"><i>code...</i></span>
+}
+
+<i>...optionally followed by as many of these blocks as you want: </i>
+ 
+<span class="purple">elsif</span> ( <span class="orange"><i>condition</i></span> )
+{
+   <span class="orange"><i>code...</i></span>
+}
+ 
+<i>...optionally followed by one of these blocks:</i>
+   
+<span class="purple">else </span>  
+{
+   <span class="orange"><i>code...</i></span>
+}
+</pre></div></div>
+
+    <p>Those parentheses <i>must</i> be there; the curly braces <i>must</i> be there. 
+    (Later, you'll find out how to write the 
+    same kind of thing much more succinctly.)</p>
+   
+    <p>Now let's change the order of the blocks in the <span class="purple">if</span> statement. Edit bmi.pl, adding the code shown in 
+    <ins>blue</ins> and deleting the code shown in <del>red</del>:</p>
+
+<div class="listingBox"><div class="listingTitle">CODE TO EDIT:</div><div class="listing"><pre>#!/usr/bin/perl
+use strict;
+use warnings;
+     
+my $b_m_i = <ins>23.4</ins>;
+    
+if ( $b_m_i &lt; 18.5 )
+{
+  print "Underweight\n";
+}
+<ins>elsif ( $b_m_i &lt; 30 )
+{
+  print "Overweight\n";
+}</ins>
+elsif ( $b_m_i &lt; 25 )
+{
+  print "Normal\n";
+}
+<del>elsif ( $b_m_i &lt; 30 )
+{
+  print "Overweight\n";
+}</del>
+else
+{
+  print "Obese\n";
+}
+</pre></div></div>
+
+    <p><img src="images/coderunner/checksyntax.JPG"> and run it:</p>
+    
+<div class="interactiveBox"><div class="interactiveTitle">INTERACTIVE TERMINAL SESSION:</div><div class="interactive"><pre>cold:~/perl1$ <ins>./bmi.pl</ins>
+Overweight
+cold:~/perl1$ 
+</pre></div></div>
+
+<p>See the difference?</p>
+   
+   <p>Order matters because we took a shortcut in writing the conditions. $b_m_i is 23.4, so the first test 
+     (if ($b_m_i &lt; 18.5 )) will fail, but the next test (elsif ( $b_m_i &lt; 30 )) will pass, and we'll run the code between 
+     the {} and print "Overweight\n." As we found the first true value, Perl then will consider itself done with the if block and 
+     move on to the next bit of code. This is a probem, because the &lt;25 case will never be tested, and a person with a normal 
+     BMI will be mistakenly reported as Overweight! How do we make sure this doesn't happen?  </p>
+   
+   <p>Now suppose we want our tests to look more like the ones in the table from Wikipedia. We can do
+    that using the operator <span class="darkblue">&amp;&amp;</span> ("and"—both sides have to be true). 
+    Add the <ins>blue</ins> code as shown:</p>
+ 
+<div class="listingBox"><div class="listingTitle">CODE TO EDIT:</div><div class="listing"><pre>#!/usr/bin/perl
+use strict;
+use warnings;
+    
+my $b_m_i = 23.4;
+    
+if ( $b_m_i &lt; 18.5 )
+{
+  print "Underweight\n";
+}
+elsif ( <ins>$b_m_i &gt;= 18.5 &amp;&amp;</ins> $b_m_i &lt; 25 )
+{
+  print "Normal\n";
+}
+<ins>elsif ( $b_m_i &gt;= 25 &amp;&amp; $b_m_i &lt; 30 )</ins>
+{
+  print "Overweight\n";
+}
+<ins>elsif ( $b_m_i &gt;= 30 )</ins>
+{
+  print "Obese\n";
+}
+<ins>else
+{
+  print "This shouldn't happen!!!\n";
+}</ins>
+</pre></div></div>
+   
+    <p><img src="images/coderunner/checksyntax.JPG"> and run it:</p>
+    
+<div class="interactiveBox"><div class="interactiveTitle">INTERACTIVE TERMINAL SESSION:</div><div class="interactive"><pre>cold:~/perl1$ <ins>./bmi.pl</ins>
+Normal
+cold:~/perl1$ 
+</pre></div></div> 
+     
+    <p>The four tests are complete; 
+    that is, there is no value that <span class="darkred">$b_m_i</span> could take that wouldn't match one of them. But 
+    it's good practice when writing multi-way <span class="purple">if ... elsif ... elsif</span> constructions, to 
+   include an <span class="purple">else</span> clause, just in case you make an error in your logic. One common 
+    error that's made when writing the tests this way is to write <span class="darkblue">&gt;</span> instead of 
+    <span class="darkblue">&gt;=</span>. If <span class="darkred">$b_m_i</span> happened to be <i>exactly</i> 25, we'd have a problem. 
+    That's why we usually write tests the way we did in the earlier example; it's easier to get 
+    the tests in the right order than to remember to put the 
+    equals signs in the right places.</p>
+
+   <p>The operators we've been using here for making conditions—<span class="darkblue">&lt;</span>, 
+    <span class="darkblue">&gt;</span>, <span class="darkblue">&gt;=</span>, <span class="darkblue">&amp;&amp;</span>—are 
+     documented in <b>perldoc 
+     perlop</b> and  
+    <a href="http://perldoc.perl.org/perlop.html" target="_blank">http://perldoc.perl.org/perlop.html</a> (look for "Relational Operators").</p>
+   
+   <p>The <span class="darkblue">&amp;&amp;</span> operator deserves special mention—that's how we say "and" in a 
+    Perl condition, as in "this must be true <i>and</i> that must be true." To 
+     say "this must be true <i>or</i> this must be true, we use the "or" operator: <span class="darkblue">||</span>.</p>
+   
+  
+    <p>We've learned how to determine whether one number is greater or less than another. Now suppose we
+    want to determine whether they're exactly equal? We do that using the <span class="darkblue">==</span> operator. Don't 
+    confuse this with the <i>assignment</i> operator we've already seen, <span class="darkblue">=</span>. They have 
+    to be different in Perl, otherwise if you wrote something like this code:</p>
+
+<div class="observeBox"><div class="observeTitle">OBSERVE:</div><div class="observe"><pre>
+<span class="purple">if</span> ( <span class="darkred">$days</span> <span class="darkblue">=</span> <span class="orange">7</span> )
+</pre></div></div>
+    
+   <p>That code would assign <span class="orange">7</span> to <span class="darkred">$days</span> and use that as 
+    the value of the condition. While that action is actually legal in Perl, so many people were
+    doing it by mistake that Perl now gives a warning if you put <span class="darkblue">=</span> inside of an
+    <span class="purple">if</span> condition (yet another reason we include <span class="darkblue">use warnings</span>
+    in all our programs).</p>
+   
+   <p>
+    Here's an example of the <span class="darkred">==</span> and <span class="darkgreen">||</span> operators in action:
+   </p>
+    
+<div class="observeBox"><div class="observeTitle">OBSERVE:</div><div class="observe"><pre>
+if ( $b_m_i &lt; 18.5 || $b_m_i &gt; 25 )
+{
+  print "Abnormal\n";
+}
+elsif ( $b_m_i <span class="darkred">==</span> 18.5 <span class="darkgreen">||</span> $b_m_i <span class="darkred">==</span> 25 )
+{
+  print "Right on the edge!\n";
+}
+else
+{
+  print "Normal\n";
+}
+</pre></div></div>
+    
+    <p>This line would be read as: "Else if $b_m_i <span class="darkred">is exactly equal to</span> 18.5 
+      <span class="darkgreen">or</span> $b_m_i <span class="darkred">is exactly equal to</span> 25"...</p>
+
+  </div></div>
+  <a name="s_02"></a><div id="s_02"><div class="subheading">What is Truth?</div><div class="subheadingText">
+   
+   <p>So now you've seen that <span class="purple">if</span> statements in Perl have <i>conditions</i>
+    enclosed within parentheses, where we can ask a true or false question. In many languages, that's all
+    you can use in their equivalents of the <span class="purple">if</span> statement. In Perl, you
+    can enter any <i>expression</i>, that is, anything that could have a
+    value. For instance, <span class="darkblue">$PI * ($radius**2)</span> is an expression. (Do you think it is
+    true or false? Why?) You could place it within the parentheses of an <span class="purple">if</span> 
+    statement. Perl has rules to determine if an expression is true or false. 
+    Here they are:</p>
+   
+   <ul><li>If a string expression evaluates to the empty string "" or the string "0" (the character 
+     zero and nothing else), then it's false.</li><li>If a numeric expression evaluates to an integer zero or to a floating point zero (exactly zero, not "nearly" zero), 
+      then it's false.</li><li>If an expression evaluates as the <i>undefined</i> value (remember that? "undef"), then it's false.</li><li>Any other value of any kind of expression is true.</li></ul>
+   
+   <p>There you have it. The rule that the undefined value is false is pretty useful, because you'll recall that
+    an uninitialized variable has the undefined value. That means you can use an 
+    <span class="purple">if</span> statement to figure out whether you've gotten a value for a variable yet. For 
+    instance:</p>
+   
+<div class="observeBox"><div class="observeTitle">OBSERVE:</div><div class="observe"><pre>
+my $year;
+
+# Here's where the code that asks the user to enter a value for $year would go--we'll see how
+# to do that later--and if they don't enter a value, $year won't get changed.
+
+unless ( $year ) 
+{
+  print "You didn't enter a year!\n";
+}    
+</pre></div></div>
+   
+   <p>If $year never got changed, it would still contain <b>undef</b> and therefore be 
+    false. (Of course, it would also be false if the user entered zero, but that's probably not 
+    useful either, since there wasn't a <a href="http://en.wikipedia.org/wiki/Year_zero">year 
+     zero</a>, but I digress.)</p>
+   
+   <p>See that <b>unless</b> keyword? That's Perl's handy way of saying "if the 
+    condition is <i>not</i> true."  Don't try using <span class="purple">elsif</span> and 
+    <span class="purple">else</span> blocks with <span class="purple">unless</span>; Perl will execute those commands, 
+    but anyone reading your program—including you—might become horribly confused.</p>
+   
+   <p>If you actually wanted to say "if the condition is <i>not</i> true," then use Perl's 
+    <b>not</b> (<span class="darkgreen">!</span>) operator like this:</p>
+       
+<div class="observeBox"><div class="observeTitle">OBSERVE:</div><div class="observe"><pre>
+if ( <span class="darkgreen">!</span> $year ) 
+{
+  print "You didn't enter a year!\n";
+}    
+</pre></div></div>
+    
+    <p>Finally, suppose you want to be able to tell whether a variable hasn't yet been initialized or for 
+      some other reason contains the undefined value. There's a special function for that called 
+      <span class="darkgreen">defined</span> that returns true only if its argument is defined, even if it's false:</p>
+    
+<div class="observeBox"><div class="observeTitle">OBSERVE:</div><div class="observe"><pre>
+my $x;
+unless ( <span class="darkgreen">defined</span> $x ) { print "Not defined!\n" }
+$x = 0;
+if ( <span class="darkgreen">defined</span> $x )     { print "Defined!\n" }
+</pre></div></div>
+  
+  </div></div>
+
+  <p>Don't be afraid! Try these operators out and experiment a lot!  Keep up the good work and see you in the next lesson!</p>
+ 
+ </div>
+<div class="footer"><div id="timeSurvey"></div>				
+				Copyright © 1998-2014 O'Reilly Media, Inc.<br><img src="https://courses.oreillyschool.com/common/cclicense.png"><br>
+				This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 Unported License.<br>
+				See <a href="http://creativecommons.org/licenses/by-sa/3.0/legalcode">http://creativecommons.org/licenses/by-sa/3.0/legalcode</a> 
+				for more information.
+				</div><iframe id="t" width="1" height="1" border="0" style="display:none"></iframe><script language="javascript">bodyLoaded();</script><script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+  ga('create', 'UA-44720547-1', 'oreillyschool.com');
+  ga('send', 'pageview');
+</script></body></html>

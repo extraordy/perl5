@@ -1,0 +1,438 @@
+<html><!-- Copyright (c) 1998-2014 O'Reilly Media, Inc.
+			This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 Unported License.
+			See http://creativecommons.org/licenses/by-sa/3.0/legalcode for more information.
+            --><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"><link rel="stylesheet" type="text/css" href="../common/Lab.css"><script type="text/javascript" src="../common/Lab.js"></script><script language="javascript"></script><title>Formatted Printing and More Looping</title></head><body id="body"><a name="top"></a><div class="title">Formatted Printing and More Looping</div><div class="resize"><a href="Perl1-09.html#top" onclick="changeSize('smaller');" class="aS" title="Keep clicking to make fonts smaller">A</a><a href="Perl1-09.html#top" onclick="changeSize('larger');" class="aL" title="Keep clikcing to make fonts larger">A</a><a href="Perl1-09.html#top" onclick="lv()" class="lv" title="Adjust Page for High Contrast">HC</a><div id="fh"><p>Click on <span class="aS">A</span> to make all fonts on the page smaller.</p><p>Click on <span class="aL">A</span> to make all fonts on the page larger.</p><p>Click on <span class="lv">HC</span> to toggle high contrast mode. When you move your mouse over 
+                 some bold words in high contrast mode, related words are automatically highlighted. Text is shown
+                 in black and white. 
+             </p></div></div><hr>
+ 
+ <div class="goalTitle">Lesson Objectives</div><div class="goals">
+  
+  
+  When you complete this lesson, you will be able to:
+  
+  <ul><li>use the built-in Perl print function.</li><li>execute formatted printing.</li></ul>
+ </div><hr>
+ 
+ <a name="h_01"></a><div class="heading">Formatted Printing</div><div class="headingText">
+  
+  <p>Imagine you're watching one of those late-night infomercials hawking steak knives and sandwich 
+   makers. Only this time, they're saying, "Are you tired of measuring string lengths and adding spaces 
+   by hand to get output that lines up in columns? Have you ever wanted to zero-fill a number or print 
+   one to a certain number of decimal places? Well, look no further! You need <b>printf</b>, the amazing
+   built-in Perl function! It formats numbers! It formats strings! It knows about octal, hexadecimal, 
+   and binary! But wait—there's more! You also get scientific notation, <i>and</i> left and right 
+   justification, absolutely free! Now how much would you pay?"</p>
+  
+  <a name="s_01"></a><div id="s_01"><div class="subheading">printf()</div><div class="subheadingText">
+   
+   <p>
+    Fortunately, you don't have to pay anything—Perl is free! Even so, <span class="darkgreen">printf</span> is pretty
+    amazing, so we're going to spend some time getting familiar with it.
+   </p>
+   
+   <p><span class="darkgreen">printf</span> is similar to <span class="darkgreen">print</span>—it prints its arguments—but in  
+    <span class="darkgreen">printf</span> there's an <b>f</b> which stands for "formatted." The general syntax 
+    of <span class="darkgreen">printf</span> is:
+   </p>
+   
+   <p><span class="darkgreen">printf</span> <span class="orange"><i>format</i></span>, argument, ... </p>
+   
+   <p>This is a type of <i>data-driven programming</i>; the <i>format</i> (the first argument) is a 
+    string to be printed, but it may contain special characters that will be replaced by formatted 
+    versions of the subsequent arguments.</p>
+    
+    <p>Let's try an example.  Create a file called <b>printf.pl</b> as shown:</p>
+
+<div class="listingBox"><div class="listingTitle">CODE TO TYPE:</div><div class="listing"><pre><ins>#!/usr/bin/perl
+use strict;
+use warnings;
+
+printf "I'm an ordinary string.\n";
+printf "Here's a number in a field of 10 characters: &lt;%10d&gt;\n", 42;
+printf "Here's a date: %02d/%02d/%4d\n", 7, 4, 1776;
+my $PI = 3.14159265358979;
+printf "PI to 3 decimal places = %.3f\n", $PI;
+printf "PI to 4 decimal places = %.4f\n", $PI;
+my $places = 5;
+printf "PI to $places decimal places = %.*f\n", $places, $PI;
+my $integer = 161;
+printf "$integer in octal       = %o\n", $integer;
+printf "$integer in hexadecimal = %x\n", $integer;
+printf "$integer in binary      = %b\n", $integer;
+printf "%10s-justified string; %-10s-justified string\n", qw&lt;right left&gt;;</ins>
+</pre></div></div>
+   
+   <p><img src="images/coderunner/checksyntax.JPG"> and run it. </p>
+   
+<div class="interactiveBox"><div class="interactiveTitle">INTERACTIVE TERMINAL SESSION:</div><div class="interactive"><pre>cold:~$ <ins>cd perl1</ins>
+cold:~/perl1$ <ins>./printf.pl</ins>
+I'm an ordinary string.
+Here's a number in a field of 10 characters: &lt;        42&gt;
+Here's a date: 07/04/1776
+PI to 3 decimal places = 3.142
+PI to 4 decimal places = 3.1416
+PI to 5 decimal places = 3.14159
+161 in octal       = 241
+161 in hexadecimal = a1
+161 in binary      = 10100001
+right-justified string; left      -justified string    
+cold:~/perl1$    
+</pre></div></div>
+   
+   <p>Wow! That's 
+    a lot of capability for one function, isn't it? And we've 
+    barely scratched the surface of what <span class="darkgreen">printf</span> can do. Now, at this point you 
+    might consider rushing to <b>perldoc -f printf</b> or 
+    <a href="http://perldoc.perl.org/functions/printf.html" target="_blank">http://perldoc.perl.org/functions/print.html</a> to learn all the details you can 
+     about <span class="darkgreen">printf</span>. But you won't find them there. There's another function 
+     called <span class="darkgreen">sprintf</span> (which along with 
+    <span class="darkgreen">printf</span> may be familiar to you if you're already a C programmer). 
+    <span class="darkgreen">sprintf</span> is just like <span class="darkgreen">printf</span> except that instead of 
+    printing the formatted string, it returns it. Check out this <b>sprintf</b> example:</p>
+   
+<div class="observeBox"><div class="observeTitle">OBSERVE:</div><div class="observe"><pre>
+<span class="darkred">$title</span> = <span class="darkgreen">sprintf</span> <span class="orange">"Report of store #%4d for %02d/%02d\n"</span>, 
+<span class="darkred">$storenum</span>, <span class="darkred">$month</span>, <span class="darkred">$day</span>;
+</pre></div></div>
+   
+   <p>
+    Information about the elements that can go into the <i>format</i> argument is identical for 
+    both <span class="darkgreen">sprintf</span> and <span class="darkgreen">printf</span>. Rather than write the 
+    same information twice in the documentation, 
+    the developers of Perl included the format argument information once, in <span class="darkgreen">sprintf</span>. 
+    You can find out all about 
+    those things beginning with % (called <b>conversions</b>) through <b>perldoc -f sprintf</b> or 
+        <a href="http://perldoc.perl.org/functions/sprintf.html" target="_blank">http://perldoc.perl.org/functions/sprintf.html</a>.
+   </p>
+   
+   <p>
+    By the way, I snuck in one extra thing in <span class="darkred">printf.pl</span>; did you spot it? The 
+    <span class="darkgreen">qw</span> operator isn't using parentheses to delimit its argument 
+    <span class="orange">right left</span>; it uses angle brackets instead. You can use any "paired" group of 
+    delimiting characters you want instead of parentheses, such as angle brackets (<b>&lt;&gt;</b>), square 
+    brackets (<b>[]</b>), or curly brackets (<b>{}</b>). 
+   </p>
+   
+   <p>
+    The sheer range of things that <span class="darkgreen">printf</span> can do means that the documentation (for
+    <span class="darkgreen">sprintf</span>) is pretty long. I'll summarize  some of the most useful parts. 
+   </p>
+   
+   <p>Everything in the string that is the first argument to <span class="darkgreen">printf</span> will get 
+    printed out just as it is, with the exception of <b>conversions</b> beginning with a % character. Because these conversions are done at run-time, you can supply that first argument in any number of ways: 
+    as a single-quoted string, a double-quoted string, or a scalar. It's common to 
+    use a double-quoted string so that we can put a newline where we need it using <b>\n</b>. 
+    When you do use a double-quoted string, scalars and arrays will interpolate in it, 
+    so make sure you don't use double-quoted strings if your scalars and arrays might contain % signs that you don't want. 
+    Usually,
+    if you want to output a string that's in a scalar, you'll use the <b>%s</b> conversion:
+   </p>
+   
+<div class="observeBox"><div class="observeTitle">OBSERVE:</div><div class="observe"><pre>
+<span class="darkgreen">printf</span> <span class="orange">"Here's a string: $scalar"</span>;      # Not recommended
+<span class="darkgreen">printf</span> <span class="orange">"Here's a string: %s"</span>, <span class="darkred">$scalar</span>;  # Preferred
+</pre></div></div>
+   
+   <p>
+    Here are the most common conversions:
+   </p>
+   
+   <ul><li>
+     %s: string
+    </li><li>
+     %d: integer
+    </li><li>
+     %f: floating-point number
+    </li><li>
+     %o, %x, %b: octal, hexadecimal, and binary, respectively
+    </li><li>
+     %%: a percent character
+    </li></ul>
+   
+   <p>
+    Each one of those will format the output using exactly the space required, but you can change that. 
+    By putting a number between the % and the letter, you can pad the conversion result with spaces on 
+    the left so that it is right-justified in a field of the specified number of characters. If you put a minus sign 
+    in front of the number, it left-justifies:
+   </p>
+   
+   <div class="observeBox"><div class="observeTitle">OBSERVE: printf justification</div><div class="observe"><pre>
+<span class="darkgreen">printf</span> <span class="orange">"|%8d|\n"</span>, <span class="orange">123</span>;    # prints |     123|
+<span class="darkgreen">printf</span> <span class="orange">"|%-8d|\n"</span>, <span class="orange">123</span>;   # prints |123     |
+</pre></div></div>
+   
+   <p>
+    The vertical bars in these examples are there to indicate the boundaries of 
+    the resulting fields. Width and justification works for all of the conversions listed above. If 
+    you specify a width that is actually narrower than what you're printing, Perl ignores the width. There is no "center" 
+    justification.
+   </p>
+   
+   <p>
+    For the <b>%d</b> conversion, you can prefix a width with a zero to get zero fill instead of
+    space padding: 
+   </p>
+   
+   <div class="observeBox"><div class="observeTitle">OBSERVE: zero filling</div><div class="observe"><pre>
+<span class="darkgreen">printf</span> <span class="orange">"|%012d|\n"</span>, <span class="orange">234523</span>;   # prints |000000234523|
+</pre></div></div>
+   
+   <p>
+    For the <b>%f</b> conversion, you usually specify a <i>precision</i> in addition to a width; the 
+    precision is given as a number after a period following the width. Take a look at this
+    example of <b>floating-point precision</b>:
+   </p>
+   
+   <div class="observeBox"><div class="observeTitle">OBSERVE: floating-point precision</div><div class="observe"><pre>
+<span class="darkgreen">printf</span> <span class="orange">"|%12.6f|\n"</span>, <span class="orange">234.523</span>;   # prints |  234.523000|
+</pre></div></div>
+         
+   <p>
+    The default precision is 6. You can omit the width and just specify the number of digits to print 
+    after the decimal point. Here's an example that uses <b>floating-point decimal places</b>:
+   </p>
+   
+   <div class="observeBox"><div class="observeTitle">OBSERVE: floating-point decimal places</div><div class="observe"><pre>
+<span class="darkgreen">printf</span> <span class="orange">"|%.2f|\n"</span>, <span class="orange">234.523</span>;   # prints |234.52|
+</pre></div></div>
+   
+   <p>
+    For the <b>%s</b> conversion, precision is interpreted as a maximum field width; the string will be
+    truncated from the right as necessary to fit:
+   </p>
+
+<div class="observeBox"><div class="observeTitle">OBSERVE: string precision</div><div class="observe"><pre>
+<span class="darkgreen">printf</span> <span class="orange">"|%.6s|\n"</span>, <span class="orange">"abcdefghi"</span>;    # prints |abcdef|
+<span class="darkgreen">printf</span> <span class="orange">"|%8.6s|\n"</span>, <span class="orange">"abcdefghi"</span>;   # prints |  abcdef|
+</pre></div></div>
+   
+   <p>
+    <b>Scientific Notation</b><br>
+    Sometimes you need to deal in numbers that are so big (or so small) that the number of digits makes them hard to read.
+    Scientists have to do this all the time, which is why they invented <i>scientific notation</i>, a way of expressing
+    those numbers with a floating point number in the range 1 to (just under) 10 and a power of ten to multiply the result by.
+    So 299792458 (speed of light in meters per second) can be represented as 2.99792458 times 10 to the power 8, which is written as
+    <b>2.99792458E+08</b>, and 0.00000000000000000000000000091093829 (mass of an electron in grams) can be written as <b>9.10938291E-28</b>.
+   </p>
+   <p>
+    Perl can use those scientific notation numbers as program literals. A plus sign after the E is optional; so are leading zeros in the digits
+    following the E (called the <i>exponent</i>), and the E can be upper
+    or lower case.  You can also print them out, using <span class="darkgreen">printf</span>:
+   </p>
+<div class="observeBox"><div class="observeTitle">OBSERVE: scientific notation</div><div class="observe"><pre>
+<span class="darkgreen">printf</span> <span class="orange">"Light-year in meters: %e"</span>, 2.99792458E8 * 60 * 60 * 24 * 365.24;  # prints Light-year in meters: 9.460471e+15
+</pre></div></div>
+   <p>
+    You can see there a literal scientific number (speed of light in meters per second), and the output from the <b>%e</b> 
+    conversion is in scientific notation.  There is also a friendly <b>%g</b> conversion that will use <b>%e</b> if the 
+    number is very big (or small) and <b>%f</b> otherwise.
+   </p>
+   <p>
+    We'll do another <span class="darkgreen">printf</span> example shortly, right after we've learned another 
+    piece of syntax.
+   </p>
+ 
+  </div></div>
+ </div>
+ <a name="h_02"></a><div class="heading">foreach Loops</div><div class="headingText">
+  
+   <p>
+    Here's the general form of a <span class="purple">foreach</span> loop:
+   </p>
+
+<div class="observeBox"><div class="observeTitle">OBSERVE: foreach statement form</div><div class="observe"><pre>
+<span class="purple">foreach</span> <span class="darkred"><i>variable</i></span>( <span class="orange"><i>list</i></span> )
+{
+  <span class="green"><i>code...</i></span>
+}
+</pre></div></div>
+  
+   <p>
+    The <span class="darkred"><i>variable</i></span> will be set in turn, to each of the elements of the 
+    <span class="orange"><i>list</i></span>, and the <span class="green"><i>code</i></span> will be executed each time. Usually (but 
+    not always, as you'll see shortly), you'll reference the variable in the code so that the code does 
+    something different each time. 
+   </p>
+   <p>
+    Here are a couple of examples:
+   </p>
+   
+<div class="observeBox"><div class="observeTitle">OBSERVE:</div><div class="observe"><pre>
+<span class="purple">foreach</span> <span class="darkred">$fruit</span>( <span class="darkred">@fruits</span> )
+{
+  print "Found a $fruit\n";
+}
+</pre></div></div>
+   
+<div class="observeBox"><div class="observeTitle">OBSERVE:</div><div class="observe"><pre>
+# $lines contains lines that look like:
+# SKU cost cost cost ...
+<span class="purple">foreach</span> <span class="darkred">my $line</span>( <span class="darkgreen">split</span> <span class="orange">"\n"</span>, <span class="darkred">$lines</span> )
+{
+  <span class="purple">my</span> (<span class="darkred">$sku</span>, <span class="darkred">@costs</span>) = <span class="darkgreen">split</span> <span class="orange">" "</span>, <span class="darkred">$line</span>;
+  <span class="purple">my</span> $total = 0;
+  print "SKU $sku has total cost ";
+  <span class="purple">foreach</span> <span class="darkred">my $cost</span>( <span class="darkred">@costs</span> )
+  {
+    $total += $cost;
+  }
+  print "$total\n";
+}
+</pre></div></div>
+  
+  <a name="s_01"></a><div id="s_01"><div class="subheading">The .. Range Operator</div><div class="subheadingText">
+  
+   <p>
+    Sometimes you'll want to execute the same piece of code a certain number of times without regard to
+    any loop variable. In such a case, you could write code that looks like this:
+   </p>
+   
+<div class="observeBox"><div class="observeTitle">OBSERVE: repetitious Loop</div><div class="observe"><pre>
+<span class="purple">foreach</span> <span class="darkred">my $whatever</span> ( 1, 2, 3 )
+{
+  print "I tell you three times\n";
+}  
+</pre></div></div>
+  
+   <p>
+    If you wanted to go around the loop a hundred times, you'd have to do a lot of typing! This is where 
+    the <i>range operator</i> comes in handy:
+  </p>
+  
+<div class="observeBox"><div class="observeTitle">OBSERVE: range operator</div><div class="observe"><pre>
+<span class="orange"><i>number1</i></span> <span class="darkgreen">..</span> <span class="orange"><i>number2</i></span>
+</pre></div></div>
+  
+   <p>
+    An expression of this form evaluates to the <i>list</i> of all the numbers in the range 
+    <i>number1</i> to <i>number2</i>, inclusive. So we could rewrite the loop above as: 
+   </p>
+
+<div class="observeBox"><div class="observeTitle">OBSERVE:</div><div class="observe"><pre>
+<span class="purple">foreach</span> <span class="darkred">my $whatever</span> ( 1 .. 3 )
+{
+  print "I tell you three times\n";
+}  
+</pre></div></div>
+  
+   <p>
+    Now, if we want to change our code to make it go around the loop a hundred times, it won't be a problem. It's 
+    also less difficult to set parameters: 
+   </p> 
+   
+<div class="observeBox"><div class="observeTitle">OBSERVE:</div><div class="observe"><pre>
+<span class="purple">my</span> <span class="darkred">$count</span> = <span class="orange">3</span>;
+<span class="purple">foreach</span> <span class="darkred">my $whatever</span> ( 1 .. $count )
+{
+  print "I tell you $count times\n";
+}  
+</pre></div></div>
+  
+   <p>
+    Now let's use <span class="purple">foreach</span> in a <span class="darkgreen">printf</span> example. You may remember this 
+    program from lesson 6:
+  </p>
+
+<div class="observeBox"><div class="observeTitle">OBSERVE: store.pl</div><div class="observe"><pre>
+#!/usr/bin/perl
+use strict;
+use warnings;
+
+my $lines = &lt;&lt;'END_OF_REPORT';
+0.95  300   White Peaches
+1.45  120   California Avocados
+5.50   10   Durien
+0.40  700   Spartan Apples
+END_OF_REPORT
+
+my ($peaches_sold, $avocados_sold, $durien_sold, $apples_sold) = (12, 6, -1, 24);  # One durien returned... too smelly
+my ($line1, $line2, $line3, $line4) = split "\n", $lines;
+my ($cost, $quantity, $item) = split " ", $line1, 3;
+$quantity -= $peaches_sold;
+$line1 = join " ", $cost, $quantity, $item;
+print "$line1\n";
+($cost, $quantity, $item) = split " ", $line2, 3; 
+$quantity -= $avocados_sold;
+$line2 = join " ", $cost, $quantity, $item;
+print "$line2\n";($cost, $quantity, $item) = split " ", $line3, 3;
+$quantity -= $durien_sold;
+$line3 = join " ", $cost, $quantity, $item;
+print "$line3\n";
+($cost, $quantity, $item) = split " ", $line4, 3;
+$quantity -= $apples_sold;
+$line4 = join " ", $cost, $quantity, $item;
+print "$line4\n";
+</pre></div></div>
+  
+   <p>That's kind of hard to read, isn't it? Let's tidy it up, and make it clearer and more extensible. Create a new file
+    as shown:</p>
+   
+<div class="listingBox"><div class="listingTitle">CODE TO TYPE:</div><div class="listing"><pre><ins>#!/usr/bin/perl
+use strict;
+use warnings;
+
+my $lines = &lt;&lt;'END_OF_REPORT';
+ 0.95   300   White Peaches
+ 1.45   120   California Avocados
+10.50    10   Durien
+ 0.40  1500   Spartan Apples
+END_OF_REPORT
+
+my @sold = (12, 6, -1, 24);  # One durien returned... too smelly
+foreach my $line ( split "\n", $lines )
+{
+  my ($cost, $quantity, $item) = split " ", $line, 3;
+  $quantity -= shift @sold;
+  printf "%5.2f %6d %s\n", $cost, $quantity, $item;
+}</ins>
+</pre></div></div>
+   
+   <p><img src="images/coderunner/save.gif"> it in your <b>/perl1</b> folder as <b>store_report.pl</b> and run it. </p>
+   
+<div class="interactiveBox"><div class="interactiveTitle">INTERACTIVE TERMINAL SESSION:</div><div class="interactive"><pre>cold:~/perl1$ <ins>./store_report.pl</ins>
+ 0.95    288 White Peaches
+ 1.45    114 California Avocados
+10.50     11 Durien
+ 0.40   1476 Spartan Apples    
+cold:~/perl1$    
+</pre></div></div>
+  
+   <p><img src="images/coderunner/save.gif"> Save and 
+    run it. A few of the numbers have been changed which makes it easier to see what 
+    <span class="darkgreen">printf</span> is actually doing for us. The output report is lined up in columns 
+    just like the input.
+   </p>
+   
+   <p>
+    By the way, some of the input lines in this program begin with spaces to allow 
+    the <i>costs</i> to line up, yet <span class="darkgreen">split()</span> still does the right thing. That's 
+    because <span class="darkgreen">split()</span>  
+    ignores any whitespace at the beginning of the string when its splitting on whitespace. 
+    That's one of those really handy Perl behaviors that you may not even notice.
+   </p>
+  
+   <p>
+    If you're slightly uncomfortable with the fact that the program we've got depends on the input and the array 
+    <span class="darkred">@sold</span> being in the same order, good! That's how a programmer should think! We'll find out what 
+    to do about that dilemma later. 
+   </p>
+  
+  </div></div>
+   
+  <p>For now, get busy with the lesson's assignments and press on!</p>
+ 
+ </div>
+<div class="footer"><div id="timeSurvey"></div>				
+				Copyright © 1998-2014 O'Reilly Media, Inc.<br><img src="https://courses.oreillyschool.com/common/cclicense.png"><br>
+				This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 Unported License.<br>
+				See <a href="http://creativecommons.org/licenses/by-sa/3.0/legalcode">http://creativecommons.org/licenses/by-sa/3.0/legalcode</a> 
+				for more information.
+				</div><iframe id="t" width="1" height="1" border="0" style="display:none"></iframe><script language="javascript">bodyLoaded();</script><script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+  ga('create', 'UA-44720547-1', 'oreillyschool.com');
+  ga('send', 'pageview');
+</script></body></html>

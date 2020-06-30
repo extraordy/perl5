@@ -1,0 +1,68 @@
+<html>
+   <!-- Copyright (c) 1998-2014 O'Reilly Media, Inc. Unauthorized use is strictly
+                prohibited. None of this code or content can by copied without the express written
+                permission from O'Reilly Media, Inc. -->
+   <head>
+      <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+      <link rel="stylesheet" type="text/css" href="http://archive.oreilly.com/oreillyschool/courses/Perl1/common/Lab.css">
+      <title>Scalars and Arithmetic - Quiz 2</title>
+   </head>
+   <body id="body">
+      <h2>Scalars and Arithmetic - Quiz 2</h2> 
+      
+      
+      
+      
+      <p>Create a new perl script with the following code:</p>
+      
+      
+      <div class="listingBox">
+         <div class="listingTitle">Type this in the editor below:</div>
+         <div class="listing"><pre> my $x = (.0425 * 2) + .0025;
+ print $x - (.0425 * 2) - .0025;
+</pre></div>
+      </div> 
+      
+      
+      <p>Run your script. What answer do you get?</p>
+      
+      
+      <p>Explain why the answer is not zero.</p>
+      
+        
+      
+      
+      <p>2.16840434497101e-18 due to floating point precision rounding errors.</p>
+      
+      
+      <p>Note: There is some possibility that the answer will change depending on the platform that the code is run on, but this is
+         
+         the answer that the student will get when they run the program on our platform.
+      </p>
+      
+      
+      <p>The reason is due to rounding errors and the limited precision of floating point numbers as stored by computers. The point
+         of 
+         this question is not for the student to understand exactly how this happens and the structure of floating point storage and
+         
+         calculations, but to understand that it does happen, because it is a source of frequent frustration in Perl and all languages.
+         
+         Any answer that includes the terms "rounding" and "precision" is likely to be correct.
+      </p>
+      
+      
+      <p>An answer that refers to improper use of () or precedence may indicate the student has altered the given code. This answer
+         
+         should be considered incorrect; ask the student to run the code as is and explain why the answer that it does result in is
+         
+         not zero, and instead is a very very small number that approaches zero.
+      </p> 
+      
+      
+      <p><b>Grading Criteria:</b> Student should show they recognize floating point errors.</p>
+      
+      
+      
+      
+   </body>
+</html>

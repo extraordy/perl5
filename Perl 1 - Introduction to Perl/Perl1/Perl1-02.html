@@ -1,0 +1,367 @@
+<html><!-- Copyright (c) 1998-2014 O'Reilly Media, Inc.
+			This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 Unported License.
+			See http://creativecommons.org/licenses/by-sa/3.0/legalcode for more information.
+            --><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"><link rel="stylesheet" type="text/css" href="../common/Lab.css"><script type="text/javascript" src="../common/Lab.js"></script><script language="javascript"></script><title>Scalars and Arithmetic</title></head><body id="body"><a name="top"></a><div class="title">Scalars and Arithmetic</div><div class="resize"><a href="Perl1-02.html#top" onclick="changeSize('smaller');" class="aS" title="Keep clicking to make fonts smaller">A</a><a href="Perl1-02.html#top" onclick="changeSize('larger');" class="aL" title="Keep clikcing to make fonts larger">A</a><a href="Perl1-02.html#top" onclick="lv()" class="lv" title="Adjust Page for High Contrast">HC</a><div id="fh"><p>Click on <span class="aS">A</span> to make all fonts on the page smaller.</p><p>Click on <span class="aL">A</span> to make all fonts on the page larger.</p><p>Click on <span class="lv">HC</span> to toggle high contrast mode. When you move your mouse over 
+                 some bold words in high contrast mode, related words are automatically highlighted. Text is shown
+                 in black and white. 
+             </p></div></div><hr>
+ 
+ <div class="goalTitle">Lesson Objectives</div><div class="goals">
+  
+  
+   When you complete this lesson, you will be able to:
+  
+  <ul><li>write programs to calculate numbers.</li><li>use parentheses to indicate precedence.</li><li>use built-in functions.</li><li>use Perl operators.</li><li>use scalar variables.</li></ul>
+ </div><hr>
+
+ <a name="h_01"></a><div class="heading">Scalars and Arithmetic in Perl</div><div class="headingText">
+   
+  <p>As gratifying as it may be to print strings, we can have a lot more fun using computers to do the 
+   "heavy lifting" of calculating numbers. Quick! What's the square root of 147 times 19 plus 
+   32!? We can write a program to help us solve this fast, without ever using a pencil.</p>
+  
+  <p>Create a new file named <b>simple_math.pl</b>, as shown in <ins>blue</ins>:</p>
+   
+<div class="listingBox"><div class="listingTitle">CODE TO TYPE:</div><div class="listing"><pre><ins>#!/usr/bin/perl
+use strict;
+use warnings;
+
+print sqrt(147) * 19 + 32, "\n";</ins>
+</pre></div></div>
+  
+  <p><img src="images/coderunner/checksyntax.JPG"> and run it.</p>
+  
+<div class="interactiveBox"><div class="interactiveTitle">INTERACTIVE TERMINAL SESSION</div><div class="interactive"><pre> <ins>cd perl1</ins>
+cold:~/perl1$ <ins>./simple_math.pl</ins>
+262.362757406661
+cold:~/perl1$ 
+</pre></div></div>
+
+  <p>Let's take a look at a few key elements in our code and see what's going on:</p>
+  
+  <ul><li><b>Commas</b> The comma indicates that <span class="darkgreen">print()</span> can take multiple 
+    <i>arguments</i> (things to print). When we type commas in between the arguments, they'll get 
+    printed one after the other. We call that series of things separated by commas a <i>list</i>—makes 
+    sense, right? (More on those later!)</li><li><b>Precision</b> The answer has a bunch of digits that follow the decimal point. If you know a little
+    about square roots, you know that the real answer would go on forever. So, why doesn't it? Well,
+    you have to stop somewhere. Perl's precision is
+    equal to that of the <a href="http://en.wikipedia.org/wiki/Floating_point" target="_blank">floating point</a> numbers your computer uses. (You can get it to print
+    more digits if you use a special module called <span class="darkred">bignum</span>; but that's more 
+    advanced than we want to be right now.)</li><li><b>Parentheses</b> Why do we have parentheses around the <ins>147</ins>? 
+    Why <i>don't</i> we have them around the arguments to <span class="darkgreen">print</span>? We can answer these 
+    questions by checking out what happens when we change those conditions. First let's take the parentheses away completely:</li></ul>
+    
+<div class="listingBox"><div class="listingTitle">CODE TO EDIT:</div><div class="listing"><pre>#!/usr/bin/perl
+use strict;
+use warnings;
+
+<ins>print sqrt 147 * 19 + 32, "\n";
+</ins>
+</pre></div></div>
+  
+  <p><img src="images/coderunner/checksyntax.JPG"> and run it.</p>
+  
+<div class="interactiveBox"><div class="interactiveTitle">INTERACTIVE TERMINAL SESSION</div><div class="interactive"><pre>cold:~/perl1$ <ins>./simple_math.pl</ins>
+53.1507290636732
+cold:~/perl1$ 
+</pre></div></div>
+ 
+  <p>Now put the parentheses back in, and add a second pair:</p>
+   
+<div class="listingBox"><div class="listingTitle">CODE TO EDIT:</div><div class="listing"><pre>#!/usr/bin/perl
+use strict;
+use warnings;
+
+<ins>print(sqrt(147) * 19 + 32, "\n");
+</ins>
+</pre></div></div>
+  
+  <p><img src="images/coderunner/checksyntax.JPG"> and run it.</p>
+  
+<div class="interactiveBox"><div class="interactiveTitle">INTERACTIVE TERMINAL SESSION</div><div class="interactive"><pre>cold:~/perl1$ <ins>./simple_math.pl</ins>
+262.362757406661
+cold:~/perl1$ 
+</pre></div></div>
+  
+  <p>So what's going on here? First, we need to address a little thing called <i>precedence</i>. The original 
+   problem—"the square root of 147 times 19 plus 32"—is a bit ambiguous. Does it mean:
+  </p>
+  <ul><li>((the square root of 147) times 19) plus 32</li><li>((the square root of 147) times (19 plus 32)</li><li>the square root of ((147 times 19) plus 32)</li></ul>
+  <p>...or any of several other possibilities? I added  
+   parentheses so you could figure out the meaning of the expression. We use parentheses the same 
+   way in Perl. If you don't have parentheses in place to indicate which tasks to execute first, 
+   your Perl program uses 
+   rules of <i>precedence</i> to determine 
+   the order that it will execute operators like <b>+</b>, <b>*</b>, and <b>sqrt</b>. So looking back up the page at the 
+   results of the totally parentheses-free statement, which parts of the 
+   calculation do you suppose Perl did first, second, and third?</p>
+  
+  <p>Built-in functions like <span class="darkgreen">print()</span> don't require
+   parentheses around their arguments. Most languages
+   don't give you a choice—you <i>must</i> include them—but parentheses are optional in
+   Perl. You can include them if you like, or if you need them to prevent Perl from
+   making the wrong assumption about where your function arguments end. Programmers 
+   who are used to working in languages where parentheses are required tend to include them all the time, 
+   but with Perl, we usually leave them off the outermost function call (the leftmost one in a statement, for example, 
+   <span class="darkgreen">print()</span> in the lines above). The code is more readable when
+   it isn't cluttered with extra parentheses. In this course we'll always follow
+   the best practices for Perl, including the economical use of parentheses.</p>
+  
+  <a name="s_01"></a><div id="s_01"><div class="subheading">Perl's Operators</div><div class="subheadingText">
+   
+   <p>Perl has <i>lots</i> of operators. You can always 
+    look up an operator in <b>perldoc</b> locally or at:
+    <a href="http://perldoc.perl.org/perlop.html" target="_blank">http://perldoc.perl.org/perlop.html</a>. 
+    Let's use some of them to calculate the volume of a sphere with a radius of 7.5 meters:</p>
+   
+   <p><div class="c"><img src="images/ball.jpg"></div></p>
+   
+   
+   <p>Create a file named <b>sphere.pl</b>. Type the code below into the console as shown:</p> 
+   
+<div class="listingBox"><div class="listingTitle">CODE TO TYPE:</div><div class="listing"><pre><ins>#!/usr/bin/perl
+use strict;
+use warnings;
+
+print "Volume of sphere of radius 7.5 = ";
+print 4/3 * 3.14159265 * (7.5 ** 3), "\n";</ins>  
+</pre></div></div>
+   
+   <p><img src="images/coderunner/checksyntax.JPG"> and run it:</p>
+   
+<div class="interactiveBox"><div class="interactiveTitle">INTERACTIVE TERMINAL SESSION</div><div class="interactive"><pre>cold:~/perl1$ <ins>./sphere.pl</ins>
+Volume of sphere of radius 7.5 = 1767.145865625
+cold:~/perl1$ 
+</pre></div></div>
+   
+   <p>We couldn't just type in <b>pi</b>, because Perl doesn't know what it means, so we 
+   typed <ins>3.14159265</ins> instead. And rather than take 
+    the time to look up the precedence of the <i>exponentiation</i> operator 
+    (<ins>**</ins>), we put parentheses in to make it clear that we are cubing 
+    <ins>7.5</ins> and nothing else, even if precedence means the parentheses may not be 
+    necessary.</p>
+  
+  </div></div>
+  <a name="s_02"></a><div id="s_02"><div class="subheading">Scalar Variables</div><div class="subheadingText">
+   
+   <p>You know, if this was all we could do with Perl, we'd be better off buying a cheap calculator. 
+    But there's more to Perl than math operations. This is where <i>variables</i> come in: we can put 
+    numbers and other things into little 
+    chunks of memory and give them names. Perl has several kinds of variables; the most 
+    important and basic kind is the <b>scalar variable</b>.  The word "scalar" means "has only one thing." 
+     A scalar variable stores exactly one thing: a 
+    number or a string.</p>
+   
+   <p>Most languages don't make their variables look special in any way, but Perl uses punctuation 
+    characters as prefixes to make variables stand out. The punctuation character for scalars is the 
+    dollar sign, <b>$</b> (because it looks like an "S," for "scalar"). Following the 
+    <b>$</b> is a name that you (the programmer) select. Pick any name you like, as long as it 
+    follows these rules: </p>
+   
+   <ul><li>It contains only uppercase letters, lowercase letters, digits, or underscores.</li><li>It starts with a letter or an underscore.</li><li>It can't be just a single underscore.</li></ul>
+
+   <p>When we want to use a scalar variable in our program, we have to inform Perl of our plan by declaring 
+    the variable before we use it. We do that using the keyword <b>my</b>. We 
+    can also assign a value to the variable at the same time with the <b>=</b> operator.</p> 
+    
+   <p>Let's try an example. Create a new program
+    named <b>sphere_variable.pl</b> file as shown:</p>
+   
+<div class="listingBox"><div class="listingTitle">CODE TO TYPE:</div><div class="listing"><pre><ins>#!/usr/bin/perl
+use strict;
+use warnings;
+
+my $radius;
+$radius = 7.5;
+my $PI = 3.14159265;
+my $volume = 4/3 * $PI * ($radius ** 3);
+print "Volume of sphere of radius ", $radius, " = ", $volume, "\n";</ins>   
+</pre></div></div>
+   
+   <p><img src="images/coderunner/checksyntax.JPG"> and run it:</p>
+   
+<div class="interactiveBox"><div class="interactiveTitle">INTERACTIVE TERMINAL SESSION</div><div class="interactive"><pre>cold:~/perl1$ <ins>./sphere_variable.pl</ins>
+Volume of sphere of radius 7.5 = 1767.145865625
+cold:~/perl1$ 
+</pre></div></div>
+   
+    <p>Did you get the same result as before? Hopefully you did. </p>
+    
+    <p>Now, behold the power of variables!: 
+    Change the <ins>7.5</ins> to 
+    <ins>49.4</ins> and run the program again. Perl adjusts the output accordingly. 
+    We can also use scalars as items in the list of arguments we pass to 
+    <span class="darkgreen">print()</span>.</p>
+   
+   <p>In our programs, we'll assign values to variables as
+    we declare them, like we did above with <ins>my $PI = 3.14159265;</ins>, but in mature programs,
+    it's common to declare a scalar without giving it a value initially. </p>
+    
+   <p><i>Only enter</i> 
+    <ins>my</ins> <i>once per variable</i>. If you do it more than once, you'll get an error. Try it!</p>
+   
+   <p>Let's try another example. Create the file <b>metric.pl</b> as shown:</p>
+   
+<div class="listingBox"><div class="listingTitle">CODE TO TYPE:</div><div class="listing"><pre><ins>#!/usr/bin/perl
+use strict;
+use warnings;
+
+# Convert meters to feet
+my $feet = 5280;   # One mile
+my $meters = $feet / 3.2808399;
+print $feet, " feet is ", $meters, " meters\n";</ins>
+</pre></div></div>
+
+   <p><img src="images/coderunner/checksyntax.JPG"> and run it:</p>
+   
+<div class="interactiveBox"><div class="interactiveTitle">INTERACTIVE TERMINAL SESSION</div><div class="interactive"><pre>cold:~/perl1$ <ins>./metric.pl</ins>
+5280 feet is 1609.3439975538 meters
+cold:~/perl1$ 
+</pre></div></div>
+   
+   <p>Here you can see Perl's <i>comment</i> feature. Everything from a pound (#) sign on to the 
+    end of the line is a comment (this is one case where line breaks <i>are</i> significant to Perl).
+    But if the pound (<ins><b>#</b></ins>) sign is inside of a string (between quotation marks), 
+    it's not a comment, it's just part of 
+    the string. Also, the shebang line at the beginning does not indicate a comment; it 
+    follows special rules that apply only when the first two 
+    characters in the file are <ins>#!</ins>.</p>   
+  
+  </div></div>
+  <a name="s_03"></a><div id="s_03"><div class="subheading">Naming Conventions</div><div class="subheadingText">
+   
+   <p>In programming as in life, there are <i>rules</i> and then there are <i>conventions</i>. A rule <i>must</i> be followed or 
+    your program won't work. Following convention is not <i>required</i>, but they are recommended standards
+    that programmers have agreed to adopt to make life easier for all.</p> 
+   
+    
+   <p>So in addition to the rules to be adhered to when naming scalars, there are some conventions about 
+    naming them as well:</p>
+   
+   <ul><li>Constants are typed in <span class="darkred">$ALL_CAPITAL_LETTERS</span>.</li><li>Local variables are <span class="darkred">$lower_case</span>.</li><li>Global variables are in <span class="darkred">$Title_Case</span>.</li><li>Words in the name are separated by underscores, as you see above.</li></ul>
+   
+   <p>These conventions differ from those recommended for some other popular programming languages, and 
+    while you could use those conventions in Perl, your programs would look like they 
+    were written with a funny accent.</p>
+    
+    <p> We haven't yet covered the difference between local and global 
+    variables, so for the moment pretend they're all local variables. As for constants, we saw an 
+     example of one above: <span class="darkred">$PI</span>.</p>
+   
+   <p>Picking good names for variables is one of the most important skills a programmer has, so put 
+    some thought into it whenever you write a program.</p>
+   
+   <p>Variables don't <i>have</i> to be initialized (given an initial value) when you declare them, 
+    mind you. Here's another program for you to write that demonstrates this. Create 
+    <b>from_metric.pl</b> as shown:</p>
+   
+<div class="listingBox"><div class="listingTitle">CODE TO TYPE:</div><div class="listing"><pre><ins>#!/usr/bin/perl
+use strict;
+use warnings;
+
+# Convert liters to various US measurements of volume
+my $liters = 2.5;
+
+my $LITERS_TO_FL_OZ   = 1000 / 29.574;
+my $LITERS_TO_PINTS   = 1 / .4731;
+my $LITERS_TO_GALLONS = $LITERS_TO_PINTS / 8;
+my $LITERS_TO_CU_IN   = 1000 / 16.387;
+
+print $liters, " liters = ",
+      $liters * $LITERS_TO_FL_OZ,   " fluid ounces, ",
+      $liters * $LITERS_TO_PINTS,   " pints, ",
+      $liters * $LITERS_TO_GALLONS, " gallons, ",
+      $liters * $LITERS_TO_CU_IN,   " cubic inches\n";
+</ins></pre></div></div>
+
+   <p><img src="images/coderunner/checksyntax.JPG"> and run it:</p>
+   
+<div class="interactiveBox"><div class="interactiveTitle">INTERACTIVE TERMINAL SESSION</div><div class="interactive"><pre>cold:~/perl1$ <ins>./from_metric.pl</ins>
+2.5 liters = 84.5337120443633 fluid ounces, 5.28429507503699 pints, 0.660536884379624 gallons, 152.559956062733 cubic inches
+cold:~/perl1$ 
+</pre></div></div>
+   
+   <p>See how we split a very long <span class="darkgreen">print()</span> statement over multiple lines there? 
+    We could have used multiple <span class="darkgreen">print()</span> statements instead, like we did 
+    before, but as it says at the top of the famous <a href="http://shop.oreilly.com/product/9780596004927.do" target="_blank">camel book</a> for Perl, "There's More Than One Way To Do It."</p> 
+   
+   <p><div class="c"><img src="images/TMTOWTDI.png"></div></p>
+
+   <p>Take another look at our example code to see how we used spaces to make things line up vertically.  Perl doesn't mind, and it 
+    makes the program easier to read.</p> 
+
+   <p>Now we're going to break the program intentionally. Make the changes as shown in <ins>blue</ins>:</p>
+
+<div class="listingBox"><div class="listingTitle">CODE TO EDIT:</div><div class="listing"><pre>#!/usr/bin/perl
+use strict;
+use warnings;
+    
+# Convert liters to various US measurements of volume
+<ins>my $liters;</ins>
+    
+my $LITERS_TO_FL_OZ   = 1000 / 29.574;
+my $LITERS_TO_PINTS   = 1 / .4731;
+my $LITERS_TO_GALLONS = $LITERS_TO_PINTS / 8;
+my $LITERS_TO_CU_IN   = 1000 / 16.387;
+    
+print $liters, " liters = ",
+      $liters * $LITERS_TO_FL_OZ,   " fluid ounces, ",
+      $liters * $LITERS_TO_PINTS,   " pints, ",
+      $liters * $LITERS_TO_GALLONS, " gallons, ",
+      $liters * $LITERS_TO_CU_IN,   " cubic inches\n";
+</pre></div></div>
+
+   <p><img src="images/coderunner/checksyntax.JPG"> and run it.</p> 
+    
+<div class="interactiveBox"><div class="interactiveTitle">INTERACTIVE TERMINAL SESSION:</div><div class="interactive"><pre>cold:~/perl1$ <ins>./from_metric.pl</ins>
+Use of uninitialized value in multiplication (*) at perl/from_metric.pl line 13.
+Use of uninitialized value in multiplication (*) at perl/from_metric.pl line 13.
+Use of uninitialized value in multiplication (*) at perl/from_metric.pl line 13.
+Use of uninitialized value in multiplication (*) at perl/from_metric.pl line 13.
+Use of uninitialized value in print at perl/from_metric.pl line 13.
+ liters = 0 fluid ounces, 0 pints, 0 gallons, 0 cubic inches
+</pre></div></div>   
+   
+   <p>It's a good thing we included <span class="darkblue">use warnings</span> in our code, because this program produces 
+    warnings! Perl complains about the use of an <i>uninitialized</i> value. In this case, we can see what's 
+    uninitialized: <ins>$liters</ins>. So, what value does it have? It has the special <i>undefined</i> value 
+    in Perl called  <b>undef</b>. You can actually assign <b>undef</b> to a scalar explicitly.</p>
+   
+   <p>But wait—Perl still executed the <span class="darkgreen">print</span> statement, it just put zero in for 
+    every calculation. What's that all about? Well, the messages you saw were <i>warnings</i>; in  
+    other words, not a big enough a problem for Perl to stop running. (You might disagree, but Perl is a 
+    pretty promiscuous language!) When Perl sees <b>undef</b> used in a calculation, it 
+    produces a warning (as long as you have <span class="darkblue">use warnings</span> enabled) and then assumes a value of
+    zero instead of <b>undef</b>, then just keeps going. </p>
+   
+   <p>Finally, take the <span class="darkblue">use warnings</span> line out of the program and rerun it. 
+   The results look pretty bad, right? That's why we always put 
+    <span class="darkblue">use warnings</span> in every program.</p> 
+   
+   <p>You may have noticed that we haven't distinguished integers from 
+    floating point values in our programs. That's because Perl handles everything for us behind the scenes. If 
+    it can store a number in an integer, it does. If it needs a floating point value instead, it 
+    uses that. When an integer value needs to change to a floating point value (perhaps because it's 
+    being divided by a number that doesn't go into it evenly), Perl "promotes" it to a floating point 
+    number. Of course, some numbers can't be represented exactly in a computer because it only has
+    a limited number of bits available for storing numbers (see the discussion about "precision" 
+    above).</p>
+   
+   <p>You're doing great so far, and starting to get a real feel for the power of Perl. 
+   More cool stuff awaits you in the next lesson!</p>
+                                
+  </div></div>
+ </div>
+<div class="footer"><div id="timeSurvey"></div>				
+				Copyright © 1998-2014 O'Reilly Media, Inc.<br><img src="https://courses.oreillyschool.com/common/cclicense.png"><br>
+				This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 Unported License.<br>
+				See <a href="http://creativecommons.org/licenses/by-sa/3.0/legalcode">http://creativecommons.org/licenses/by-sa/3.0/legalcode</a> 
+				for more information.
+				</div><iframe id="t" width="1" height="1" border="0" style="display:none"></iframe><script language="javascript">bodyLoaded();</script><script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+  ga('create', 'UA-44720547-1', 'oreillyschool.com');
+  ga('send', 'pageview');
+</script></body></html>

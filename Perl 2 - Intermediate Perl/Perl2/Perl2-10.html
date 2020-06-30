@@ -1,0 +1,317 @@
+<html><!-- Copyright (c) 1998-2014 O'Reilly Media, Inc.
+			This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 Unported License.
+			See http://creativecommons.org/licenses/by-sa/3.0/legalcode for more information.
+            --><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"><link rel="stylesheet" type="text/css" href="../common/Lab.css"><script type="text/javascript" src="../common/Lab.js"></script><script language="javascript"></script><title>Substitution and More One-Liners</title></head><body id="body"><a name="top"></a><div class="title">Substitution and More One-Liners</div><div class="resize"><a href="Perl2-10.html#top" onclick="changeSize('smaller');" class="aS" title="Keep clicking to make fonts smaller">A</a><a href="Perl2-10.html#top" onclick="changeSize('larger');" class="aL" title="Keep clikcing to make fonts larger">A</a><a href="Perl2-10.html#top" onclick="lv()" class="lv" title="Adjust Page for High Contrast">HC</a><div id="fh"><p>Click on <span class="aS">A</span> to make all fonts on the page smaller.</p><p>Click on <span class="aL">A</span> to make all fonts on the page larger.</p><p>Click on <span class="lv">HC</span> to toggle high contrast mode. When you move your mouse over 
+                 some bold words in high contrast mode, related words are automatically highlighted. Text is shown
+                 in black and white. 
+             </p></div></div><hr>
+ 
+ <div class="goalTitle">Lesson Objectives</div><div class="goals">
+  
+  
+  When you complete this lesson, you will be able to:
+  
+  <ul><li>use the substitution operator in more diverse situations.</li><li>use substitution in one liners.</li></ul>
+ </div><hr>
+ 
+  <p>We'll take a diversion from our discussion of one-liners for the first part of this lesson to discuss
+    Perl's substitution operator.  Then we'll go over how it can be used in more one-liners!</p>
+  
+  <a name="h_01"></a><div class="heading">Substitution</div><div class="headingText">
+   
+   <p>We've used the <b>substitution operator</b> (<b>s///</b>) in this course already, but without understanding it fully. The 
+    <span class="blue">s///</span> operator combines the regular expression matching operator with the ability to 
+    change the part of the input that was matched to some double quoted string, all in a minimalist
+    syntax. Here's what it looks like:</p>
+   
+<div class="observeBox"><div class="observeTitle">OBSERVE: Substitution Operator</div><div class="observe"><pre>
+s/<i>regex</i>/<i>replacement</i>/
+</pre></div></div>
+
+   <p>Just like the match operator, you can use other delimiters if you want; unlike the match operator, the
+    <b>s</b> at the beginning cannot be omitted when the delimiter is <b>/</b>. If you want the regex to be 
+    case-insensitive, add the <span class="darkblue">/i</span> modifier at the end:</p>
+      
+   <div class="observeBox"><div class="observeTitle">OBSERVE: Substitution Operator</div><div class="observe"><pre>
+s/<i>regex</i>/<i>replacement</i><span class="darkblue">/i</span>
+</pre></div></div>
+   
+   <p>So how do you use it? Just like the match operator; either bound to an explicit variable:</p>
+   
+   <div class="observeBox"><div class="observeTitle">OBSERVE: Bound Substitution</div><div class="observe"><pre>
+<span class="red">$text</span> =~ <span class="orange">s{cat}{dog}</span><span class="darkred">  # Note use of paired delimiters</span>
+</pre></div></div>
+   
+   <p>...or acting implicitly on <span class="red">$_</span>:</p>
+   
+   <div class="observeBox"><div class="observeTitle">OBSERVE: Substitution on $_</div><div class="observe"><pre>
+<span class="orange">s/p(?:oo|[uiea])ddle/fiddle/</span>
+</pre></div></div>
+
+  <p>In the end, whatever was matched by the regex between the first set of delimiters, is changed to 
+   whatever is between the second set of delimiters. This change takes place in the variable explicitly or 
+   it is implicitly bound to the substitution operator; that is, that variable is modified in place. The 
+   <i>result</i> of the <b>s///</b> is true if the regex matched. It's false if it didn't.</p>
+  
+  <p>Okay, let's see it in action! Create <span class="darkred">substitute.pl</span> as shown:</p>
+  
+<div class="listingBox"><div class="listingTitle">CODE TO TYPE: substitute.pl</div><div class="listing"><pre><ins>#!/usr/bin/perl
+use strict;
+use warnings;
+
+my $date = localtime();
+$date =~ s/ (\d\d:\d\d:\d\d)// or die "$date not in expected format!\n";
+my $time = $1;
+while ( defined( my $line = &lt;DATA&gt; ) )
+{
+  chomp $line;
+  $line =~ s/X_DATE_X/$date/;
+  $line =~ s/X_TIME_X/$time/;
+  print "$line\n";
+}
+
+__END__
+The date is X_DATE_X today
+and the time is X_TIME_X;
+i.e., it is X_TIME_X on X_DATE_X</ins>
+</pre></div></div>
+  
+  <p><img src="images/coderunner/checksyntax.JPG"> and run it. This is actually a common pattern, it's called 
+   <i>templating</i>. It looks for special markers in text and turns them into computed values at run-time. 
+   I'll walk you through each of the substitutions in this program:</p>
+  
+  <ul><li><span class="red">$date</span> =~ <span class="orange">s/ (\d\d:\d\d:\d\d)//</span> <br>
+    <span class="red">$date</span> is set to the scalar context result of <span class="darkgreen">localtime</span>, which is 
+    something of the form <span class="orange">"Day Mon DD HH:MI:SS YYYY"</span>; for example, 
+    <span class="orange">Tue May 11 21:41:40 2010</span> (It might be different if you run this on a system with a 
+    non-English locale). I want to extract the <span class="orange">HH:MI:SS</span> part and call that the 
+    time, and then call the rest of the string in <span class="red">$date</span> after <span class="orange">HH:MI:SS</span> is removed. So 
+    the date in this example would be <span class="orange">Tue May 11 2010</span> and the time would be 
+    <span class="orange">21:41:40</span>. This first substitution removes the time, including the leading space, from 
+    <span class="red">$date</span>. It also saves the time in a capturing parenthesis group—the regex part of a 
+    substitution is a proper regex, so if it matches, capturing groups will save to <span class="red">$1</span>, <span class="red">$2</span>, and so on. The 
+    next line of code copies <span class="red">$1</span> to <span class="red">$time</span>. (The <span class="darkgreen">die</span> execution 
+    path will only be taken if the return from <span class="darkgreen">localtime</span> is incorrect; unlikely, but 
+    we always want to follow the good practice of testing for success before using <span class="red">$1</span>.)</li><li><span class="red">$line</span> =~ s<span class="orange">/X_DATE_X/$date/</span> <br>
+    Replace <span class="orange">X_DATE_X</span> in <span class="red">$line</span> with the current date.</li><li><span class="red">$line</span> =~ s<span class="orange">/X_TIME_X/$time/</span> <br>
+    Replace <span class="orange">X_TIME_X</span> in <span class="red">$line</span> with the current time.</li></ul>
+  
+  <p>See how variables get interpolated in the replacement string? That string is interpreted as a double-quoted 
+   string. Let's do another example. Create <span class="darkred">dedup.pl</span> as shown:</p>
+  
+<div class="listingBox"><div class="listingTitle">CODE TO TYPE: dedup.pl</div><div class="listing"><pre><ins>#!/usr/bin/perl
+use strict;
+use warnings;
+
+while ( &lt;DATA&gt; )
+{
+  s/([A-Z]{3})\s+\1/$1/;
+  print;
+}
+
+__END__
+ 32   1.334   DEX FDU
+968  95.348   FTY JOS
+874   2.230   KLS KLS
+348 237.849   RTR ISH
+742  83.018   FTW FTW</ins>
+</pre></div></div>
+  
+  <p><img src="images/coderunner/checksyntax.JPG"> and run it. It parses a report format with lines 
+   that consist of an integer, a floating point number, and then two acronyms, which are sometimes the same. Don't 
+   try to figure out what this data means (you won't get far; I made it up!), or why your goal is to eliminate 
+   duplicated acronyms from the report; for now, let's just see how this program works.</p>
+  
+  <p>All of the program's logic is contained within the substitution that takes place on <span class="red">$_</span>. The regex 
+   part matches three consecutive uppercase letters (saved into <span class="red">$1</span>), followed by mandatory 
+   whitespace, followed by—wait a minute, what's this <span class="orange">\1</span> doing there?</p>
+  
+  <p><span class="orange">\1</span> tells Perl that you want to match <i>whatever the first capturing group</i>
+   just matched (so there'd better be capturing parentheses before that <span class="orange">\1</span>). You can not get that 
+   effect in the regex by using <span class="red">$1</span> because <span class="red">$1</span> isn't populated by Perl until the whole 
+   regex match has completed. Instead, you would get the <i>previous</i> value of <span class="red">$1</span> (which would 
+   be <span class="orange">undef</span> the first time out, but after any successful match and capture, it would be 
+   whatever was left over from the last regex). That would be a hard bug to find, so for now, avoid using <span class="red">$1</span> 
+   <i>inside a regex</i>.</p>
+  
+  <p>The replacement string in <span class="blue">s///</span> is not in the regex, so we can use <span class="red">$1</span> 
+   there. So our substitution operator reads like this: "Start matching; capture three uppercase letters, then 
+   whitespace followed by the same letters, and substitute everything you matched with the letters you 
+   captured." That's how we remove duplicates!</p>
+  
+  </div>
+  <a name="h_02"></a><div class="heading">Substitution in One-liners</div><div class="headingText">
+   
+   <p>The substitution operator is a favorite tool used in one-liners. For instance: </p>
+
+   <div class="observeBox"><div class="observeTitle">OBSERVE: s/// one-liner</div><div class="observe"><pre>
+<b>perl -nle 's/(\w{3,})\s+\1/$1/;print' <i>input_file...</i></b>
+</pre></div></div>
+   
+   <p>That's a one-liner version of the program <span class="darkred">dedup.pl</span>. Do you see how the
+    one-liner helps you save time and work?  Well, hold on, because we can save even more.</p>  
+  
+  </div>
+  <a name="h_03"></a><div class="heading">The -p Flag</div><div class="headingText">
+   
+   <p>It's so common to want to do a one-liner of the form we just saw—read lines in a loop into 
+    <span class="red">$_</span>, do some transformation on <span class="red">$_</span> and then print it—that Perl has a special 
+    flag you can use instead of <b>-n</b>; it's
+    the <b>-p</b> flag (the "p" stands for "print" and the "n" stands for "no printing").</p>
+   
+   <p>using <b>-p</b>, our previous one-liner can be shortened further to this:</p>
+   
+<div class="observeBox"><div class="observeTitle">OBSERVE: -p one-liner</div><div class="observe"><pre>
+<b>perl -ple 's/(\w{3,})\s+\1/$1/' <i>input_file...</i></b>
+</pre></div></div>
+   
+   <p>It's really common to transform a text file (or files) by performing a substitution 
+    on each line, that's wrapped up in the one-liner with <b>-ple</b> tags. You may think that we've just
+    reinvented the <b>sed</b> program, but Perl's regular expressions are a lot more powerful than <b>sed</b>'s. 
+    And, if you ever want to add more transformational code using the substitution for extra lines of
+    computation, you can do that.</p>
+
+   <p>Try that one-liner right now. Edit <span class="darkred">dedup.pl</span> to extract just the text that comes 
+    after the <span class="orange">__END__</span> line into a file named <span class="darkred">./perl2/dup_data.txt</span>, 
+    and then run it: </p>
+    
+<div class="interactiveBox"><div class="interactiveTitle">INTERACTIVE TERMINAL SESSION</div><div class="interactive"><pre>cold:~$ <ins>cd perl2</ins>
+cold:~/perl2$ <ins>perl -ple 's/(\w{3,})\s+\1/$1/' ./dup_data.txt</ins>
+</pre></div></div>
+   
+   <p>To recap, the <b>-p</b> flag assumes a loop of:</p>
+   
+<div class="observeBox"><div class="observeTitle">OBSERVE: Implicit -p code</div><div class="observe"><pre>
+while ( &lt;&gt; )
+{
+   # <i>code</i>
+   print;
+}
+</pre></div></div>
+   
+   <p>...around your <b>-e</b> <i>code</i>. It does not work with <b>-n</b>; using both together will result in 
+    an error.</p>
+  
+  </div>
+  <a name="h_04"></a><div class="heading">The -i Flag</div><div class="headingText">
+   
+   <p>In another common scenario, you are given one or more text files and then asked to transform them in some
+    way expressed in terms of a substitution, like this: "Take these files and change the date format from MM/DD/YY
+    to YYYY-MM-DD," or "Give me a new set of files just like these, but with all the names of the staff
+    changed from uppercase to title case," or "Change the name and model number of the product in these
+    press releases to the latest version and send them over to marketing."   The task of changing text
+    in files comes up so frequently that Perl has a special flag to facilitate it: the <b>-i</b> flag.</p>
+   
+   <p><b>-i</b> is always used in conjunction with <b>-p</b>; it modifies the destination of 
+    <span class="darkgreen">print</span> statements so that they write back to the files you already read from within the 
+    <b>-p</b> loop.</p>
+   
+   <p>That's a lot to wrap your brain around in one go, so let me break it down. The <b>-i</b> flag takes an 
+    argument that is an extension used to rename the original files so that you have a backup copy. When our program 
+    invokes <b>perl -p -i.bak -e '<i>code</i>' file</b>, it means this: </p>
+   <ol><li>Rename file to file.bak.</li><li>Open file.bak for reading.</li><li>Open file for writing.</li><li>For each line in the input:
+     <ol><li>Read it into <span class="red">$_</span>.</li><li>Run <i>code</i>.</li><li>Print <span class="red">$_</span> to the output.</li></ol>
+    </li><li>Close the input and output files.</li></ol>
+   
+   <p>And if there are any more files named on the command line, we'd do the same for them as well. (The <b>-i</b> 
+    is ignored if there are no files named and input comes from standard input.)</p>
+   
+   <p>That's a <i>lot</i> of power to pack into a little letter!  And <b>-i</b> has one other trick available: 
+    if you don't provide an extension argument for it, then it will modify the input files
+    <i>in place,</i>; that is, with no backup.  You need to be really confident in your Perl skills before
+    you use that mode.</p>
+   
+   <p>Let's look at a few examples of the <b>-i</b> flag:</p>
+   
+<div class="observeBox"><div class="observeTitle">OBSERVE: dos2unix</div><div class="observe"><pre>
+<b>perl -pi.bak -e 's/\r\Z//' <i>file...</i></b>
+</pre></div></div>
+   
+   <p>This little gem performs the same function as the Unix program dos2unix: it converts text files that 
+    came from a Windows system (where the line separators are, in a Unix Perl terminology, 
+    <span class="orange">\r\n</span>) to Unix format (where the line separators are just <span class="orange">\n</span>). To do 
+    that, we need to get rid of any <span class="orange">\r</span> that's followed by a <span class="orange">\n</span>. 
+    The <span class="orange">\Z</span> anchor is closely related to the one we've seen already: <span class="orange">\z</span>, but 
+    where <span class="orange">\z</span> matches the end of the string, <span class="orange">\Z</span> matches the end of the 
+    string <b>or</b> a newline (<span class="orange">\n</span>) that is followed by the end of the string.</p>
+   
+   <p>You can put the <b>-l</b> flag in as well, but it's more common for people to leave it out when using the <b>-i</b> flag. 
+    Using <b>-l</b> in this 
+    case means that the newline gets stripped off during input and put back in at the end of the implicit
+    <span class="darkgreen">print</span> to the output; it's not going to have any effect unless for some
+    bizarre reason we put <span class="darkgreen">print()</span> statements in our <b>-e</b> code.</p>
+   
+   <p>Let's try this example now:</p>
+   
+<div class="interactiveBox"><div class="interactiveTitle">INTERACTIVE SESSION:</div><div class="interactive"><pre>cold:~/perl2$ <ins>perl -pi.bak -e 's/(\w{3,})\s+\1/$1/' dup_data.txt</ins></pre></div></div>
+   
+   <p>Verify that it has updated <span class="darkred">dup_data.txt</span> and that the original file is in
+    <span class="darkred">dup_data.txt.bak</span>. 
+   </p>
+   
+   <p>Often you'll need to do some reformatting. Use <b>wget</b> to copy the <span class="darkred">cd_data</span> 
+    file to your /perl folder as shown. Type the code below in the Unix window as shown:</p> 
+   
+<div class="interactiveBox"><div class="interactiveTitle">INTERACTIVE SESSION:</div><div class="interactive"><pre>cold:~/perl2$ <ins>wget "http://courses.oreillyschool.com/Perl2/cd_data"</ins>
+--14:58:39--  http://courses.oreillyschool.com/Perl2/cd_data
+           =&gt; `cd_data'
+Resolving www.oreillyschool.com... 63.171.219.110
+Connecting to www.oreillyschool.com|63.171.219.110|:80... connected.
+HTTP request sent, awaiting response... 200 OK
+Length: 906 [text/plain]
+
+100%[======================================================================================================================================&gt;] 906           --.--K/s             
+
+14:58:39 (13.50 MB/s) - `cd_data' saved [906/906]
+cold:~/perl2$ 
+</pre></div></div>  
+   
+   <p>Then, try this example. Type the code below in the Unix window as shown:</p>
+   
+<div class="interactiveBox"><div class="interactiveTitle">INTERACTIVE SESSION:</div><div class="interactive"><pre>cold:~/perl2$ <ins>perl -pi.bak -e 's/\A(\d+)\.\s+/$1:\n\t/' ./cd_data</ins>
+</pre></div></div>
+   
+   <p>That code performs the task of indenting the rest of the information about each track on 
+    a line after the track number. Let's try another one. Put the original file back and 
+    type the code below in the Unix window as shown:</p>
+   
+<div class="interactiveBox"><div class="interactiveTitle">INTERACTIVE SESSION:</div><div class="interactive"><pre>cold:~/perl2$ <b>mv ./cd_data.bak ./cd_data</b>
+cold:~/perl2$ <ins>perl -pi.bak -e 's/\A(\d+)\.\s+(.*)\s+([\d:]+)\Z/$1 ($3)\n\t$2/' ./cd_data</ins>
+</pre></div></div>
+   
+   <p>You can embed character class shortcuts inside character classes, so for instance, in our example
+    <span class="orange">[\d:]</span> is a character class for digits and the colon.</p>
+   
+   <p>To make sure you understand the effect of <b>-l</b> and the difference between <span class="orange">\z</span> and
+    <span class="orange">\Z</span>, try that example with the other possible combinations of the different 
+    flags, and also using <span class="orange">\z</span> instead of <span class="orange">\Z</span>.</p>
+   
+   <p>Go over that last example, carefully inspecting each part of the regex and substitution, until you are 
+    sure you understand how it works.</p>
+   
+   <p><div class="c"><table class="noteBox fBox pBox "><tr><td class="noteTitle">Note</td><td class="note">If you are uncertain about the effects of the <b>-i</b> operation, you can test it without having to
+    rename the backup file after each attempt. Just leave out the <b>-i</b> flag
+    and get standard output instead of overwriting the input file(s).</td></tr></table></div></p>
+   
+   <p>I'll bet you are going to see <i>lots</i> of ways you can use substitution and the <b>-i</b> flag in 
+    your everyday work and leisure coding from now on!</p>
+  
+  </div>
+ <br><br><br><br> 
+ <p>Once you finish this lesson, go back to the syllabus page by clicking on the page tab above and do
+  the assignments.</p>
+  
+ 
+<div class="footer"><div id="timeSurvey"></div>				
+				Copyright © 1998-2014 O'Reilly Media, Inc.<br><img src="https://courses.oreillyschool.com/common/cclicense.png"><br>
+				This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 Unported License.<br>
+				See <a href="http://creativecommons.org/licenses/by-sa/3.0/legalcode">http://creativecommons.org/licenses/by-sa/3.0/legalcode</a> 
+				for more information.
+				</div><iframe id="t" width="1" height="1" border="0" style="display:none"></iframe><script language="javascript">bodyLoaded();</script><script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+  ga('create', 'UA-44720547-1', 'oreillyschool.com');
+  ga('send', 'pageview');
+</script></body></html>

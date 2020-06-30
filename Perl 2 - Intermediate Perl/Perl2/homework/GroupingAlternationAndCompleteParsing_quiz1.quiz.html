@@ -1,0 +1,48 @@
+<html>
+   <!-- Copyright (c) 1998-2014 O'Reilly Media, Inc. Unauthorized use is strictly
+                prohibited. None of this code or content can by copied without the express written
+                permission from O'Reilly Media, Inc. -->
+   <head>
+      <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+      <link rel="stylesheet" type="text/css" href="http://archive.oreilly.com/oreillyschool/courses/Perl2/common/Lab.css">
+      <title>Grouping, Alternation, and Complete Parsing - Quiz 1</title>
+   </head>
+   <body id="body">
+      <h2>Grouping, Alternation, and Complete Parsing - Quiz 1</h2> 
+      
+      
+      
+      
+      <p>This regular expression for a zip code: <b>/\d{5}(?:-\d{4})?/</b> matches the string "123456789-987654321". Why? How would you fix it? </p>
+      
+        
+      
+      
+      <p>The regex matches the part of the string "56789-9876".</p>
+      
+      
+      <p>To prevent that, use an anchor such as \b: /\b\d{5}(?:-\d{4})?\b/.</p>
+      
+      
+      <p><b>Grading Criteria:</b> Student should demonstrate knowledge of using anchors in a regular expression.</p>
+      
+      
+      
+      
+      
+      
+      <p>What is $1 when the regular expression <b>/(straw(?:berry|berrylike))/</b> is applied to "strawberrylike"? Why doesn't it match the whole string?</p>
+      
+      
+      
+      
+      <p>$1 is "strawberry" due to the test matching on 'berry' first and shortcutting.</p>
+      
+      
+      <p><b>Grading Criteria:</b> Student should demonstrate knowledge of non-capture groups in a regular expression.</p>
+      
+      
+      
+      
+   </body>
+</html>

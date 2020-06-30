@@ -1,0 +1,875 @@
+<html><!-- Copyright (c) 1998-2014 O'Reilly Media, Inc.
+			This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 Unported License.
+			See http://creativecommons.org/licenses/by-sa/3.0/legalcode for more information.
+            --><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"><link rel="stylesheet" type="text/css" href="../common/Lab.css"><script type="text/javascript" src="../common/Lab.js"></script><script language="javascript"></script><title>Working with Objects</title></head><body id="body"><a name="top"></a><div class="title">Working with Objects</div><div class="resize"><a href="Perl4-03.html#top" onclick="changeSize('smaller');" class="aS" title="Keep clicking to make fonts smaller">A</a><a href="Perl4-03.html#top" onclick="changeSize('larger');" class="aL" title="Keep clikcing to make fonts larger">A</a><a href="Perl4-03.html#top" onclick="lv()" class="lv" title="Adjust Page for High Contrast">HC</a><div id="fh"><p>Click on <span class="aS">A</span> to make all fonts on the page smaller.</p><p>Click on <span class="aL">A</span> to make all fonts on the page larger.</p><p>Click on <span class="lv">HC</span> to toggle high contrast mode. When you move your mouse over 
+                 some bold words in high contrast mode, related words are automatically highlighted. Text is shown
+                 in black and white. 
+             </p></div></div><hr>
+ 
+ 
+ <div class="goalTitle">Lesson Objectives</div><div class="goals">
+  
+  
+  When you complete this lesson, you will be able to: 
+  <ul><li>engage with important Object Oreinted programming terms and principles.</li><li><a href="Perl4-03.html#using_objects">Use Objects</a>.</li><li><a href="Perl4-03.html#creating_objects">Create Objects</a>.</li></ul>
+ </div><hr>
+
+ <p>This is quite possibly the most important lesson on Perl you will ever take. It holds the key to unlocking 
+   the vast treasure trove known as CPAN (the Comprehensive Perl Archive Network), containing tens of thousands 
+   of modules of code that other people have written and published to make your life easier! Nearly all of 
+   those modules are <i>Object-Oriented</i> (OO) and right here is where you'll learn how they work.</p>
+   
+ 
+ 
+ <a href="Perl4-03.html" name="using_objects"></a>
+ <a name="h_01"></a><div class="heading">Using Objects</div><div class="headingText">
+  
+  <p>This course is not a complete primer on the general principles of object-oriented programming. We'll cover 
+   the basics right now; our goal here is to teach you the specific terminology we're employing in this course. 
+   If you don't have an OO programming 
+   background, the upcoming explanations should be sufficient to 
+   get you through the rest of this course, but you may want to consider additional education 
+   on the principles of object-oriented analysis and design; you'll be glad you did. OST offers a couple of options for that: 
+    <a href="http://www.oreillyschool.com/courses/java/" target="_blank">Introduction to Object-Oriented Programming</a> and 
+   <a href="http://shop.oreilly.com/product/9780596008673.do" target="_blank">Head-First Object-Oriented Analysis and Design</a>.</p>
+    
+  <a name="s_01"></a><div id="s_01"><div class="subheading">Object-Oriented Programming Principles</div><div class="subheadingText">
+  
+   <p>Early in my career I worked with large FORTRAN programs for space and astronomy applications. 
+    They had to deal with huge amounts of data; I'd see code full of subroutine calls with dozens of 
+    parameters being passed (and when that wasn't enough, they used COMMON blocks, but enough about 
+    FORTRAN's shortcomings).</p>
+   
+   <p>Objects solve the problem of passing data around in increasingly larger parameter lists to subroutines. 
+    Instead, each object contains all the data associated with it, and when you perform an action on the 
+    object, it knows where to find that data, allowing subroutine calls (in OO terms, now <i>method</i> calls) 
+    to be much shorter.</p>
+   
+   <p>Before we get going on examples, here are some important OO programming terms and principles: </p>
+   
+   <ul><li>A <i>class</i> is like a blueprint or template describing a certain object, which is a model of 
+     something in the problem we are solving.</li><li>A class provides a <i>constructor</i> for creating new objects.</li><li>Each object will be referred to as an <i>instance</i> of the class.</li><li>The class is (mostly) <i>abstract</i>; instances are <i>concrete</i>.</li><li>There can (usually) be an arbitrary number of instances created from a class, all of them different. 
+     (There are rare exceptions called <i>Singleton</i> classes.)</li><li>Each instance has <i>attributes</i> and <i>behavior</i>.</li><li>You can access and modify the attributes, and trigger the behavior, of any instance independently of 
+     all other instances.</li><li>The rules for accessing the attributes, and the code for performing the behavior, are stored in the 
+     class.</li><li>The instance-specific behavior is triggered through <i>instance methods</i>.</li><li>The class may define additional <i>class methods</i> that (usually) act on additional 
+     <i>class attributes</i> that are defined for the class as a whole and stored within the class.</li></ul>
+   
+   <p>Object-oriented 
+    techniques range so far and wide and there are exceptions to just about everything I've said, but 
+    the above information is the most common and practical definition of object-oriented programming.</p>
+   <p>Here's an example of how these concepts might be applied. It's not like our usual examples where we write code, 
+    it's a description of 
+    a particular object class. Before you create an object class in any language, you need to be able 
+    to work with it in the universal abstract terms used in object-oriented analysis and design. Take a look:</p>
+   
+   <ul><li>Let's say we have a class describing bank accounts named <b>BankAccount</b>.</li><li>The class provides the means to create a new bank account. (The constructor here is like a bank branch 
+     manager.)</li><li>All bank accounts share a common structure (they all have an account number, balance, owner, and various other elements.), but 
+     each bank account is different from all other bank accounts (they have different account numbers, balances, 
+     and owners).</li><li>Doing anything to any one particular bank account does not affect the others. </li><li>There are instance methods for bank accounts: <b>credit</b>, <b>debit</b>, and so on.</li><li>The BankAccount class defines class attributes such as the address of the bank branch, the number of the 
+     next account to be created, and so on.</li><li>The BankAccount class defines class methods that operate on those class attributes, for instance, to 
+     increment the number of the next account to be created. </li><li>The BankAccount class defines class methods that operate on other data, such as the aggregate of all 
+     bank accounts that have been created, for instance, to sum the balances in all accounts to determine the 
+     amount the bank has on deposit (this is a hypothetical mom-and-pop bank that does not indulge in the kind 
+     of fractional reserve leveraging that places so many modern banks in financial jeopardy). Therefore it has 
+     to keep a note of every bank account that gets created by putting some kind of hook in the constructor that
+     adds a reference to the new account to a list stored in the class.</li></ul>
+
+   <div class="c"><table class="noteBox fBox pBox "><tr><td class="noteTitle">Note</td><td class="note">In the course of your career as a programmer, you might get into the world of bookkeeping, 
+    where there are very strict rules for posting dollar amounts to particular ledger accounts. In that world, 
+    a bank account is considered an Asset account, which is typically maintained with a Debit balance, which 
+    means that when you post a deposit (an increase) to the account, it is posted as a Debit.<br><br>
+   In this course, we will treat a bank account as a simpler, user-based element, where we will consider an 
+   increase to the account as a "credit."</td></tr></table></div>
+      
+   <p>We're going to focus on bank accounts as our example during the next two lessons, but 
+    objects can represent <i>anything</i> to which you can ascribe attributes and behavior. Usually they 
+    represent concrete things such as readouts on an aircraft control display, or a page on the internet. 
+    But they can also represent more abstract things that you may need to use in an application, such as 
+    a metaclass that allows other classes to implement roles or traits.</p>
+  
+  </div></div>
+  <a name="s_02"></a><div id="s_02"><div class="subheading">Starting To Use Objects</div><div class="subheadingText">
+   
+   <p>Let's go over how to use an object. We'll get around to using one in the second part 
+    of this lesson. Learning how to create them will be easier when you've learned how they're used.</p>
+   
+   <p>In order to use an object, we need the class that describes it. 
+    
+    
+    
+   Copy the file <b>BankAccount.pm</b> from the <b>/software/Perl4</b> folder into your <b>perl4</b> folder, 
+     but don't look in it yet!</p>
+
+   <div class="interactiveBox"><div class="interactiveTitle">INTERACTIVE TERMINAL SESSION: Type this into the terminal</div><div class="interactive"><pre>
+cold:~/$ <ins>cd perl4</ins>
+cold:~/perl4$ <ins>cp /software/Perl4/BankAccount.pm .</ins>   
+</pre></div></div>      
+    
+   <p>This file implements a bank account class like the one I used as the example above, but it doesn't have all 
+    of that functionality, at least, not yet. Now create <b>usebank.pl</b> in your <b>/perl4</b> folder as 
+    shown:</p>
+   
+
+<div class="listingBox"><div class="listingTitle">CODE TO ENTER:</div><div class="listing"><pre>#!/usr/local/bin/perl
+use strict;
+use warnings;
+
+use BankAccount;
+
+my $personal_account = BankAccount-&gt;new( owner =&gt; 'me',
+                                         account_number =&gt; 12345,
+                                         balance =&gt; 1000 );
+$personal_account-&gt;credit( 500 );
+print 'New balance = $', $personal_account-&gt;balance, "\n";
+</pre></div></div>
+   
+   <p><img src="images/coderunner/save.gif"> and run that program. You'll see this:</p>
+   
+<div class="interactiveBox"><div class="interactiveTitle">INTERACTIVE TERMINAL SESSION: Expected output</div><div class="interactive"><pre>cold:~/perl4$  <ins>./usebank.pl</ins>
+New balance = $1500
+</pre></div></div>
+   
+   <p>Take a second to digest what's going on here: we created a bank account with an opening balance of 
+    $1000. Then we credited $500 to the account. Finally, we printed out the balance and got $1500. Now let's 
+    look at the new syntax:</p>
+   
+<div class="observeBox"><div class="observeTitle">OBSERVE: usebank.pl</div><div class="observe"><pre>
+.
+.
+.
+my <span class="darkred">$personal_account</span> = <span class="darkblue">BankAccount-&gt;new</span>( owner =&gt; 'me',
+                                         account_number =&gt; 12345,
+                                         balance =&gt; 1000 );
+<span class="darkred">$personal_account</span>-&gt;<span class="darkgreen">credit(</span> <span class="orange">500</span> <span class="darkgreen">)</span>;
+print 'New balance = $', <span class="darkred">$personal_account</span>-&gt;<span class="purple">balance</span>, "\n";
+.
+.
+. 
+</pre></div></div>   
+   
+   <p>We have called a <i>constructor:</i> <span class="darkblue">BankAccount-&gt;new</span> and passed it a list of 
+    arguments to be interpreted as a list of attribute names and their initial values. (Hey, it 
+    looks a lot like a hash initialization. We'll come back to that later.)</p>
+   
+   <p>The <span class="darkblue">new</span> method returned an <i>instance</i> of the BankAccount class, which we stored 
+    in <span class="darkred">$personal_account</span>. We then called the <span class="darkgreen">credit</span> method on it and 
+    passed <span class="orange">500</span> as the amount to be credited. Finally, we called the <span class="purple">balance</span> 
+    method on it and this returned the current balance, which we printed.</p>
+   
+   <p>We'll get to this exciting new use of the arrow operator in a moment, but first, let's address this burning 
+    question: How do we know what methods and attributes we can use? The answer is found in the documentation. 
+    I will rarely write documentation for the code in this course, but I'll make an exception here, to
+    illustrate that you can't determine what you're <i>supposed</i> to do with an object class someone else 
+    wrote without reading the documentation. (Reading the source code will tell you what you <i>can</i> do, but 
+    that's not the same thing! Of course, the next version of the code might change that, but we'll work with what we've got now.) 
+    The documentation is the 
+    author's contract with you.</p>
+   
+   <p>So, let's look at the BankAccount module's documentation. We'll just use <b>perldoc</b> on the file itself:</p>
+   
+   <div class="interactiveBox"><div class="interactiveTitle">INTERACTIVE TERMINAL SESSION: perldoc output</div><div class="interactive"><pre>cold:~/perl4$ <ins>perldoc BankAccount.pm</ins>
+<b>NAME</b>
+         BankAccount - class implementing a bank account
+<b>SYNOPSIS</b>
+         use BankAccount;
+         my $account = BankAccount-&gt;new( &lt;attributes&gt; );
+<b>ATTRIBUTES</b>
+   <b>balance</b>
+       The initial balance.
+   <b>account_number</b>
+       The account number.
+   <b>owner</b>
+       The name of the account owner.
+<b>METHODS</b>
+       Any of the attributes may be accessed via a method of the same name,
+       and set by passing an argument to that method.  The following methods
+       are also defined:
+   <b>$account-&gt;credit( &lt;amount&gt; )</b>
+       Add amount to the balance.
+   <b>$account-&gt;debit( &lt;amount&gt; )</b>
+       Subtract amount from the balance.
+</pre></div></div>
+ 
+  </div></div>
+  <a name="s_03"></a><div id="s_03"><div class="subheading">Method Calls: The Arrow Operator</div><div class="subheadingText">
+     
+   <p><div class="c">I shot an arrow into the air,<br>
+    It fell to earth, I knew not where;<br>
+    For, so swiftly it flew, the sight <br>
+    Could not follow it in its flight. <br>
+    -Henry Wadsworth Longfellow</div></p>
+   
+   <p>You've already used the arrow operator (<b>-&gt;</b>) for accessing aggregate members via references, or 
+    calling coderefs. Now we'll use it for something new! Remember, we decide what the arrow operator does by
+    looking at what's on its right side. If that's a bareword, then it's a method name, and may or may not be 
+    followed by parentheses containing zero or more arguments to pass to the method. It will return a list of
+    zero or more values, just like any subroutine (more on this later). </p>
+     
+   <p>The method may be either a class method or an instance method, depending on what's on the <i>left</i> 
+    side: if there's a class there (a bareword), it's a class method. If there's an object there (something you 
+    got from a constructor—and no, I haven't told you what kind of thing that is, yet), then it's an 
+    instance method. </p>
+     
+   <p>The <span class="darkblue">new</span> method was a class method (yes, it's a constructor; a constructor is a 
+    particular kind of class method). The <span class="darkgreen">credit</span> method was an instance method. But what 
+    about <span class="purple">balance</span>? That's an instance method too! In Perl (unlike most other object-oriented 
+    languages), there's nothing special about attributes. You access attributes through instance methods. So 
+    strictly speaking, you can't actually tell that you're accessing an attribute; as far as you're concerned, 
+    you're calling an instance method that has some behavior documented as returning and/or modifying some 
+    internal state, but whether it does anything else behind the scenes (like send an email to the FBI if you 
+    execute an unusually large credit), is impossible to determine without looking at the source code.</p>
+     
+   <p>To make sure you get comfortable using this object, let's make a few changes to <b>usebank.pl</b>:</p>
+     
+
+<div class="listingBox"><div class="listingTitle">CODE TO EDIT:</div><div class="listing"><pre>#!/usr/local/bin/perl
+use strict;
+use warnings;
+
+use BankAccount;
+
+my $personal_account = BankAccount-&gt;new( owner =&gt; 'me',
+                                            <del>account_number =&gt; 12345,</del>
+                                            balance =&gt; 1000 );
+<del>$personal_account-&gt;credit( 500 );
+</del><ins>$personal_account-&gt;owner( 'Biff' );
+</ins><del>print 'New balance = $', $personal_account-&gt;balance, "\n";
+</del><ins>$personal_account-&gt;debit( 100 );
+print 'Balance on ', $personal_account-&gt;owner, "'s account = \$", $personal_account-&gt;balance, "\n";
+</ins></pre></div></div>
+     
+   <p><img src="images/coderunner/save.gif"> and run it, and you'll see this:</p>
+     
+<div class="interactiveBox"><div class="interactiveTitle">INTERACTIVE TERMINAL SESSION: Expected output</div><div class="interactive"><pre>cold:~/perl4$ <ins>./usebank.pl</ins>
+Balance on Biff's account = $900
+</pre></div></div>
+     
+   <p>Our class has very little attribute validation—make that no attribute validation. It doesn't check 
+    to make sure that an account_number attribute is passed to <span class="darkblue">new</span> or what heinous consequences that 
+    omission might have later on. In fact, you can pass attributes with any names you want and it won't mind. 
+    A well-written class might validate these attributes to make sure that they match what the documentation
+    says is permitted.</p>
+ 
+  </div></div>
+ </div>
+ <a href="Perl4-03.html" name="creating_objects"></a>
+ <a name="h_02"></a><div class="heading">Creating Objects</div><div class="headingText">
+   
+  <p>The goal of a module author is to provide a <i>black box:</i> code that you don't have to inspect in order 
+   to use. But we're going to learn how to write modules now, so it's time to peek under the hood of 
+   <b>BankAccount.pm</b>.</p>
+   
+  <p>You already know that the <b>use BankAccount</b> statement caused Perl to load <b>BankAccount.pm</b>, which made 
+   its subroutines available to our program. </p>
+
+<div class="observeBox"><div class="observeTitle">OBSERVE: BankAccount.pm</div><div class="observe"><pre>
+<span class="darkgreen">package</span> <span class="orange">BankAccount</span>;
+use strict;
+use warnings;
+
+
+sub <span class="darkblue">new</span>
+{
+  my ($class, %attr) = @_;
+
+  my $ref = \%attr;
+  bless $ref, $class;
+  return $ref;
+}
+.
+.
+.
+</pre></div></div>  
+  
+  <p>The <span class="darkgreen">package</span> statement caused the <span class="darkblue">new</span> subroutine to be in the 
+   <span class="orange">BankAccount</span> package.</p>
+   
+  <p>I like to say that when it comes to the implementation of object-oriented programming in Perl, there is 
+   less going on than meets the eye. Where other languages have special keywords, data types, and syntax for 
+   objects, Perl has very little of that, and implements objects by using a lot of things you already know about 
+   and only a few extra pieces of "magic" to glue them together. Here's the first piece of that magic:</p>
+   
+  <p><div class="c"><table class="noteBox fBox pBox "><tr><td class="noteTitle">Note</td><td class="note">A class in Perl is just a package. </td></tr></table></div></p>
+   
+  <p>The class method call <b>BankAccount-&gt;new</b> simply causes Perl to call the <span class="darkblue">new</span> 
+   subroutine in the package <span class="orange">BankAccount</span>; that is, <b>BankAccount::new</b>, with one 
+   important addition: Perl passes an extra first argument to every method call, equivalent to what was on the left side 
+   of the arrow.</p>
+   
+  <p>What's on the left side of that arrow in our example? The bareword <b>BankAccount</b>. So the string <b>BankAccount</b> 
+   gets passed as a first argument to <b>BankAccount::new</b>. That's the class name, so we called it 
+   <span class="red">$class</span> in the definition of <span class="blue">new</span>. Add a line to <b>BankAccount.pm</b> so you can see 
+   the arguments:</p>
+  
+
+<div class="listingBox"><div class="listingTitle">CODE TO EDIT:</div><div class="listing"><pre>
+ .
+ .
+ .
+sub new
+{
+  my ($class, %attr) = @_;
+  <ins>print "Arguments: @_\n";</ins>
+  my $ref = \%attr;
+  bless $ref, $class;
+  return $ref;
+}
+.
+.
+.</pre></div></div>
+   
+  <p><img src="images/coderunner/save.gif"> it and run <b>usebank.pl</b>:</p>
+  
+<div class="interactiveBox"><div class="interactiveTitle">INTERACTIVE TERMINAL SESSION: Expected output</div><div class="interactive"><pre>cold:~/perl4$ <ins>./usebank.pl</ins>
+Arguments: BankAccount owner me balance 1000
+Balance on Biff's account = $900
+</pre></div></div>
+   
+  <p>Remove the line you added before you continue. The rest of the arguments that were passed to 
+   <span class="darkblue">new</span> were put into a hash named <b>%attr</b> that we referenced in <b>$ref</b>. This is 
+   going to be our object. In Perl, there is no fixed representation of an object; it just has to be a reference 
+   to something (we'll see why in a moment), but it can be a reference to anything. However, they most commonly 
+   reference a hash, because that's really convenient for storing the object's data. 
+   Every entry in the hash is one of the object's attributes; the name and value are right there.</p>
+   
+  <p>Before we go over the rest of <span class="darkblue">new</span>, let's see how we would add another attribute.
+    Modify <b>usebank.pl</b> as shown: </p>
+  
+
+<div class="listingBox"><div class="listingTitle">CODE TO EDIT:</div><div class="listing"><pre>#!/usr/local/bin/perl
+use strict;
+use warnings;
+
+use BankAccount;
+
+my $personal_account = BankAccount-&gt;new( owner =&gt; 'me',
+                                            balance =&gt; 1000<ins>,</ins> 
+                                            <ins>overdraft_limit =&gt; 500</ins> );
+$personal_account-&gt;owner( 'Biff' );
+<ins>print "Overdraft limit = \$", $personal_account-&gt;overdraft_limit, "\n";</ins>
+$personal_account-&gt;debit( 100 );
+print 'Balance on ', $personal_account-&gt;owner, "'s account = \$", $personal_account-&gt;balance, "\n";
+</pre></div></div>
+   
+  <p><img src="images/coderunner/save.gif"> and run that program, and you will see:</p>
+  
+<div class="interactiveBox"><div class="interactiveTitle">INTERACTIVE TERMINAL SESSION: Expected output</div><div class="interactive"><pre>cold:~/perl4$ <ins>./usebank.pl</ins>
+Can't locate object method "overdraft_limit" via package "BankAccount" at ./usebank.pl line 11.
+</pre></div></div>
+   
+  <p>The BankAccount module doesn't have a method to get at the overdraft limit. Let's add one now. Make the 
+   following modification to <b>BankAccount.pm</b>:</p>
+   
+
+<div class="listingBox"><div class="listingTitle">CODE TO EDIT:</div><div class="listing"><pre>.
+.
+.
+
+sub owner
+{
+  my $self = shift;
+
+  $self-&gt;{owner} = shift if @_;
+  return $self-&gt;{owner};
+}
+
+
+<ins>sub overdraft_limit
+{
+  my $self = shift;
+  
+  $self-&gt;{overdraft_limit} = shift if @_;
+  return $self-&gt;{overdraft_limit};
+}</ins>
+ 
+ 
+sub account_number
+{
+  my $self = shift;
+
+  $self-&gt;{account_number} = shift if @_;
+  return $self-&gt;{account_number};
+}
+
+
+.
+.
+.
+</pre></div></div>
+   
+  <p><img src="images/coderunner/save.gif"> that file and re-run <b>usebank.pl</b> and you will see:</p>
+  
+<div class="interactiveBox"><div class="interactiveTitle">INTERACTIVE TERMINAL SESSION: Expected output</div><div class="interactive"><pre>cold:~/perl4$ <ins>./usebank.pl</ins>
+Overdraft limit = $500
+Balance on Biff's account = $900
+</pre></div></div>
+   
+  <p>What just happened?  You saw from the earlier error message that Perl could not find an 
+   <b>overdraft_limit</b> method in the <b>BankAccount</b> package; after we created 
+   <b>BankAccount::overdraft_limit</b>, it found and used it. That method call was made with 
+   <b>$personal_account-&gt;overdraft_limit</b>. So how did Perl know to look in the BankAccount package for 
+    the overdraft_limit subroutine?</p>
+   
+  <p>The answer lies in the rest of the <b>new</b> routine:</p>
+  
+<div class="observeBox"><div class="observeTitle">OBSERVE: new()</div><div class="observe"><pre>
+sub new
+{
+  my (<span class="darkgreen">$class</span>, %attr) = @_;
+  my <span class="darkred">$ref</span> = \%attr;
+  <span class="darkblue">bless</span> <span class="darkred">$ref</span>, <span class="darkgreen">$class</span>;
+  return <span class="darkred">$ref</span>;
+}
+</pre></div></div>  
+  
+  <p>Before we returned the hash reference <span class="darkred">$ref</span>, we called <span class="darkblue">bless</span> on the reference 
+   and passed the name of the <span class="darkgreen">$class</span> to it. That's the next bit of magic:</p>
+   
+  <p><div class="c"><table class="noteBox fBox pBox "><tr><td class="noteTitle">Note</td><td class="note"> Instance method calls are made on references that have been <span class="darkblue">bless</span>ed into a 
+   package, so that Perl knows which package contains the method definition.</td></tr></table></div></p>
+   
+  <p><span class="darkblue">bless</span> takes the second argument and puts it in a special place in the data pointed to 
+   by its first argument:</p>
+   
+  <p><div class="c"><img src="images/lessonImages/bless.png"></div></p>
+   
+  <p>When the arrow operator sees a bareword on its right side and a reference on its left side, it follows the 
+   reference to look in that specific place for the package. If the reference wasn't <span class="darkblue">bless</span>ed, it can't find one, 
+   as you'll see when you try this one-liner:</p>
+   
+<div class="interactiveBox"><div class="interactiveTitle">INTERACTIVE TERMINAL SESSION: One-liner</div><div class="interactive"><pre>cold:~/perl4$ <ins>perl -le '$ref = {}; $ref-&gt;whatever'</ins>
+Can't call method "whatever" on unblessed reference at -e line 1.</pre></div></div>
+   
+  <p>Looking at <span class="darkblue">new</span> again, here's the explanation of the whole subroutine:</p>
+   
+  <ul><li>Shift the phantom argument (the class name) into <span class="darkgreen">$class</span>.</li><li>Copy the remaining arguments into a hash (<span class="darkred">%attr</span>).</li><li>Create a reference to <span class="darkred">%attr</span> and <span class="darkblue">bless</span> it.</li><li>Return <span class="darkred">$ref</span> as the result of <span class="darkblue">new</span>.</li></ul>
+   
+  <p>So our object <b>$personal_account</b> is just a hash reference. But it's special in that 
+   it has been <span class="darkblue">bless</span>ed so that the hash it points to "knows" about the package into which 
+   it was <span class="darkblue">bless</span>ed.</p>
+   
+  <p>For <i>instance method calls</i>, the same rule for the "phantom argument" applies: Perl passes the thing on the 
+   left side of the arrow as that first argument. In the case of an instance method, that is the object itself, 
+   which is the hash reference. So let's see how an <i>accessor method</i> (what we call a method written for
+   accessing an attribute) like <span class="darkgreen">overdraft_limit()</span> works:</p>
+   
+<div class="observeBox"><div class="observeTitle">OBSERVE: Accessor method</div><div class="observe"><pre>
+sub <span class="darkgreen">overdraft_limit</span>
+{
+  my <span class="darkblue">$self</span> = shift;
+  
+  <span class="darkblue">$self</span>-&gt;{<span class="orange">overdraft_limit</span>} = shift if <span class="darkred">@_</span>;
+  return <span class="darkblue">$self</span>-&gt;{<span class="orange">overdraft_limit</span>};
+}
+</pre></div></div>
+   
+  <p>Remember: <i>There's less going on than meets the eye.</i>  The phantom argument is shifted from 
+   <span class="darkred">@_</span> into <span class="darkblue">$self</span>. We could have called it anything, but the most common 
+   name is <span class="darkblue">$self</span>. (This is different from most other object-oriented languages where the 
+   name of the invocant is fixed.) The object is a hash reference, so the next line replaces the value of 
+   <span class="orange">overdraft_limit</span> in it if an argument is passed to the method to overwrite it; this lets us 
+   write <b>$personal_account-&gt;overdraft_limit( 1000 )</b> to change the value after initialization. That object 
+   behavior is entirely at the whim of the writer of the object class; if we'd wanted to, we could simply 
+   prohibit changing the value after initialization by not having that line in 
+   <span class="darkgreen">overdraft_limit()</span>. Then, the routine would return the corresponding value in the hash 
+   reference. </p>
+   
+  <p><table class="noteBox fBox pBox "><tr><td class="noteTitle">Note</td><td class="note"> You may have noticed that nothing stops the writer of <b>usebank.pl</b> from accessing attributes 
+   directly by treating <b>$personal_account</b> as the hash reference that it is: 
+   <b>$personal_account-&gt;{overdraft_limit} = 1000</b>, for instance. Don't do that! That is called 
+   <i>violating encapsulation</i> and can cause many problems, because you're bypassing the interface the 
+   module writer set up for doing things to the object. That interface should be complete, so when you write a 
+   module, be sure and provide ways for your users to do everything that they shoul be able to 
+   do to an object's attributes, that way they're not tempted to violate encapsulation.</td></tr></table></p>
+    
+  <a name="s_01"></a><div id="s_01"><div class="subheading">Extending the Module</div><div class="subheadingText">
+   
+   <p>If you're new to object-oriented programming or just new to object-oriented programming in Perl, 
+    you're probably pretty excited about what you've just learned, and all of the new possibilities. That's excellent! Now we're going to expand on that foundation. 
+    Let's modify <b>BankAccount.pm</b> even more to explore some of those possibilitie. Modify your code as shown:</p>
+
+     
+<div class="listingBox"><div class="listingTitle">CODE TO EDIT:</div><div class="listing"><pre>package BankAccount;
+use strict;
+use warnings;
+
+
+sub new
+{
+  my ($class, %attr) = @_;
+
+  my $ref = \%attr;
+  bless $ref, $class;
+  return $ref;
+}
+
+
+sub balance
+{
+  my $self = shift;
+
+  $self-&gt;{balance} = shift if @_;
+  return $self-&gt;{balance};
+}
+
+
+sub owner
+{
+  my $self = shift;
+
+<del>  $self-&gt;{owner} = shift if @_;
+  return $self-&gt;{owner};</del>
+  <ins>if ( @_ )
+  {
+    $self-&gt;{owner} = @_ &gt; 1 ? [ @_ ] : shift;
+  }
+  my $current = $self-&gt;{owner} or return;
+  return ref $current ? @$current : $current;</ins>
+}
+
+
+sub overdraft_limit
+{
+  my $self = shift;
+
+<del>  $self-&gt;{overdraft_limit} = shift if @_;</del>
+<ins>  if ( @_ )
+  {
+    my $new_limit = shift;
+    warn "Can't have negative overdraft limit!\n" and return if $new_limit &lt; 0;
+    $self-&gt;{overdraft_limit} = $new_limit;
+  }</ins>  
+  
+  return $self-&gt;{overdraft_limit};
+}
+
+
+sub account_number
+{
+  my $self = shift;
+
+  $self-&gt;{account_number} = shift if @_;
+  return $self-&gt;{account_number};
+}
+
+
+sub debit
+{
+  my ($self, $amount) = @_;
+
+  $self-&gt;balance( $self-&gt;balance - $amount );
+}
+
+
+sub credit
+{
+  my ($self, $amount) = @_;
+
+  $self-&gt;balance( $self-&gt;balance + $amount );
+}
+
+
+1;
+</pre></div></div>
+     
+   <p><img src="images/coderunner/save.gif"> it, and then modify <b>usebank.pl</b> as shown:</p>
+
+     
+<div class="listingBox"><div class="listingTitle">CODE TO EDIT:</div><div class="listing"><pre>#!/usr/local/bin/perl
+use strict;
+use warnings;
+
+use BankAccount;
+
+my $personal_account = BankAccount-&gt;new( owner =&gt; 'me',
+                                         balance =&gt; 1000,
+                                         overdraft_limit =&gt; 500 );
+$personal_account-&gt;owner( <del>'Biff'</del><ins>'Marty', 'Lorraine'</ins> );
+<del>print "Overdraft limit = \$", $personal_account-&gt;overdraft_limit, "\n";</del>
+<ins>$personal_account-&gt;overdraft_limit( -1 );
+</ins>$personal_account-&gt;debit( 100 );
+print 'Balance on ', $personal_account-&gt;owner, "'s account = \$", $personal_account-&gt;balance, "\n";
+</pre></div></div>
+     
+   <p><img src="images/coderunner/save.gif"> and run it and you will see:</p>
+     
+<div class="interactiveBox"><div class="interactiveTitle">INTERACTIVE TERMINAL SESSION: Expected output</div><div class="interactive"><pre>cold:~/perl4$ <ins>./usebank.pl</ins>
+Can't have negative overdraft limit!
+Balance on MartyLorraine's account = $900
+</pre></div></div>
+     
+   <p>Here we've made up some rules for argument passing and validation. The change to the <b>overdraft_limit()</b> 
+    method gives us a warning if we try to set a negative limit. Alternatively, we could have chosen to 
+    <span class="darkred">die</span> instead (and that might be a better choice in a production program). The change to 
+    the <b>owner()</b> method allows joint accounts; if there's more than one owner passed to the method for storing, 
+    they're stored as an array, and upon retrieving from the method, expanded into the list again. This is why 
+    the last line prints <b>MartyLorraine</b>: it's in a list context, so it's printing the list 
+    (<b>Marty</b>, <b>Lorrraine</b>). The <i>interface</i> to the method has changed; users of the module 
+    should be made aware of this through documentation, so they know that the 
+    method may return multiple values in the case of joint ownership.</p>
+     
+   <p>Object-oriented purists (and there are many of them) might not whole-heartedly embrace  
+    the <i>design</i> of the class and methods that I've shown you here, but my purpose is to show you 
+    <i>how</i> to implement a class, not how to design an interface; that's a matter for a class on 
+    object-oriented analysis and design. The approach we've taken isn't a bad one and it's a good teaching tool.</p>
+ 
+  </div></div>
+  <a name="s_02"></a><div id="s_02"><div class="subheading">Improving the Implementation</div><div class="subheadingText">
+     
+   <p>Let's look at another enhancement to the module. Suppose we need to remember all of the transactions that 
+    have been made on an account. Modify <b>BankAccount.pm</b> as shown:</p>
+   
+
+<div class="listingBox"><div class="listingTitle">CODE TO EDIT:</div><div class="listing"><pre>.
+.
+.
+
+sub account_number
+{
+  my $self = shift;
+
+  $self-&gt;{account_number} = shift if @_;
+  return $self-&gt;{account_number};
+}
+
+<ins>sub transact
+{
+  my ($self, $type, $amount) = @_;
+  my %transaction = ( date =&gt; time, type =&gt; $type, amount =&gt; $amount );
+  push @{ $self-&gt;{transactions} }, \%transaction;
+  $self-&gt;{balance} += $amount;
+}</ins>
+
+sub debit
+{
+  my ($self, $amount) = @_;
+
+<del>  $self-&gt;balance( $self-&gt;balance - $amount );</del>
+<ins>  $self-&gt;transact( debit =&gt; -$amount );</ins>
+}
+
+
+sub credit
+{
+  my ($self, $amount) = @_;
+
+<del>  $self-&gt;balance( $self-&gt;balance + $amount );</del>
+<ins>  $self-&gt;transact( credit =&gt; $amount );</ins>
+}
+
+1;
+.
+.
+.
+</pre></div></div>
+     
+   <p><img src="images/coderunner/save.gif"> it and edit <b>usebank.pl</b>:</p>
+     
+
+<div class="listingBox"><div class="listingTitle">CODE TO EDIT:</div><div class="listing"><pre>#!/usr/local/bin/perl
+use strict;
+use warnings;
+
+use BankAccount;
+
+my $personal_account = BankAccount-&gt;new( owner =&gt; 'me',
+                                         balance =&gt; 1000,
+                                         overdraft_limit =&gt; 500 );
+<del>$personal_account-&gt;owner( 'Marty', 'Lorraine' );</del>
+<del>$personal_account-&gt;overdraft_limit( -1 );</del>
+<ins>$personal_account-&gt;credit( 300 );</ins>
+$personal_account-&gt;debit( 100 );
+print 'Balance on ', $personal_account-&gt;owner, "'s account = \$", $personal_account-&gt;balance, "\n";
+</pre></div></div>
+     
+   <p><img src="images/coderunner/save.gif"> and run it, and you'll see this:</p>
+   
+<div class="interactiveBox"><div class="interactiveTitle">INTERACTIVE TERMINAL SESSION: Expected output</div><div class="interactive"><pre>cold:~/perl4$ <ins>./usebank.pl</ins>
+Balance on me's account = $1200
+</pre></div></div>
+   
+   <p>Ignoring that glaring grammatical issue for now, see how we have the <b>credit()</b> and <b>debit()</b> methods each call the 
+    new <b>transact()</b> method? That avoids duplicating the code that maintains the <b>transactions</b> data in the 
+    object. And notice how we can store data in the object that isn't an attribute we gave the user direct access 
+    to? You can think of this as <i>private data</i>. (And no, we haven't put in any code yet that reads the 
+    data we've put into the <b>transactions</b> slot; you'll get to do that in the homework!)</p>
+     
+   <p>Now consider how this approach pays off if we need to implement a way of transferring money between 
+    accounts:</p>
+   
+<div class="observeBox"><div class="observeTitle">OBSERVE: Transfer Method</div><div class="observe"><pre>
+# Call as $account-&gt;transfer( $amount, $target_account )
+sub <span class="blue">transfer</span>
+{
+  my ($self, $amount, $target_account) = @_;
+
+  $self-&gt;debit( $amount );
+  $target_account-&gt;credit( $amount );
+}
+</pre></div></div>
+     
+   <p>But this would appear in the transaction record for each account as a simple credit or 
+    debit. We'd like more specific information than that. Make this change in <b>BankAccount.pm</b>:</p>
+
+   
+<div class="listingBox"><div class="listingTitle">CODE TO EDIT:</div><div class="listing"><pre>package BankAccount;
+use strict;
+use warnings;
+
+<ins>{
+  my $NEXT_ACCTNO = 10001;
+  sub next_acctno
+  {
+    return $NEXT_ACCTNO++;
+  }
+}</ins>
+ 
+sub new
+{
+  my ($class, %attr) = @_;
+  <ins>$attr{account_number} = $class-&gt;next_acctno;</ins>  
+  my $ref = \%attr;
+  bless $ref, $class;
+  return $ref;
+}
+
+
+sub balance
+{
+  my $self = shift;
+
+  $self-&gt;{balance} = shift if @_;
+  return $self-&gt;{balance};
+}
+
+
+sub owner
+{
+  my $self = shift;
+
+  if ( @_ )
+  {
+    $self-&gt;{owner} = @_ &gt; 1 ? [ @_ ] : shift;
+  }
+  my $current = $self-&gt;{owner} or return;
+  return ref $current ? @$current : $current;
+}
+
+
+sub overdraft_limit
+{
+  my $self = shift;
+
+  if ( @_ )
+  {
+    my $new_limit = shift;
+    warn "Can't have negative overdraft limit!\n" and return if $new_limit &lt; 0;
+    $self-&gt;{overdraft_limit} = $new_limit;
+  }
+  return $self-&gt;{overdraft_limit};
+}
+
+
+sub account_number
+{
+  my $self = shift;
+
+  $self-&gt;{account_number} = shift if @_;
+  return $self-&gt;{account_number};
+}
+
+sub transact
+{
+  my ($self, $type, $amount) = @_;
+  my %transaction = ( date =&gt; time, type =&gt; $type, amount =&gt; $amount );
+  push @{ $self-&gt;{transactions} }, \%transaction;
+  $self-&gt;{balance} += $amount;
+}
+
+sub debit
+{
+  my ($self, $amount) = @_;
+
+  $self-&gt;transact( debit =&gt; -$amount );
+}
+
+sub credit
+{
+  my ($self, $amount) = @_;
+
+  $self-&gt;transact( credit =&gt; $amount );
+}
+
+<ins>sub transfer
+{
+  my ($self, $amount, $target_account) = @_;
+  my $message = "Transfer to " . $target_account-&gt;account_number;
+  $self-&gt;transact( $message, -$amount );
+  $message = "Transfer from " . $self-&gt;account_number;
+  $target_account-&gt;transact( $message, $amount );
+}
+</ins>
+1;
+.
+.
+.
+</pre></div></div>
+     
+   <p><img src="images/coderunner/save.gif"> it and edit <b>usebank.pl</b>:</p>
+   
+
+<div class="listingBox"><div class="listingTitle">CODE TO EDIT:</div><div class="listing"><pre>
+#!/usr/local/bin/perl
+use strict;
+use warnings;
+
+use BankAccount;
+
+my $personal_account = BankAccount-&gt;new( owner =&gt; 'me',
+                                         balance =&gt; 1000,
+                                         overdraft_limit =&gt; 500 );
+$personal_account-&gt;credit( 300 );
+$personal_account-&gt;debit( 100 );
+<del>print 'Balance on ', $personal_account-&gt;owner, "'s account = \$", $personal_account-&gt;balance, "\n";
+</del><ins>my $slush_fund = BankAccount-&gt;new( owner =&gt; 'you',
+                                   balance =&gt; 10000 );
+$slush_fund-&gt;transfer( 5000, $personal_account );
+print "New balance on my account = \$", $personal_account-&gt;balance, "\n";</ins>
+</pre></div></div>
+     
+   <p><img src="images/coderunner/save.gif"> and run it and you will see:</p>
+   
+<div class="interactiveBox"><div class="interactiveTitle">INTERACTIVE TERMINAL SESSION: Expected Output</div><div class="interactive"><pre>cold:~/perl4$ <ins>./usebank.pl</ins>
+New balance on my account = $6200</pre></div></div>
+     
+   <p>Do you see how the description of the transaction is properly captured and passed to the <b>transact()</b> 
+    method? We've also introduced a <i>class method</i>, <b>next_acctno()</b>, used by <b>new()</b>, to operate 
+    on <i>class data</i> to generate a new account number every time it's called.</p>
+   
+  </div></div>
+   
+  <p><table class="noteBox fBox pBox "><tr><td class="noteTitle">Note</td><td class="note"> To be completely accurate, a method call is not restricted to being a bareword on the right side of 
+   the arrow; it can also be a scalar containing a string which will be interpreted as the method name. 
+   Similarly, a class method call is not restricted to being a bareword on the left side of the arrow; it can 
+   also be a scalar containing a string which will be interpreted as the class name.</td></tr></table></p>
+   
+ </div>
+ 
+ <p>That was a <i>lot</i> for one lesson! You'll get more comfortable with object-oriented programming as we 
+  go along, and also as you do the homework. Keep up the great work!</p>
+ 
+   <p>Once you finish the lesson, go back to the syllabus to complete the homework.</p>
+
+<div class="footer"><div id="timeSurvey"></div>				
+				Copyright © 1998-2014 O'Reilly Media, Inc.<br><img src="https://courses.oreillyschool.com/common/cclicense.png"><br>
+				This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 Unported License.<br>
+				See <a href="http://creativecommons.org/licenses/by-sa/3.0/legalcode">http://creativecommons.org/licenses/by-sa/3.0/legalcode</a> 
+				for more information.
+				</div><iframe id="t" width="1" height="1" border="0" style="display:none"></iframe><script language="javascript">bodyLoaded();</script><script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+  ga('create', 'UA-44720547-1', 'oreillyschool.com');
+  ga('send', 'pageview');
+</script></body></html>

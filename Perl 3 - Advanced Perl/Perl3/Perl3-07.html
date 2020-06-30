@@ -1,0 +1,635 @@
+<html><!-- Copyright (c) 1998-2014 O'Reilly Media, Inc.
+			This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 Unported License.
+			See http://creativecommons.org/licenses/by-sa/3.0/legalcode for more information.
+            --><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"><link rel="stylesheet" type="text/css" href="../common/Lab.css"><script type="text/javascript" src="../common/Lab.js"></script><script language="javascript"></script><title>References</title></head><body id="body"><a name="top"></a><div class="title">References</div><div class="resize"><a href="Perl3-07.html#top" onclick="changeSize('smaller');" class="aS" title="Keep clicking to make fonts smaller">A</a><a href="Perl3-07.html#top" onclick="changeSize('larger');" class="aL" title="Keep clikcing to make fonts larger">A</a><a href="Perl3-07.html#top" onclick="lv()" class="lv" title="Adjust Page for High Contrast">HC</a><div id="fh"><p>Click on <span class="aS">A</span> to make all fonts on the page smaller.</p><p>Click on <span class="aL">A</span> to make all fonts on the page larger.</p><p>Click on <span class="lv">HC</span> to toggle high contrast mode. When you move your mouse over 
+                 some bold words in high contrast mode, related words are automatically highlighted. Text is shown
+                 in black and white. 
+             </p></div></div><hr>
+  
+  <div class="goalTitle">Lesson Objectives</div><div class="goals">
+    
+    When you complete this lesson, you will be able to: 
+    <ul><li>make <a href="Perl3-07.html#references_to_scalars"> references to Scalars</a></li><li>make <a href="Perl3-07.html#references_to_arrays"> references to Arrays</a></li><li>make <a href="Perl3-07.html#anonymous_references">a nonymous References</a></li></ul>
+  </div><hr>
+ 
+ <p><div class="c">“County library? Reference desk, please. Hello? Yes, I need a word definition. Well, that's the 
+  problem. I don't know how to spell it and I'm not allowed to say it. Could you just rattle off all the swear 
+  words you know and I'll stop you when...Hello?”<br>
+  -Bill Watterson, <i>Calvin &amp; Hobbes</i></div></p>
+  
+  <p>Welcome to lesson seven, an exploration of <b>references</b> in Perl.</p>
+
+      
+ <a href="Perl3-07.html" name="references_to_scalars"></a>
+ <a name="h_01"></a><div class="heading">References to Scalars</div><div class="headingText">
+ 
+  <p>I've claimed, "this is a really important and useful feature of Perl!" so often, I must sound 
+   like a cross between an infomercial presenter and a politician. But trust me, all the great stuff I've told you about Perl is true! 
+   But wait—there's more! Here's yet another great Perl feature: <b>references</b>. </p>
+   
+   <p>References are scalars that point, or <i>refer to</i>,  
+    data somewhere else. When you want use the values they point to, you dereference the references. </p>
+         
+   <p>So far you've seen that scalars can contain strings, numbers, or filehandles (or 
+   directory handles, which are a lot like filehandles). But a reference is an entirely new element 
+   for a scalar to contain.</p>
+   
+  <p>References unlock the door to all the kinds of data representation and 
+   processing that you can do in Perl. The most advanced Perl programs depend on references. We'll spend most 
+   of the rest of this course learning about references in all their glory, which will enable you to 
+   write programs for complex data manipulation. And, if you go on to our fourth Perl course, 
+   we'll use that knowledge of references to do object-oriented programming for
+   everything from e-mail to databases. Perl references are a really big deal!</p>
+    
+  <p>We'll start with the basics; making and using references to scalars. But first, let me tell you 
+   what a Perl reference is <i>not:</i> it is <i>not</i> the same as a C/C++ pointer. (Don't worry if you're not familiar with 
+   C or C++.) Even though I will be using diagrams containing arrows, and I may use the phrase "points to" when 
+   talking about references, a reference in Perl 
+   can be used for only one thing: getting back the thing to which it points. You <i>cannot</i> perform "pointer 
+    arithmetic" on Perl references (if you're not familiar with pointer arithmetic, that's okay too).</p>
+     
+  <p>In order to make a reference to a named <span class="darkblue">scalar</span> in our code, we type a <span class="green">backslash</span> 
+   before the scalar; the result of that expression is the <span class="darkred">reference</span> to that scalar:</p>
+     
+<div class="observeBox"><div class="observeTitle">OBSERVE:</div><div class="observe"><pre>
+<span class="darkred">$scalar_ref</span> = <span class="green">\</span><span class="darkblue">$scalar</span>;
+</pre></div></div>
+        
+  <p>At first it may seem odd to use the backslash as a operator for forming a reference; so far we've only seen the backslash 
+  as an escape character or part of a digraph, but that was from inside of strings or regexes. Now our 
+   backslash occurs within program code. Let's try an example. Create <b>scalar_ref.pl</b> in your 
+   <b>/perl3</b> folder as shown:</p>
+     
+<div class="listingBox"><div class="listingTitle">CODE TO TYPE:</div><div class="listing"><pre>#!/usr/bin/perl
+use strict;
+use warnings;
+
+my $marsupial = 'wallaby';
+
+my $creature_ref = \$marsupial;
+
+print $$creature_ref, "\n";
+</pre></div></div>
+     
+  <p><img src="images/coderunner/checksyntax.JPG"> and run it as shown:</p>
+  
+<div class="interactiveBox"><div class="interactiveTitle">INTERACTIVE SESSION:</div><div class="interactive"><pre>
+code:~$ <ins>cd perl3</ins>
+cold:~/perl3$ <ins>./scalar_ref.pl</ins>
+wallaby
+</pre></div></div>
+     
+  <p>Okay, so that may not have been super exciting, but hey—we gotta start somewhere, right? In addition 
+   to <i>taking</i> a reference, we've shown you what to do with it: you can get back the scalar it refers to by 
+   putting a dollar sign (<span class="green">$</span>) in front of the <span class="darkblue">reference</span>, like this: </p>
+     
+<div class="observeBox"><div class="observeTitle">OBSERVE:</div><div class="observe"><pre>
+$scalar = <span class="green">$</span><span class="darkblue">$scalar_ref</span>
+</pre></div></div>
+     
+  <p>At first, that construction may seem odd too because it brings to mind the special variable 
+   <b>$$</b> (which is the current process ID). Or it may just seem odd because, like the backslash, we haven't
+   thought of a dollar sign as an operator before. And yet here both of those symbols are being pressed into service as operators. The 
+   different syntactical contexts in which they are used allow those symbols to be used for varied purposes. </p>
+     
+  <p>Here's a visual aid for the reference to help makes this a bit more clear:</p>
+     
+  <p><div class="c"><img src="images/lessonImages/scalar_ref.png"></div></p>
+     
+  <p>In this diagram the reference arrow points to the data that is stored in the variable with 
+    the name <b>$marsupial;</b> not at the name <b>$marsupial</b> itself. This distinction will become increasingly important as we 
+   go on through the lessons.</p>
+     
+  <p>Now, if you're curious—and I hope you are—you probably already wondered what's inside of that orange blob in the  
+   <b>$scalar_ref</b> and what you can do with it. So let's do some experimentation 
+   with it to see what happens. (I encourage you to try this kind of thing yourself all the time—be fearless! You can't 
+   break our system. The worst that could happen is that you encounter something strange and you have to 
+   ask your instructor for help. No problem.) Modify the program as shown:</p>
+     
+<div class="listingBox"><div class="listingTitle">CODE TO TYPE:</div><div class="listing"><pre>
+#!/usr/bin/perl
+use strict;
+use warnings;
+
+my $marsupial = 'wallaby';
+
+my $creature_ref = \$marsupial;
+
+print $$creature_ref, "\n";
+<ins>print "\$creature_ref = $creature_ref\n";</ins>
+</pre></div></div>
+     
+  <p><img src="images/coderunner/checksyntax.JPG"> and run it as shown:</p>
+
+<div class="interactiveBox"><div class="interactiveTitle">INTERACTIVE SESSION:</div><div class="interactive"><pre>cold:~/perl3$ <ins>./scalar_ref.pl</ins>
+wallaby
+$creature_ref = SCALAR(0x94a26fc)
+</pre></div></div>
+     
+  <p>That's really interesting! I bet you didn't see that coming. It's Perl's way of saying, "This is a reference 
+   to a scalar." (The hexadecimal number may be different on your screen, that's okay.)</p>
+     
+  <p>We just printed out a scalar as a <i>string</i> (by interpolating it inside double quotation marks).
+   I wonder if it would look different if we printed it as a <i>number</i>? Some special 
+   variables in Perl can behave differently when treated as numbers instead of strings. We can force Perl to 
+   interpret a scalar as a number by performing an arithmetic operation on the scalar that expects it to be a number, 
+   but won't change the value of that number. Adding or subtracting zero, or multiplying or dividing by one 
+   will do that. Modify <b>scalar_ref.pl</b> as shown: </p>
+     
+<div class="listingBox"><div class="listingTitle">CODE TO TYPE:</div><div class="listing"><pre>
+#!/usr/bin/perl
+use strict;
+use warnings;
+
+my $marsupial = 'wallaby';
+
+my $creature_ref = \$marsupial;
+
+print $$creature_ref, "\n";
+print "\$creature_ref = $creature_ref\n";
+<ins>print "\$creature_ref = ", $creature_ref + 0, "\n";</ins>
+</pre></div></div>
+     
+  <p><img src="images/coderunner/checksyntax.JPG"> and run it as shown:</p>
+
+<div class="interactiveBox"><div class="interactiveTitle">INTERACTIVE SESSION:</div><div class="interactive"><pre>cold:~/perl3$ <ins>./scalar_ref.pl</ins>
+wallaby
+$creature_ref = SCALAR(0x928d6fc)
+$creature_ref = 155854588
+</pre></div></div>
+     
+  <p>Look at that: the reference is also a number. And you're probably thinking, "Is it the same number 
+   as the hexadecimal string in parentheses?" You can perform this test to find your answer.
+   Modify <b>scalar_ref.pl</b> as shown:</p>
+    
+<div class="listingBox"><div class="listingTitle">CODE TO TYPE:</div><div class="listing"><pre>#!/usr/bin/perl
+use strict;
+use warnings;
+
+my $marsupial = 'wallaby';
+
+my $creature_ref = \$marsupial;
+
+print $$creature_ref, "\n";
+print "\$creature_ref = $creature_ref\n";
+<del>print "\$creature_ref = ", $creature_ref + 0, "\n";</del>
+<ins>printf "\$creature_ref = %x\n", $creature_ref;</ins>
+</pre></div></div>
+     
+  <p>(We no longer need to add zero because the <b>%x</b> format specified in 
+   <span class="darkgreen">printf()</span> will impose a numeric context.)</p> 
+
+   <p><img src="images/coderunner/checksyntax.JPG"> and run it as shown:</p>
+
+<div class="interactiveBox"><div class="interactiveTitle">INTERACTIVE SESSION:</div><div class="interactive"><pre>
+cold:~/perl3$ <ins>./scalar_ref.pl</ins>
+wallaby
+$creature_ref = SCALAR(0x928d6fc)
+$creature_ref = 928d6fc
+</pre></div></div>
+     
+  <p>That's not so surprising. If Perl has a cryptic hexadecimal number in a reference's string value and 
+   a cryptic number associated with the same reference's numeric value, it makes sense that they would be the same 
+   number.</p>
+     
+   <p>I mentioned earlier that pointer arithmetic was pointless with references. Let's add to it and see what happens. Modify <b>scalar_ref.pl</b> 
+     as shown:</p>
+     
+<div class="listingBox"><div class="listingTitle">CODE TO TYPE:</div><div class="listing"><pre>
+#!/usr/bin/perl
+use strict;
+use warnings;
+
+my $marsupial = 'wallaby';
+
+my $creature_ref = \$marsupial;
+
+print $$creature_ref, "\n";
+print "\$creature_ref = $creature_ref\n";
+printf "\$creature_ref = %x\n", $creature_ref;
+<ins>my $augmented = $creature_ref + 32;
+printf "\$creature_ref + 32 = %x\n", $augmented;
+
+print "\$augmented = $augmented\n";
+print "\$$augmented = ", $$augmented, "\n";</ins>
+</pre></div></div>
+     
+  <p><img src="images/coderunner/checksyntax.JPG"> and run it as shown:</p>
+
+<div class="interactiveBox"><div class="interactiveTitle">INTERACTIVE SESSION:</div><div class="interactive"><pre>
+cold:~/perl3$ <ins>./scalar_ref.pl</ins>
+wallaby
+$creature_ref = SCALAR(0x9bb96fc)
+$creature_ref = 9bb96fc
+$creature_ref + 32 = 9bb971c
+$augmented = 163288860
+Can't use string ("163288860") as a SCALAR ref while "strict refs" in use at ./scalar_ref.pl line 19.
+</pre></div></div>
+     
+  <p>So what happened?  As soon as we added something to the reference, the result was a plain old number; there 
+   was no magic <b>SCALAR(0x...)</b> printed when we put it in a double-quoted string. Attempting to 
+   dereference that result produced an error. </p>
+     
+  <p>The reference has only one really useful ability and that is to get back the thing 
+   it references, by <i>dereferencing</i> it. When our program changed, even the number that was associated with the reference changed. And you
+    may have noticed 
+   that I have never referred to that number as an "address." It may look like an address, but you 
+   can't actually do anything with addresses in Perl. The only guarantee is that references to the same thing will 
+   stringify or numerify to the same values, and references to different things will not. Modify 
+   <b>scalar_ref.pl</b> as shown here: </p>
+     
+<div class="listingBox"><div class="listingTitle">CODE TO TYPE:</div><div class="listing"><pre>
+#!/usr/bin/perl
+use strict;
+use warnings;
+
+my $marsupial = 'wallaby';
+
+my $creature_ref = \$marsupial;
+
+print $$creature_ref, "\n";
+print "\$creature_ref = $creature_ref\n";
+<del>printf "\$creature_ref = %x\n", $creature_ref;
+
+my $augmented = $creature_ref + 32;
+printf "\$creature_ref + 32 = %x\n", $augmented;
+
+print "\$augmented = $augmented\n";
+print "\$$augmented = ", $$augmented, "\n";</del>
+
+<ins>my $ref_copy = $creature_ref;
+print "\$ref_copy     = $ref_copy\n";
+
+my $australian = 'wallaby';
+my $aussie_ref = \$australian;
+
+print "\$aussie_ref   = $aussie_ref\n";</ins>
+</pre></div></div>
+     
+  <p><img src="images/coderunner/checksyntax.JPG"> and run it as shown:</p>
+
+<div class="interactiveBox"><div class="interactiveTitle">INTERACTIVE SESSION:</div><div class="interactive"><pre>
+cold:~/perl3$ <ins>./scalar_ref.pl</ins>
+wallaby
+$creature_ref = SCALAR(0x93276fc)
+$ref_copy     = SCALAR(0x93276fc)
+$aussie_ref   = SCALAR(0x933b78c)
+</pre></div></div>
+
+  <p>The numbers may be different for you, but the important thing to note is that the references 
+   <b>$creature_ref</b> and <b>$ref_copy</b> stringify identically (you can use 
+   <b>eq</b> to test whether they refer to the same thing); and <b>$creature_ref</b> and 
+   <b>$aussie_ref</b> stringify to different strings, because they point to different scalars, even though 
+   the scalars they point to <i>happen</i> to have the same value. </p>
+     
+  <p>Okay, so that's enough about the mechanics of references for now; let's get busy working. We're going to focus more 
+   or less exclusively now on taking references and dereferencing. References to scalars are good, but 
+   references to arrays even better! Let's learn about those.</p>
+ </div>
+ <a href="Perl3-07.html" name="references_to_arrays"></a>
+ <a name="h_02"></a><div class="heading">References to Arrays</div><div class="headingText">
+   
+  <p>For our next example, we'll use a reference to an array with the backslash operator, just like we did before:</p>
+   
+<div class="observeBox"><div class="observeTitle">OBSERVE:</div><div class="observe"><pre>
+$array_ref = \@array;
+</pre></div></div>
+   
+  <p>Create <b>array_ref.pl</b> in your <b>/perl3</b> folder as shown:</p>
+   
+<div class="listingBox"><div class="listingTitle">CODE TO TYPE:</div><div class="listing"><pre>#!/usr/bin/perl
+use strict;
+use warnings;
+
+my @snakes = qw(adder coral cobra garter asp);
+
+my $reptiles_ref = \@snakes;
+
+my $index;
+printf "%d $_\n", $index++ for @$reptiles_ref;
+</pre></div></div>
+     
+  <p><img src="images/coderunner/checksyntax.JPG"> and run it as shown:</p>
+
+<div class="interactiveBox"><div class="interactiveTitle">INTERACTIVE SESSION:</div><div class="interactive"><pre>
+cold:~/perl3$ <ins>./array_ref.pl</ins>
+0 adder
+1 coral
+2 cobra
+3 garter
+4 asp
+</pre></div></div>
+    
+  <p>Perl is very consistent in its reference syntax: to dereference a reference to an array, put an at sign 
+   (<b>@</b>) in front of it; this will return the contents of the array. Here's a graphic representation to help you visualize
+   and understand array references: </p>
+      
+  <p><div class="c"><img src="images/lessonImages/array_ref.png"></div></p>
+   
+  <p>When you have a reference to something, it provides you with a way to change that relative data. Create 
+   <b>ref_mod.pl</b> in your <b>/perl3</b> folder as shown: </p>
+   
+<div class="listingBox"><div class="listingTitle">CODE TO TYPE:</div><div class="listing"><pre>#!/usr/bin/perl
+use strict;
+use warnings;
+
+{
+  my $marsupial = 'wallaby';
+  my $creature_ref = \$marsupial;
+
+  my @snakes = qw(adder coral cobra garter asp);
+  my $reptiles_ref = \@snakes;
+
+  modify_refs( $creature_ref, $reptiles_ref );
+
+  print "\$marsupial = $marsupial\n";
+  print "\@snakes = @snakes\n";
+}
+
+sub modify_refs
+{
+  my ($scalar_ref, $array_ref) = @_;
+
+  $$scalar_ref .= ' stew';
+  pop @$array_ref;
+}</pre></div></div>
+     
+  <p><img src="images/coderunner/checksyntax.JPG"> and run it as shown:</p>
+
+<div class="interactiveBox"><div class="interactiveTitle">INTERACTIVE SESSION:</div><div class="interactive"><pre>
+cold:~/perl3$ <ins>./ref_mod.pl</ins>
+$marsupial = wallaby stew
+@snakes = adder coral cobra garter
+</pre></div></div>
+   
+  <p>Even from deep inside that subroutine, your reference was able to modify <b>$marsupial</b> 
+    and <b>@snakes</b> through the references to them, even though the variables they referred to were no 
+   longer in scope during that subroutine. Remember, references point to <i>storage:</i> the data 
+   <i>stored</i> in the variable for which you've taken a reference.</p>
+   
+   <p>Everywhere you can use a scalar variable like <b>$marsupial</b>, you can use a dereferenced
+     reference to a scalar: <b>$$creature_ref</b>. In the subroutine above we copied the reference 
+     <b>$creature_ref</b> into <b>$scalar_ref</b> (it still points to the same thing—we 
+     established that behavior earlier) and we were able to use the dereferenced reference as an <b>lvalue</b> 
+     (an <b>lvalue</b> is an expression that you can write on the left hand side of an assignment statement; it 
+   defines a specific memory address of a variable) to
+   modify the original data. The same goes for the array reference.</p>
+   
+  <p>You can use an array reference anywhere you'd have the <i>name</i> portion of an array (the identifier that
+    comes after the <b>@</b> sigil—a sigil is the bit of punctuation that tells Perl what sort of variable is being used) in code; 
+    this program gives some examples of those constructions so you 
+      can see what I mean. Create <b>array_ref_ex.pl</b> in your <b>/perl3</b> folder as shown:</p>
+   
+<div class="listingBox"><div class="listingTitle">CODE TO TYPE:</div><div class="listing"><pre>#!/usr/bin/perl
+use strict;
+use warnings;
+
+my @countries = qw(Sudan Sweden Switzerland Surinam Singapore);
+my $countries_ref = \@countries;
+
+print "Array     in scalar context: " . @countries      . "\n";
+print "Array ref in scalar context: " . @$countries_ref . "\n";
+
+print "Array in list context:     ", @countries,      "\n";
+print "Array ref in list context: ", @$countries_ref, "\n";
+
+print "Third member of array:      $countries[2]\n";
+print "Third member via array ref: $$countries_ref[2]\n";
+
+print "Index of last element of array:      $#countries\n";
+print "Index of last element via array ref: $#$countries_ref\n";
+</pre></div></div>
+   
+  <p><img src="images/coderunner/checksyntax.JPG"> and run it as shown:</p>
+
+<div class="interactiveBox"><div class="interactiveTitle">INTERACTIVE SESSION:</div><div class="interactive"><pre>
+cold:~/perl3$ <ins>./array_ref_ex.pl</ins>
+Array     in scalar context: 5
+Array ref in scalar context: 5
+Array in list context:     SudanSwedenSwitzerlandSurinamSingapore
+Array ref in list context: SudanSwedenSwitzerlandSurinamSingapore
+Third member of array:      Switzerland
+Third member via array ref: Switzerland
+Index of last element of array:      4
+Index of last element via array ref: 4
+</pre></div></div>
+   
+  <p>Do you see what I mean?  If you want to know how to do a particular operation with an array reference, 
+   just ask yourself how you'd do it with an array named, for instance, <b>@foo</b>, and replace the <b>foo</b>
+   part of the construction with the reference.</p>   
+         
+  <p>Take another look at the graphical representation of the array reference. I made sure to draw a
+   distinction between an array and the scalars that are contained within it. What do you suppose <i>this</i>
+   diagram represents?:</p>
+   
+  <p><div class="c"><img src="images/lessonImages/element_ref.png"></div></p>
+   
+  <p>That's a reference to an array <i>element</i> rather than the whole array. So what kind of reference is 
+   it? It's a reference to a <i>scalar!</i> Create <b>element_ref.pl</b> in your <b>/perl3</b> folder as 
+   shown:</p>
+   
+<div class="listingBox"><div class="listingTitle">CODE TO TYPE:</div><div class="listing"><pre>#!/usr/bin/perl
+use strict;
+use warnings;
+
+my @snakes = qw(adder coral cobra garter asp);
+my $reptile_ref = \$snakes[2];
+
+print "\$reptile_ref looks like $reptile_ref\n";
+
+$$reptile_ref = 'boa';
+
+print "\@snakes = @snakes\n";</pre></div></div>
+   
+  <p><img src="images/coderunner/checksyntax.JPG"> and run it as shown:</p>
+
+<div class="interactiveBox"><div class="interactiveTitle">INTERACTIVE SESSION:</div><div class="interactive"><pre>
+cold:~/perl3$ <ins>./element_ref.pl</ins>
+$reptile_ref looks like SCALAR(0x9e2b7a4)
+@snakes = adder coral boa garter asp
+</pre></div></div>
+   
+  <p>The reference <b>$reptile_ref</b> is a scalar reference, and we can use it to modify 
+   the element of the array to which it points. (We <i>cannot</i> use our reference to get at the array itself or any other 
+   element of the array.)</p>
+  
+ </div>
+ <a href="Perl3-07.html" name="anonymous_references"></a>
+  <a name="h_03"></a><div class="heading">Anonymous References</div><div class="headingText">
+   
+  <p>You may have noticed that I tend to repeat myself. It isn't because I don't have confidence in your ability 
+    to catch information the first time around. I repeat important information to help you retain it—and there's a lot of it. 
+    So let me reiterate here, 
+    references point to the data that is stored in a scalar or array, not to the
+   name of that scalar or array. In fact, given a reference, you cannot retrieve the name of the thing that it 
+   points to, only the data stored in it. And frequently we write subroutines that expect one or more 
+   references in their arguments, so we end up passing references around our code like ordinary data. So, what 
+   if we don't actually <i>need</i> a named variable at all, because we plan to use only references?</p>
+   
+  <p>Suppose we have a subroutine and its purpose is to return an array reference for later use.
+    Create <b>anon_ref.pl</b> in your <b>/perl3</b> folder as shown:</p>
+   
+<div class="listingBox"><div class="listingTitle">CODE TO TYPE:</div><div class="listing"><pre>#!/usr/bin/perl
+use strict;
+use warnings;
+
+my $day_ref = make_day_ref( 'German' );
+
+print "Der dritte tag der woche ist $$day_ref[2]\n";
+
+
+sub make_day_ref
+{
+  my $language = shift;
+
+  my @english_names = qw(Sunday Monday Tuesday Wednesday Thursday Friday Saturday);
+  my @french_names  = qw(Dimanche Lundi Mardi Mercredi Jeudi Vendredi Samedi);
+  my @german_names  = qw(Sonntag Montag Dienstag Mittwoch Donnerstag Freitag Samstag);
+  if ( $language eq 'English' )
+  {
+    return \@english_names;
+  }
+  elsif ( $language eq 'French' )
+  {
+    return \@french_names;
+  }
+  elsif ( $language eq 'German' )
+  {
+    return \@german_names;
+  }
+  else
+  {
+    die "Unrecognized language $language";
+  }
+}
+</pre></div></div>
+   
+  <p><img src="images/coderunner/checksyntax.JPG"> and run it (you know what to do):</p>
+
+<div class="interactiveBox"><div class="interactiveTitle">INTERACTIVE SESSION:</div><div class="interactive"><pre>
+cold:~/perl3$ <ins>./anon_ref.pl</ins>
+Der dritte tag der woche ist Dienstag
+</pre></div></div>
+   
+  <p>This code could be a good start to internationalizing a program. But look how long our 
+   routine <b>make_day_ref</b> is. Essentially it's just defining data. So, what's the point in 
+   defining the names <b>@english_names</b>, <b>@french_names</b>, and so on, when we only use them once, in 
+   order to take a reference?</p>
+   
+  <p>The answer lies in a new piece of Perl syntax, the <b>anonymous array reference constructor</b>. That's quite 
+    a mouthful! The <b>anonymous array reference constructor</b> is an expression that returns a reference to 
+    an array that we never bothered putting into 
+   a named variable before, so we put <b>square brackets</b> around the 
+   <i><b>list</b></i> we want in that array instead, like this:</p>
+   
+<div class="observeBox"><div class="observeTitle">OBSERVE:</div><div class="observe"><pre>
+$array_ref = <span class="blue">[</span> <i><span class="darkred">list</span></i> <span class="blue">]</span>
+</pre></div></div>
+   
+  <p>Let's see that at work; modify <b>anon_ref.pl</b> as shown:</p>
+  
+<div class="listingBox"><div class="listingTitle">CODE TO TYPE:</div><div class="listing"><pre>
+#!/usr/bin/perl
+use strict;
+use warnings;
+
+my $day_ref = make_day_ref( 'German' );
+
+print "Der dritte tag der woche ist $$day_ref[2]\n";
+
+
+sub make_day_ref
+{
+  my $language = shift;
+<del>
+  my @english_names = qw(Sunday Monday Tuesday Wednesday Thursday Friday Saturday);
+  my @french_names  = qw(Dimanche Lundi Mardi Mercredi Jeudi Vendredi Samedi);
+  my @german_names  = qw(Sonntag Montag Dienstag Mittwoch Donnerstag Freitag Samstag);</del>
+  if ( $language eq 'English' )
+  {
+    return <del>\@english_names</del> <ins>[ qw(Sunday Monday Tuesday Wednesday Thursday Friday Saturday) ]</ins>;
+  }
+  elsif ( $language eq 'French' )
+  {
+    return <del>\@french_names</del> <ins>[ qw(Dimanche Lundi Mardi Mercredi Jeudi Vendredi Samedi) ]</ins>;
+  }
+  elsif ( $language eq 'German' )
+  {
+    return <del>\@german_names</del> <ins>[ qw(Sonntag Montag Dienstag Mittwoch Donnerstag Freitag Samstag) ]</ins>;
+  }
+  else
+  {
+    die "Unrecognized language $language";
+  }
+}</pre></div></div>
+  <p><img src="images/coderunner/checksyntax.JPG"> and run it. The result should be the same as before. But we've 
+   made the code shorter! Now we don't need to think up variable names just to be able to construct 
+   references.</p>
+   
+  <p>The anonymous array ref constructor may look odd; we're used to seeing square brackets used to 
+   delimit array indexes. Don't worry, Perl can tell when you're using them for this purpose.</p>
+   
+  <p>Now you may be wondering whether there is an anonymous scalar ref constructor. There is, but 
+   we don't often have a need for them, so I'll just show it to you briefly:</p>
+   
+<div class="observeBox"><div class="observeTitle">OBSERVE:</div><div class="observe"><pre>
+$scalar_ref = <span class="blue">\</span><i>LITERAL</i>
+</pre></div></div>
+   
+  <p>That's right, you just put a <span class="blue">backslash</span> in front of any literal value to which you want a 
+   reference. For instance:</p>
+   
+<div class="observeBox"><div class="observeTitle">OBSERVE:</div><div class="observe"><pre>
+$e_ref = <span class="blue">\</span>2.71828183;
+$name_ref = <span class="blue">\</span>"Peter";
+</pre></div></div>
+   
+  <p>These anonymous scalar references are <i>immutable</i> (or 
+   "constant," if you like); you can't change them. That quality can be useful in certain circumstances. Try this one-liner:</p>
+   
+<div class="interactiveBox"><div class="interactiveTitle">INTERACTIVE SESSION:</div><div class="interactive"><pre>
+cold:~/perl3$ <ins>perl -le '$s_ref = \"four"; print $$s_ref; $$s_ref = 42'</ins>
+four
+Modification of a read-only value attempted at -e line 1.
+</pre></div></div>
+   
+  <p>That is <i>not</i> true of anonymously-constructed array references:</p>
+   
+<div class="interactiveBox"><div class="interactiveTitle">INTERACTIVE SESSION:</div><div class="interactive"><pre>
+cold:~/perl3$ <ins>perl -le '$a_ref = [ 10..20 ]; print "@$a_ref"; $$a_ref[5] *= 2; print "@$a_ref"'</ins>
+10 11 12 13 14 15 16 17 18 19 20
+10 11 12 13 14 30 16 17 18 19 20
+</pre></div></div>
+   
+  <p>Finally, here's what happens when you stringify (in this case, by printing) an array ref:</p>
+   
+<div class="observeBox"><div class="observeTitle">OBSERVE:</div><div class="observe"><pre>
+cold:~/perl3$ <ins>perl -le '$a_ref = [ 10..20 ]; print $a_ref'</ins>
+ARRAY(0x8cf2158)
+</pre></div></div>
+   
+  <p>There's no real use to printing out a reference, but 
+    sooner or later you'll make the mistake of using a reference  
+   where you meant to use a scalar, and you'll see a string like that instead. But this way you'll know 
+   what it means. </p>
+  
+ </div>
+ 
+ <p>We've only just begun to cover references and you can see already that they are the keys to 
+  "packaging" data to pass around your program. It gets even better from here!</p>
+   
+ <p>Once you finish the lesson, go back to the syllabus to complete the homework.</p>
+   
+<div class="footer"><div id="timeSurvey"></div>				
+				Copyright © 1998-2014 O'Reilly Media, Inc.<br><img src="https://courses.oreillyschool.com/common/cclicense.png"><br>
+				This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 Unported License.<br>
+				See <a href="http://creativecommons.org/licenses/by-sa/3.0/legalcode">http://creativecommons.org/licenses/by-sa/3.0/legalcode</a> 
+				for more information.
+				</div><iframe id="t" width="1" height="1" border="0" style="display:none"></iframe><script language="javascript">bodyLoaded();</script><script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+  ga('create', 'UA-44720547-1', 'oreillyschool.com');
+  ga('send', 'pageview');
+</script></body></html>

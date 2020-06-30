@@ -1,0 +1,898 @@
+<html><!-- Copyright (c) 1998-2014 O'Reilly Media, Inc.
+			This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 Unported License.
+			See http://creativecommons.org/licenses/by-sa/3.0/legalcode for more information.
+            --><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"><link rel="stylesheet" type="text/css" href="../common/Lab.css"><script type="text/javascript" src="../common/Lab.js"></script><script language="javascript"></script><title>References to Subroutines</title></head><body id="body"><a name="top"></a><div class="title">References to Subroutines</div><div class="resize"><a href="Perl3-12.html#top" onclick="changeSize('smaller');" class="aS" title="Keep clicking to make fonts smaller">A</a><a href="Perl3-12.html#top" onclick="changeSize('larger');" class="aL" title="Keep clikcing to make fonts larger">A</a><a href="Perl3-12.html#top" onclick="lv()" class="lv" title="Adjust Page for High Contrast">HC</a><div id="fh"><p>Click on <span class="aS">A</span> to make all fonts on the page smaller.</p><p>Click on <span class="aL">A</span> to make all fonts on the page larger.</p><p>Click on <span class="lv">HC</span> to toggle high contrast mode. When you move your mouse over 
+                 some bold words in high contrast mode, related words are automatically highlighted. Text is shown
+                 in black and white. 
+             </p></div></div><hr>
+  
+  <div class="goalTitle">Lesson Objectives</div><div class="goals"> 
+    
+    When you complete this lesson, you will be able to:
+    <ul><li>apply <a href="Perl3-12.html#coderefs">Coderefs</a>.</li><li>use the <a href="Perl3-12.html#closures">Closure</a> subroutine.</li><li>utilize a few other <a href="Perl3-12.html#miscellaneous_code_reference_notes">miscellaneous Code Reference behaviors.</a></li></ul>
+  </div><hr>
+ 
+ <p>The information about references just keeps coming! You're doing well to keep up with all of it. Good job!
+   </p>
+ 
+
+ <a href="Perl3-12.html" name="coderefs"></a>
+ <a name="h_01"></a><div class="heading">Coderefs</div><div class="headingText">
+ 
+  <p>One of the most interesting types of reference that you can have is to a <i>subroutine</i>. That may 
+   seem a bit mind-boggling to you at first. I mean, how can <i>code</i> be the same as <i>data</i>? 
+    Well, coderefs are an unusual type of reference.  Let's dig in and see how coderefs work! </p>
+  
+  <a name="s_01"></a><div id="s_01"><div class="subheading">References to Named Subroutines</div><div class="subheadingText">
+   
+    <p>In order to create a reference to a subroutine, you type a backslash and then an 
+      ampersand before the name of the subroutine. The syntax goes like this:</p>
+   
+<div class="observeBox"><div class="observeTitle">OBSERVE:</div><div class="observe"><pre>
+$code_ref = \&amp;subroutine_name
+</pre></div></div>
+   
+   <p>We would apply that syntax like this:</p>
+   
+<div class="observeBox"><div class="observeTitle">OBSERVE:</div><div class="observe"><pre>
+sub square
+{
+  my $arg = shift;
+
+  return $arg ** 2;
+}
+
+my $square_ref = \&amp;square; 
+</pre></div></div>
+   
+   <p>Without that ampersand, Perl would think you were <i>calling</i> the routine <b>square</b>, and
+    wanted to take a reference to the results—you actually saw this happen in one of the homework questions in the previous 
+    lesson. If you're wondering why an ampersand, it's possible to <i>call</i> a subroutine by putting
+    an ampersand in front of its name, but that's not considered good practice.</p>
+   
+   <p>To dereference, we use the arrow operator. We use square brackets 
+    after an arrow for an arrayref, curly braces after an arrow for a hashref, so what do you suppose 
+    comes after an arrow for a coderef? We use parentheses, which contain any arguments to 
+    pass to the subroutine:</p>
+   
+<div class="observeBox"><div class="observeTitle">OBSERVE:</div><div class="observe"><pre>print $square_ref-&gt;( 42 );   # 1764
+</pre></div></div>
+   
+   <p>Now try it out for yourself. Create <b>area.pl</b> in your <b>/perl3</b> folder as 
+    shown:</p>
+   
+<div class="listingBox"><div class="listingTitle">CODE TO TYPE:</div><div class="listing"><pre>#!/usr/bin/perl
+use strict;
+use warnings;
+
+my $triangle_ref = \&amp;triangle;
+my $square_ref   = \&amp;square;
+my $pentagon_ref = \&amp;pentagon;
+
+my $side = shift or die;  # Length
+print "Area of triangle of side $side = ", $triangle_ref-&gt;( $side ), "\n";
+print "Area of square of side   $side = ", $square_ref-&gt;( $side ), "\n";
+print "Area of pentagon of side $side = ", $pentagon_ref-&gt;( $side ), "\n";
+
+sub triangle  # Equilateral
+{
+  my $side = shift;
+
+  return sqrt(3) / 4 * $side ** 2 
+}
+
+sub square
+{
+  my $side = shift;
+
+  return $side ** 2;
+}
+
+sub pentagon   # Regular
+{
+  my $side = shift;
+
+  return sqrt(25 + 10 * sqrt(5)) / 4 * $side ** 2;
+}
+</pre></div></div>
+   
+   <p><img src="images/coderunner/checksyntax.JPG"> and run it by typing the commands below as shown:</p>
+   
+<div class="interactiveBox"><div class="interactiveTitle">INTERACTIVE SESSION:</div><div class="interactive"><pre>cold:~$ <ins>cd perl3</ins>
+cold:~/perl3$ <ins>./area.pl 6</ins>
+Area of triangle of side 6 = 15.5884572681199
+Area of square of side 6 = 36
+Area of pentagon of side 6 = 61.9371864212028
+</pre></div></div>
+   
+   <p>The subroutine does <i>not</i> need to appear in the program before your references to 
+    it, because Perl makes two passes through your program. It compiles subroutines on the first 
+    pass, and resolves references on the second.</p>
+   
+   <p>Our next graphical representation of a code reference will be a bit different from those we've seen 
+    before. The code that the reference points to is in your program, not in some dynamically-allocated 
+    memory that gets created, deleted, expanded, or compressed while your program is running. Think 
+    of it like this:</p>
+   
+   <p><div class="c"><img src="images/lessonImages/coderef.png"></div></p>
+  
+   <p>I intentionally drew the arrow to point at the contents of the subroutine <span class="blue">square</span>, and
+    not at the word "square" itself.  Just as with the other references, when using coderefs, you cannot retrieve the name of 
+    what is being referenced. But unlike other 
+    references, you cannot make a new copy of what is being referenced. Any reference to that 
+    code will point to the same code, not a new version. Since you can't change the code that is being 
+    referenced, this distinction is mostly academic.</p>
+   
+   <p>Our polygon area program exhibits some regularity. Let's see what happens when we take advantage of that regularity
+    by putting the coderefs into some data structures. Modify <b>area.pl</b> as shown:</p>
+   
+<div class="listingBox"><div class="listingTitle">CODE TO TYPE:</div><div class="listing"><pre>#!/usr/bin/perl
+use strict;
+use warnings;
+
+<del>my $triangle_ref = \&amp;triangle;
+my $square_ref   = \&amp;square;
+my $pentagon_ref = \&amp;pentagon;</del>
+
+my $side = shift or die;  # Length
+<ins>my @area_refs = ( 0 .. 2, \&amp;triangle, \&amp;square, \&amp;pentagon );
+
+for my $sides ( 3..5 )
+{
+  print "Area of regular $sides-gon of side $side = ",
+        $area_refs[$sides]-&gt;( $side ), "\n";
+}
+
+</ins><del>print "Area of triangle of side $side = ", $triangle_ref-&gt;( $side ), "\n";
+print "Area of square of side   $side = ", $square_ref-&gt;( $side ), "\n";
+print "Area of pentagon of side $side = ", $pentagon_ref-&gt;( $side ), "\n";</del>
+
+sub triangle  # Equilateral
+{
+  my $side = shift;
+
+  return sqrt(3) / 4 * $side ** 2 
+}
+
+sub square
+{
+  my $side = shift;
+
+  return $side ** 2;
+}
+
+sub pentagon   # Regular
+{
+  my $side = shift;
+
+  return sqrt(25 + 10 * sqrt(5)) / 4 * $side ** 2;
+}
+</pre></div></div>
+   
+   <p><img src="images/coderunner/checksyntax.JPG"> and run it as shown:</p>
+
+<div class="interactiveBox"><div class="interactiveTitle">INTERACTIVE SESSION:</div><div class="interactive"><pre>cold:~/perl3$ <ins>./area.pl 7</ins>
+Area of regular 3-gon of side 7 = 21.2176223927187
+Area of regular 4-gon of side 7 = 49
+Area of regular 5-gon of side 7 = 84.3033926288594
+</pre></div></div>
+   
+    <p>Sorry, I couldn't resist playing a little trick on you here. The number of sides that comprise the regular shapes for which we 
+    have area subroutines, are small integers; I represented them using indexes in an array. But it's 
+    more common, and in general more useful, to use a hash as the data structure, like this:</p>
+   
+<div class="listingBox"><div class="listingTitle">CODE TO TYPE:</div><div class="listing"><pre>#!/usr/bin/perl
+use strict;
+use warnings;
+
+<del>my @area_refs = ( 0 .. 2, \&amp;triangle, \&amp;square, \&amp;pentagon );</del>
+<ins>my %area_ref = ( 3 =&gt; \&amp;triangle, 4 =&gt; \&amp;square, 5 =&gt; \&amp;pentagon );</ins>
+
+my $side = shift or die;  # Length
+for my $sides ( 3..5 )
+{
+  print "Area of regular $sides-gon of side $side = ",
+        <del>$area_refs[$sides]-&gt;( $side ), "\n";</del>
+        <ins>$area_ref{$sides}-&gt;( $side ), "\n";</ins>
+}
+
+sub triangle  # Equilateral
+{
+  my $side = shift;
+
+  return sqrt(3) / 4 * $side ** 2 
+}
+
+sub square
+{
+  my $side = shift;
+
+  return $side ** 2;
+}
+
+sub pentagon   # Regular
+{
+  my $side = shift;
+
+  return sqrt(25 + 10 * sqrt(5)) / 4 * $side ** 2;
+}
+</pre></div></div>
+   
+   <p><img src="images/coderunner/checksyntax.JPG"> and run it. You'll see exactly the same 
+    results.</p>
+  
+  </div></div>
+  <a name="s_02"></a><div id="s_02"><div class="subheading">Dispatch Tables</div><div class="subheadingText">
+  
+   <p>Because we're now treating code like data, we can employ a highly useful programming 
+    technique called a <i>dispatch table</i>. Let's see how to use the dispatch table in an example. 
+     There were once text-based adventure games that involved dialogs like this one:</p>
+   
+<div class="observeBox"><div class="observeTitle">OBSERVE:</div><div class="observe"><pre>Command: <ins>look</ins>
+You are in a small cave with torches flickering on the blood-stained walls.
+There are exits to the north, south, and east.
+A hungry troll bars your way.
+There is a sword here.
+Command: <ins>give troll jewel</ins>
+The troll scorns your feeble attempt at appeasement.
+Command: <ins>take sword</ins>
+Taken.
+Command: <ins>kill troll with sword</ins>
+(gory scenes omitted)
+</pre></div></div>
+   
+   <p>We can implement a parser for the commands this game allows by using a separate subroutine for each major verb, 
+    indexed through a hash that will become the dispatch table. It's not necessarily the best way, but we'll use it for now. 
+    Create <b>dispatch.pl</b> in your <b>/perl3</b> folder as shown:</p>
+   
+<div class="listingBox"><div class="listingTitle">CODE TO TYPE:</div><div class="listing"><pre>#!/usr/bin/perl
+use strict;
+use warnings;
+
+my %verb = ( give =&gt; \&amp;give, drop =&gt; \&amp;drop,
+             take =&gt; \&amp;take, kill =&gt; \&amp;kill,
+             look =&gt; \&amp;look, have =&gt; \&amp;inventory, quit =&gt; \&amp;quit );
+
+# Minimum definition of the game to make demonstration work
+
+my %inventory     = ( me =&gt; { jewel =&gt; 1 }, troll =&gt; { diamond =&gt; 1 } );
+my %room_contents = ( cave =&gt; { sword =&gt; 1 } );
+my %location      = ( me =&gt; 'cave', troll =&gt; 'cave', thief =&gt; 'attic' );
+
+for ( prompt(); $_ = &lt;STDIN&gt;; prompt() )
+{
+  chomp;
+  next unless /(\S+)(?:\s+(.+))?/;
+  $verb{$1} or warn "\tI don't know how to $1\n" and next;
+  $verb{$1}-&gt;($2);
+}
+
+sub prompt { print "Command: " }
+
+sub quit { exit }
+
+sub give
+{
+  local $_ = shift;
+  /(\S+)\s+to\s+(\S+)/ or return warn "\tGive what to who?\n";
+  delete $inventory{me}{$1} or return warn "\tYou don't have a $1\n";
+  $inventory{$2}{$1}++;
+  print "\tGiven\n";
+}
+
+sub drop
+{
+  my $what = shift;
+  delete $inventory{me}{$what} or return warn "\tYou don't have a $what\n";
+  my $here = $location{me};
+  $room_contents{$here}{$what}++;
+  print "\tDropped\n";
+}
+
+sub take
+{
+  my $what = shift;
+  my $here = $location{me};
+  delete $room_contents{$here}{$what} or return warn "\tThere's no $what here\n";
+  $inventory{me}{$what}++;
+  print "\tTaken\n";
+}
+
+sub inventory
+{
+  for my $have ( keys %{ $inventory{me} } )
+  {
+    print "\tYou have a $have\n";
+  }
+}
+
+sub look
+{
+  my $here = $location{me};
+  print "\tYou are in the $here\n";
+  for my $around ( keys %{ $room_contents{$here} } )
+  {
+    print "\tThere is a $around on the ground\n";
+  }
+  for my $actor ( keys %location )
+  {
+    next if $actor eq 'me';
+    print "\tThere is a $actor here\n" if $location{$actor} eq $here;
+  }
+}
+
+sub kill
+{
+  local $_ = shift;
+  /(\S+)\s+with\s+(\S+)/ or return warn "\tKill who with what?\n";
+  $inventory{me}{$2} or return warn "\tYou don't have a $2\n";
+  my $here = $location{me};
+  my $its_at = $location{$1} or return warn "\tNo $1 to kill\n";
+  $its_at eq $here or return warn "\tThe $1 isn't here\n";
+  delete $location{$1};
+  my $had_ref = delete $inventory{$1};
+  $room_contents{$here}{$_}++ for keys %$had_ref;
+  print "Dispatched!\n";
+}
+</pre></div></div>
+   
+   <p><img src="images/coderunner/checksyntax.JPG"> and run it as shown:</p>
+
+<div class="interactiveBox"><div class="interactiveTitle">INTERACTIVE SESSION:</div><div class="interactive"><pre>cold:~/perl3$ <ins>./dispatch.pl</ins>
+Command: <ins>look</ins>
+        You are in the cave
+        There is a sword on the ground
+        There is a troll here
+Command: <ins>have</ins>
+        You have a jewel
+Command: <ins>take knife</ins>
+        There's no knife here
+Command: <ins>take sword</ins>
+        Taken
+Command: <ins>look</ins>
+        You are in the cave
+        There is a troll here
+Command: <ins>have</ins>
+        You have a sword
+        You have a jewel
+Command: <ins>kill troll</ins>
+        Kill who with what?
+Command: <ins>kill thief with knife</ins>
+        You don't have a knife
+Command: <ins>kill thief with sword</ins>
+        The thief isn't here
+Command: <ins>kill frog with sword</ins>
+        No frog to kill
+Command: <ins>kill troll with sword</ins>
+Dispatched!
+Command: look
+        You are in the cave
+        There is a diamond on the ground
+Command: <ins>quit</ins>
+</pre></div></div>
+   
+   <p>Is that fun or what? There is so much functionality packed into that little stretch of code! We're 
+   using data structures and references to their maximum advantage. Let's look at what's happening in the 
+    <span class="blue">kill</span> subroutine:</p>
+
+<div class="observeBox"><div class="observeTitle">OBSERVE:</div><div class="observe"><pre>sub kill
+{
+  local $_ = shift;
+  <span class="darkblue">/(\S+)\s+with\s+(\S+)/</span> or return warn "\tKill who with what?\n";
+  <span class="darkgreen">$inventory{me}</span>{<span class="red">$2</span>} or return warn "\tYou don't have a <span class="red">$2</span>\n";
+  my <span class="green">$here</span> = <span class="orange">$location</span>{me};
+  my <span class="blue">$its_at</span> = <span class="orange">$location</span>{<span class="darkred">$1</span>} or return warn "\tNo <span class="darkred">$1</span> to kill\n";
+  <span class="blue">$its_at</span> eq $<span class="green">here</span> or return warn "\tThe <span class="darkred">$1</span> isn't here\n";
+  delete <span class="orange">$location</span>{<span class="darkred">$1</span>};
+  my <span class="purple">$had_ref</span> = delete $<span class="darkgreen">inventory</span>{<span class="darkred">$1</span>};
+  $room_contents{$<span class="green">here</span>}{$_}++ for keys %<span class="purple">$had_ref</span>;
+  print "Dispatched!\n";
+} 
+</pre></div></div>   
+   
+   <ol><li>Use the <span class="darkblue">regex</span> to make sure that the operand matches the phrase 
+     "&lt;<span class="darkred">someone</span>&gt; with &lt;<span class="red">something</span>&gt;". If so, the 
+     "<span class="darkred">someone</span>" will be in <span class="darkred">$1</span> and the "<span class="red">something</span>" will be 
+     in <span class="red">$2</span>.</li><li>Use <span class="darkgreen">$inventory{me}</span> to make sure that I have the "<span class="red">something</span>."</li><li>Get my current <span class="orange">$location</span> into the variable <span class="green">$here</span> to simplify later 
+     expressions.</li><li>Get the <span class="orange">$location</span> of "<span class="darkred">someone ($1)</span>" into <span class="blue">$its_at</span>; 
+     if "<span class="darkred">someone ($1)</span>" doesn't exist, they will have no entry in 
+     <span class="orange">%location</span>, the assignment will be false, and we will return with a warning.</li><li>Verify that the <span class="orange">location</span> of "<span class="darkred">someone</span>" is <span class="green">here</span> 
+     (you can't kill someone in a different room).</li><li>Begin the execution process: remove "<span class="darkred">someone</span>" from the location listing.</li><li>Retrieve a list of items that "<span class="darkred">someone</span>" owned into <span class="purple">$had_ref</span>, and remove it 
+     from the <span class="darkgreen">inventory</span> in the process.</li><li>Add the contents of everything <span class="purple">$had_ref</span> points at to the contents of the 
+     current <span class="orange">location</span>.</li></ol>
+   
+   <p>This program illustrates several advanced Perl techniques&gt; when you get a handle on them, you'll be able to 
+    construct complex data processing programs.</p>
+ 
+  </div></div>
+  <a name="s_03"></a><div id="s_03"><div class="subheading">References to Anonymous Subroutines</div><div class="subheadingText">
+   
+   <p>It seems a little excessive to have to create an entire subroutine <span class="blue">quit</span> just to call 
+     <span class="darkgreen">exit</span>. Can't we just remove the function call and place its contents directly where the 
+     call would be made?  Yes we can, using <i>anonymous</i> 
+    subroutines. We can create references to blocks of code that don't have a subroutine name. Modify <b>dispatch.pl</b> 
+     as shown:</p>
+     
+<div class="listingBox"><div class="listingTitle">CODE TO TYPE:</div><div class="listing"><pre>#!/usr/bin/perl
+use strict;
+use warnings;
+
+ my %verb = ( give =&gt; \&amp;give, drop =&gt; \&amp;drop,
+              take =&gt; \&amp;take, kill =&gt; \&amp;kill,
+              look =&gt; \&amp;look, have =&gt; \&amp;inventory, quit =&gt; <del>\&amp;quit</del> <ins>sub { exit }</ins> );
+
+# Minimum definition of the game to make demonstration work
+
+my %inventory     = ( me =&gt; { jewel =&gt; 1 }, troll =&gt; { diamond =&gt; 1 } );
+my %room_contents = ( cave =&gt; { sword =&gt; 1 } );
+my %location      = ( me =&gt; 'cave', troll =&gt; 'cave', thief =&gt; 'attic' );
+
+for ( prompt(); $_ = &lt;STDIN&gt;; prompt() )
+{
+  chomp;
+  next unless /(\S+)(?:\s+(.+))?/;
+  $verb{$1} or warn "\tI don't know how to $1\n" and next;
+  $verb{$1}-&gt;($2);
+}
+
+sub prompt { print "Command: " }
+
+<del>sub quit { exit }</del>
+
+sub give
+{
+  local $_ = shift;
+  /(\S+)\s+to\s+(\S+)/ or return warn "\tGive what to who?\n";
+  delete $inventory{me}{$1} or return warn "\tYou don't have a $1\n";
+  $inventory{$2}{$1}++;
+  print "\tGiven\n";
+}
+
+sub drop
+{
+  my $what = shift;
+  delete $inventory{me}{$what} or return warn "\tYou don't have a $what\n";
+  my $here = $location{me};
+  $room_contents{$here}{$what}++;
+  print "\tDropped\n";
+}
+
+sub take
+{
+  my $what = shift;
+  my $here = $location{me};
+  delete $room_contents{$here}{$what} or return warn "\tThere's no $what here\n";
+  $inventory{me}{$what}++;
+  print "\tTaken\n";
+}
+
+sub inventory
+{
+  for my $have ( keys %{ $inventory{me} } )
+  {
+    print "\tYou have a $have\n";
+  }
+}
+
+sub look
+{
+  my $here = $location{me};
+  print "\tYou are in the $here\n";
+  for my $around ( keys %{ $room_contents{$here} } )
+  {
+    print "\tThere is a $around on the ground\n";
+  }
+  for my $actor ( keys %location )
+  {
+    next if $actor eq 'me';
+    print "\tThere is a $actor here\n" if $location{$actor} eq $here;
+  }
+}
+
+sub kill
+{
+  local $_ = shift;
+  /(\S+)\s+with\s+(\S+)/ or return warn "\tKill who with what?\n";
+  $inventory{me}{$2} or return warn "\tYou don't have a $2\n";
+  my $here = $location{me};
+  my $its_at = $location{$1} or return warn "\tNo $1 to kill\n";
+  $its_at eq $here or return warn "\tThe $1 isn't here\n";
+  delete $location{$1};
+  my $had_ref = delete $inventory{$1};
+  $room_contents{$here}{$_}++ for keys %$had_ref;
+  print "Dispatched!\n";
+} 
+</pre></div></div>
+     
+     <p><img src="images/coderunner/checksyntax.JPG"> and run it. It will work just like it did before. 
+      You now have the syntax of an anonymous subroutine reference:</p>
+     
+<div class="observeBox"><div class="observeTitle">OBSERVE:</div><div class="observe"><pre>$code_ref = <span class="darkred">sub { ... }</span>
+</pre></div></div>
+     
+   <p><span class="darkred">sub { ... }</span> can appear anywhere you want to have a code reference in your 
+    program. In particular, this enables you to create a subroutine that returns a reference to a 
+    subroutine! We'll explore that in detail a bit later.</p>
+ 
+  </div></div>
+ </div>
+ <a href="Perl3-12.html" name="closures"></a>
+ <a name="h_02"></a><div class="heading">Closures</div><div class="headingText">
+  
+  <p><div class="c">"To hear some people talking about closures, you'd think they were discussing quantum 
+   physics, brain surgery, or VCR programming."<br>
+   -Damian Conway, <i>Object-Oriented Perl</i></div></p>
+  
+   <p>A <b>closure</b> is a subroutine that uses a variable that is defined outside of the subroutine; the 
+   subroutine is said to be <i>closed over</i> the variable.  You already know how to do that. 
+     For example, the <span class="blue">kill</span> routine in <b>dispatch.pl</b> uses the variable 
+   <span class="orange">%location</span>, which is defined outside of itself.</p>
+  
+  <p>The most useful closure is one that uses a variable that isn't global, for example: </p>
+  
+<div class="observeBox"><div class="observeTitle">OBSERVE:</div><div class="observe"><pre>{
+  my <span class="red">$fh</span>;
+
+  sub <span class="blue">open_log</span>
+  {
+    open <span class="red">$fh</span>, '&gt;', $LOG_FILE or die "Can't open $LOG_FILE: $!\n";
+  }
+  sub <span class="blue">write_log</span>
+  {
+    print {<span class="red">$fh</span>} localtime().": @_\n";
+  }
+}  
+</pre></div></div>
+  
+  <p>The two subroutines <span class="blue">open_log</span> and <span class="blue">write_log</span> are the only pieces of code 
+   that can use the variable <span class="red">$fh</span>, because it is contained within the naked block.</p>
+  
+  <p>An even <i>more</i> useful kind of closure will have its code inside an anonymous subroutine. 
+   One application of this is the technique known as <b>currying</b>, which allows you to 
+    create a subroutine dynamically that acts like another subroutine, with some of its arguments fixed to certain 
+   values. </p>
+  
+  <p>That's easier done than said though. Create <b>curry.pl</b> in the usual <b>/perl3</b> 
+   folder:</p>
+  
+<div class="listingBox"><div class="listingTitle">CODE TO TYPE:</div><div class="listing"><pre><ins>#!/usr/bin/perl
+use strict;
+use warnings;
+
+sub add
+{
+  my ($left, $right) = @_;
+
+  return $left + $right;
+}
+
+sub make_adder
+{
+  my $operand = shift;
+
+  return sub { add( $operand, @_ ) };
+}
+
+
+my $add_three = make_adder( 3 );
+my $add_seven = make_adder( 7 );
+
+my $i = 12;
+
+print "\$i = $_\n" for $i, $add_three-&gt;($i), $add_seven-&gt;($i);
+</ins></pre></div></div>
+  
+  <p><img src="images/coderunner/checksyntax.JPG"> and run it as shown:</p>
+  
+<div class="interactiveBox"><div class="interactiveTitle">INTERACTIVE SESSION:</div><div class="interactive"><pre>cold:~/perl3$ <ins>./curry.pl</ins>
+$i = 12
+$i = 15
+$i = 19
+</pre></div></div>
+  
+  <p>I admit, this isn't the most exciting example, but it does demonstrate the concept of currying well.
+     Let's go over it in detail:</p> 
+  
+<div class="observeBox"><div class="observeTitle">OBSERVE:</div><div class="observe"><pre>#!/usr/bin/perl
+use strict;
+use warnings;
+
+sub add
+{
+  my ($left, $right) = <span class="orange">@_</span>;
+
+  return $left + $right;
+}
+
+sub <span class="darkblue">make_adder</span>
+{
+  my <span class="darkred">$operand</span> = shift;
+
+  return sub { add( <span class="darkred">$operand</span>, <span class="orange">@_</span> ) };
+}
+
+
+my $add_three = <span class="darkblue">make_adder</span>( 3 );
+my $add_seven = <span class="darkblue">make_adder</span>( 7 );
+
+my $i = 12;
+
+print "\$i = $_\n" for $i, $add_three-&gt;($i), $add_seven-&gt;($i);
+</pre></div></div>
+  
+  <p>The anonymous subroutine is closed over the variable <span class="darkred">$operand</span>. Each coderef that 
+   is returned from <span class="darkblue">make_adder</span> is to the <i>same</i> piece of code, but each 
+   coderef has a <i>different</i> idea of what <span class="darkred">$operand</span> contains: it's whatever
+   it contained at the time the anonymous subroutine was constructed. The <span class="orange">@_</span> inside the
+   anonymous code refers to the parameters that are passed to the coderef when it is called, <i>not</i>
+    the parameters that are passed to the enclosing subroutine (in this case, <span class="blue">make_adder</span>).</p>
+  
+  <p>This is the basis for much more complex, and more useful code. We'll try out a more practical 
+   example here, using a program from an earlier lesson.</p>
+  
+  <p>Open <b>stock.pl</b>, click the <b>Save As</b> 
+   icon (<img src="images/coderunner/saveas.gif">) and save it as <b>stock2.pl</b> 
+   in your <b>/perl3</b> folder. Now make these changes:</p>
+
+<div class="listingBox"><div class="listingTitle">CODE TO TYPE:</div><div class="listing"><pre>#!/usr/bin/perl
+use strict;
+use warnings;
+
+<del>my $stock_ref = get_stock_ref( 'INSECTS' );
+print "I have $$stock_ref{ants} ants\n";</del>
+
+my @DATA = &lt;DATA&gt;;
+
+<ins>my $insect_ref = get_stock_ref( 'INSECTS' );
+my $fish_ref = get_stock_ref( 'FISH' );
+print "I have ", $insect_ref-&gt;( 'ants' ), " ants\n";
+print "I have ", $fish_ref-&gt;( 'guppies' ), " guppies\n";
+print "When looking under insects:\n";
+$insect_ref-&gt;( 'guppies' );</ins>
+
+sub get_stock_ref
+{
+  my $seeking = shift;
+
+  <del>my (@data, $type);
+  while ( &lt;DATA&gt; )
+  {
+    if ( ( my ($what, $number) = /(.*)\s+(\d+)/ ) &amp;&amp; ( $type eq $seeking ) )
+    {
+      push @data, $what, $number;
+    }
+    elsif ( /(\S+)/ )
+    {
+      $type = $1;
+    }
+    else
+    {
+      next;
+    }
+  }
+  return { @data };</del>
+  
+  <ins>return sub {
+    my $want = shift;
+    my $type;
+    for ( @DATA )
+    {
+      if ( ( my ($what, $number) = /(.*)\s+(\d+)/ ) &amp;&amp; ( $type eq $seeking ) )
+      {
+        return $number if $what eq $want;
+      }
+      elsif ( /(\S+)/ )
+      {
+        $type = $1;
+      }
+      else
+      {
+        next;
+      }
+    }
+    die "Couldn't find any $want\n";
+  };</ins>
+}
+
+__END__
+
+INSECTS
+ants 1000000
+beetles 200000
+
+MAMMALS
+aardvarks 4
+antelopes 3
+
+FISH
+guppies 10
+angel fish 40
+king crabs 10
+</pre></div></div>
+  
+  <p><img src="images/coderunner/checksyntax.JPG"> and run it as shown:</p>
+  
+<div class="interactiveBox"><div class="interactiveTitle">INTERACTIVE SESSION:</div><div class="interactive"><pre>cold:~/perl3$ <ins>./stock2.pl</ins>
+I have 1000000 ants
+I have 10 guppies
+When looking under insects:
+Couldn't find any guppies
+</pre></div></div>
+  
+   <p>Here we've created routines that specialize in searching <i>insects</i> and <i>fish</i>, 
+     respectively.</p>
+
+  <a name="s_01"></a><div id="s_01"><div class="subheading">Callbacks</div><div class="subheadingText">
+   
+    <p>A <i>callback</i> is a subroutine reference passed to another subroutine to be executed as part of 
+      some other code. Essentially, it lets you turn a program <i>inside-out</i>. We'll give it a try. Suppose you have written 
+      some code that goes through all of the files in a directory. Create <b>files.pl</b> in 
+      your <b>/perl3</b> folder as shown:</p>
+         
+<div class="listingBox"><div class="listingTitle">CODE TO TYPE:</div><div class="listing"><pre><ins>#!/usr/bin/perl
+use strict;
+use warnings;
+
+process_directory( shift || '.' );
+
+sub process_directory
+{
+  my $dir = shift;
+
+  opendir my $dh, $dir or die "Couldn't open $dir: $!\n";
+  while ( my $file = readdir $dh )
+  {
+    next if $file =~ /\A\.\.?\z/;
+    print "Found an executable file: $file\n" if -x $file;
+  }
+}</ins>
+</pre></div></div>
+ 
+    <p><img src="images/coderunner/checksyntax.JPG"> and run it (the results may not match exactly):</p>
+ 
+<div class="interactiveBox"><div class="interactiveTitle">INTERACTIVE SESSION:</div><div class="interactive"><pre>cold:~/perl3$ <ins>./files.pl</ins>
+Found an executable file: files.pl
+Found an executable file: graphic.pl
+Found an executable file: stock.pl
+Found an executable file: dispatch.pl
+Found an executable file: area.pl
+Found an executable file: curry.pl
+</pre></div></div>
+ 
+    <p>But this isn't very generalizable code. Our routine for processing a directory is specialized to 
+      look for executable files. But we want to pass in <i>behavior</i> as a parameter. A 
+      callback lets us do that. Modify the program as shown:</p>
+    
+<div class="listingBox"><div class="listingTitle">CODE TO TYPE:</div><div class="listing"><pre>#!/usr/bin/perl
+use strict;
+use warnings;
+
+process_directory( shift || '.' <ins>, \&amp;is_executable </ins> );
+
+<ins>sub is_executable
+{
+  my $file = shift;
+
+  print "Found an executable file: $file\n" if -x $file;
+}</ins>
+  
+sub process_directory
+{
+  my $dir = shift;
+  <ins>my $callback = shift;</ins>
+
+  opendir my $dh, $dir or die "Couldn't open $dir: $!\n";
+  while ( my $file = readdir $dh )
+  {
+    next if $file =~ /\A\.\.?\z/;
+    <ins>$callback-&gt;( $file );</ins>
+    <del>print "Found an executable file: $file\n";</del>
+  }
+}
+</pre></div></div>
+
+    <p><img src="images/coderunner/checksyntax.JPG"> and run it. The results will be the same as 
+      before. But now we can make our directory processing code do all kinds of things without having to 
+      rewrite that <span class="darkgreen">readdir()</span> loop every time. Modify your code as shown:</p>
+ 
+<div class="listingBox"><div class="listingTitle">CODE TO TYPE:</div><div class="listing"><pre>#!/usr/bin/perl
+use strict;
+use warnings;
+
+process_directory( shift || '.', <del>\&amp;is_executable</del> <ins>\&amp;print_size</ins> );
+
+<ins>sub print_size
+{
+  my $file = shift;
+
+  print "$file is ", -s $file, " bytes long\n";
+}
+</ins>
+sub is_executable
+{
+  my $file = shift;
+
+  print "Found an executable file: $file\n" if -x $file;
+}
+
+sub process_directory
+{
+  my $dir = shift;
+  my $callback = shift;
+
+  opendir my $dh, $dir or die "Couldn't open $dir: $!\n";
+  while ( my $file = readdir $dh )
+  {
+    next if $file =~ /\A\.\.?\z/;
+    $callback-&gt;( $file );
+  }
+}
+</pre></div></div>
+  
+  <p><img src="images/coderunner/checksyntax.JPG"> and run it:</p>
+  
+<div class="interactiveBox"><div class="interactiveTitle">INTERACTIVE SESSION:</div><div class="interactive"><pre>cold:~/perl3$ <ins>./files.pl</ins>
+files.pl is 514 bytes long
+graphic.pl is 205 bytes long
+stock.pl is 858 bytes long
+dispatch.pl is 2088 bytes long
+area.pl is 523 bytes long
+curry.pl is 335 bytes long
+</pre></div></div>
+  
+    <p>Can you see the power and flexibility that this technique unlocks?</p>
+  
+  </div></div>
+  
+ </div>
+ <a href="Perl3-12.html" name="miscellaneous_code_reference_notes"></a> 
+ <a name="h_03"></a><div class="heading">A Few More Code Reference Notes</div><div class="headingText">
+  
+   <p>Before we close out this lesson you want to be aware of a few more coderef behaviors.</p>
+   
+  <a name="s_01"></a><div id="s_01"><div class="subheading">ref()</div><div class="subheadingText">
+     
+    <p>The result of calling <span class="darkgreen">ref()</span> on a subroutine reference is 
+      <span class="orange">CODE</span>.</p>
+   
+  </div></div>
+  <a name="s_02"></a><div id="s_02"><div class="subheading">Syntax</div><div class="subheadingText">
+   
+    <p>Expressions dereferencing subroutines <i>cannot</i> be interpolated in double-quoted strings. 
+      But you <i>can</i> leave out the arrow between braces and parentheses, for example:</p>
+   
+<div class="observeBox"><div class="observeTitle">OBSERVE:</div><div class="observe"><pre>$area_ref{$sides}( $side ); 
+</pre></div></div>
+   
+    <p>This is not common practice though. Perl programmers are used to arrows when code is being called 
+      by reference, and some of that expectation is due to the syntax for<i> method calls</i>. Method calls are 
+     investigated further in a later course.</p>
+   
+    <p>If you're curious and wondering how you would apply Rule 1 and Rule 2 to dereferencing 
+      subroutine references (and I know that you are!), the answer lies in the ampersand syntax. Check it out:</p>
+   
+<div class="observeBox"><div class="observeTitle">OBSERVE:</div><div class="observe"><pre>&amp;{ <i>expression_returning_coderef</i> }( arguments )
+</pre></div></div>
+   
+    <p>But really, that's so ugly, it's just not worth the trouble.</p>
+    <p>Nice work so far. You've got a handle on references—no easy feat! Next up: exceptions and how 
+    to deal with them. See you in the next lesson!</p>
+    
+  </div></div>
+ </div>
+ 
+  <p>Once you finish the lesson, go back to the syllabus to complete the homework.</p>
+   
+<div class="footer"><div id="timeSurvey"></div>				
+				Copyright © 1998-2014 O'Reilly Media, Inc.<br><img src="https://courses.oreillyschool.com/common/cclicense.png"><br>
+				This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 Unported License.<br>
+				See <a href="http://creativecommons.org/licenses/by-sa/3.0/legalcode">http://creativecommons.org/licenses/by-sa/3.0/legalcode</a> 
+				for more information.
+				</div><iframe id="t" width="1" height="1" border="0" style="display:none"></iframe><script language="javascript">bodyLoaded();</script><script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+  ga('create', 'UA-44720547-1', 'oreillyschool.com');
+  ga('send', 'pageview');
+</script></body></html>

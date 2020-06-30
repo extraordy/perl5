@@ -1,0 +1,1369 @@
+<html><!-- Copyright (c) 1998-2014 O'Reilly Media, Inc.
+			This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 Unported License.
+			See http://creativecommons.org/licenses/by-sa/3.0/legalcode for more information.
+            --><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"><link rel="stylesheet" type="text/css" href="../common/Lab.css"><script type="text/javascript" src="../common/Lab.js"></script><script language="javascript"></script><title>More Math Functions and Course Wrap-Up</title></head><body id="body"><a name="top"></a><div class="title">More Math Functions and Course Wrap-Up</div><div class="resize"><a href="Perl2-15.html#top" onclick="changeSize('smaller');" class="aS" title="Keep clicking to make fonts smaller">A</a><a href="Perl2-15.html#top" onclick="changeSize('larger');" class="aL" title="Keep clikcing to make fonts larger">A</a><a href="Perl2-15.html#top" onclick="lv()" class="lv" title="Adjust Page for High Contrast">HC</a><div id="fh"><p>Click on <span class="aS">A</span> to make all fonts on the page smaller.</p><p>Click on <span class="aL">A</span> to make all fonts on the page larger.</p><p>Click on <span class="lv">HC</span> to toggle high contrast mode. When you move your mouse over 
+                 some bold words in high contrast mode, related words are automatically highlighted. Text is shown
+                 in black and white. 
+             </p></div></div><hr>
+  
+  <div class="goalTitle">Lesson Objectives</div><div class="goals">
+    
+    
+    When you complete this lesson, you will be able to:
+    
+    <ul><li>use additional built-in Perl math functions.</li></ul>
+  </div><hr>
+
+  <p>Welcome to the final lesson of Intermediate Perl! Congratulations on making it to the end of this 
+    course. This lesson will introduce a few new topics, and then we'll develop a relatively long program to 
+    demonstrate what you have learned in this course.</p>
+ 
+ <a name="h_01"></a><div class="heading">More Math Functions</div><div class="headingText">
+   
+   <p>The O'Reilly School of Technology founder, Scott Gray, is a mathematician by vocation and this section 
+     is dedicated to him. (Don't panic if you aren't the same sort of math whiz!) Here are some built-in Perl 
+     functions I haven't mentioned before:</p>
+   
+   <ul><li><span class="darkgreen">sin</span> <span class="red">$arg</span>: sine of <span class="red">$arg</span>, where <span class="red">$arg</span> is in 
+       radians.</li><li><span class="darkgreen">cos</span> <span class="red">$arg</span>: cosine of <span class="red">$arg</span>, where <span class="red">$arg</span> is in 
+       radians.</li><li><span class="darkgreen">atan2</span> <span class="red">$y</span>, <span class="red">$x</span>: arctangent of <span class="red">$y</span>/<span class="red">$x</span> 
+       in radians.<br><br>
+     (Using the above three functions, you can easily derive the familiar functions <span class="darkgreen">tan</span>, 
+       <span class="darkgreen">acos</span>, and <span class="darkgreen">asin</span>.)</li><li><span class="darkgreen">sqrt</span> <span class="red">$x</span>: square root of <span class="red">$x</span>.</li><li><span class="darkgreen">abs</span> <span class="red"></span>: absolute value of <span class="red">$x</span>.</li><li><span class="darkgreen">exp</span> <span class="red">$x</span>: <i>e</i><sup><span class="red">$x</span></sup>.</li><li><span class="darkgreen">log</span> <span class="red">$x</span>: Natural logarithm (base <i>e</i>) of <span class="red">$x</span>.</li></ul>
+   
+   <p>If you want to see additional math functions, there are modules on the Comprehensive Perl Archive Network 
+     for just about everything, although they are outside the scope of this course.</p>
+ 
+ </div>
+ <a name="h_02"></a><div class="heading">crypt()</div><div class="headingText">
+   
+   <p>The <span class="darkgreen">crypt</span> function computes what is most often called a <i>hash</i>, but to 
+     avoid confusion we will call it a <i>digest</i>. Despite its name, the <span class="darkgreen">crypt</span> 
+     function does not perform encryption in the sense that you are most likely to think of it. The 
+     properties of a digest are:</p>
+   
+   <ul><li>It converts a string to another string.</li><li>It can take any length input, but provides an output of small size, fixed or closely bounded in 
+       length.</li><li>The chances of two different inputs, no matter how big, being converted to the same digest by
+       the <span class="darkgreen">crypt</span> function are astronomically small.</li><li>It is impossible to reconstruct any part of the input from a digest.</li><li>You can't figure out what input the <span class="darkgreen">crypt</span> function used to create a digest by 
+       looking at the digest.</li></ul>
+   
+   <p>The <span class="darkgreen">crypt</span> function is handy for performing authentication; 
+     <span class="darkgreen">crypt</span> is the function generally used on Unix and Linux systems for logging in a 
+     user, and it is the function used for authenticating users to most web pages. The properties of a digest 
+     are such that when a password is set, you can compute the digest for it and then store the digest. The 
+     password cannot be extracted from the digest, but when a user signs in and provides a password, you can 
+     run it through <span class="darkgreen">crypt</span> again and, if you get the same digest, you know that user has 
+     the correct password. </p>
+   
+   <p>The <span class="darkgreen">crypt</span> function also takes as argument a <i>salt</i>, which is a random
+     string usually of two characters, that makes it harder for the digest to be used on a different system. 
+     Here's the way to pick a salt, recommended according to <b>perldoc</b>: </p>
+   
+<div class="observeBox"><div class="observeTitle">OBSERVE:</div><div class="observe"><pre>
+sub create_salt
+{
+  my @chars = ('.', '/', 0..9, 'A'..'Z', 'a'..'z');
+  return join '', $chars[rand @chars], $chars[rand @chars];
+}
+</pre></div></div>
+   
+   <p>Then you would call <span class="darkgreen">crypt</span>, like this:</p>
+
+<div class="observeBox"><div class="observeTitle">OBSERVE: Tales from the Crypt</div><div class="observe"><pre>
+my $password = &lt;STDIN&gt;
+chomp $password;
+my $digest = crypt $password, create_salt();
+</pre></div></div>
+   
+   <p><span class="red">$digest</span> always starts with the salt; that way you know which salt to use when verifying a 
+     password later. Perl takes only the necessary characters from the salt argument, so the verification step looks like this: </p>
+   
+<div class="observeBox"><div class="observeTitle">OBSERVE: Password Verification</div><div class="observe"><pre>
+if ( crypt( $input_password, $stored_digest ) eq $stored_digest )
+{
+  # Password is correct
+}
+</pre></div></div>
+  
+ </div>
+ <a name="h_03"></a><div class="heading">Final Example Program</div><div class="headingText">
+   
+   <p>For the final example in this course, we will develop a (relatively) long program from scratch. We 
+     will follow agile programming methods, so there will be many iterations. To give us a real-world type 
+     of task, this program will manage a <span class="darkred">.htpasswd</span> file, which is what the Apache and 
+     other web servers use to authenticate users to password-protected web pages. You don't need to have 
+     used a .htpasswd file before to work through this example. </p>
+   
+   <p><div class="c"><table class="noteBox fBox pBox "><tr><td class="noteTitle">WARNING</td><td class="note">The <span class="blue">htpasswd</span> program that comes with Apache has many more options and abilities 
+     than what we will develop here; our program should <i>not</i> be used as a substitute for 
+     <span class="blue">htpasswd</span>.</td></tr></table></div></p>
+   
+   <p>The <b>.htpasswd</b> file contains one line per user, which contains the username, followed by a colon,
+    followed by the digest of the password. (If you want to store additional information in the file for use in
+    other programs, like the user's email address, you can append it after another colon on each 
+    line.)</p>
+   
+   <p>Let's start! Create <span class="darkred">htmanage.pl</span> as shown:</p>
+
+<div class="listingBox"><div class="listingTitle">CODE TO TYPE: htmanage.pl</div><div class="listing"><pre><ins>#!/usr/bin/perl
+use strict;
+use warnings;
+
+my $Input_File = '.htpasswd';
+
+init( @ARGV );
+run();
+
+sub init
+{
+  my $read_filename;
+
+  while ( @_ )
+  {
+    my $arg = shift;
+    if ( $arg eq '-f')
+    {
+      $read_filename = 1;
+    }
+    elsif ( $read_filename )
+    {
+      $Input_File = $arg;
+      $read_filename = 0;
+    }
+  }
+}
+
+sub run
+{
+  if ( open my $fh, '&lt;', $Input_File )
+  {
+  }
+  else
+  {
+    print "$Input_File does not exist (yet)\n";
+  }
+}</ins>
+</pre></div></div>
+   
+   <p><img src="images/coderunner/checksyntax.JPG"> and run it. Don't give it any arguments just yet, 
+     just verify that it prints <span class="orange">".htpasswd does not exist (yet)"</span>. Our program already 
+     allows for one input argument: <span class="orange">-f</span> followed by a filename allows us to act on a 
+     file other than the default of <b>.htpasswd</b>.</p>
+   
+   <p>Now let's add a built-in test. Modify <span class="darkred">htmanage.pl</span>:</p>
+   
+<div class="listingBox"><div class="listingTitle">CODE TO EDIT: htmanage.pl</div><div class="listing"><pre>#!/usr/bin/perl
+use strict;
+use warnings;
+
+<ins>my $Testing;</ins>
+my $Input_File = '.htpasswd';
+
+init( @ARGV );
+<ins>$Testing and test() or </ins>run();
+
+sub init
+{
+  my $read_filename;
+
+  while ( @_ )
+  {
+    my $arg = shift;
+<del>    if ( $arg eq '-f' )</del>
+<ins>    if ( $arg eq '-t' )
+    {
+      $Testing = 1;
+    }
+    elsif ( $arg eq '-f')</ins>
+    {
+      $read_filename = 1;
+    }
+    elsif ( $read_filename )
+    {
+      $Input_File = $arg;
+      $read_filename = 0;
+    }
+  }
+}
+
+sub run
+{
+  if ( open my $fh, '&lt;', $Input_File )
+  {
+  }
+  else
+  {
+    print "$Input_File does not exist (yet)\n";
+  }
+}
+
+<ins>sub test
+{
+  print "No tests yet!\n";
+}</ins>
+</pre></div></div>
+  
+   <p><img src="images/coderunner/checksyntax.JPG"> and run it with the <span class="orange">-t</span> flag to 
+    perform testing—only there aren't any tests yet. You get the message 
+     <span class="orange">"No tests yet!"</span>. That's okay, we can change that. Modify <b>htmanage.pl</b> as shown:</p>
+   
+<div class="listingBox"><div class="listingTitle">CODE TO EDIT: htmanage.pl</div><div class="listing"><pre>#!/usr/bin/perl
+use strict;
+use warnings;
+
+my $Testing;
+my $Input_File = '.htpasswd';
+<ins>my $TEST_FILE = 'test.htpasswd';</ins>
+  
+init( @ARGV );
+$Testing and test() or run();
+
+sub init
+{
+  my $read_filename;
+
+  while ( @_ )
+  {
+    my $arg = shift;
+    if ( $arg eq '-t' )
+    {
+      $Testing = 1;
+    }
+    elsif ( $arg eq '-f')
+    {
+      $read_filename = 1;
+    }
+    elsif ( $read_filename )
+    {
+      $Input_File = $arg;
+      $read_filename = 0;
+    }
+  }
+}
+
+sub run
+{
+<del>  if ( open my $fh, '&lt;', $Input_File )</del>
+<ins>  my %digest = parse_file( $Input_File );
+}
+
+sub parse_file
+{
+  my $filename = shift;
+  if ( open my $fh, '&lt;', $filename )</ins>  
+  {
+    <ins>return ( foo =&gt; 'bar' );</ins>
+  }
+  else
+  {
+    print "$Input_File does not exist (yet)\n";
+  }
+}
+
+sub test
+{
+<del>  print "No tests yet!\n";</del>
+<ins>  my %test_data = ( scott =&gt; '123', peter =&gt; '456', steve =&gt; '789' );
+  write_file( $TEST_FILE, %test_data );
+  my %test_data_read = parse_file( $TEST_FILE );
+  for my $user ( keys %test_data )
+  {
+    delete $test_data_read{$user} or die "User $user not found";
+  }
+  keys %test_data_read and die "Spurious user(s) found in input";</ins>
+}
+
+<ins>sub write_file
+{
+}</ins>
+</pre></div></div>
+   
+   <p>We started by writing the <span class="darkgreen">test</span> function, then realized that we 
+     need to be able to read and write <span class="darkred">.htpasswd</span> files from there, so we moved the 
+     <span class="darkgreen">open()</span> call to its own subroutine that could be called for file reading. The 
+     <span class="darkgreen">test</span> function verifies that the file reading routine turns a file into a hash  
+     whose keys are the first and second colon-separated fields, respectively, and verifies that the writing 
+     routine turns such a hash into the equivalent file. Study that testing code. The 
+     <span class="darkgreen">delete()</span> function 
+     removes an element from a hash and returns the value that it had, or returns <span class="orange">undef</span> if it 
+     had no value. In a scalar context, <span class="darkgreen">keys()</span> returns the number of elements 
+     in a hash; we are using this to determine whether there is anything left in the comparison hash.</p>
+   
+   <p><img src="images/coderunner/checksyntax.JPG"> and run it in test mode—it fails! 
+     That's because we haven't written the code that it's testing yet. This is a hallmark of test-driven 
+     development. If the test passes before the code is written, there is something wrong with the 
+     test. Let's give our program the right code. Modify your code as shown:</p>
+   
+<div class="listingBox"><div class="listingTitle">CODE TO EDIT: htmanage.pl</div><div class="listing"><pre>#!/usr/bin/perl
+use strict;
+use warnings;
+
+my $Testing;
+my $Input_File = '.htpasswd';
+my $TEST_FILE = 'test.htpasswd';
+
+
+init( @ARGV );
+$Testing and test() or run();
+
+sub init
+{
+  my $read_filename;
+
+  while ( @_ )
+  {
+    my $arg = shift;
+    if ( $arg eq '-t' )
+    {
+      $Testing = 1;
+    }
+    elsif ( $arg eq '-f')
+    {
+      $read_filename = 1;
+    }
+    elsif ( $read_filename )
+    {
+      $Input_File = $arg;
+      $read_filename = 0;
+    }
+  }
+}
+
+sub run
+{
+  my %digest = parse_file( $Input_File );
+}
+
+sub parse_file
+{
+  my $filename = shift;
+
+  if ( open my $fh, '&lt;', $filename )
+  {
+    return ( foo =&gt; 'bar' );
+  }
+  else
+  {
+    print "$Input_File does not exist (yet)\n";
+  }
+}
+
+sub test
+{
+  my %test_data = ( scott =&gt; '123', peter =&gt; '456', steve =&gt; '789' );
+  write_file( $TEST_FILE, %test_data );
+  my %test_data_read = parse_file( $TEST_FILE );
+
+  for my $user ( keys %test_data )
+  {
+<del>    delete $test_data_read{$user} or die "User $user not found";</del>
+<ins>    delete $test_data_read{$user} or warn "User $user not found";</ins>
+  }
+  keys %test_data_read and die "Spurious user(s) found in input";
+}
+
+sub write_file
+{
+<ins>  my ($filename, %data) = @_;
+  open my $fh, '&gt;', $filename or die "Couldn't open $filename for writing: $!\n";
+  print {$fh} "$_:$data{$_}\n" for keys %data;</ins>
+}
+</pre></div></div>
+   
+   <p><img src="images/coderunner/checksyntax.JPG"> and run it.  We changed a <span class="darkgreen">die</span> 
+     to a <span class="darkgreen">warn</span> so we could see more errors caused by the 
+     <span class="darkgreen">parse_file()</span> routine, returning only fixed data. Let's code that routine now (and 
+     change the <span class="darkgreen">warn</span> back to a <span class="darkgreen">die</span>). Modify your code as shown:</p>
+   
+<div class="listingBox"><div class="listingTitle">CODE TO EDIT: htmanage.pl</div><div class="listing"><pre>#!/usr/bin/perl
+use strict;
+use warnings;
+
+my $Testing;
+my $Input_File = '.htpasswd';
+my $TEST_FILE = 'test.htpasswd';
+
+
+init( @ARGV );
+$Testing and test() or run();
+
+sub init
+{
+  my $read_filename;
+
+  while ( @_ )
+  {
+    my $arg = shift;
+    if ( $arg eq '-t' )
+    {
+      $Testing = 1;
+    }
+    elsif ( $arg eq '-f')
+    {
+      $read_filename = 1;
+    }
+    elsif ( $read_filename )
+    {
+      $Input_File = $arg;
+      $read_filename = 0;
+    }
+  }
+}
+
+sub run
+{
+  my %digest = parse_file( $Input_File );
+}
+
+sub parse_file
+{
+  my $filename = shift;
+  <ins>my %second_field;</ins>
+  
+  if ( open my $fh, '&lt;', $filename )
+  {
+<del>    return ( foo =&gt; 'bar' );
+</del><ins>    while ( &lt;$fh&gt; )
+    {
+      chomp;
+      my ($field1, $field2) = split /:/;
+      $second_field{$field1} = $field2;
+    }
+    return %second_field;</ins>
+  }
+  else
+  {
+    print "$Input_File does not exist (yet)\n";
+  }
+}
+
+sub test
+{
+  my %test_data = ( scott =&gt; '123', peter =&gt; '456', steve =&gt; '789' );
+  write_file( $TEST_FILE, %test_data );
+  my %test_data_read = parse_file( $TEST_FILE );
+
+  for my $user ( keys %test_data )
+  {
+    delete $test_data_read{$user} or <del>warn</del><ins>die</ins> "User $user not found";
+  }
+  keys %test_data_read and die "Spurious user(s) found in input";
+<ins>  unlink $TEST_FILE;</ins>
+}
+
+sub write_file
+{
+  my ($filename, %data) = @_;
+
+  open my $fh, '&gt;', $filename or die "Couldn't open $filename for writing: $!\n";
+  print {$fh} "$_:$data{$_}\n" for keys %data;
+}</pre></div></div>
+   
+   <p><img src="images/coderunner/checksyntax.JPG"> and run it with the <span class="orange">-t</span> flag. It
+     should run without errors now. We also want to keep our test clean too, so we remove our test file using 
+     <span class="darkgreen">unlink</span>.</p>
+   
+   <p>Let's handle nonexistent input files properly now, so that they return an empty hash. Because we'll want 
+     to handle the hash of digests in several routines, we'll make it a global variable. And we'll start 
+     filling out a menu-based user interface. Modify your code as shown:</p>
+   
+<div class="listingBox"><div class="listingTitle">CODE TO EDIT: htmanage.pl</div><div class="listing"><pre>#!/usr/bin/perl
+use strict;
+use warnings;
+
+my $Testing;
+my $Input_File = '.htpasswd';
+my $TEST_FILE = 'test.htpasswd';
+<ins>my %Digest;</ins>
+  
+init( @ARGV );
+$Testing and test() or run();
+
+sub init
+{
+  my $read_filename;
+
+  while ( @_ )
+  {
+    my $arg = shift;
+    if ( $arg eq '-t' )
+    {
+      $Testing = 1;
+    }
+    elsif ( $arg eq '-f')
+    {
+      $read_filename = 1;
+    }
+    elsif ( $read_filename )
+    {
+      $Input_File = $arg;
+      $read_filename = 0;
+    }
+  }
+}
+
+sub run
+{
+<del>  my %digest = parse_file( $Input_File );</del>
+<ins>  %Digest = parse_file( $Input_File );
+  for ( menu(); my $command = &lt;STDIN&gt;; menu() )
+  {
+    chomp $command;
+    act_on( $command );
+  }</ins>
+}
+
+<ins>sub menu
+{
+  print "Entries in $Input_File:\n";
+  my @options = make_options();
+  for my $index ( 0 .. $#options )
+  {
+    printf "%2d %s\n", $index, $options[$index];
+  }
+  print "User or Option (0 - $#options)? ";
+}
+
+sub make_options
+{
+  my @options = 'Select to Quit';
+  push @options, ( sort keys %Digest ), 'Select to Add New';
+  return @options;
+}
+
+sub act_on
+{
+  my $command = shift;
+  my @options = make_options();
+  exit if $options[$command] =~ /to Quit/i;
+  $options[$command] =~ /to Add/i  and return ask_add();
+  do_change( $options[$command] );
+}
+
+sub ask_add
+{
+  print "Add: \n";
+}
+
+sub do_change
+{
+  print "Change: \n";
+}</ins>
+  
+sub parse_file
+{
+  my $filename = shift;
+
+  my %second_field;
+  if ( open my $fh, '&lt;', $filename )
+  {
+    while ( &lt;$fh&gt; )
+    {
+      chomp;
+      my ($field1, $field2) = split /:/;
+      $second_field{$field1} = $field2;
+    }
+<del>    return %second_field;</del>  
+  }
+<del>  else</del>
+  <ins>  return %second_field;</ins>
+<del>  {
+    print "$Input_File does not exist (yet)\n";
+  }</del>
+}
+
+sub test
+{
+  my %test_data = ( scott =&gt; '123', peter =&gt; '456', steve =&gt; '789' );
+  write_file( $TEST_FILE, %test_data );
+  my %test_data_read = parse_file( $TEST_FILE );
+
+  for my $user ( keys %test_data )
+  {
+    delete $test_data_read{$user} or die "User $user not found";
+  }
+  keys %test_data_read and die "Spurious user(s) found in input";
+
+  unlink $TEST_FILE;
+}
+
+sub write_file
+{
+  my ($filename, %data) = @_;
+
+  open my $fh, '&gt;', $filename or die "Couldn't open $filename for writing: $!\n";
+  print {$fh} "$_:$data{$_}\n" for keys %data;
+}
+</pre></div></div>
+   
+   <p><img src="images/coderunner/checksyntax.JPG"> and run it. The tests are unchanged, so run it 
+     without the <span class="orange">-t</span> flag. You can enter an option <span class="orange">0</span> 
+     (zero) to quit, but the 'Add' option just prints "Add:". That's alright, we're making progress. 
+     We have the stub of an interface needed to change an existing entry, but since there's 
+     no way to add an entry to a file yet, we have no way of seeing it (unless we 
+     give it an <span class="darkred">.htpasswd</span> file from somewhere else).</p>
+   
+   <p>Let's fill in those new routines so we can add entries. Modify your code as shown: </p>
+   
+<div class="listingBox"><div class="listingTitle">CODE TO EDIT: htmanage.pl</div><div class="listing"><pre>#!/usr/bin/perl
+use strict;
+use warnings;
+
+my $Testing;
+my $Input_File = '.htpasswd';
+my $TEST_FILE = 'test.htpasswd';
+my %Digest;
+
+init( @ARGV );
+$Testing and test() or run();
+
+sub init
+{
+  my $read_filename;
+
+  while ( @_ )
+  {
+    my $arg = shift;
+    if ( $arg eq '-t' )
+    {
+      $Testing = 1;
+    }
+    elsif ( $arg eq '-f')
+    {
+      $read_filename = 1;
+    }
+    elsif ( $read_filename )
+    {
+      $Input_File = $arg;
+      $read_filename = 0;
+    }
+  }
+}
+
+sub run
+{
+  %Digest = parse_file( $Input_File );
+  for ( menu(); my $command = &lt;STDIN&gt;; menu() )
+  {
+    chomp $command;
+    act_on( $command );
+  }
+}
+
+sub menu
+{
+  print "Entries in $Input_File:\n";
+  my @options = make_options();
+
+  for my $index ( 0 .. $#options )
+  {
+    printf "%2d %s\n", $index, $options[$index];
+  }
+  print "User or Option (0 - $#options)? ";
+}
+
+sub make_options
+{
+  my @options = 'Select to Quit';
+  push @options, ( sort keys %Digest ), 'Select to Add New';
+  return @options;
+}
+
+sub act_on
+{
+  my $command = shift;
+
+  my @options = make_options();
+  exit if $options[$command] =~ /to Quit/i;
+<del>  $options[$command] =~ /to Add/i  and return do_add();
+  do_change( $options[$command] );</del>
+<ins>  if ( $options[$command] =~ /to Add/i )
+  {
+    ask_add();
+  }
+  else
+  {
+    do_change( $options[$command] );
+  }
+  write_file( $Input_File, %Digest );
+</ins>}
+
+sub ask_add
+{
+<del>  print "Add: \n";</del>
+<ins>  print "Add (username): ";
+  chomp (my $username = &lt;STDIN&gt;);
+  print "    (password): ";
+  chomp (my $password = &lt;STDIN&gt;);
+  add( $username, $password );
+}
+
+sub add
+{
+  my ($username, $password) = @_;
+  $Digest{$username} = crypt $password, create_salt();
+}
+
+sub create_salt
+{
+  my @chars = ('.', '/', 0..9, 'A'..'Z', 'a'..'z');
+  return join '', $chars[rand @chars], $chars[rand @chars];</ins>
+}
+
+sub do_change
+{
+  print "Change: \n";
+}
+
+sub parse_file
+{
+  my $filename = shift;
+
+  my %second_field;
+  if ( open my $fh, '&lt;', $filename )
+  {
+    while ( &lt;$fh&gt; )
+    {
+      chomp;
+      my ($field1, $field2) = split /:/;
+      $second_field{$field1} = $field2;
+    }
+  }
+  return %second_field;
+}
+
+sub test
+{
+  my %test_data = ( scott =&gt; '123', peter =&gt; '456', steve =&gt; '789' );
+  write_file( $TEST_FILE, %test_data );
+  my %test_data_read = parse_file( $TEST_FILE );
+
+  for my $user ( keys %test_data )
+  {
+    delete $test_data_read{$user} or die "User $user not found";
+  }
+  keys %test_data_read and die "Spurious user(s) found in input";
+
+  unlink $TEST_FILE;
+}
+
+sub write_file
+{
+  my ($filename, %data) = @_;
+
+  open my $fh, '&gt;', $filename or die "Couldn't open $filename for writing: $!\n";
+  print {$fh} "$_:$data{$_}\n" for keys %data;
+}
+</pre></div></div>
+   
+   <p><img src="images/coderunner/checksyntax.JPG"> and run it.  If you select option 
+     <b>1</b> (Add) and create a user, that user appears the next time the menu displays. And now we're 
+     writing out the new file after any addition. </p>
+   
+   <p>Let's start populating the <span class="blue">do_change</span> routine by having it delete an entry if the user 
+     clicks <b>Enter</b>, or else accept a new password. Modify your code as shown:</p>
+   
+<div class="listingBox"><div class="listingTitle">CODE TO EDIT: htmanage.pl</div><div class="listing"><pre>#!/usr/bin/perl
+use strict;
+use warnings;
+
+my $Testing;
+my $Input_File = '.htpasswd';
+my $TEST_FILE = 'test.htpasswd';
+my %Digest;
+
+init( @ARGV );
+$Testing and test() or run();
+
+sub init
+{
+  my $read_filename;
+
+  while ( @_ )
+  {
+    my $arg = shift;
+    if ( $arg eq '-t' )
+    {
+      $Testing = 1;
+    }
+    elsif ( $arg eq '-f')
+    {
+      $read_filename = 1;
+    }
+    elsif ( $read_filename )
+    {
+      $Input_File = $arg;
+      $read_filename = 0;
+    }
+  }
+}
+
+sub run
+{
+  %Digest = parse_file( $Input_File );
+  for ( menu(); my $command = &lt;STDIN&gt;; menu() )
+  {
+    chomp $command;
+    act_on( $command );
+  }
+}
+
+sub menu
+{
+  print "Entries in $Input_File:\n";
+  my @options = make_options();
+
+  for my $index ( 0 .. $#options )
+  {
+    printf "%2d %s\n", $index, $options[$index];
+  }
+  print "User or Option (0 - $#options)? ";
+}
+
+sub make_options
+{
+  my @options = 'Select to Quit';
+  push @options, ( sort keys %Digest ), 'Select to Add New';
+  return @options;
+}
+
+sub act_on
+{
+  my $command = shift;
+
+  my @options = make_options();
+  exit if $options[$command] =~ /to Quit/i;
+  if ( $options[$command] =~ /to Add/i )
+  {
+    ask_add();
+  }
+  else
+  {
+    do_change( $options[$command] );
+  }
+  write_file( $Input_File, %Digest );
+}
+
+sub ask_add
+{
+  print "Add (username): ";
+  chomp (my $username = &lt;STDIN&gt;);
+  print "    (password): ";
+  chomp (my $password = &lt;STDIN&gt;);
+<del>  add( $username, $password );</del>
+<ins>  set( $username, $password );</ins>
+}
+
+<del>sub add</del>
+<ins>sub set</ins>
+{
+  my ($username, $password) = @_;
+
+  $Digest{$username} = crypt $password, create_salt();
+}
+
+sub create_salt
+{
+  my @chars = ('.', '/', 0..9, 'A'..'Z', 'a'..'z');
+  return join '', $chars[rand @chars], $chars[rand @chars];
+}
+
+sub do_change
+{
+<del>  print "Change: \n";</del>
+<ins>  my $username = shift;
+  print "Change $username: Return to delete, or new password: ";
+  chomp( my $input = &lt;STDIN&gt; );
+  if ( $input )
+  {
+    set( $username, $input );
+  }
+  else
+  {
+    delete $Digest{$username};
+  }
+</ins>}
+
+sub parse_file
+{
+  my $filename = shift;
+
+  my %second_field;
+  if ( open my $fh, '&lt;', $filename )
+  {
+    while ( &lt;$fh&gt; )
+    {
+      chomp;
+      my ($field1, $field2) = split /:/;
+      $second_field{$field1} = $field2;
+    }
+  }
+  return %second_field;
+}
+
+sub test
+{
+  my %test_data = ( scott =&gt; '123', peter =&gt; '456', steve =&gt; '789' );
+  write_file( $TEST_FILE, %test_data );
+  my %test_data_read = parse_file( $TEST_FILE );
+
+  for my $user ( keys %test_data )
+  {
+    delete $test_data_read{$user} or die "User $user not found";
+  }
+  keys %test_data_read and die "Spurious user(s) found in input";
+
+  unlink $TEST_FILE;
+}
+
+sub write_file
+{
+  my ($filename, %data) = @_;
+
+  open my $fh, '&gt;', $filename or die "Couldn't open $filename for writing: $!\n";
+  print {$fh} "$_:$data{$_}\n" for keys %data;
+}</pre></div></div>
+   
+   <p><img src="images/coderunner/checksyntax.JPG"> and run it. Because we can reuse the 
+     <span class="blue">add</span> routine by calling it from the <span class="blue">do_change</span> routine, it's appropriate
+    to name it <span class="blue">set</span>. Now we can reuse that <span class="blue">set</span> routine for testing. Modify your code as shown:</p>
+   
+<div class="listingBox"><div class="listingTitle">CODE TO EDIT: htmanage,pl</div><div class="listing"><pre>#!/usr/bin/perl
+use strict;
+use warnings;
+
+my $Testing;
+my $Input_File = '.htpasswd';
+my $TEST_FILE = 'test.htpasswd';
+my %Digest;
+
+init( @ARGV );
+$Testing and test() or run();
+
+sub init
+{
+  my $read_filename;
+
+  while ( @_ )
+  {
+    my $arg = shift;
+    if ( $arg eq '-t' )
+    {
+      $Testing = 1;
+    }
+    elsif ( $arg eq '-f')
+    {
+      $read_filename = 1;
+    }
+    elsif ( $read_filename )
+    {
+      $Input_File = $arg;
+      $read_filename = 0;
+    }
+  }
+}
+
+sub run
+{
+  %Digest = parse_file( $Input_File );
+  for ( menu(); my $command = &lt;STDIN&gt;; menu() )
+  {
+    chomp $command;
+    act_on( $command );
+  }
+}
+
+sub menu
+{
+  print "Entries in $Input_File:\n";
+  my @options = make_options();
+
+  for my $index ( 0 .. $#options )
+  {
+    printf "%2d %s\n", $index, $options[$index];
+  }
+  print "User or Option (0 - $#options)? ";
+}
+
+sub make_options
+{
+  my @options = 'Select to Quit';
+  push @options, ( sort keys %Digest ), 'Select to Add New';
+  return @options;
+}
+
+sub act_on
+{
+  my $command = shift;
+
+  my @options = make_options();
+  exit if $options[$command] =~ /to Quit/i;
+  if ( $options[$command] =~ /to Add/i )
+  {
+    ask_add();
+  }
+  else
+  {
+    do_change( $options[$command] );
+  }
+  write_file( $Input_File, %Digest );
+}
+
+sub ask_add
+{
+  print "Add (username): ";
+  chomp (my $username = &lt;STDIN&gt;);
+  print "    (password): ";
+  chomp (my $password = &lt;STDIN&gt;);
+  set( $username, $password );
+}
+
+sub set
+{
+  my ($username, $password) = @_;
+
+  $Digest{$username} = crypt $password, create_salt();
+}
+
+sub create_salt
+{
+  my @chars = ('.', '/', 0..9, 'A'..'Z', 'a'..'z');
+  return join '', $chars[rand @chars], $chars[rand @chars];
+}
+
+sub do_change
+{
+  my $username = shift;
+
+  print "Change $username: Return to delete, or new password: ";
+  chomp( my $input = &lt;STDIN&gt; );
+  if ( $input )
+  {
+    set( $username, $input );
+  }
+  else
+  {
+    delete $Digest{$username};
+  }
+}
+
+sub parse_file
+{
+  my $filename = shift;
+
+  my %second_field;
+  if ( open my $fh, '&lt;', $filename )
+  {
+    while ( &lt;$fh&gt; )
+    {
+      chomp;
+      my ($field1, $field2) = split /:/;
+      $second_field{$field1} = $field2;
+    }
+  }
+  return %second_field;
+}
+
+<ins>sub verify
+{
+  my ($digest, $password) = @_;
+  return crypt( $password, $digest ) eq $digest;
+}</ins>
+  
+sub test
+{
+  my %test_data = ( scott =&gt; '123', peter =&gt; '456', steve =&gt; '789' );
+  write_file( $TEST_FILE, %test_data );
+  my %test_data_read = parse_file( $TEST_FILE );
+
+  for my $user ( keys %test_data )
+  {
+    delete $test_data_read{$user} or die "User $user not found";
+  }
+  keys %test_data_read and die "Spurious user(s) found in input";
+<ins>  unlink $TEST_FILE;
+  $Input_File = $TEST_FILE;
+  set( $_, $test_data{$_} ) for keys %test_data;
+  write_file( $Input_File, %Digest );
+  %test_data_read = parse_file( $Input_File );
+  verify( $test_data_read{$_}, $test_data{$_} )
+    or die "Incorrect password for $_"
+      for keys %test_data_read;
+</ins>
+  unlink $TEST_FILE;
+}
+
+sub write_file
+{
+  my ($filename, %data) = @_;
+
+  open my $fh, '&gt;', $filename or die "Couldn't open $filename for writing: $!\n";
+  print {$fh} "$_:$data{$_}\n" for keys %data;
+}</pre></div></div>
+   
+   <p><img src="images/coderunner/checksyntax.JPG"> and run it with the <span class="orange">-t</span> flag. No 
+     output means the tests passed! Now run it without the <span class="orange">-t</span> flag and play with the 
+     options. This <span class="blue">test</span> routine now tests password encryption by verifying that the digest 
+     matches what it should.</p>
+   
+   <p>Hey, that <span class="blue">verify</span> routine looks like it would provide a valuable user function: the 
+     ability to verify a password for an entry in the file. But to make it do that, we'll have to change our user 
+     interface. Modify the code below as shown:</p>
+   
+<div class="listingBox"><div class="listingTitle">CODE TO EDIT: htmanage.pl</div><div class="listing"><pre>#!/usr/bin/perl
+use strict;
+use warnings;
+
+my $Testing;
+my $Input_File = '.htpasswd';
+my $TEST_FILE = 'test.htpasswd';
+my %Digest;
+
+init( @ARGV );
+$Testing and test() or run();
+
+sub init
+{
+  my $read_filename;
+
+  while ( @_ )
+  {
+    my $arg = shift;
+    if ( $arg eq '-t' )
+    {
+      $Testing = 1;
+    }
+    elsif ( $arg eq '-f' )
+    {
+      $read_filename = 1;
+    }
+    elsif ( $read_filename )
+    {
+      $Input_File = $arg;
+      $read_filename = 0;
+    }
+  }
+}
+
+sub run
+{
+  %Digest = parse_file( $Input_File );
+  for ( menu(); my $command = &lt;STDIN&gt;; menu() )
+  {
+    chomp $command;
+    act_on( $command );
+  }
+}
+
+sub menu
+{
+  print "Entries in $Input_File:\n";
+  my @options = make_options();
+
+  for my $index ( 0 .. $#options )
+  {
+    printf "%2d %s\n", $index, $options[$index];
+  }
+  print "User or Option (0 - $#options)? ";
+}
+
+sub make_options
+{
+  my @options = 'Select to Quit';
+  push @options, ( sort keys %Digest ), 'Select to Add New';
+  return @options;
+}
+
+sub act_on
+{
+  my $command = shift;
+
+  my @options = make_options();
+<ins>  die "Invalid option" if $command !~ /\A\d+\z/ || ! $options[$command];
+</ins>  exit if $options[$command] =~ /to Quit/i;
+  if ( $options[$command] =~ /to Add/i )
+  {
+    ask_add();
+  }
+  else
+  {
+    do_change( $options[$command] );
+  }
+  write_file( $Input_File, %Digest );
+}
+
+sub ask_add
+{
+  print "Add (username): ";
+  chomp (my $username = &lt;STDIN&gt;);
+  print "    (password): ";
+  chomp (my $password = &lt;STDIN&gt;);
+  set( $username, $password );
+}
+
+sub set
+{
+  my ($username, $password) = @_;
+
+  $Digest{$username} = crypt $password, create_salt();
+}
+
+sub create_salt
+{
+  my @chars = ('.', '/', 0..9, 'A'..'Z', 'a'..'z');
+  return join '', $chars[rand @chars], $chars[rand @chars];
+}
+
+sub do_change
+{
+  my $username = shift;
+
+<del>  print "Change $username: Return to delete, or new password: ";
+</del><ins>  print "Change $username: (D)elete, (V)erify, (N)ew: ";
+</ins><del>  chomp( my $input = &lt;STDIN&gt; );
+</del><ins>  chomp( my $cmd = &lt;STDIN&gt; );
+</ins><del>  if ( $input )
+</del><ins>  if ( $cmd =~ /\AN/i )
+</ins>  {
+<ins>    print "New password for $username: ";
+    chomp( my $input = &lt;STDIN&gt; );
+</ins>    set( $username, $input );
+  }
+<del>  else
+</del><ins>  elsif ( $cmd =~ /\AD/i )
+</ins>  {
+    delete $Digest{$username};
+  }
+<ins>  elsif ( $cmd =~ /\AV/i )
+  {
+    print "Password to check: ";
+    chomp( my $password = &lt;STDIN&gt; );
+    print verify( $Digest{$username}, $password ) ? "Correct" : "Wrong", "\n";
+  }
+</ins>}
+
+sub parse_file
+{
+  my $filename = shift;
+
+  my %second_field;
+  if ( open my $fh, '&lt;', $filename )
+  {
+    while ( &lt;$fh&gt; )
+    {
+      chomp;
+      my ($field1, $field2) = split /:/;
+      $second_field{$field1} = $field2;
+    }
+  }
+  return %second_field;
+}
+
+sub verify
+{
+  my ($digest, $password) = @_;
+
+  return crypt( $password, $digest ) eq $digest;
+}
+
+sub test
+{
+  my %test_data = ( scott =&gt; '123', peter =&gt; '456', steve =&gt; '789' );
+  write_file( $TEST_FILE, %test_data );
+  my %test_data_read = parse_file( $TEST_FILE );
+
+  for my $user ( keys %test_data )
+  {
+    delete $test_data_read{$user} or die "User $user not found";
+  }
+  keys %test_data_read and die "Spurious user(s) found in input";
+
+  unlink $TEST_FILE;
+
+  $Input_File = $TEST_FILE;
+  set( $_, $test_data{$_} ) for keys %test_data;
+  write_file( $Input_File, %Digest );
+  %test_data_read = parse_file( $Input_File );
+  verify( $test_data_read{$_}, $test_data{$_} )
+    or die "Incorrect password for $_"
+      for keys %test_data_read;
+
+  unlink $TEST_FILE;
+<ins>  print "Tests pass\n";
+</ins>}
+
+sub write_file
+{
+  my ($filename, %data) = @_;
+
+  open my $fh, '&gt;', $filename or die "Couldn't open $filename for writing: $!\n";
+  print {$fh} "$_:$data{$_}\n" for keys %data;
+}
+</pre></div></div>
+   
+   <p><img src="images/coderunner/checksyntax.JPG"> and run it with the <span class="orange">-t</span> flag. Now 
+     we have some reassurance that the tests are passing. Play with the new Verify option. Now it
+     checks to make sure that the user doesn't enter a command that would cause an error if used as an array index.</p>
+   
+   <p>Check out this sample dialog to verify that your program is behaving the same way. Type the code below in the Unix shell as shown:</p>
+   
+<div class="interactiveBox"><div class="interactiveTitle">INTERACTIVE TERMINAL SESSION:</div><div class="interactive"><pre>cold:~$ <ins>cd perl2</ins>
+cold:~/perl2$ <ins>./htmanage.pl</ins>
+Entries in .htpasswd:
+ 0 Select to Quit
+ 1 Select to Add New
+User or Option (0 - 1)? <ins>1</ins>
+Add (username): <ins>ralph</ins>
+    (password): <ins>malph</ins>
+Entries in .htpasswd:
+ 0 Select to Quit
+ 1 ralph
+ 2 Select to Add New
+User or Option (0 - 2)? <ins>1</ins>
+Change ralph: (D)elete, (V)erify, (N)ew: <ins>V</ins>
+Password to check: <ins>malph</ins>
+Correct
+Entries in .htpasswd:
+ 0 Select to Quit
+ 1 ralph
+ 2 Select to Add New
+User or Option (0 - 2)? <ins>1</ins>
+Change ralph: (D)elete, (V)erify, (N)ew: <ins>N</ins>
+New password for ralph: <ins>secret</ins>
+Entries in .htpasswd:
+ 0 Select to Quit
+ 1 ralph
+ 2 Select to Add New
+User or Option (0 - 2)? <ins>1</ins>
+Change ralph: (D)elete, (V)erify, (N)ew: <ins>D</ins>
+Entries in .htpasswd:
+ 0 Select to Quit
+ 1 Select to Add New
+User or Option (0 - 1)? <ins>0</ins>
+cold:~/perl2$ 
+</pre></div></div>
+
+ </div>
+  
+  <p>Congratulations! You have just finished <i>Intermediate Perl</i>! Remember to go back to the syllabus 
+    page by clicking on the page tab above to do the final assignments.</p>
+  
+  <p>I sincerely hope you'll continue to have fun using Perl. Thank you for taking this course! It's been a real pleasure having you. 
+    If you're interested in going further, 
+    stay tuned! More OST Perl courses are on the horizon that will help you to become even more effective as a Perl developer. </p>
+    
+  <p><div class="c"><img src="images/lessonImages/perl_camel.jpg"></div></p>
+
+<div class="footer"><div id="timeSurvey"></div>				
+				Copyright © 1998-2014 O'Reilly Media, Inc.<br><img src="https://courses.oreillyschool.com/common/cclicense.png"><br>
+				This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 Unported License.<br>
+				See <a href="http://creativecommons.org/licenses/by-sa/3.0/legalcode">http://creativecommons.org/licenses/by-sa/3.0/legalcode</a> 
+				for more information.
+				</div><iframe id="t" width="1" height="1" border="0" style="display:none"></iframe><script language="javascript">bodyLoaded();</script><script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+  ga('create', 'UA-44720547-1', 'oreillyschool.com');
+  ga('send', 'pageview');
+</script></body></html>

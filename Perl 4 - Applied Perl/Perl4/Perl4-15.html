@@ -1,0 +1,715 @@
+<html><!-- Copyright (c) 1998-2014 O'Reilly Media, Inc.
+			This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 Unported License.
+			See http://creativecommons.org/licenses/by-sa/3.0/legalcode for more information.
+            --><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"><link rel="stylesheet" type="text/css" href="../common/Lab.css"><script type="text/javascript" src="../common/Lab.js"></script><script language="javascript"></script><title>Final Topics</title></head><body id="body"><a name="top"></a><div class="title">Final Topics</div><div class="resize"><a href="Perl4-15.html#top" onclick="changeSize('smaller');" class="aS" title="Keep clicking to make fonts smaller">A</a><a href="Perl4-15.html#top" onclick="changeSize('larger');" class="aL" title="Keep clikcing to make fonts larger">A</a><a href="Perl4-15.html#top" onclick="lv()" class="lv" title="Adjust Page for High Contrast">HC</a><div id="fh"><p>Click on <span class="aS">A</span> to make all fonts on the page smaller.</p><p>Click on <span class="aL">A</span> to make all fonts on the page larger.</p><p>Click on <span class="lv">HC</span> to toggle high contrast mode. When you move your mouse over 
+                 some bold words in high contrast mode, related words are automatically highlighted. Text is shown
+                 in black and white. 
+             </p></div></div><hr>
+ 
+ <div class="goalTitle">Lesson Objectives</div><div class="goals">
+ 
+ When you complete this lesson, you will be able to:
+
+  <ul><li>complete <a href="Perl4-15.html#a_final_application">a Final Application</a>.</li><li>access <a href="Perl4-15.html#perl_and_people">Perl and People</a> in the Perl community.</li></ul>
+ </div><hr>
+ 
+ <p><div class="c">"Don't let it end like this.  Tell them I said something."<br>
+  -Pancho Villa (Last words)</div></p>
+ 
+ <p>You've made it! You've arrived at the final lesson of <i>Applied Perl</i>. It's clear 
+  that Perl is a rich field that we could keep using to generate content more or less indefinitely (in fact 
+  your author salivates over the thought of the possible royalties!), but at some point, 
+  we have to decide when you have had enough. We have reached that point. If there are to be more Perl courses, 
+  they will come about as a result of feedback from you. But for now, we'll wind up our course with the intention of empowering you 
+  to advance your Perl education through your own resources.</p>
+ 
+ 
+ 
+ <a href="Perl4-15.html" name="final_topics"></a>
+ <a name="h_01"></a><div class="heading">Final Topics</div><div class="headingText">
+ 
+  <p>This final lesson will cover some miscellaneous topics before diving into a final application.</p>
+   
+  <a name="s_01"></a><div id="s_01"><div class="subheading">Plain Old Documentation</div><div class="subheadingText">
+  
+   <p><div class="c">"I determined never to stop until I had come to the end and achieved my purpose."<br>
+    -David Livingstone</div></p>
+   
+   <p>There is a saying that goes, "Real programmers don't document; it was hard to write, it should be hard 
+    to understand." I don't know who wrote that, but I disagree! 
+    Even if for no other audience than yourself, documentation is important. Look at how 
+    much of it you have read and relied upon throughout this course. When you write code, 
+    remember the standard set by those authors who helped you with notes and documentation, and follow their example.</p>
+    
+   <p>Fortunately, Perl makes it as convenient as possible to create documentation. Let's ask and answer a few questions about it now:</p> 
+   
+   <p><b>Q:</b> Where is the easiest place to document a program or module?<br> 
+    <b>A:</b> In the file where the code is located.</p> 
+   <p><b>Q:</b> What's the best way to make it attractive to write documentation?<br> 
+    <b>A:</b> Allow it to be inserted wherever you are in the source.</p> 
+   <p><b>Q:</b> What's the easiest format to use?<br> 
+    <b>A:</b> The same ASCII (or UTF-8) text you're using to create the code.</p>
+   <p><b>Q:</b> What's the easiest tool to use?<br> 
+    <b>A:</b> The same editor you're using to write the code.</p> 
+   <p><b>Q:</b> What's the easiest way to ensure that documentation can be rendered into different formats 
+    depending on the presentation tool?<br> 
+    <b>A:</b> Use a markup language.</p>
+    
+   <p>Perl's <b>POD</b>—Plain Old Documentation—satisfies all of those constraints. It's a markup 
+    language—yes, it uses angle brackets, but it's <i>not</i> an XML application, and the main 
+    directives are lines starting with an equals sign. Larry Wall designed it to be as easy 
+    to use and understand as possible. All the documentation you've 
+    read, from pages like <b>perlop</b>, to <b>perldoc -f crypt</b>, to module documentation, was written in 
+    POD. Most of the POD for modules was embedded in the .pm file with the source code; when you run 
+    <b>perldoc</b>, it looks in @INC (with a few subdirectories) for file names ending in .pod or .pm.</p>
+    
+   <p>Let's use POD to document a program. Edit the last version of <b>parsedate.pl</b> from the previous 
+    lesson:</p>
+    
+<div class="listingBox"><div class="listingTitle">CODE TO EDIT:</div><div class="listing"><pre>#!/usr/local/bin/perl
+use strict;
+use warnings;
+
+use lib "$ENV{HOME}/mylib/lib/perl5";
+use DateTime::Format::Natural;
+
+my $parser = DateTime::Format::Natural-&gt;new( time_zone =&gt; 'local' );
+
+while ( my $str = prompt() )
+{
+  if ( my $time = $parser-&gt;parse_datetime( $str )and $parser-&gt;success )
+  {
+    print "$str =&gt; $time\n";
+  }
+  else
+  {
+    warn "Unable to parse '$str'\n";
+  }
+}
+
+sub prompt
+{
+  my $line;
+  {
+    print "Enter a date (q to quit): ";
+    chomp( $line = &lt;STDIN&gt; );
+    redo unless length $line;
+    exit if lc $line eq 'q';
+  }
+  return $line;
+}
+<ins>
+__END__
+
+=head1 NAME
+
+parsedate - Demonstration of L&lt;DateTime::Format::Natural&gt; date parsing.
+
+=head1 USAGE
+
+  ./parsedate.pl
+  Enter a date (q to quit): 2 weeks from now
+  2 weeks from now =&gt; 2011-05-18T20:43:09
+
+=head1 DESCRIPTION
+
+This program was written as a demonstration of
+L&lt;DateTime::Format::Natural&gt; date parsing for the
+lesson on timestamps in the O'Reilly School of Technology
+B&lt;Applied Perl&gt; course.
+
+The C&lt;parse_datetime&gt; method is used to parse timestamps
+of almost arbitrary format.
+
+=head1 AUTHOR
+
+Written by I&lt;<i>your name here&gt;</i>.
+
+=head1 DEPENDENCIES
+
+L&lt;DateTime::Format::Natural&gt;.
+
+=head1 LICENSE AND COPYRIGHT
+
+This section describes the license that applies
+to your code.  Whenever you release anything for
+the world at large to use, you need to tell them
+under what terms they are permitted to use it,
+modify it, incorporate it in commercial products,
+or redistribute it.
+
+=cut</ins></pre></div></div>
+    
+   <p><img src="images/coderunner/save.gif"> Save the file and run <b>perldoc</b>:</p>
+    
+<div class="interactiveBox"><div class="interactiveTitle">INTERACTIVE TERMINAL SESSION: Command to type</div><div class="interactive"><pre>cold:~$ <ins>cd perl4</ins>
+cold:~/perl4$ <ins>perldoc parsedate.pl</ins>
+PARSEDATE(1)          User Contributed Perl Documentation         PARSEDATE(1)
+
+
+
+<b>NAME</b>
+       parsedate - Demonstration of DateTime::Format::Natural date parsing.
+
+<b>USAGE</b>
+         ./parsedate.pl
+         Enter a date (q to quit): 2 weeks from now
+         2 weeks from now =&gt; 2011-05-18T20:43:09
+
+<b>DESCRIPTION</b>
+       This program was written as a demonstration of
+       DateTime::Format::Natural date parsing for the lesson on timestamps in
+       the O'Reilly School of Technology Applied Perl course.
+
+       The "parse_datetime" method is used to parse timestamps of almost
+       arbitrary format.
+
+<b>AUTHOR</b>
+       Written by <u>your name here</u>.
+
+<b>DEPENDENCIES</b>
+       DateTime::Format::Natural.
+
+<b>LICENSE AND COPYRIGHT</b>
+       This section describes the license that applies to your code.  Whenever
+       you release anything for the world at large to use, you need to tell
+       under what terms they are permitted to use it, modify it,
+       incorporate it in commercial products, or redistribute it.
+
+
+
+perl v5.10.1                      2009-01-25                           ISBN(3)</pre></div></div>
+    
+   <p>The first line of  POD begins with an equals sign (no leading white space), and continues until 
+    a line starting with the directive <b>=cut</b>. The documentation for POD is found at 
+    <b>perldoc perlpod</b> and is—you guessed it—written in POD. POD can be rendered into many 
+    formats. When you run <b>perldoc</b>, POD gets formatted like a Unix manual page. When you look at, say, 
+    <a href="http://search.cpan.org/perldoc?perlpod" target="_blank">http://search.cpan.org/perldoc?perlpod</a>, the <i>same POD source</i> is run through a 
+    POD-to-HTML formatter. (For the sake of efficiency, the HTML got cached when the POD was last changed. 
+    The point I'm making here is that no one is spending time writing HTML versions of the documentation.) Most of the 
+    O'Reilly books on Perl were written in POD (with some custom extensions for tables and footnotes).</p>
+    
+   <p>Because the POD format is so straightforward, I won't explain here. You
+    can read about it in the documentation. Instead, we will move on and discuss some useful and necessary POD 
+    <i>practices</i>.</p>
+    
+   <ul><li>POD can be placed anywhere in a program. Different people have different preferences, and rationales for 
+     those preferences. You can put all the POD at the beginning of the file; the advantage there is that 
+     programmers are confronted with it immediately. You can put it at the end of the file; the 
+     advantage in doing that is that you can precede it with <span class="code">__END__</span> and ensure that Perl does not waste time 
+     parsing it when the code is being run through Perl rather than perldoc. Or you can intersperse it 
+     throughout the file. This practice is applied only to modules where the documentation consists  
+     of descriptions of methods or exported functions, in which case the documentation for each method or 
+     function may precede or follow that method or function. The advantage to choosing this option is 
+     that the documentation 
+     is immediately adjacent to the referenced code so it's easier to chang or delete when a 
+     corresponding change is made to the code. </li><li>Put a blank line before, and after, every POD directive (any line starting with 
+     <b>=</b>), otherwise some POD formatters won't see the directive. This does not apply to formatting 
+     codes using angle brackets.</li><li>There are some standard section names to use with <span class="code">=head1</span> directives. For a 
+     comprehensive list, see:  
+     <a href="http://search.cpan.org/perldoc?Perl::Critic::Policy::Documentation::RequirePodSections" target="_blank">http://search.cpan.org/perldoc?Perl::Critic::Policy::Documentation::RequirePodSections</a>.  
+     Unless you intend to pass these default perlcritic POD checks, you do not need to include all of these 
+     sections, only the ones that make sense.</li></ul>
+ 
+  </div></div>
+  <a name="s_02"></a><div id="s_02"><div class="subheading">The Debugger</div><div class="subheadingText">
+     
+   <p><div class="c">"Fear not that life shall come to an end but rather fear that it shall never have a beginning."<br>
+    -Cardinal John Henry Newman</div></p>
+   
+   <p>Perl has an interactive debugger. Many programmers denounce it, but when pressed, most of them 
+    have never actually used it. It uses mostly single-character commands that are fairly similar to those 
+    of debuggers like <b>gdb</b>. I used it as a quick way to find out where POE was 
+    storing the port number for the TCP server we created a few lessons ago. The debugger is best used in 
+    conjunction with the source code in an editor window nearby (although there are also several IDEs 
+    available that lay all of this out for you in a GUI); that way you can use the searching power of the 
+    editor to find interesting places in the code.</p>
+     
+   <p>One of the best applications of the debugger is in exploring code written by someone else. It also 
+    gives you the ability to change the values of variables, so you can experiment without having to edit the 
+    code (which can be particularly hard if the code in question is in a module in a directory you can't modify). Let's 
+    look at a debugging session similar to the one I just described, using the file <b>/perl4/poe_tcp.pl</b> 
+    from an earlier lesson (ensure that your version matches the one below by making sure line 16 
+    is the line starting "Started =&gt;"):</p>
+     
+<div class="interactiveBox"><div class="interactiveTitle">INTERACTIVE TERMINAL SESSION: Commands to type</div><div class="interactive"><pre>cold:~/perl4$ <ins>perl -d poe_tcp.pl</ins>
+Loading DB routines from perl5db.pl version 1.33
+Editor support available.
+
+Enter h or `h h' for help, or `man perldebug' for more help.
+
+main::(poe_tcp.pl:19):  );
+  DB&lt;1&gt; <ins>-</ins>
+1       #!/usr/local/bin/perl
+2:      use strict;
+3:      use warnings;
+4 
+5:      use lib "$ENV{HOME}/mylib/lib/perl5";
+6:      use POE qw(Component::Server::TCP);
+7 
+8:      sub S_HND { return POE::Wheel::SocketFactory::MY_SOCKET_HANDLE }
+9 
+10      POE::Component::Server::TCP-&gt;new(
+11        ClientInput =&gt; sub {
+12:         my ($heap, $input) = @_[HEAP, ARG0];
+13:         print "Read from client: $input\n";
+14:         $heap-&gt;{client}-&gt;put( $input );
+15        },
+16:       Started =&gt; sub { my $sock = $_[HEAP]{listener}[S_HND];
+17:                        my ($port) = Socket::sockaddr_in( getsockname($sock) );
+18:                        print "Listening on port $port\n" },
+19==&gt;   );
+20 
+21:     $poe_kernel-&gt;run();
+  DB&lt;1&gt; <ins>c 16</ins>
+main::CODE(0xa32c6d8)(poe_tcp.pl:16):
+16:       Started =&gt; sub { my $sock = $_[HEAP]{listener}[S_HND];
+  DB&lt;2&gt; <ins>s</ins>
+main::S_HND(poe_tcp.pl:8):      sub S_HND { return POE::Wheel::SocketFactory::MY_SOCKET_HANDLE }
+  DB&lt;2&gt; <ins>r</ins>
+scalar context return from main::S_HND: 0
+main::CODE(0xa32c6d8)(poe_tcp.pl:17):
+17:                        my ($port) = Socket::sockaddr_in( getsockname($sock) );
+  DB&lt;2&gt; <ins>x $_[HEAP]{listener}</ins>
+0  POE::Wheel::SocketFactory=ARRAY(0xa71a190)
+   0  GLOB(0xa71a150)
+      -&gt; *Symbol::GEN2
+            FileHandle({*Symbol::GEN2}) =&gt; fileno(3)
+   1  1
+   2  'tcp_server_got_connection'
+   3  'tcp_server_got_error'
+   4  2
+   5  'POE::Wheel::SocketFactory(1) -&gt; select accept'
+   6  undef
+   7  undef
+   8  undef
+   9  6
+   10  1
+   11  undef
+   12  'yes'
+  DB&lt;3&gt; x $_[HEAP]{listener}[0]
+0  GLOB(0xa71a150)
+   -&gt; *Symbol::GEN2
+         FileHandle({*Symbol::GEN2}) =&gt; fileno(3)
+  DB&lt;5&gt; <ins>x Socket::sockaddr_in( getsockname( $_[HEAP]{listener}[0] ) )</ins>
+0  32969
+1  "\c@\c@\c@\c@"
+  DB&lt;6&gt; <ins>q</ins>
+=== 13057 === Sessions were started, but POE::Kernel's run() method was never
+called to execute them. [...]
+        eval {...} called at poe_tcp.pl line 0
+cold:~/perl4$</pre></div></div>
+     
+   <p><b>perldoc perldebug</b> tells you how to use the debugger. When debugging programs that <b>fork</b>, the debugger 
+    requires that you have the correct terminal settings and xterm spawning capability. For further information, you may want to read 
+    the book <a href="http://www.amazon.com/Perl-Medic-Transforming-Legacy-Code/dp/0201795264" target="_blank">Perl Medic</a>, written by yours truly!</p>
+  
+  </div></div>
+ </div>
+ <a href="Perl4-15.html" name="a_final_application"></a> 
+ <a name="h_02"></a><div class="heading">A Final Application</div><div class="headingText">
+ 
+  <p><div class="c">"The world is round and the place which may seem like the end may also be only the beginning."<br>
+   -Ivy Baker Priest</div></p>
+   
+  <p>For this final project we'll extend our bank account web interface, and we'll also learn a 
+   broader lesson about <i>refactoring</i>. The current state of that interface is just too complicated to 
+   be extended further. It is simply <i>not fun</i>. (This is a more important consideration than many people will 
+   acknowledge—if you're not having fun, your productivity plummets.) The current code contains SQL 
+   mixed in with executable code. To extend it to do more we'd add more SQL, which would lead to readability 
+   problems that could be just as bad as embedded HTML in Perl programs.</p>
+   
+  <p>This presents a learning opportunity! We can experiment with a module that gives us a higher level of abstraction over a 
+   database: <b>Class::DBI</b>. Go ahead and install it:</p>
+   
+<div class="interactiveBox"><div class="interactiveTitle">INTERACTIVE TERMINAL SESSION: Command to type</div><div class="interactive"><pre>cold:~/perl4$ <ins>PERL5LIB=~/mylib/lib/perl5 cpan Class::DBI</ins>
+[output omitted]</pre></div></div>
+   <p>
+    We are going to remake our database with some different relationships and different
+    column names that help <b>Class::DBI</b> do its job better (and actually model the problem
+    better).  
+    So unpack the tar file <b>/software/Perl4/Lesson15Files.tar.gz</b>, save the .tmpl
+    files in your current (perl4) directory, and
+    run the file make_db.mysql through the <b>mysql</b> program to create and populate that database:
+   </p>
+  
+<div class="interactiveBox"><div class="interactiveTitle">INTERACTIVE TERMINAL SESSION: Command to type</div><div class="interactive"><pre>cold:~/perl4$ <ins>mysql -h sql -p $USER &lt; make_db.mysql</ins>
+Enter password: <ins>(type your password)</ins></pre></div></div>
+   
+  <p>Now create a module that will abstract out our common templating functionality:</p>
+  
+<div class="listingBox"><div class="listingTitle">CODE TO ENTER:</div><div class="listing"><pre>package MyTemplate;
+use strict;
+use warnings;
+
+use base 'HTML::Template';
+
+use CGI qw(header);
+use File::Basename;
+
+sub new
+{
+  my ($basename) = fileparse( $0, '.cgi' );
+  return shift-&gt;SUPER::new( filename          =&gt; "$basename.tmpl",
+                            die_on_bad_params =&gt; 0 );
+}
+
+sub html_output
+{
+  return header() . (shift-&gt;SUPER::output);
+}
+
+
+1;
+</pre></div></div>
+   
+  <p><img src="images/coderunner/save.gif"> Save it as <b>/perl4/MyTemplate.pm</b> (or you 
+   might want to create a special subfolder for these files, like /perl4/Lesson15, so you can 
+   compare them to the versions from earlier lessons). 
+    This gives us an object that inherits from HTML::Template. ('base' is a module
+    that gives a clean access to @ISA.) It
+    also automatically uses a template with the same name as the .cgi file
+    being executed, with the extension '.tmpl' instead of '.cgi'. Now create a cgi file:
+   </p>
+<div class="listingBox"><div class="listingTitle">CODE TO ENTER:</div><div class="listing"><pre>#!/usr/local/bin/perl
+use strict;
+use warnings;
+
+use lib qw(<i>your_home_directory</i>/mylib/lib/perl5);
+use CGI::Carp qw(fatalsToBrowser);
+use MyTemplate;
+use Bank;
+
+my $template = MyTemplate-&gt;new;
+my @acct_nums = map { $_-&gt;get( 'account_number' ) } Bank::Account-&gt;retrieve_all;
+$template-&gt;param( account_loop =&gt; [ map { { account_number =&gt; $_ } } @acct_nums ] );
+
+print $template-&gt;html_output;</pre></div></div>
+   
+  <p>Replace <i>your_home_directory</i> with your home directory in this and all other .cgi files. 
+   Save it in the appropriate folder as <b>atm_select.cgi</b>. </p>
+  
+  <table class="noteBox "><tr><td class="noteTitle">Note</td><td class="note">So far, we have used <b>use lib "$ENV{HOME}/mylib/lib/perl5"</b> to supply the value for 
+   the home directory. This pattern doesn't work with CGI, so we must instead use the form above, 
+   <b>use lib qw(<i>your_home_directory</i>/mylib/lib/perl5)</b>.</td></tr></table>
+  
+  <p>This looks intriguing: the code 
+   is essentially the same as before except that the account numbers come from a different 
+   module. Let's see what that module looks like. Create another new Perl program:</p>
+   
+<div class="listingBox"><div class="listingTitle">CODE TO ENTER:</div><div class="listing"><pre>package Bank;
+use strict;
+use warnings;
+
+use base 'Class::DBI';
+
+use Cwd;
+
+my ($USER) = (cwd() =~ m!/.*?/(.*?)/!);
+my $PASSWORD = 'secret';   # XXX change to your password
+my $SERVER   = 'sql';
+
+__PACKAGE__-&gt;connection( "dbi:mysql:database=$USER;host=$SERVER", $USER, $PASSWORD );
+
+package Bank::Account;
+
+use base 'Bank';
+
+__PACKAGE__-&gt;table( 'account' );
+__PACKAGE__-&gt;columns( All =&gt; qw(id account_number balance) );
+
+1;</pre></div></div>
+  
+  <p>Insert your password where indicated, save that file as <b>Bank.pm</b>, and bring up 
+    <b>http://<i>your_username</i>.oreillystudent.com/perl4/atm_select.cgi</b> in your web browser.  
+    It displays the familiar menu of two account numbers. That's not bad 
+    for a few lines that contain no SQL. How did they do this?</p>
+   <p>
+    <b>Class::DBI</b> provides an object-oriented interface to a relational database.  Each
+    table is an object class, and columns within them are accessed via the <b>get</b>
+    accessor.  <b>Class::DBI</b> provides the capability to express one-to-one and one-to-many relationships,
+    as we're about to see.  Edit <b>Bank.pm</b> to add the information about the other tables:
+   </p>
+<div class="listingBox"><div class="listingTitle">CODE TO EDIT:</div><div class="listing"><pre>package Bank;
+use strict;
+use warnings;
+
+use base 'Class::DBI';
+
+use Cwd;
+
+my ($USER) = (cwd() =~ m!/.*?/(.*?)/!);
+my $PASSWORD = 'secret';   # XXX  Change to your password
+my $SERVER   = 'sql';
+
+__PACKAGE__-&gt;connection( "dbi:mysql:database=$USER;host=$SERVER", $USER, $PASSWORD );
+
+package Bank::Account;
+
+use base 'Bank';
+
+__PACKAGE__-&gt;table( 'account' );
+__PACKAGE__-&gt;columns( All =&gt; qw(id account_number balance) );
+<ins>__PACKAGE__-&gt;has_many( owners =&gt; [ 'Bank::Customer' =&gt; 'person' ] );
+__PACKAGE__-&gt;has_many( transactions =&gt; [ 'Bank::Transactions' =&gt; 'single_transaction' ] );
+__PACKAGE__-&gt;autoupdate( 1 );
+
+
+package Bank::Customer;
+
+use base 'Bank';
+
+__PACKAGE__-&gt;table( 'customer' );
+__PACKAGE__-&gt;columns( Primary =&gt; qw(account person) );
+__PACKAGE__-&gt;has_a( person =&gt; 'Bank::Person' );
+__PACKAGE__-&gt;has_a( account =&gt; 'Bank::Account' );
+
+
+package Bank::Person;
+
+use base 'Bank';
+
+__PACKAGE__-&gt;table( 'person' );
+__PACKAGE__-&gt;columns( All =&gt; qw(id first_name last_name) );
+__PACKAGE__-&gt;has_many( accounts =&gt; [ 'Bank::Customer' =&gt; 'account' ] );
+
+
+package Bank::Transactions;
+
+use base 'Bank';
+
+__PACKAGE__-&gt;table( 'transactions' );
+__PACKAGE__-&gt;columns( Primary =&gt; qw(account single_transaction) );
+__PACKAGE__-&gt;has_a( single_transaction =&gt; 'Bank::Transaction::Single' );
+__PACKAGE__-&gt;has_a( account =&gt; 'Bank::Account' );
+
+
+package Bank::Transaction::Single;
+
+use base 'Bank';
+
+__PACKAGE__-&gt;table( 'single_transaction' );
+__PACKAGE__-&gt;columns( All =&gt; qw(id amount transaction_type previous_balance new_balance transaction_date) );
+__PACKAGE__-&gt;has_a( transaction_type =&gt; 'Bank::Transaction::Type' );
+__PACKAGE__-&gt;has_many( accounts =&gt; [ 'Bank::Transactions' =&gt; 'account' ] );
+
+sub type
+{
+  return shift-&gt;get( 'transaction_type' )-&gt;name;
+}
+
+package Bank::Transaction::Type;
+
+use base 'Bank';
+
+__PACKAGE__-&gt;table( 'transaction_type' );
+__PACKAGE__-&gt;columns( All =&gt; qw(id name) );
+</ins>
+1;</pre></div></div>
+   <p>
+    You can see here that you can have multiple packages (and classes) defined
+    within a single file.  That's okay as long as we don't want to put any of them
+    in a <b>use</b> statement other than the one that matches the name of the file,
+    "Bank."  Recall that __PACKAGE__ evaluates to the name of the current package.
+    It saves us some effort and helps focus attention where it belongs.
+   </p>
+   <p>
+    Now, create another new cgi file:
+   </p>
+   <div class="listingBox"><div class="listingTitle">CODE TO ENTER:</div><div class="listing"><pre>#!/usr/local/bin/perl
+use strict;
+use warnings;
+
+use lib qw(<i>your_home_directory</i>/mylib/lib/perl5);
+use CGI qw(param);
+use CGI::Carp qw(fatalsToBrowser);
+use MyTemplate;
+use Bank;
+
+my $template = MyTemplate-&gt;new;
+my $account_number = param( 'account_number' );
+
+my ($account) = Bank::Account-&gt;search( account_number =&gt; $account_number );
+
+$template-&gt;param( owners =&gt; join ', ', map { $_-&gt;first_name . " " . $_-&gt;last_name } $account-&gt;owners );
+
+$template-&gt;param( account_number =&gt; $account_number,
+                  balance =&gt; $account-&gt;get( 'balance' ) );
+
+my @ATTRS = qw(transaction_date type amount new_balance);
+my @transactions = map { my $t = $_; +{ map { $_, $t-&gt;$_ } @ATTRS } }
+                       $account-&gt;transactions;
+$template-&gt;param( transaction_loop =&gt; \@transactions );
+print $template-&gt;html_output;</pre></div></div>
+   <p>
+    <img src="images/coderunner/save.gif"> Save it as <b>atm_choose.cgi</b>. Now click on 
+    "Submit Query" in your browser after selecting one
+    of the account numbers.  You'll see a familiar account statement, along with a
+    form at the bottom that doesn't (yet) work.  Class::DBI has provided us with
+    search methods that replace the need to write SQL.  We provided a
+    method of our own, <b>type</b>, that follows the association to the
+    transaction_type table to turn a transaction type id into a name.
+    Because <b>Class::DBI</b> provides accessor convenience methods ($object-&gt;attr is
+    short for $object-&gt;get( 'attr' ) ), we can seamlessly weave
+    a call to that into the attribute fetches. (If you're wondering why
+    there's a <b>+</b> sign before the hashref braces, this is one of those
+    rare cases where Perl doesn't intuit the meaning we wanted if we just leave the braces bare.)
+   </p>
+   <p>
+    Now, we're going to add the capability to perform timed withdrawals.  
+    This requires us to convert the routine we created earlier, <b>add_transaction</b>, 
+    a complex function that involved
+    several SQL statements, to use Class::DBI. Create another new cgi file,
+    the target of that form: </p>
+ <div class="listingBox"><div class="listingTitle">CODE TO ENTER:</div><div class="listing"><pre>#!/usr/local/bin/perl
+use strict;
+use warnings;
+
+use lib qw(<i>your_home_directory</i>/mylib/lib/perl5);
+use CGI qw(:all);
+use CGI::Carp qw(fatalsToBrowser);
+use MyTemplate;
+use Date::Parse;
+use Bank;
+
+my $template = MyTemplate-&gt;new;
+my %param = map { $_, param( $_ ) } qw(account_number type time amount);
+
+my $time = str2time( $param{time} ) or die "Cannot parse '$param{time}'";
+my $to_sleep = $time - time;
+die "time is no good\n" if $to_sleep &lt; 0 || $to_sleep &gt; 3600;
+
+$param{time} = localtime $time;
+$template-&gt;param( %param );
+print $template-&gt;html_output;
+
+my ($account_number, $type, $amount) = @param{ qw(account_number type amount) };
+unless ( fork )   # child
+{
+  close STDIN;    # This prevents the web server from holding the
+  close STDOUT;   # connection open the whole time we're sleeping
+  close STDERR;
+  sleep $to_sleep;
+
+  my ($account) = Bank::Account-&gt;search( account_number =&gt; $account_number );
+  my $balance = $account-&gt;get( 'balance' );
+  my ($trans_type) = Bank::Transaction::Type-&gt;search( name =&gt; $type );
+  my $new_balance = $balance + ($type eq 'credit' ? 1 : -1) * $amount;
+  my $single_trans = Bank::Transaction::Single-&gt;insert( { amount =&gt; $amount,
+                                     transaction_type =&gt; $trans_type,
+                                     previous_balance =&gt; $balance,
+                                     new_balance =&gt; $new_balance,
+                                     } );
+  Bank::Transactions-&gt;insert( { single_transaction =&gt; $single_trans,
+                                account =&gt; $account } );
+  $account-&gt;set( balance =&gt; $new_balance );
+  exit;
+}</pre></div></div>
+   <p><img src="images/coderunner/save.gif"> 
+    Save it as <b>atm_timed.cgi</b>; now enter a time a few minutes in the future 
+    <i>according to our server—it is on Central Time—</i>and an amount in
+    the timed transaction form.  Select <b>Credit</b> or <b>Debit</b> and click <b>Submit</b>.
+    On the following page, click <b>Continue</b> to return to the statement page and
+    verify that your transaction has not yet taken place.  Wait until the time
+    you specified, then reload the page, and verify that it has happened.
+    (You can specify the time to the nearest second if you like.)
+   </p>
+   <p>
+    We close the standard streams in the child, otherwise the web server will
+    see that they're still open and keep your browser waiting until the child has exited.
+   </p>
+   <p>
+    Class::DBI provides insert and update (set) methods in
+    addition to search. Class::DBI can take objects in lieu
+    of values for columns it knows are related to another table.
+   </p>
+   <p>
+    This type of web application framework is okay for small applications, but will 
+    start to grate on you by the time you build very large ones. There are several frameworks 
+    available in Perl that operate at higher abstraction levels and make those applications 
+    easier. We haven't tackled them here because there's no clear front runner. 
+    But if you're going to create large-scale web applications, you may want to look 
+    into Catalyst, Dancer, CGI::Application, and Jifty. They embody varying levels of 
+    complexity and capability.</p>
+   
+ </div>
+ <a href="Perl4-15.html" name="perl_and_people"></a>
+ <a name="h_03"></a><div class="heading">Perl and People</div><div class="headingText">
+  <a name="s_01"></a><div id="s_01"><div class="subheading">The Perl Community</div><div class="subheadingText">
+   
+   <p><div class="c">"When you have a taste for exceptional people, you always end up meeting them everywhere."<br>
+    -Mac Orlan</div></p>
+  
+   <p>Part of what makes Perl great is some of the people behind it, and it's been my privilege 
+    to get to know many of them. You can too, either online or by attending local Perl Monger 
+    groups (see <a href="http://www.pm.org/" target="_blank">http://www.pm.org/</a>) or annual 
+    international meetings such as Yet Another Perl Conference: 
+    <a href="http://www.yapc.org/" target="_blank">http://www.yapc.org/</a>; and O'Reilly's 
+    Open Source Conference (which started out as the Perl Conference): 
+    <a href="http://www.oscon.com/" target="_blank">http://www.oscon.com/</a>.</p>
+  </div></div>
+  <a name="s_02"></a><div id="s_02"><div class="subheading">Perl Fun</div><div class="subheadingText">
+   
+  
+   <p>Perl people like to have fun! And I'm not just talking about OSCON parties involving 
+    farm animals. (I'm not kidding! Randal Schwartz rented some alpacas for a 
+    party celebrating the release of his "Intermediate Perl" book, which has an alpaca on the 
+    front cover.) There are mailing lists devoted to fun with Perl, and also to the game of Perl 
+    "golf" (solving a problem in the fewest number of characters—not recommended for 
+    maintainability).</p>
+  
+  </div></div>
+  <a name="s_03"></a><div id="s_03"><div class="subheading">Perl Jobs</div><div class="subheadingText">
+   
+   <p><div class="c">"Doubt is the beginning, not the end, of wisdom."<br>
+    -George Iles</div></p>
+   
+   <p>There is continual demand for <i>good</i> Perl programmers—not the average Perl 
+    programmer who has picked up some parts of the language along with many bad habits, but 
+    people who know how to do serious large-scale work with Perl—the kind of work that 
+    you have now earned the knowledge to consider. See <a href="http://jobs.perl.org/" target="_blank">http://jobs.perl.org/</a> for many current job listings.</p>
+  
+  </div></div>
+  <a name="s_04"></a><div id="s_04"><div class="subheading">The Future of Perl</div><div class="subheadingText">
+   <p><div class="c">"And in the end, it's not the years in your life that count. It's the life in your years."<br>
+    -Abraham Lincoln</div></p>
+   
+   <p>Perl started in 1987, but continues to be revitalized by the constant introduction of new features into Perl 5, which 
+    necessitate the regular release of new editions of the best-selling O'Reilly book, "Learning Perl" (that one has a llama on it).
+    On the horizon is Perl 6, a project ten years in the making, and a complete redesign of the language and its implementation.
+    Non-backwards-compatible and based on the Parrot virtual machine architecture, Perl 6 offers some of the most advanced programming
+    language capabilities ever.  When it is fully implemented, it promises to rock the computer world. Stay on top of its
+    progress via <a href="http://www.perl6.org/" target="_blank">http://www.perl6.org/</a>.
+   </p>
+  </div></div>
+ </div>
+ 
+ <p>And that's it! You have come to the end of not just the last lesson of this course, but the last course 
+  in the Perl Certificate series. Congratulations, and thank you for choosing the O'Reilly School of 
+  Technology to help you learn Perl! It's been a pleasure having you in the course. Good work and good luck!</p>
+ 
+ <div class="c"><img src="images/lessonImages/graduation-jubilation.jpg"></div>
+  <br><br><br><br>
+  
+ <p>Remember to do your homework!</p>
+   
+ <p><div class="c">"Life moves on, whether we act as cowards or heroes. Life has no other discipline to impose, if 
+  we would but realize it, than to accept life unquestioningly. Everything we shut our eyes to, everything 
+  we run away from, everything we deny, denigrate or despise, serves to defeat us in the end. What seems 
+  nasty, painful, evil, can become a source of beauty, joy and strength, if faced with an open mind. Every 
+  moment is a golden one for he who has the vision to recognize it as such."<br>
+  -Henry Miller</div></p>
+
+<div class="footer"><div id="timeSurvey"></div>				
+				Copyright © 1998-2014 O'Reilly Media, Inc.<br><img src="https://courses.oreillyschool.com/common/cclicense.png"><br>
+				This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 Unported License.<br>
+				See <a href="http://creativecommons.org/licenses/by-sa/3.0/legalcode">http://creativecommons.org/licenses/by-sa/3.0/legalcode</a> 
+				for more information.
+				</div><iframe id="t" width="1" height="1" border="0" style="display:none"></iframe><script language="javascript">bodyLoaded();</script><script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+  ga('create', 'UA-44720547-1', 'oreillyschool.com');
+  ga('send', 'pageview');
+</script></body></html>

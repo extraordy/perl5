@@ -1,0 +1,297 @@
+<html><!-- Copyright (c) 1998-2014 O'Reilly Media, Inc.
+			This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 Unported License.
+			See http://creativecommons.org/licenses/by-sa/3.0/legalcode for more information.
+            --><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"><link rel="stylesheet" type="text/css" href="../common/Lab.css"><script type="text/javascript" src="../common/Lab.js"></script><script language="javascript"></script><title>Perl's Contextual Behavior</title></head><body id="body"><a name="top"></a><div class="title">Perl's Contextual Behavior</div><div class="resize"><a href="Perl1-10.html#top" onclick="changeSize('smaller');" class="aS" title="Keep clicking to make fonts smaller">A</a><a href="Perl1-10.html#top" onclick="changeSize('larger');" class="aL" title="Keep clikcing to make fonts larger">A</a><a href="Perl1-10.html#top" onclick="lv()" class="lv" title="Adjust Page for High Contrast">HC</a><div id="fh"><p>Click on <span class="aS">A</span> to make all fonts on the page smaller.</p><p>Click on <span class="aL">A</span> to make all fonts on the page larger.</p><p>Click on <span class="lv">HC</span> to toggle high contrast mode. When you move your mouse over 
+                 some bold words in high contrast mode, related words are automatically highlighted. Text is shown
+                 in black and white. 
+             </p></div></div><hr>
+ 
+ <div class="goalTitle">Lesson Objectives</div><div class="goals">
+  
+  
+  When you complete this lesson, you will be able to:
+  
+  <ul><li>write Perl code in the proper context.</li><li>use the concatenation operator to put arguments in scalar context.</li></ul>
+ </div><hr>
+ 
+ <a name="h_01"></a><div class="heading">Context</div><div class="headingText">
+  <div class="c"><p>"The skill of writing is to create a context in which other people can think."<br>
+  -<i>Edwin Schlossberg</i></p></div>
+  
+  <a name="s_01"></a><div id="s_01"><div class="subheading">Scalar and List Context</div><div class="subheadingText">
+    
+   <p> Remember a few lessons ago when I referred to the 
+    notion of something "expecting" a list and said, "We have an entire lesson dedicated to the intricacies of lists later")? Well, 
+    "later" is now! One of the fundamental concepts in Perl is <i>context</i>.   
+    The definitive book on the language, <a href=" http://oreilly.com/catalog/9780596000271" target="_blank">Programming Perl</a>,
+    claims that Perl programmers will be miserable until they learn it.
+   
+    Well, we certainly don't want that to happen to us, so let's get busy learning! 
+    In basic terms, context in Perl is defined like this:</p>
+   
+    <p><div class="c">Any expression can be interpreted in several different ways; the way that is chosen depends on how
+     the expression is being used.</div>
+   </p>
+  
+   <p>
+    This concept will become much more clear to you after we go over some examples.
+    Let's review our code from insect_sales.pl:
+   </p>
+   
+   <div class="observeBox"><div class="observeTitle">OBSERVE:</div><div class="observe"><pre>
+<span class="purple">my</span> <span class="darkred">$date</span> = <span class="darkgreen">localtime()</span>.
+</pre></div></div>
+  
+   <p>
+    The result of <span class="darkgreen">localtime()</span> is being assigned to a <i>scalar</i>, so we 
+    say that the assignment places <span class="darkgreen">localtime()</span> in <b>scalar context</b>. And 
+    <span class="darkgreen">localtime()</span> in a scalar context returns a
+    string representing the current date and time. It would look something like this: <b>'Mon Aug 10 10:04:49 2009'</b>. 
+   </p>
+   <p>
+    But <i>instead</i> of assigning <span class="darkgreen">localtime()</span> to a scalar, we could assign it to an 
+    array. Let's try an example. Create a new file as shown:
+   </p>
+  
+<div class="listingBox"><div class="listingTitle">CODE TO TYPE:</div><div class="listing"><pre><ins>#!/usr/bin/perl
+use strict;
+use warnings;
+
+my @parts = localtime();
+my $count = 0;
+foreach my $part ( @parts )
+{
+  print "Element $count = $part\n";
+  $count++; 
+}</ins>
+</pre></div></div>
+  
+   <p><img src="images/coderunner/checksyntax.JPG"> Save it in your <b>/perl1</b> folder as <b>localtime.pl</b> and run it. </p>
+   
+<div class="interactiveBox"><div class="interactiveTitle">INTERACTIVE TERMINAL SESSION:</div><div class="interactive"><pre>cold:~$ <ins>cd perl1</ins>
+cold:~/perl1$ <ins>./localtime.pl</ins>
+Element 0 = 0
+Element 1 = 50
+Element 2 = 18
+Element 3 = 7
+Element 4 = 11
+Element 5 = 109
+Element 6 = 1
+Element 7 = 340
+Element 8 = 0    
+cold:~/perl1$    
+</pre></div></div>
+  
+   <p>Before we go any further, take a good look at the code and see if you can 
+    figure out what it means.</p>
+  
+   <p>Also, observe that the <b>++</b> operator is used for its side effect of 
+    adding one to its operand, without looking at its value. This is a common use of the <b>++</b> operator.</p>  
+   
+   <p>Now, look at <b>perldoc -f localtime</b> or <a href="http://perldoc.perl.org/functions/localtime.html" target="_blank">http://perldoc.perl.org/functions/localtime.html</a>. <span class="darkgreen">localtime()</span>  
+    returns a list of numbers representing elements of the current date and time, so you can access 
+    each element—the day, the month, etc.—individually.</p>
+   
+   <p>The important lesson here is that <span class="darkgreen">localtime()</span> behaves differently depending 
+    upon the context. There are two important contexts to learn:</p>
+   
+   <ul><li>Scalar</li><li>List</li></ul>
+  
+   <p>And any expression can be placed into either context by putting it somewhere that "expects" either a 
+    scalar or a list. For example, <b>print</b> expects a list of arguments, so if you 
+    <b>print localtime()</b>, all of those numerical date/time elements will be printed out, one after 
+    the other, without spaces in between them. If you wanted to print the scalar context value of 
+    <span class="darkgreen">localtime()</span> without having to assign it to a scalar variable first, you'd 
+    look for an expression that would put part of itself in scalar context. For example, string 
+    concatenation:</p>
+   
+   <div class="observeBox"><div class="observeTitle">OBSERVE:</div><div class="observe"><pre>
+<span class="darkred">$x</span> <span class="darkgreen">.</span> <span class="darkred">$y</span>
+</pre></div></div>
+  
+   <p> Perl only concatenates scalars, so the concatenation operator puts each of its arguments in scalar context:</p>
+
+<div class="observeBox"><div class="observeTitle">OBSERVE:</div><div class="observe"><pre>
+<span class="darkgreen">print localtime() . </span> <span class="orange">"\n"</span>;
+</pre></div></div>
+  
+   <p>If you just want to print out a readable time in a hurry, that's a fine way of doing it, 
+   although it might be challenging for others to read your code.</p>
+   
+   <p>There's no way of predicting how <span class="darkgreen">localtime()</span> 
+    will behave in one context based on its behavior in another context. The people who wrote 
+    <span class="darkgreen">localtime()</span> made good, useful choices, but there is no general rule for the way a function will behave 
+    in a list context, even when you know its behavior in a scalar context or vice versa. 
+    </p>
+   
+   <p>A scalar variable (say, <span class="darkred">$x</span>) in a scalar context, yields that variable. A scalar 
+    variable in a list context (say, <span class="darkred">@y</span> = <span class="darkred">$x</span>) yields a list containing only that 
+    variable. An array in a list context, for instance:</p>
+  
+   <div class="observeBox"><div class="observeTitle">OBSERVE:</div><div class="observe"><pre>
+(<span class="darkred">$x</span>, <span class="darkred">$y</span>) = <span class="darkred">@z</span>;
+</pre></div></div>
+  
+   <p>...yields the list of elements in the array. In this particular case, we know that the array is in list context 
+    because it's being assigned to a list—a set of scalars separated by commas <i>inside 
+     parentheses</i>.</p> 
+      
+   <p>By the way, just because a code snippet doesn't declare its variables with
+    <span class="purple">my</span>, doesn't mean you shouldn't. Sometimes I'll leave out the snippet of code that declares variables 
+    just to make the code easier for you to read overall, but when you write a program, you need to include the
+    <span class="purple">my</span> declarations. <span class="purple">use strict</span> won't let you get away with leaving out
+     <span class="purple">my</span>, and you're always using <span class="purple">use strict</span>, aren't you?</p>
+   
+   <p>So, what about an array in a scalar context? Let's try that! Create a file called
+    <b>scalar_array.pl</b> as shown:</p>
+   
+<div class="listingBox"><div class="listingTitle">CODE TO TYPE:</div><div class="listing"><pre><ins>#!/usr/bin/perl
+use strict;
+use warnings;
+
+my @array = qw(apple pear loganberry starfruit durien kumquat);
+my $whatever = @array;
+print "Array in scalar context = $whatever\n";</ins>
+</pre></div></div>
+   
+   <p><img src="images/coderunner/checksyntax.JPG"> and run it. </p>
+   
+<div class="interactiveBox"><div class="interactiveTitle">INTERACTIVE TERMINAL SESSION:</div><div class="interactive"><pre>cold:~/perl1$ <ins>./scalar_array.pl</ins>
+Array in scalar context = 6
+cold:~/perl1$    
+</pre></div></div>
+   
+   <p>An array in a scalar context—used wherever Perl would expect a scalar—evaluates as the number 
+    of elements in the array. Here are some ways of using scalar context to get to that: </p>
+   
+   <ul><li><span class="darkred">$count</span> = <span class="darkred">@array</span></li><li><span class="orange">0</span> <span class="darkgreen">+</span> <span class="darkred">@array</span></li><li><span class="darkgreen">scalar</span>( <span class="darkred">@array</span> )</li><li><span class="purple">while</span> ( <span class="darkred">@array</span> )</li></ul>
+   
+   <p>In the third item on the list, the <span class="darkgreen">scalar()</span> function is a Perl <i>built-in</i> that 
+    forces its argument into scalar context. (There's no <span class="darkgreen">list()</span> function; you 
+    won't need it.)</p>
+   
+   <p>Now take a look at the last item. How does that one work? The condition of a <span class="purple">while()</span> statement 
+    must be either true or false, so it's evaluated in <i>Boolean context</i>, which is for 
+    all practical purposes the same as scalar context. And whatever comes between the parentheses 
+    is going to be put in scalar context.  By the way, this example demonstrates another important difference 
+    between the <span class="purple">while</span> and <span class="purple">foreach</span> loops 
+    (your homework from the previous lesson may come to mind): <span class="purple">while</span> puts the 
+    contents of the parentheses—its condition—into 
+    scalar context, and <span class="purple">foreach</span> puts the contents of its parentheses—its arguments—into list 
+    context.)</p>
+   
+   <p>Let's incorporate that into one of our earlier examples. Create 
+    a new file called <b>name_finder.pl</b> as shown:</p>
+    
+<div class="listingBox"><div class="listingTitle">CODE TO TYPE:</div><div class="listing"><pre><ins>#!/usr/bin/perl
+use strict;
+use warnings;
+
+my @names = ("Charles Francis Xavier", "Hiram K. Hackenbacker", "James Moriarty", "Samuel Finley Breese Morse");
+while ( @names )
+{
+  my $name = shift @names;
+  my @parts = split ' ', $name;
+  my $first_name = shift @parts;
+  my $last_name = pop @parts;
+  print "$name is sanitized to $last_name, $first_name\n";
+}</ins>
+</pre></div></div>
+   
+   <p><img src="images/coderunner/checksyntax.JPG"> and run it. </p>
+   
+<div class="interactiveBox"><div class="interactiveTitle">INTERACTIVE TERMINAL SESSION:</div><div class="interactive"><pre>cold:~/perl1$ <ins>./name_finder.pl</ins>
+Charles Francis Xavier is sanitized to Xavier, Charles
+Hiram K. Hackenbacker is sanitized to Hackenbacker, Hiram
+James Moriarty is sanitized to Moriarty, James
+Samuel Finley Breese Morse is sanitized to Morse, Samuel    
+cold:~/perl1$    
+</pre></div></div>
+   
+   <p>This version of the program will no longer stop when it hits an element of the array 
+    <span class="darkred">@names</span> that happens to be false—not a likely possibility with names, but if 
+    you're iterating over an array that might contain a false element, you'll want to take this 
+    approach.
+   </p>
+   
+   <p>Now, modify the program as shown:</p>
+   
+<div class="listingBox"><div class="listingTitle">CODE TO TYPE:</div><div class="listing"><pre>#!/usr/bin/perl
+use strict;
+use warnings;
+
+my @names = ("Charles Francis Xavier", "Hiram K. Hackenbacker", "James Moriarty", "Samuel Finley Breese Morse");
+<ins>foreach my $name ( @names )</ins>
+{ 
+  <del>my $name = shift @names;</del>
+  my @parts = split ' ', $name;
+  my $first_name = shift @parts;
+  my $last_name = pop @parts;
+  print "$name is sanitized to $last_name, $first_name\n";
+}
+</pre></div></div>   
+
+   <p><img src="images/coderunner/checksyntax.JPG"> and run it. </p>
+   
+<div class="interactiveBox"><div class="interactiveTitle">INTERACTIVE TERMINAL SESSION:</div><div class="interactive"><pre>cold:~/perl1$ <ins>./name_finder.pl</ins>
+Charles Francis Xavier is sanitized to Xavier, Charles
+Hiram K. Hackenbacker is sanitized to Hackenbacker, Hiram
+James Moriarty is sanitized to Moriarty, James
+Samuel Finley Breese Morse is sanitized to Morse, Samuel    
+cold:~/perl1$    
+</pre></div></div>
+
+   <p>This version of the code does the same thing as the last one and demonstrates the array being placed in list 
+    context. Because <span class="darkgreen">shift</span> isn't used, the array is not modified, and because 
+    <span class="purple">foreach</span> specifies a block iteration variable (<span class="darkred">$name</span>), the code is 
+    slightly shorter. This version is arguably better than the previous version.</p>
+   
+   <p>Any function in Perl may return different results in list context and scalar context, and 
+    many do. When you learn to write your own functions (in the next lesson), you'll be able to tell 
+    whether something was called in list context or scalar context by calling the 
+    <span class="darkgreen">wantarray</span> built-in function.</p>
+   
+   <p>Keep in mind that when you assign to a list of scalars, they should be separated by commas and 
+    surrounded by parentheses:</p>
+   
+   <p>(<span class="darkred">$x</span>, <span class="darkred">$y</span>, <span class="darkred">$z</span>) = ...</p>
+   
+   <p>Doing that puts the right side of the <b>=</b> sign into list context. So, what's the difference between these two 
+    statements?:</p>
+   
+   <ul><li><span class="darkred">$x</span> = ...</li><li>(<span class="darkred">$x</span>) = ...</li></ul>
+   
+   <p>The first statement puts the right side of the <b>=</b> sign into scalar context; the second puts it into list 
+    context. The list to which items are being assigned may have only one element in it, but it's still a list, as 
+    opposed to a scalar that is not within a list (like in the first statement).</p>
+   
+   <p><table class="noteBox fBox pBox "><tr><td class="noteTitle">Note</td><td class="note">By the way, the authors of "Programming Perl" weren't kidding when they mentioned the misery
+   that might follow when a programmer doesn't quite understand context. In fact, one person 
+   has a police record as a result of not understanding the difference between scalar and list context! Read 
+    <a href="http://yro.slashdot.org/article.pl?sid=01/03/13/208259" target="_blank">this Slashdot article</a>, a real-life 
+    cautionary tale!</td></tr></table></p>
+   
+   <p>This lesson is a little shorter than previous ones, because the homework is a little more labor intensive. There 
+    are many subtleties to understand about lists and context in Perl, so hopefully you'll find yourself exploring. If you get 
+    confused, stop and ask yourself whether you're wrestling with code that you might really want to use. 
+    If it seems potentially useful, then keep going as far as you like!</p>
+   
+   <p>By now, you're getting a solid understanding of the fundamentals of Perl and you know quite a few things 
+    that casual Perl programmers probably don't. You're doing great! Keep going!</p>
+  
+  </div></div>
+
+ </div>
+<div class="footer"><div id="timeSurvey"></div>				
+				Copyright © 1998-2014 O'Reilly Media, Inc.<br><img src="https://courses.oreillyschool.com/common/cclicense.png"><br>
+				This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 Unported License.<br>
+				See <a href="http://creativecommons.org/licenses/by-sa/3.0/legalcode">http://creativecommons.org/licenses/by-sa/3.0/legalcode</a> 
+				for more information.
+				</div><iframe id="t" width="1" height="1" border="0" style="display:none"></iframe><script language="javascript">bodyLoaded();</script><script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+  ga('create', 'UA-44720547-1', 'oreillyschool.com');
+  ga('send', 'pageview');
+</script></body></html>

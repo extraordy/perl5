@@ -1,0 +1,663 @@
+<html><!-- Copyright (c) 1998-2014 O'Reilly Media, Inc.
+			This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 Unported License.
+			See http://creativecommons.org/licenses/by-sa/3.0/legalcode for more information.
+            --><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"><link rel="stylesheet" type="text/css" href="../common/Lab.css"><script type="text/javascript" src="../common/Lab.js"></script><script language="javascript"></script><title>Heterogeneous Data Structures</title></head><body id="body"><a name="top"></a><div class="title">Heterogeneous Data Structures</div><div class="resize"><a href="Perl3-11.html#top" onclick="changeSize('smaller');" class="aS" title="Keep clicking to make fonts smaller">A</a><a href="Perl3-11.html#top" onclick="changeSize('larger');" class="aL" title="Keep clikcing to make fonts larger">A</a><a href="Perl3-11.html#top" onclick="lv()" class="lv" title="Adjust Page for High Contrast">HC</a><div id="fh"><p>Click on <span class="aS">A</span> to make all fonts on the page smaller.</p><p>Click on <span class="aL">A</span> to make all fonts on the page larger.</p><p>Click on <span class="lv">HC</span> to toggle high contrast mode. When you move your mouse over 
+                 some bold words in high contrast mode, related words are automatically highlighted. Text is shown
+                 in black and white. 
+             </p></div></div><hr>
+  
+  <div class="goalTitle">Lesson Objectives</div><div class="goals"> 
+    
+    When you complete this lesson, you will be able to:
+    <ul><li>handle <a href="Perl3-11.html#semi_regular_data_structures">Semi-Regular Data Structures</a>.</li><li>handle <a href="Perl3-11.html#irregular_data_structures">Irregular Data Structures</a>.</li></ul>
+  </div><hr>
+ 
+  <p>We've seen arrays of arrays and hashes of hashes (okay, well technically, arrays of arrayrefs and hashes 
+    of hashrefs). Our 
+    data structures have been consistently regular because we designed them that way. But Perl 
+    really has no problem with more complex arrays that contain references to arrays, hashes, scalars, and such.
+    And sometimes that's exactly what we want. This lesson is all about data structures that are not so 
+    regular.</p>
+  
+  
+ 
+ <a href="Perl3-11.html" name="semi_regular_data_structures"></a>
+ <a name="h_01"></a><div class="heading">Semi-Regular Data Structures</div><div class="headingText">
+  
+  <a name="s_01"></a><div id="s_01"><div class="subheading">Hashes of Arrays</div><div class="subheadingText">
+   
+    <p>Remember our data structure for the state database from the last lesson? It looked like this:</p>
+   
+    <p><div class="c"><img src="images/lessonImages/hoh.png"></div></p>
+   
+    <p>Unfortunately, it repeats the storage for the keys' <b>name</b>, <b>capital</b>, and 
+      so on, in every record. But, since this isn't a sparse dataset, we can shrink the storage required by using 
+      a hash of arrays:</p>
+   
+    <p><div class="c"><img src="images/lessonImages/hoa.png"></div></p>
+   
+    <p>Each entry in the hash is an arrayref containing the elements in a predetermined order. Let's write 
+      the code for that. Modify <b>state.pl</b> in your <b>/perl3</b> folder as shown:</p>
+   
+<div class="listingBox"><div class="listingTitle">CODE TO TYPE:</div><div class="listing"><pre>#!/usr/bin/perl
+use strict;
+use warnings;
+
+my %state;
+my @names;
+while ( &lt;&gt; )
+{
+  chomp;
+  my ($abbreviation, @fields) = split /\s*\|\s*/;
+  @names = @fields and next if $abbreviation eq 'key';
+  <del>@{ $state{$abbreviation} }{@names} = @fields;</del>
+  <ins>$state{$abbreviation} = \@fields;</ins>
+}
+
+my $limit;
+for my $abbr ( sort keys %state )
+{
+  print "$abbr: ";
+  my @values = @{ $state{$abbr} };
+  <del>for my $key ( sort keys %{ $state{$abbr} } )</del>
+  <ins>for my $key ( @names )</ins>
+  {
+    <del>print "$key =&gt; $state{$abbr}{$key} ";</del>
+    <ins>print "$key =&gt; ", shift @values, ", ";</ins>
+  }
+  print "\n";
+  exit if ++$limit &gt;= 5;
+}
+</pre></div></div>
+   
+    <p><img src="images/coderunner/checksyntax.JPG"> and run it again on the 
+      <b>state_full.data</b> input file:</p>
+    
+<div class="interactiveBox"><div class="interactiveTitle">INTERACTIVE SESSION:</div><div class="interactive"><pre>cold:~$ <ins>cd perl3</ins>
+cold:~/perl3$ <ins>./state.pl ./state_full.data</ins>
+AK: bird =&gt; Willow Ptarmigan, capital =&gt; Juneau, flower =&gt; Forget-me-not, largest_city =&gt; Anchorage, name =&gt; Alaska,
+AL: bird =&gt; Yellowhammer, capital =&gt; Montgomery, flower =&gt; Camellia, largest_city =&gt; Birmingham, name =&gt; Alabama,
+AR: bird =&gt; Mockingbird, capital =&gt; Little Rock, flower =&gt; Apple Blossom, largest_city =&gt; Little Rock, name =&gt; Arkansas,
+AZ: bird =&gt; Cactus Wren, capital =&gt; Phoenix, flower =&gt; Saguaro Cactus Blossom, largest_city =&gt; Phoenix, name =&gt; Arizona,
+CA: bird =&gt; California Valley Quail, capital =&gt; Sacramento, flower =&gt; Golden Poppy, largest_city =&gt; Los Angeles, name =&gt; California, </pre></div></div>
+    
+    <p>You get exactly the same output as the 
+      last time you ran it.</p>
+    <p>The parsing loop looks for the header line and saves the column headings from it into the array 
+      <b>@names</b>. Unlike the hash-of-hashes version of this program, this one would actually work 
+      if the header line wasn't the first line.</p>
+    
+    <p>When we print out the data structure, we copy the array pointed to by each arrayref and shift 
+      each successive element out while we iterate through the parallel array of field names 
+      (<b>@names</b>).</p>
+   
+    <p>Now let's exercise our <span class="darkgreen">map()</span> skills while we remove the 
+      unwanted trailing commas from the end of each line. Modify <b>state.pl</b> as shown: </p>
+   
+<div class="listingBox"><div class="listingTitle">CODE TO TYPE:</div><div class="listing"><pre>#!/usr/bin/perl
+use strict;
+use warnings;
+
+my %state;
+my @names;
+while ( &lt;&gt; )
+{
+  chomp;
+  my ($abbreviation, @fields) = split /\s*\|\s*/;
+  @names = @fields and next if $abbreviation eq 'key';
+  $state{$abbreviation} = \@fields;
+}
+
+my $limit;
+for my $abbr ( sort keys %state )
+{
+  print "$abbr: ";
+  my @values = @{ $state{$abbr} };
+  <ins>print join( ', ', map { "$_ =&gt; " . shift @values } @names ), ".\n";</ins>
+  <del>for my $key ( @names )
+  {
+    print "$key =&gt; ", shift @values, ", ";
+  }
+  print "\n";</del>
+  exit if ++$limit &gt;= 5;
+}
+</pre></div></div>
+   
+    <p><img src="images/coderunner/checksyntax.JPG"> and run it as shown:</p>
+    
+<div class="interactiveBox"><div class="interactiveTitle">INTERACTIVE SESSION:</div><div class="interactive"><pre>cold:~/perl3$ <ins>./state.pl ./state_full.data</ins>
+AK: name =&gt; Alaska, capital =&gt; Juneau, largest_city =&gt; Anchorage, bird =&gt; Willow Ptarmigan, flower =&gt; Forget-me-not.
+AL: name =&gt; Alabama, capital =&gt; Montgomery, largest_city =&gt; Birmingham, bird =&gt; Yellowhammer, flower =&gt; Camellia.
+AR: name =&gt; Arkansas, capital =&gt; Little Rock, largest_city =&gt; Little Rock, bird =&gt; Mockingbird, flower =&gt; Apple Blossom.
+AZ: name =&gt; Arizona, capital =&gt; Phoenix, largest_city =&gt; Phoenix, bird =&gt; Cactus Wren, flower =&gt; Saguaro Cactus Blossom.
+CA: name =&gt; California, capital =&gt; Sacramento, largest_city =&gt; Los Angeles, bird =&gt; California Valley Quail, flower =&gt; Golden Poppy.
+</pre></div></div>
+    
+    <p>The output is slightly 
+      improved. But what if we want to access specific named attributes from our code?  We can no longer write 
+      <b>print $state{AK}{capital}</b> because we no longer have a hash of hashes. We'd need to write 
+      <b>print $state{AK}[1]</b> and that, to use a non-technical term, sucks. We can only tell that the 
+      index required is <b>1</b> by looking at the data file heading line, remembering that the 
+      first column doesn't count, and hoping that it doesn't change. Using code that depends on the format 
+      of external data is a bad idea. The code didn't care about the ordering of the data 
+      before, why should it now? </p>
+   
+    <p>One solution to this problem would be to capture the positional information in a separate hash. Modify the program like this:</p>
+    
+<div class="listingBox"><div class="listingTitle">CODE TO TYPE:</div><div class="listing"><pre>#!/usr/bin/perl
+use strict;
+use warnings;
+
+my %state;
+my @names;
+while ( &lt;&gt; )
+{
+  chomp;
+  my ($abbreviation, @fields) = split /\s*\|\s*/;
+  @names = @fields and next if $abbreviation eq 'key';
+  $state{$abbreviation} = \@fields;
+}
+<ins>my $count = 0;
+my %index = map { $_ =&gt; $count++ } @names;
+my ($attr, $abbr) = qw(capital AR);
+print "The $attr of $state{$abbr}[ $index{name} ] is $state{$abbr}[ $index{$attr} ]\n";
+exit;
+</ins>
+my $limit;
+for my $abbr ( sort keys %state )
+{
+  print "$abbr: ";
+  my @values = @{ $state{$abbr} };
+  print join( ', ', map { "$_ =&gt; " . shift @values } @names ), ".\n";
+  exit if ++$limit &gt;= 5;
+}
+</pre></div></div>
+   
+    <p><img src="images/coderunner/checksyntax.JPG"> and run it (we inserted the 
+      <span class="darkgreen">exit()</span> as a quick way to suppress the loop output that we're not interested 
+      in at the moment, while not losing the original loop code):</p>
+    
+<div class="interactiveBox"><div class="interactiveTitle">INTERACTIVE SESSION:</div><div class="interactive"><pre>cold:~/perl3$ <ins>./state.pl ./state_full.data</ins>
+The capital of Arkansas is Little Rock
+</pre></div></div>
+   
+    <p>We could make things a little easier for ourselves with special index variables. Modify <b>state.pl</b> as shown:</p>
+
+<div class="listingBox"><div class="listingTitle">CODE TO TYPE:</div><div class="listing"><pre>#!/usr/bin/perl
+use strict;
+use warnings;
+
+my %state;
+my @names;
+while ( &lt;&gt; )
+{
+  chomp;
+  my ($abbreviation, @fields) = split /\s*\|\s*/;
+  @names = @fields and next if $abbreviation eq 'key';
+  $state{$abbreviation} = \@fields;
+}
+my $count = 0;
+my %index = map { $_ =&gt; $count++ } @names;
+<ins>my $NAME = $index{name};</ins>
+my ($attr, $abbr) = qw(capital AR);
+print "The $attr of $state{$abbr}[ <del>$index{name}</del><ins>$NAME</ins> ] is $state{$abbr}[ $index{$attr} ]\n";
+exit;
+
+my $limit;
+for my $abbr ( sort keys %state )
+{
+  print "$abbr: ";
+  my @values = @{ $state{$abbr} };
+  print join( ', ', map { "$_ =&gt; " . shift @values } @names ), ".\n";
+  exit if ++$limit &gt;= 5;
+}</pre></div></div>
+   
+    <p><img src="images/coderunner/checksyntax.JPG"> and run it; the output is identical.</p>
+    
+    <p>When we have a small number of fixed data (no more than three items) to pass around a 
+      program, an arrayref is often a good programming option. And in order to use an arrayref, you 
+      should have some way of keeping track of the specific location of each element, like we've done in our example with the hash 
+      of indexes and variables containing indexes.</p>
+   
+  </div></div>
+  
+   <p>Imagine how we could use other kinds of semi-regular data structures—like arrays of 
+     hashrefs—for various tasks. There are countless possibilities!</p>
+   
+ </div>
+ <a href="Perl3-11.html" name="irregular_data_structures"></a>
+ <a name="h_02"></a><div class="heading">Irregular Data Structures</div><div class="headingText">
+   
+   <p>Sometimes, you need a data structure that doesn't have any regularity to it at all; say, an array 
+     that might have a hashref in one element, an arrayref in another, an ordinary scalar in another, and 
+     so on, even repeated down through multiple levels. One example of such a data structure is a 
+     <i>tree.</i></p>
+   
+  <a name="s_01"></a><div id="s_01"><div class="subheading">Parse Trees</div><div class="subheadingText">
+   
+    <p>Consider an arithmetic expression like <b>5 + 17 * $x - 3 ** 2</b>. When an expression like that 
+      appears in a computer program of some kind, the compiler parses it into a tree that can later be 
+      executed to figure out its value. A tree for that expression would look like this:</p>
+   
+    <p><div class="c"><img src="images/lessonImages/tree.png"></div></p>
+    
+    <p>Each node contains either an operation to be performed on its children, or a value to perform an 
+      operation on. Let's write a parser like that now. Create <b>parse.pl</b> in your 
+      <b>/perl3</b> folder as shown: </p>
+   
+<div class="listingBox"><div class="listingTitle">CODE TO TYPE:</div><div class="listing"><pre>#!/usr/bin/perl
+use strict;
+use warnings;
+
+use Data::Dumper;
+
+my (@numbers, @operators);
+
+my $exp = join '', &lt;DATA&gt;;
+chomp $exp;
+
+my $tree = parse( $exp );
+print Dumper $tree;
+
+my %VARIABLES = ( '$x' =&gt; 8 );
+
+my $result = evaluate( $tree );
+
+$exp =~ s/\Q$_\E/$VARIABLES{$_}/ for keys %VARIABLES;
+print "$exp = $result\n";
+
+sub parse
+{
+  local $_ = shift;
+
+  if ( my ($left, $op, $right) = /(.+)([+-])(.+)/ )
+  {
+    return make_node( OP =&gt; parse($left), $op, parse($right) );
+  }
+  elsif ( ($left, $op, $right) = m!(.*[^*])([*/])([^*].*)! )
+  {
+    return make_node( OP =&gt; parse($left), $op, parse($right) );
+  }
+  elsif ( ($left, $op, $right) = /(.+)(\*\*)(.+)/ )
+  {
+    return make_node( OP =&gt; parse($left), $op, parse($right) );
+  }
+  elsif ( my ($const) = /\A\s*(\d+)\s*\z/ )
+  {
+    return make_node( CONST =&gt; $const );
+  }
+  elsif ( my ($var) = /\A\s*(\$\w+)\s*\z/ )
+  {
+    return make_node( VAR =&gt; $var );
+  }
+  else
+  {
+    die "Error parsing '$_'\n";
+  }
+}
+
+sub make_node
+{
+  my $type = shift;
+
+  if ( $type =~ /CONST|VAR/ )
+  {
+    return { type =&gt; $type, value =&gt; shift };
+  }
+
+  my ($left, $op, $right) = @_;
+  return { type =&gt; $type, left =&gt; $left, right =&gt; $right, op =&gt; $op };
+}
+
+sub evaluate
+{
+  my $node = shift;
+
+  if ( $node-&gt;{type} eq 'CONST' )
+  {
+    return $node-&gt;{value};
+  }
+  elsif ( $node-&gt;{type} eq 'VAR' )
+  {
+    return $VARIABLES{ $node-&gt;{value} };
+  }
+  elsif ( $node-&gt;{type} eq 'OP' )
+  {
+    my ($left, $right) = map { evaluate( $node-&gt;{$_} ) } qw(left right);
+    if ( $node-&gt;{op} eq '+' )
+    {
+      return $left + $right;
+    }
+    elsif ( $node-&gt;{op} eq '-' )
+    {
+      return $left - $right;
+    }
+    elsif ( $node-&gt;{op} eq '*' )
+    {
+      return $left * $right;
+    }
+    elsif ( $node-&gt;{op} eq '/' )
+    {
+      return $left / $right;
+    }
+    elsif ( $node-&gt;{op} eq '**' )
+    {
+      return $left ** $right;
+    }
+    die "Unknown operator $node-&gt;{op}\n";
+  }
+  else
+  {
+    die "Unknown node type $node-&gt;{type}\n";
+  }
+}
+__END__
+5 + 17 * $x - 3 ** 2
+</pre></div></div>
+   
+    <p><img src="images/coderunner/checksyntax.JPG"> and run it as shown:</p>
+    
+<div class="interactiveBox"><div class="interactiveTitle">INTERACTIVE SESSION:</div><div class="interactive"><pre>
+cold:~/perl3$ <ins>./parse.pl</ins>
+$VAR1 = {
+          'left' =&gt; {
+                      'left' =&gt; {
+                                  'value' =&gt; '5',
+                                  'type' =&gt; 'CONST'
+                                },
+                      'right' =&gt; {
+                                   'left' =&gt; {
+                                               'value' =&gt; '17',
+                                               'type' =&gt; 'CONST'
+                                             },
+                                   'right' =&gt; {
+                                                'value' =&gt; '$x',
+                                                'type' =&gt; 'VAR'
+                                              },
+                                   'type' =&gt; 'OP',
+                                   'op' =&gt; '*'
+                                 },
+                      'type' =&gt; 'OP',
+                      'op' =&gt; '+'
+                    },
+          'right' =&gt; {
+                       'left' =&gt; {
+                                   'value' =&gt; '3',
+                                   'type' =&gt; 'CONST'
+                                 },
+                       'right' =&gt; {
+                                    'value' =&gt; '2',
+                                    'type' =&gt; 'CONST'
+                                  },
+                       'type' =&gt; 'OP',
+                       'op' =&gt; '**'
+                     },
+          'type' =&gt; 'OP',
+          'op' =&gt; '-'
+        };
+5 + 17 * 8 - 3 ** 2 = 132
+</pre></div></div>
+
+    <p>Those regular expressions have made parsing considerably easier, but there's still a lot to 
+      explain here! Let's go over some of the more basic and incidental pieces first. We use the word 
+      <b>local</b> to create a scoped copy of <b>$_</b> so that our recursive subroutine doesn't stomp 
+      on other versions of <b>$_</b> used by subroutines higher up the calling stack. Remember, 
+      <b>$_</b> belongs to Perl, not us, so we wouldn't say "my $_". We use <b>$_</b> inside the 
+      <b>parse</b> subroutine to avoid having to bind the matching statements to a variable. This keeps them more concise.</p>
+   
+    <p>Also, the <b>\Q...\E</b> construction inside a regular expression is the quoting form of the 
+      <span class="darkgreen">quotemeta()</span> function (for more information on quotemeta, 
+      visit <a href="http://perldoc.perl.org/5.12.1/functions/quotemeta.html" target="_blank">perldoc -f quotemeta</a>). It 
+      causes the expansion of <b>$_</b> inside the regex to have special characters quoted, so that 
+      when <b>$_</b> is equal to <b>$x</b>, it is interpolated in the regex as 
+      <b>\$x</b>, which we need, because there is no variable <b>$x</b> in our 
+      program. We do this substitution so that when the input string is printed out for verification, it 
+      has any "variables" substituted already. This makes it easier to paste into a calculator to determine whether 
+      the calculated answer was correct.</p>
+   
+    <p>The program itself works in two phases: parse and execute. First, we construct 
+      a parse tree for the expression, then we print the tree with <span class="darkgreen">Dumper()</span>, and then 
+      we evaluate the tree with <b>evaluate</b> and print the result.</p>
+   
+    <p>The parser constructs a binary tree by looking for the lowest-precedence operators first: <b>+</b> and <b>-</b>. 
+      It splits the expression into what's on the left of that operator and what's on the right, and 
+      builds a "node" (represented with a hashref) that contains pointers to the left and right parts.</p>
+   
+    <p>Then the parser looks for higher-precedence operators, and finally it looks for numbers or 
+      "variables" (which for the sake of convenience are not actual variables in the program, but 
+      represented in the special hash <span class="red">%VARIABLES</span>). </p>
+   
+    <p>The recursion (the application of a function as a part of the definition of that same function) 
+      can be hard to follow at first, but the structure printed by 
+      <span class="darkgreen">Dumper()</span> shows you the result.</p>
+   
+    <p>The evaluation recurses through the same tree, extracting values and variables and applying 
+      operators to them.</p>
+   
+    <p>Take the time to study this program and how it works. Throw other expressions at it. This 
+      program can only deal with the operators <b>+</b>, <b>-</b>, <b>*</b>, <b>/</b>, and 
+      <b>**</b>—that last one requires the regex looking for <b>*</b> to ensure that it finds only 
+      one <b>*</b>. It can handle integers and "variables" that have values in <b>%VARIABLES</b>. 
+      Anything else will cause a failure.</p>
+ 
+  </div></div>
+  <a name="s_02"></a><div id="s_02"><div class="subheading">The ref() Function</div><div class="subheadingText">
+   
+    <p>For all its depth and tree-ness, the tree that we built in the last example contains only hashrefs. 
+      Suppose it were more heterogeneous and contained other reference types; for example, suppose we 
+      decided to save space when building our tree and put integers in as ordinary scalars instead of 
+      inside hashrefs. How would we indicate inside the <b>evaluate</b> routine, the way to dereference 
+      <b>$node</b>?</p>
+     
+    <p>This is where we bring in the <span class="darkgreen">ref()</span> function. It indicates the type of reference 
+      you pass it:</p>
+     
+  <div class="c">  <table class="tbl" border=""><tr><th>Argument to ref()</th><th>Result</th></tr><tr><td>Not a reference</td><td>False (empty string)</td></tr><tr><td>Reference to a scalar</td><td>'SCALAR'</td></tr><tr><td>Reference to an array</td><td>'ARRAY'</td></tr><tr><td>Reference to a hash</td><td>'HASH'</td></tr></table></div>
+     
+    <p>Let's see that in action. Modify <b>parse.pl</b> as shown:</p>
+     
+<div class="listingBox"><div class="listingTitle">CODE TO TYPE:</div><div class="listing"><pre>#!/usr/bin/perl
+use strict;
+use warnings;
+
+use Data::Dumper;
+
+my (@numbers, @operators);
+
+my $exp = join '', &lt;DATA&gt;;
+chomp $exp;
+
+my $tree = parse( $exp );
+print Dumper $tree;
+
+my %VARIABLES = ( '$x' =&gt; 8 );
+
+my $result = evaluate( $tree );
+
+$exp =~ s/\Q$_\E/$VARIABLES{$_}/ for keys %VARIABLES;
+print "$exp = $result\n";
+
+sub parse
+{
+  local $_ = shift;
+
+  if ( my ($left, $op, $right) = /(.+)([+-])(.+)/ )
+  {
+    return make_node( OP =&gt; parse($left), $op, parse($right) );
+  }
+  elsif ( ($left, $op, $right) = m!(.*[^*])([*/])([^*].*)! )
+  {
+    return make_node( OP =&gt; parse($left), $op, parse($right) );
+  }
+  elsif ( ($left, $op, $right) = /(.+)(\*\*)(.+)/ )
+  {
+    return make_node( OP =&gt; parse($left), $op, parse($right) );
+  }
+  elsif ( my ($const) = /\A\s*(\d+)\s*\z/ )
+  {
+    return make_node( CONST =&gt; $const );
+  }
+  elsif ( my ($var) = /\A\s*(\$\w+)\s*\z/ )
+  {
+    return make_node( VAR =&gt; $var );
+  }
+  else
+  {
+    die "Error parsing '$_'\n";
+  }
+}
+
+
+sub make_node
+{
+  my $type = shift;
+
+  <del>if ( $type =~ /CONST|VAR/ )
+  {
+    return { type =&gt; $type, value =&gt; shift };
+  }</del>
+  <ins>if ( $type eq 'CONST' )
+  {
+    return shift;
+  }
+  elsif ( $type eq 'VAR' )
+  {
+    return [ shift ];
+  }</ins>
+
+  my ($left, $op, $right) = @_;
+  return { type =&gt; $type, left =&gt; $left, right =&gt; $right, op =&gt; $op };
+}
+
+
+sub evaluate
+{
+  my $node = shift;
+
+  <ins>if ( ! ref $node )
+  {
+    return $node;
+  }
+  elsif ( ref $node eq 'ARRAY' )
+  {
+    return $VARIABLES{ $node-&gt;[0] };
+  }</ins>
+  <del>if ( $node-&gt;{type} eq 'CONST' )
+  {
+    return $node-&gt;{value};
+  }
+  elsif ( $node-&gt;{type} eq 'VAR' )
+  {
+    return $VARIABLES{ $node-&gt;{value} };
+  }</del>
+  elsif ( $node-&gt;{type} eq 'OP' )
+  {
+    my ($left, $right) = map { evaluate( $node-&gt;{$_} ) } qw(left right);
+    if ( $node-&gt;{op} eq '+' )
+    {
+      return $left + $right;
+    }
+    elsif ( $node-&gt;{op} eq '-' )
+    {
+      return $left - $right;
+    }
+    elsif ( $node-&gt;{op} eq '*' )
+    {
+      return $left * $right;
+    }
+    elsif ( $node-&gt;{op} eq '/' )
+    {
+      return $left / $right;
+    }
+    elsif ( $node-&gt;{op} eq '**' )
+    {
+      return $left ** $right;
+    }
+    die "Unknown operator $node-&gt;{op}\n";
+  }
+  else
+  {
+    die "Unknown node type $node-&gt;{type}\n";
+  }
+}
+__END__
+5 + 17 * $x - 3 ** 2
+</pre></div></div>
+     
+    <p><img src="images/coderunner/checksyntax.JPG"> and run it as shown:</p>
+     
+<div class="interactiveBox"><div class="interactiveTitle">INTERACTIVE SESSION:</div><div class="interactive"><pre>cold:~/perl3$ <ins>./parse.pl</ins>
+$VAR1 = {
+          'left' =&gt; {
+                      'left' =&gt; '5',
+                      'right' =&gt; {
+                                   'left' =&gt; '17',
+                                   'right' =&gt; [
+                                                '$x'
+                                              ],
+                                   'type' =&gt; 'OP',
+                                   'op' =&gt; '*'
+                                 },
+                      'type' =&gt; 'OP',
+                      'op' =&gt; '+'
+                    },
+          'right' =&gt; {
+                       'left' =&gt; '3',
+                       'right' =&gt; '2',
+                       'type' =&gt; 'OP',
+                       'op' =&gt; '**'
+                     },
+          'type' =&gt; 'OP',
+          'op' =&gt; '-'
+        };
+5 + 17 * 8 - 3 ** 2 = 132
+</pre></div></div>
+     
+  
+    <p>In this program, we also changed the representation of "variables" to an arrayref just to see what 
+      that looks like.</p>
+     
+    <p>Study the output from <span class="darkgreen">Dumper()</span> and see how it has changed. Then, look at the 
+      changes in the program code and see how they created that tree and parsed it.</p>
+      
+    <p><span class="darkgreen">ref()</span> looked at the value returned by <span class="darkgreen">ref()</span>. 
+      Most programs that use <span class="darkgreen">ref()</span> in practice just test whether the 
+      result is true or false; that is, whether it's a reference or not. That would have been the case in our last example if 
+      we weren't storing an arrayref in the 
+      tree on occasion there.</p>
+  
+  </div></div>
+  <a name="s_03"></a><div id="s_03"><div class="subheading">References to Lists</div><div class="subheadingText">
+      
+   <p>Here's what happens when you take a reference to a list:</p>
+   
+<div class="observeBox"><div class="observeTitle">OBSERVE:</div><div class="observe"><pre>\(1, 2, 3, $x)
+</pre></div></div>
+    
+   <p>You don't get an arrayref and you don't get some special kind of reference that we've never seen 
+     before. You get the list of references to the individual elements, just as though you had written this code:</p>
+   
+<div class="observeBox"><div class="observeTitle">OBSERVE:</div><div class="observe"><pre>(\1, \2, \3, \$x)
+</pre></div></div>
+ 
+  </div></div>
+   
+   <p>Good work! That's enough about less-than-regular data structures—for now. In the next lesson we'll tackle 
+   references to subroutines and more! See you there...</p>
+ </div>
+
+ <p>Once you finish the lesson, go back to the syllabus to complete the homework.</p>
+   
+<div class="footer"><div id="timeSurvey"></div>				
+				Copyright © 1998-2014 O'Reilly Media, Inc.<br><img src="https://courses.oreillyschool.com/common/cclicense.png"><br>
+				This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 Unported License.<br>
+				See <a href="http://creativecommons.org/licenses/by-sa/3.0/legalcode">http://creativecommons.org/licenses/by-sa/3.0/legalcode</a> 
+				for more information.
+				</div><iframe id="t" width="1" height="1" border="0" style="display:none"></iframe><script language="javascript">bodyLoaded();</script><script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+  ga('create', 'UA-44720547-1', 'oreillyschool.com');
+  ga('send', 'pageview');
+</script></body></html>

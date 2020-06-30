@@ -1,0 +1,88 @@
+<html>
+   <!-- Copyright (c) 1998-2014 O'Reilly Media, Inc. Unauthorized use is strictly
+                prohibited. None of this code or content can by copied without the express written
+                permission from O'Reilly Media, Inc. -->
+   <head>
+      <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+      <link rel="stylesheet" type="text/css" href="http://archive.oreilly.com/oreillyschool/courses/Perl1/common/Lab.css">
+      <title>Properties - Quiz 1</title>
+   </head>
+   <body id="body">
+      <h2>Properties - Quiz 1</h2> 
+      
+      
+      
+      
+      <p>Name one important difference between how Perl treats the number <b>0.0</b> and the string <b>"0.0"</b>.</p>
+      
+        
+      
+      
+      <p><b>0.0 (is a number)</b> will evaluate to false; <b>"0.0" (is a string)</b> will evaluate to true. This is the answer we're 
+         looking for.
+      </p>
+      
+      
+      <p><b>Grading Criteria:</b> Student should be able to explain the truth value for each version of 0.0.</p>
+      
+      
+      
+      
+      
+      
+      <p>The following code fragment is legal and produces the desired result but is confusing:</p>
+      
+      
+      <div class="observeBox">
+         <div class="observeTitle">Observe:</div>
+         <div class="observe"><pre>unless ( $germ_count &lt; 50 )
+{
+&nbsp;print "Filthy\n";
+}
+elsif ( $germ_count &gt; 25 )
+{
+&nbsp;print "Dirty\n";
+}
+else
+{
+&nbsp;print "Clean\n";
+}</pre></div>
+      </div>
+      
+      
+      <p>How is the code confusing?</p>
+      
+      
+      <p>How would you make it clearer?</p>
+      
+        
+      
+      
+      <div class="observeBox">
+         <div class="observeTitle">Observe:</div>
+         <div class="observe"><pre>if( $germ_count &gt;= 50) { ... }</pre></div>
+      </div>
+      
+      
+      <p>Common Issues:</p>
+      
+      
+      <ul>
+         <li>If the student overcomplicates their checks, for example by adding extra checks to elsif to check that $germ_count is 
+            &lt; 50, instruct them that this check is not needed.
+         </li>
+         <li>If the student inverts the order of Filthy/Dirty/Clean, instruct them that the only change that needs to be made is for 
+            the unless check and no other changes needs to be made.
+         </li>
+      </ul>
+      
+      
+      <p><b>Grading Criteria:</b> Student should be able to describe the use of unless and double negatives and offer a solution using 
+         an if statement.
+      </p>
+      
+      
+      
+      
+   </body>
+</html>

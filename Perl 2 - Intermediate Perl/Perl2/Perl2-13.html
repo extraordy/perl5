@@ -1,0 +1,434 @@
+<html><!-- Copyright (c) 1998-2014 O'Reilly Media, Inc.
+			This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 Unported License.
+			See http://creativecommons.org/licenses/by-sa/3.0/legalcode for more information.
+            --><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"><link rel="stylesheet" type="text/css" href="../common/Lab.css"><script type="text/javascript" src="../common/Lab.js"></script><script language="javascript"></script><title>For Loops and More Miscellaneous Topics</title></head><body id="body"><a name="top"></a><div class="title">For Loops and More Miscellaneous Topics</div><div class="resize"><a href="Perl2-13.html#top" onclick="changeSize('smaller');" class="aS" title="Keep clicking to make fonts smaller">A</a><a href="Perl2-13.html#top" onclick="changeSize('larger');" class="aL" title="Keep clikcing to make fonts larger">A</a><a href="Perl2-13.html#top" onclick="lv()" class="lv" title="Adjust Page for High Contrast">HC</a><div id="fh"><p>Click on <span class="aS">A</span> to make all fonts on the page smaller.</p><p>Click on <span class="aL">A</span> to make all fonts on the page larger.</p><p>Click on <span class="lv">HC</span> to toggle high contrast mode. When you move your mouse over 
+                 some bold words in high contrast mode, related words are automatically highlighted. Text is shown
+                 in black and white. 
+             </p></div></div><hr>
+  
+  <div class="goalTitle">Lesson Objectives</div><div class="goals">
+    
+    
+    When you complete this lesson, you will be able to:
+    
+    <ul><li>use <a href="Perl2-13.html#for_loops">For Loops</a>.</li><li>use <a href="Perl2-13.html#loop_labels">Loop Labels</a>.</li><li>use <a href="Perl2-13.html#unbuffered_output">Unbuffered Output</a>.</li></ul>
+  </div><hr>
+ 
+ <a name="h_01"></a><div class="heading">For Loops</div><div class="headingText">
+   
+  <p>If you're familiar with other computer languages, you've probably used a loop. In most other languages, there is a 
+    <span class="purple">for</span> loop, which has three parts to its condition. Perl has a <b>for</b> loop as 
+   well, and it works much the same way as in those other languages. But the 
+   <span class="purple">foreach</span> loop is <i>much</i> more useful in Perl. A common mistake people make when learning Perl is to use the 
+   <span class="purple">for</span> loop where the <span class="purple">foreach</span> loop would give their programs greater clarity.</p>
+   
+  <p>With that in mind, let's look at the <span class="purple">for</span> loop:</p>
+  
+<div class="observeBox"><div class="observeTitle">OBSERVE: for loop syntax</div><div class="observe"><pre>
+<span class="purple">for</span> ( <span class="darkblue">Initialization</span>; <span class="darkred">condition</span>; <span class="darkgreen">iteration</span> )
+{
+  # ... code ...
+}
+</pre></div></div>
+   
+  <p>The <span class="purple">for</span> loop is characterized by the three clauses separated by semicolons inside 
+   parentheses; we call it the "directive." Each clause is a single Perl expression. Here's what the clauses 
+   do:</p>
+   
+  <ul><li><span class="darkblue">Initialization:</span> This is executed right before the first iteration of the 
+    loop. It's typically used to set an index variable to its initial value.</li><li><span class="darkred">Condition:</span> This expression is evaluated in Boolean context (to see if it
+    is true or false) before each execution of the loop. As soon as it evaluates as false, the 
+    <span class="purple">for</span> statement terminates, just like a <span class="purple">while</span> statement would.</li><li><span class="darkgreen">Iteration:</span> This clause is executed at the end of each iteration of the 
+    loop before the <span class="darkred"><i>condition</i></span> is tested again.</li></ul>
+   
+  <p>And though we love the <span class="purple">for</span> statement, it could be replaced by a  
+   <span class="purple">while</span> statement that has this structure:</p>
+   
+<div class="observeBox"><div class="observeTitle">OBSERVE: while equivalent</div><div class="observe"><pre>
+<span class="darkblue">Initialization</span>
+<span class="purple">while</span> ( <span class="darkred">condition</span> )
+{
+  # ... code ...
+  <span class="darkgreen">iteration</span>
+}
+</pre></div></div>
+   
+  <p>...except the <span class="purple">for</span> loop imposes its own scoping level on the directive, so that you 
+   can declare variables in the Initialization with <span class="purple">my</span> and restrict their scope to 
+   the <span class="purple">for</span> statement. So strictly speaking, the for loop is equivalent to this:</p>
+   
+<div class="observeBox"><div class="observeTitle">OBSERVE: while equivalent</div><div class="observe"><pre>
+{
+  <span class="darkblue">Initialization</span>
+  <span class="purple">while</span> ( <span class="darkred">condition</span> )
+  {
+    # ... code ...
+    <span class="darkgreen">iteration</span>
+  }
+}
+</pre></div></div>
+   
+  <p>Now that you understand the operation of <span class="purple">for</span>, let's look at an example:</p>
+   
+<div class="observeBox"><div class="observeTitle">OBSERVE: for loop</div><div class="observe"><pre>
+<span class="purple">for</span> ( <span class="darkblue">my $i = 0</span>; <span class="darkred">$i &lt;= $#array</span>; <span class="darkgreen">$i++</span> )
+{
+  print "Element $i is $array[$i]\n";
+}
+</pre></div></div>
+   
+   <p>Although a 
+     <span class="purple">for</span> loop isn't a very good way to iterate through an array, it makes for a tidy example. 
+     </p>
+   <p>The expression <span class="red">$#array</span> evaluates to
+   the index of the last element of the array <span class="red">@array</span>. So, if <span class="red">@fruits</span> contains the four 
+   elements <span class="orange">apple, orange, banana, cherry</span>, then <span class="red">$#fruits</span> is <span class="orange">3</span>,
+   and the value of the last element <span class="red">$fruits[$#fruits]</span> is <span class="orange">cherry</span>. Because it's 
+   fairly common to want to access the last element of an array, and since that expression is cumbersome 
+   and repetitive, Perl also allows you to use <i>negative</i> indices to count backwards from the 
+   <i>end</i> of an array. So you get <span class="red">$fruits[-1]</span> <span class="blue">eq</span> <span class="orange">'cherry'</span> and 
+   <span class="red">$fruits[-2]</span> <span class="blue">eq</span> <span class="orange">'banana'</span>.</p>
+   
+   <p>Try the <span class="purple">for</span> loop in a one-liner by typing the code below in the Unix shell as shown:</p>
+   
+<div class="interactiveBox"><div class="interactiveTitle">INTERACTIVE SESSION:</div><div class="interactive"><pre>cold:~$ <ins>perl -le 'push @sq, $_ ** 2 foreach 1 .. 9; for ( $i = 0; $i &lt;= $#sq; $i++ ) { print "Element $i is $sq[$i]" }'</ins>
+Element 0 is 1
+Element 1 is 4
+Element 2 is 9
+Element 3 is 16
+Element 4 is 25
+Element 5 is 36
+Element 6 is 49
+Element 7 is 64
+Element 8 is 81
+cold:~$ 
+</pre></div></div>
+   
+  <p>The <span class="purple">for</span> loop is a bad way to iterate through an array because there's a good chance 
+    of making a <i>fencepost error</i>. <i>Fencepost error</i> gets its catchy name from this question: "If 
+   you have 100 feet of fencing to be used on a fence with posts spaced 10 feet apart, how many posts do you 
+   need?" (Answer: 11. Think about it.) Does the operator in the condition need to be 
+   <span class="blue">&lt;</span>, or <span class="blue">&lt;=</span>? Does the right side need to be <span class="red">$#sq - 1</span>, 
+   <span class="red">$#sq</span>, or <span class="red">$#sq + 1</span>? Any time it takes you to come up with the correct answer is 
+   too much—if you use the <span class="purple">foreach</span> loop to iterate through array elements, you don't 
+   need to think about that at all.</p>
+   
+  <p>But, if you also need to know the <i>index</i> of an array element in the loop (as in the example 
+    above), the <span class="purple">for</span> loop is at least concise. An alternative to using the <span class="purple">for</span> loop
+   would be:</p>
+   
+<div class="observeBox"><div class="observeTitle">OBSERVE: array iteration</div><div class="observe"><pre>
+{
+  my $i = 0;
+  <span class="purple">foreach my</span> <span class="red">$element</span> ( <span class="red">@array</span> )
+  {
+    print "Element $i is $array[$i]\n";
+    $i++;
+  }
+}
+</pre></div></div>
+   
+  <p>But you still have to think about the initial value of <span class="red">$i</span> and where to 
+   put the postincrement operation in that example. </p>
+   
+  <p>Another <i>for</i> example is suggested by the <b>perldoc perlsyn</b> entry for the <span class="purple">for</span> loop. 
+   Let's create a simplified version of it in <span class="darkred">prompt.pl</span> as shown:</p>
+   
+<div class="listingBox"><div class="listingTitle">CODE TO TYPE: prompt.pl</div><div class="listing"><pre><ins>#!/usr/bin/perl
+use strict;
+use warnings;
+
+for ( prompt(); &lt;STDIN&gt;; prompt() )
+{
+  print "Input received: ";
+  print;
+  last if /Quit/i;
+}
+
+sub prompt { print "Input: " }
+</ins></pre></div></div>
+   
+   <p><img src="images/coderunner/checksyntax.JPG"> and run it. Now type in lines of text at the prompt 
+     until you get bored, then type a line containing the word "quit." (You can also end the program with 
+     end-of-file on standard input, by typing a line beginning with Control-D, on Unix/Linux systems.)</p>
+   
+  <p>This example is a prototype for many applications where you need to prompt the user for input
+    in a loop. By abstracting the prompting code into a subroutine, we minimize duplication. It also 
+    demonstrates a few new topics. <span class="blue">STDIN</span> is the predetermined filehandle for input from the
+    terminal (or wherever it has been redirected from), just like <span class="blue">STDOUT</span> and 
+   <span class="blue">STDERR</span>.</p>
+    
+  <p>And just like <span class="purple">while</span> statements, if a readline 
+   (<span class="blue">&lt;&gt;</span>) operator is the only thing in the condition of a <span class="purple">for</span> statement, 
+   Perl assumes the code <span class="blue">defined $_ = </span> is in front of it.</p>
+  
+  <p>Finally, since the code for the <span class="blue">prompt</span> subroutine was short, I chose to put 
+    it all on one line and  to omit the 
+    semicolon at the end of the statement (layout rules don't have to be followed strictly if 
+   clarity can be achieved by breaking them). Remember, semicolons are statement <i>separators</i> in Perl, not 
+   statement <i>terminators</i>; you can omit them at the end of a block or the end of a file, but only where 
+    the closing curly brace follows immediately on the same line.</p>
+   
+  <p>I'll share one last thought about <span class="purple">for</span> and <span class="purple">foreach</span> here. Compare
+    the forms of the two statements:</p>
+   
+<div class="observeBox"><div class="observeTitle">OBSERVE: for vs. foreach</div><div class="observe"><pre>
+<span class="purple">for</span> ( initialization; condition; iteration )
+<span class="purple">foreach</span> [ loop_variable ] ( list )
+</pre></div></div>
+   
+  <p>Perl can tell these two statements apart not just by the different keywords, but
+   also by the presence of semicolons within the parentheses. Because <span class="purple">foreach</span> is so much 
+   more useful than <span class="purple">for</span>, you'll type it more often. It would 
+    make sense, then, to use a shorter keyword than <span class="purple">foreach</span> (this is a principle known as <i>Huffman</i> coding).  
+   Therefore, Perl allows you to type <span class="purple">for</span> even when you mean <span class="purple">foreach</span>, and it will know 
+   what you mean:</p>
+   
+<div class="observeBox"><div class="observeTitle">OBSERVE: foreach, spelled 'for'</div><div class="observe"><pre>
+<span class="purple">for</span> [ loop_variable ] ( list )
+</pre></div></div>
+   
+  <p>From now on, we'll use that form of the <span class="purple">foreach</span> loop (or postfixed modifier) to save on 
+   typing and to illustrate the most common best practice.</p>
+ 
+ </div>
+ <a href="Perl2-13.html" name="loop_labels"></a>
+ <a name="h_02"></a><div class="heading">Loop Labels</div><div class="headingText">
+   
+  <p>This relatively small topic becomes essential when you have nested loops and need to break out of an outer one.
+   Suppose you have some Minesweeper game-like code that scans through a grid looking for a certain 
+   element; create <span class="darkred">sweep.pl</span> as shown:</p>
+  
+<div class="listingBox"><div class="listingTitle">CODE TO TYPE: sweep.pl</div><div class="listing"><pre><ins>#!/usr/bin/perl
+use strict;
+use warnings;
+
+my @row0 = qw(O O O O O);
+my @row1 = qw(O O O O O);
+my @row2 = qw(O O O O O);
+my @row3 = qw(O X O X O);
+my @row4 = qw(O O X O O);
+
+for my $row_index ( 0 .. 4 )
+{
+  my @row = $row_index == 0 ? @row0
+          : $row_index == 1 ? @row1
+          : $row_index == 2 ? @row2
+          : $row_index == 3 ? @row3
+          :                   @row4;
+  for ( my $column_index = 0; $column_index &lt;= $#row; $column_index++ )
+  {
+    if ( $row[$column_index] eq 'X' )
+    {
+      print "Found at [ $row_index, $column_index ]\n";
+      last;
+    }
+  }
+}</ins>
+</pre></div></div>
+   
+   <p><img src="images/coderunner/checksyntax.JPG"> and run it. Our program finds and reports the 
+   coordinates of Xs. But which Xs is it reporting? The first X in each row that contains any Xs, because the
+   <span class="purple">last</span> statement causes it to stop processing the inner loop when it finds an X. That's a 
+   little confusing, because the output suggests to us that it's actually reporting on all of them. Now 
+   suppose we want to find only the <i>first</i> X. And suppose the matrix is really large and we don't 
+   want to spend time scanning it after finding the first X. When we find one X, we want to 
+   stop processing <i>both</i> loops.</p>
+   
+  <p>But <span class="purple">last</span> only bails out of the innermost loop; that's going to cause problems—unless we 
+   use a <i>loop label</i>. Modify the program as follows:</p>
+   
+<div class="listingBox"><div class="listingTitle">CODE TO EDIT: sweep.pl</div><div class="listing"><pre>
+#!/usr/bin/perl
+use strict;
+use warnings;
+
+my @row0 = qw(O O O O O);
+my @row1 = qw(O O O O O);
+my @row2 = qw(O O O O O);
+my @row3 = qw(O X O X O);
+my @row4 = qw(O O X O O);
+
+<ins>OUTER: </ins>for my $row_index ( 0 .. 4 )
+{
+  my @row = $row_index == 0 ? @row0
+          : $row_index == 1 ? @row1
+          : $row_index == 2 ? @row2
+          : $row_index == 3 ? @row3
+          :                   @row4;
+  for ( my $column_index = 0; $column_index &lt;= $#row; $column_index++ )
+  {
+    if ( $row[$column_index] eq 'X' )
+    {
+      print "Found at [ $row_index, $column_index ]\n";
+      last<ins> OUTER</ins>;
+    }
+  }
+}
+</pre></div></div>
+   
+   <p><img src="images/coderunner/checksyntax.JPG"> and run it.  There you have it!</p>
+   
+  <p>Here's how labels work. A label is a bareword followed by a colon; by "bareword" I mean any string of 
+   characters that would be legal after a <span class="red">$</span> or <span class="red">@</span> or <span class="red">%</span> for a variable name 
+   that you declare with <span class="purple">my</span>. By universal convention, we restrict labels to uppercase 
+   letters, underscores, and digits.</p>
+   
+  <p>Labels can only come before loop statements: <span class="purple">for</span>, <span class="purple">foreach</span>, 
+   <span class="purple">while</span>, and <span class="purple">until</span>. </p>
+   
+  <p>Any loop control statement—<span class="purple">next</span>, <span class="purple">last</span>, 
+   <span class="purple">redo</span>—can take a target that is the name of the label of an enclosing loop. Any 
+   loops within the one that the control statement happens to be inside of, will be ignored for the purpose of 
+   executing the control statement.</p>
+  
+ </div>
+ <a href="Perl2-13.html" name="unbuffered_output"></a> 
+ <a name="h_03"></a><div class="heading">Unbuffered Output</div><div class="headingText">
+   
+  <p>Suppose you want to display a running count of operations performed so you can keep track of how far 
+    you've gotten. Maybe each operation takes a while to perform, so you want to see the count so you can be sure 
+   the program hasn't gotten stuck. Let's see a basic example of that; create <span class="darkred">progress.pl</span> 
+   as shown:</p>
+   
+<div class="listingBox"><div class="listingTitle">CODE TO TYPE: progress.pl</div><div class="listing"><pre><ins>#!/usr/bin/perl
+use strict;
+use warnings;
+
+for ( 1 .. 20 )
+{
+  long_operation();
+  print "$_\n";
+}
+
+sub long_operation
+{
+  sleep 1;
+}</ins>
+</pre></div></div>
+   
+   <p><img src="images/coderunner/checksyntax.JPG"> and run it. I introduced a new function here, 
+   <span class="darkgreen">sleep()</span>, which takes as argument an integer number of seconds to pause, to 
+   simulate a lengthy operation.</p>
+   
+  <p>So far, so good. But now suppose that <span class="blue">long_operation()</span> needs to print information of
+    its own to the terminal occasionally. We'll simulate that with this change:</p>
+   
+<div class="listingBox"><div class="listingTitle">CODE TO EDIT: progress.pl</div><div class="listing"><pre>
+#!/usr/bin/perl
+use strict;
+use warnings;
+
+for ( 1 .. 20 )
+{
+  long_operation(<ins> $_ </ins>);
+  print "$_\n";
+}
+
+sub long_operation
+{
+<ins>  my $arg = shift;
+
+  print "Processing element $arg\n" unless $arg % 5;</ins>
+  sleep 1;
+}</pre></div></div>
+  
+   <p><img src="images/coderunner/checksyntax.JPG"> and run it.  The <span class="darkgreen">%</span> operator is 
+   the <i>modulus</i> operator that returns the remainder when the left side is divided by the right side. 
+   We use it here to print a line every five iterations. </p>
+  
+  <p>Now the tracking numbers are mixed up in the output with the other information. We'd really like 
+   to see only the tracking numbers while the program is running, but when the program is done, 
+   then see only the other information. That sounds magical! And in fact we recently learned something that 
+   can make that happen. Remember the <span class="orange">\r</span> escape sequence for carriage return? It rewinds the 
+   cursor to the beginning of the line. Make this change:</p>
+
+<div class="listingBox"><div class="listingTitle">CODE TO EDIT: progress.pl</div><div class="listing"><pre>
+#!/usr/bin/perl
+use strict;
+use warnings;
+
+for ( 1 .. 20 )
+{
+  long_operation( $_ );
+<del>  print "$_\n";</del>
+<ins>  print "$_\r";</ins>
+}
+
+sub long_operation
+{
+  my $arg = shift;
+
+  print "Processing element $arg\n" unless $arg % 5;
+  sleep 1;
+}</pre></div></div>
+  
+   <p><img src="images/coderunner/checksyntax.JPG"> and run it. Oops. We got the output we wanted, but 
+   we didn't see the tracking numbers at all! Why is that? In fact, they were being printed, but we didn't 
+   see them in time as a result of <i>buffering</i>. The standard output stream is <i>line buffered</i> by Perl, 
+   which means that nothing goes to the screen until Perl sees a newline (<span class="orange">\n</span>). So as Perl 
+   gets each output string—<span class="orange">"1\r"</span>, <span class="orange">"2\r"</span>, <span class="orange">"3\r"</span>, and 
+   <span class="orange">"4\r"</span>—it saves them up, and then when it sees 
+   <span class="orange">"Processing element 5\n"</span>, it prints everything it's saved up to that <span class="orange">\n</span>. 
+   This means that the cursor returned to the left side of the screen after printing each 
+   <span class="orange">\r</span>, too fast for you to see it. And yet you had to wait five seconds for it to happen.</p>
+  
+  <p>We <i>really</i> don't want Perl to buffer the output. We can tell Perl what we want by setting 
+   the magic variable <span class="red">$|</span> (that's a vertical bar) to a true value. Make this change:</p>
+  
+<div class="listingBox"><div class="listingTitle">CODE TO EDIT: progress.pl</div><div class="listing"><pre>
+#!/usr/bin/perl
+use strict;
+use warnings;
+
+<ins>$| = 1;</ins>
+
+for ( 1 .. 20 )
+{
+  long_operation( $_ );
+  print "$_\r";
+}
+
+sub long_operation
+{
+  my $arg = shift;
+
+  print "Processing element $arg\n" unless $arg % 5;
+  sleep 1;
+}
+</pre></div></div>
+  
+   <p><img src="images/coderunner/checksyntax.JPG"> and run it.  There is something very satisfying about 
+   this basic, but effective mechanism.</p>
+  
+  <p><div class="c"><table class="noteBox fBox pBox "><tr><td class="noteTitle">Note</td><td class="note"> Perl will also flush its standard output buffer when you read a line from STDIN, which is why
+   <span class="darkred">prompt.pl</span> was able to print a prompt that didn't include a newline. Perl does this 
+    precisely to make it unnecessary to know about <span class="red">$|</span> in order to do prompting.</td></tr></table></div></p>
+
+  <p>Another time unbuffering can be helpful is when you have redirected the standard output of your Perl 
+   program to a file, and from another process you are monitoring that file with <span class="blue">tail -f</span> while 
+   your program runs. When output is to a file, it is normally <i>fully</i> buffered, which means that output 
+   won't be flushed until a large buffer fills up, usually about 8 kbytes big. A newline isn't sufficient to 
+   force a flush. But setting <span class="red">$|</span> will unbuffer standard output again so that you can keep up with 
+   your program's output with <span class="blue">tail -f</span>.</p>
+   
+   <p>Can you believe we're through 13 lessons already? Great work.</p>
+  
+ </div>
+  
+  <br><br><br><br> 
+  <p>Once you finish this lesson, go back to the syllabus page by clicking on the page tab above and do
+    the assignments.</p>
+<div class="footer"><div id="timeSurvey"></div>				
+				Copyright © 1998-2014 O'Reilly Media, Inc.<br><img src="https://courses.oreillyschool.com/common/cclicense.png"><br>
+				This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 Unported License.<br>
+				See <a href="http://creativecommons.org/licenses/by-sa/3.0/legalcode">http://creativecommons.org/licenses/by-sa/3.0/legalcode</a> 
+				for more information.
+				</div><iframe id="t" width="1" height="1" border="0" style="display:none"></iframe><script language="javascript">bodyLoaded();</script><script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+  ga('create', 'UA-44720547-1', 'oreillyschool.com');
+  ga('send', 'pageview');
+</script></body></html>

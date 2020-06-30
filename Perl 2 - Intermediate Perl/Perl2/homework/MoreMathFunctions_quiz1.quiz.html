@@ -1,0 +1,62 @@
+<html>
+   <!-- Copyright (c) 1998-2014 O'Reilly Media, Inc. Unauthorized use is strictly
+                prohibited. None of this code or content can by copied without the express written
+                permission from O'Reilly Media, Inc. -->
+   <head>
+      <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+      <link rel="stylesheet" type="text/css" href="http://archive.oreilly.com/oreillyschool/courses/Perl2/common/Lab.css">
+      <title>More Math Functions and Course Wrap-Up - Quiz 1</title>
+   </head>
+   <body id="body">
+      <h2>More Math Functions and Course Wrap-Up - Quiz 1</h2> 
+      
+      
+      
+      
+      <p>Read the first few pages of <b>perldoc bignum</b>. Write one-liners to find out how many extra digits of precision it 
+         provides for <b>sqrt</b>(<b>0.5</b>) on the student machine. (Hint: Read <b>perldoc perlrun</b> to see what flag to use to 
+         <b>use</b> a module from the command line.)
+      </p>
+      
+        
+      
+      
+      <p>The answer depends on the student environment, but this dialog shows the process by which to get the answer:</p>
+      
+      
+      <div class="observeBox">
+         <div class="observeTitle">Observe:</div>
+         <div class="observe"><pre>% perl -le 'print sqrt 0.5'
+0.707106781186548
+% perl -Mbignum -le 'print sqrt 0.5'
+0.7071067811865475244008443621048490392848</pre></div>
+      </div>
+      
+      
+      <p>The student may also write a program containing <b>use bignum</b> to get the second result. The answer from the above dialog is 42 - 17 = 25 extra digits.</p>
+      
+      
+      <p><b>Grading Criteria:</b> Student should demonstrate knowledge of how to use bignum to increase Perl's floating-point precision.</p>
+      
+      
+      
+      
+      
+      
+      <p>Run a one-liner to print the result of <b>rand()</b> a few times. What function would you use to generate predictable results when 
+         testing code that uses <b>rand()</b>? (Hint: read <b>perldoc -f rand</b> very carefully.)
+      </p>
+      
+      
+      
+      
+      <p>srand()</p>
+      
+      
+      <p><b>Grading Criteria:</b> Student should demonstrate knowledge of Perl's random number system.</p>
+      
+      
+      
+      
+   </body>
+</html>

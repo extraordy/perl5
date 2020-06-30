@@ -1,0 +1,525 @@
+<html><!-- Copyright (c) 1998-2014 O'Reilly Media, Inc.
+			This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 Unported License.
+			See http://creativecommons.org/licenses/by-sa/3.0/legalcode for more information.
+            --><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"><link rel="stylesheet" type="text/css" href="../common/Lab.css"><script type="text/javascript" src="../common/Lab.js"></script><script language="javascript"></script><title>Installing Modules from CPAN</title></head><body id="body"><a name="top"></a><div class="title">Installing Modules from CPAN</div><div class="resize"><a href="Perl4-05.html#top" onclick="changeSize('smaller');" class="aS" title="Keep clicking to make fonts smaller">A</a><a href="Perl4-05.html#top" onclick="changeSize('larger');" class="aL" title="Keep clikcing to make fonts larger">A</a><a href="Perl4-05.html#top" onclick="lv()" class="lv" title="Adjust Page for High Contrast">HC</a><div id="fh"><p>Click on <span class="aS">A</span> to make all fonts on the page smaller.</p><p>Click on <span class="aL">A</span> to make all fonts on the page larger.</p><p>Click on <span class="lv">HC</span> to toggle high contrast mode. When you move your mouse over 
+                 some bold words in high contrast mode, related words are automatically highlighted. Text is shown
+                 in black and white. 
+             </p></div></div><hr>
+ 
+ <div class="goalTitle">Lesson Objectives</div><div class="goals">
+  
+  
+  When you complete this lesson, you will be able to: 
+  <ul><li>access <a href="Perl4-05.html#cpan_on_the_web">CPAN on the web</a>.</li><li><a href="Perl4-05.html#running_cpan_pm">run CPAN.pm</a>.</li><li><a href="Perl4-05.html#using_privately_installed_modules">use Privately Installed Modules</a>.</li><li>use the special hash, <a href="Perl4-05.html#inc">%INC</a>.</li></ul>
+ </div><hr>
+  
+ <p>Now that you know how to use objects, let's go over how to access 
+  object classes already written by other programmers. Because as fun as it might be to write your own class, 
+  at some point you'll want to save time and use a class that's already written.</p>
+ 
+ <a href="Perl4-05.html" name="cpan_on_the_web"></a>
+ <a name="h_01"></a><div class="heading">CPAN on the Web</div><div class="headingText">
+   
+  <p><b>CPAN</b> is the <b>C</b>omprehensive <b>P</b>erl <b>A</b>rchive <b>N</b>etwork. It is one of the largest, if not <i>the</i> largest, 
+   repositories of freely downloadable software in existence. It was created in 1995 shortly after Perl 5 was 
+   released with its ability to encapsulate functionality in modules. CPAN contains over 20,000 modules and 
+   anyone can contribute to it. Maybe after this course you will become a contributor!</p>
+  
+  <a name="s_01"></a><div id="s_01"><div class="subheading">Searching CPAN on the Web</div><div class="subheadingText">
+   
+   <p>You can  <i>see</i> CPAN here on  
+    <a href="http://www.cpan.org/" target="_blank">CPAN's homepage</a>. 
+    However, we won't be visiting that site again, because it has limited practical value. Instead we'll use the
+    <a href="http://search.cpan.org/" target="_blank">CPAN search page</a>, one of three search interfaces 
+    for CPAN on the web that allows you to find modules by searching keywords. </p>
+   
+   <p>Let's suppose you want to find a module that handles ISBNs (book registration numbers). Go ahead and type "ISBN" in the 
+    search field and press Enter. A list of modules that have to do with ISBNs is returned.</p>
+   
+   <p>But this particular search interface isn't the best one to use if you're looking for a word or element that may not be contained in the 
+    module or distribution names. If you weren't familiar with the abbreviation "ISBN," but 
+    were looking for a module that addressed book numbers, typing "book number" in the search field wouldn't return 
+    as useful list of results. For that type of search, I find that a Google search of "CPAN book 
+     number" or "site:search.cpan.org book number" will produce more relevant 
+    results.</p>
+ 
+  </div></div>
+  <a name="s_02"></a><div id="s_02"><div class="subheading">A CPAN Module Web Page</div><div class="subheadingText">
+   
+   <p>Go back to the CPAN Search Results page for ISBN (or search for it again). Click on the link for 
+    <b>Business::ISBN</b> (or 
+    <a href="http://search.cpan.org/~bdfoy/Business-ISBN-2.05/lib/ISBN.pm" target="_blank">click here</a>) 
+    and you will see the page for that module, written by brian d foy (yes, he writes his name in 
+    lower-case letters), author of <a href="http://shop.oreilly.com/product/0636920018452.do" target="_blank">Learning Perl, 6th ed.</a> (O'Reilly) 
+    and <a href="http://shop.oreilly.com/product/9780596527242.do" target="_blank">Mastering Perl</a> (O'Reilly).  
+    You're looking at an HTML version of the documentation for the <b>Business::ISBN</b> module that you'll get if you 
+    install it. Every module that you install or have on your system already comes with its own documentation 
+    that you can view in a terminal with <b>perldoc</b>. Let's look at the documentation on your system for  
+    the <b>Getopt::Long</b> module:</p>
+     
+<div class="interactiveBox"><div class="interactiveTitle">INTERACTIVE TERMINAL SESSION: Command to type</div><div class="interactive"><pre>cold:~$ <ins>cd perl4</ins>
+cold:~/perl4$ <ins>perldoc Getopt::Long</ins>
+<b>NAME</b>
+       Getopt::Long - Extended processing of command line options
+[...]</pre></div></div>
+     
+   <p>Now enter <b>Getopt::Long</b> in the search box at the top of the web page and follow the first link. 
+    Aside from the table of contents at the top, it will be the same as the result you got in your terminal window. 
+    While the perldoc view of a module's documentation is a
+    more accurate view than that on search.cpan.org (because it shows you what you've got <i>installed</i>,
+    whereas the one on search.cpan.org may reflect a different version), I often just bring up the page on 
+    search.cpan.org as a shortcut to a pretty HTML view.</p>
+     
+   <p>Okay, now go back a couple of pages in your browser to the Business::ISBN page. Let's say you like what you see and 
+    want to get it. Unlike <b>Getopt::Long</b>, your computer doesn't already have this module. You can 
+    verify that it doesn't by running this command (that last character is a zero "0"):</p>
+     
+<div class="interactiveBox"><div class="interactiveTitle">INTERACTIVE TERMINAL SESSION: Command to type</div><div class="interactive"><pre>cold:~/perl4$ <ins>perl -MBusiness::ISBN -e 0</ins>
+Can't locate Business/ISBN.pm in @INC [...]</pre></div></div>
+
+  </div></div>
+  <a name="s_03"></a><div id="s_03"><div class="subheading">Installing a Module</div><div class="subheadingText">
+   
+   <p>There are two ways to install modules. There's an "obvious" way... and then there's a much easier way. We'll explore 
+    the "obvious" way first, because one day you may need to fall back on it, and it'll make you appreciate the easier way.</p>
+   
+   <p><table class="noteBox fBox pBox "><tr><td class="noteTitle">Note</td><td class="note"> Instructions about installing Perl modules in this course use the same platform as the course 
+    server you're using: Linux. They're the same for all flavors of Unix as well as for  Macintosh OS X.  
+    The instructions for Windows are different and outside the scope of this course.</td></tr></table></p>
+     
+   <p>There's a download link on the right side of the page (along with a few other things that aren't in 
+    the <b>perldoc</b> output, like a list of related modules and a picture of brian d foy). The target of that link 
+    is a <i>tarball</i> (which is kind of like a zip file) that contains the module's source. Run these commands:</p>
+   
+<div class="interactiveBox"><div class="interactiveTitle">INTERACTIVE TERMINAL SESSION: Commands to run</div><div class="interactive"><pre>cold:~/perl4$ <ins>wget http://search.cpan.org/CPAN/authors/id/B/BD/BDFOY/Business-ISBN-2.05.tar.gz</ins>
+--2011-04-18 19:39:00--  http://search.cpan.org/CPAN/authors/id/B/BD/BDFOY/Business-ISBN-2.05.tar.gz
+Resolving search.cpan.org... 38.229.66.100
+Connecting to search.cpan.org|38.229.66.100|:80... connected.
+HTTP request sent, awaiting response... 200 OK
+Length: 355413 (347K) [application/x-gzip]
+Saving to: `Business-ISBN-2.05.tar.gz'
+
+100%[======================================&gt;] 355,413      325K/s   in 1.1s    
+
+2011-04-18 19:39:01 (325 KB/s) - `Business-ISBN-2.05.tar.gz' saved [355413/355413]
+cold:~/perl4$ <ins>tar xvzf Business-ISBN-2.05.tar.gz</ins>
+[<b>tar</b> output omitted]
+cold:~/perl4$ <ins>cd Business-ISBN-2.05</ins>
+cold:~/perl4/Business-ISBN-2.05$ <ins>perl Makefile.PL</ins>
+Checking if your kit is complete...
+Looks good
+Warning: prerequisite Business::ISBN::Data 20081208 not found.
+Writing Makefile for Business::ISBN
+</pre></div></div>
+    
+   <p><div class="c"><table class="noteBox fBox pBox "><tr><td class="noteTitle">Note</td><td class="note"> To save space and remove clutter, you can remove tar.gz files from your <b>/perl4</b> folder 
+    after running the <b>tar</b> command on them successfully.</td></tr></table></div></p> 
+
+   <p>With the warning in the code above, Perl is letting you know that Business::ISBN requires a module that you don't have. 
+    This is a common occurrence; Perl modules practice a lot of reuse. Let's go get one of those modules now (you'll 
+    see in a minute why we're not fetching both of them). I've provided the link for you so there's no need to search for it:</p>
+   
+<div class="interactiveBox"><div class="interactiveTitle">INTERACTIVE TERMINAL SESSION: Commands to type</div><div class="interactive"><pre>cold:~/perl4/Business-ISBN-2.05$ <ins>cd ..</ins>
+cold:~/perl4$ <ins>wget http://www.cpan.org/authors/id/B/BD/BDFOY/Business-ISBN-Data-20081208.tar.gz</ins>
+<i>[wget output omitted]</i>
+cold:~/perl4$ <ins>tar zxf Business-ISBN-Data-20081208.tar.gz</ins>
+cold:~/perl4$ <ins>cd Business-ISBN-Data-20081208</ins>
+cold:~/perl4/Business-ISBN-Data-20081208$ <ins>perl Makefile.PL</ins>
+Checking if your kit is complete...
+Looks good
+Writing Makefile for Business::ISBN::Data
+cold:~/perl4/BBusiness-ISBN-Data-20081208$ <ins>make test</ins>
+cp Data.pm blib/lib/Business/ISBN/Data.pm
+PERL_DL_NONLAZY=1 /usr/bin/perl "-MExtUtils::Command::MM" "-e" "test_harness(0, 'blib/lib', 'blib/arch')" t/*.t
+t/check_data_structure.t .. ok     
+t/load.t .................. ok   
+t/pod.t ................... skipped: Test::Pod 1.00 required for testing POD
+t/pod_coverage.t .......... skipped: Test::Pod::Coverage required for testing POD
+All tests successful.
+Files=4, Tests=383,  0 wallclock secs ( 0.11 usr  0.02 sys +  0.17 cusr  0.02 csys =  0.32 CPU)
+Result: PASS
+</pre></div></div>
+   
+   <p>The module has passed its tests and is ready to be installed. If you had root privileges (or administrator 
+    privileges), the command  for that would be:</p>
+   
+<div class="observeBox"><div class="observeTitle">OBSERVE: Don't Try This!</div><div class="observe"><pre>
+$ <span class="red">sudo make install</span>
+</pre></div></div>
+    
+   <p>But you don't have root privileges on our server—and you're not going to get them. Why are root 
+    privileges needed? Because "make install" would install the module into one of the site_perl directories 
+    in @INC, and you need to "be 
+    root" in order to write to that directory. (To see the search path for modules, run <b>perl -le 'print for @INC'</b>.)</p>
+   
+   <p>If you're running your own machine or for some other reason have root privileges, it makes sense to use 
+    them to install a module into Perl's @INC path so that all the users of that perl can get at that module 
+    without having to do anything special. But what do you do on a machine (like ours), where you don't have root privileges? </p>
+   
+   <p>What you do <i>not</i> want to do is copy the <b>.pm</b> file from the distribution you downloaded into a 
+    directory you create. That may work for some modules, but there's a much better approach that will work every time.</p>
+   
+   <p>We'll go back to the point where we had unwrapped the tarball and 
+    cd'ed (changed directories) into the new directory. 
+    This command will get us there without having to repeat the download: </p>
+   
+<div class="interactiveBox"><div class="interactiveTitle">INTERACTIVE TERMINAL SESSION: Cleanup</div><div class="interactive"><pre>cold:~/perl4/Business-ISBN-Data-20081208$ <ins>make distclean</ins>
+[output omitted]
+</pre></div></div>
+   
+   <p>Now we'll use a modified form of our earlier command:</p>
+   
+<div class="interactiveBox"><div class="interactiveTitle">INTERACTIVE TERMINAL SESSION: Command to run</div><div class="interactive"><pre>cold:~/perl4/Business-ISBN-Data-20081208$ <ins>perl Makefile.PL INSTALL_BASE=~/mylib</ins>
+Checking if your kit is complete...
+Looks good
+Writing Makefile for Business::ISBN::Data
+</pre></div></div>
+   
+   <p>Now we're ready to run <b>make</b> (a standard Unix command that operates on the file <b>Makefile</b>
+    that was just written by the previous command):</p>
+   
+<div class="interactiveBox"><div class="interactiveTitle">INTERACTIVE TERMINAL SESSION: Command to run</div><div class="interactive"><pre>cold:~/perl4/Business-ISBN-Data-20081208$ <ins>make test install</ins>
+cp Data.pm blib/lib/Business/ISBN/Data.pm
+PERL_DL_NONLAZY=1 /usr/local/encap/perl-5.10.1/bin/perl "-MExtUtils::Command::MM" "-e" "test_harness(0, 'blib/lib', 'blib/arch')" t/*.t
+t/check_data_structure.t .. ok     
+t/load.t .................. ok   
+t/pod.t ................... skipped: Test::Pod 1.00 required for testing POD
+t/pod_coverage.t .......... skipped: Test::Pod::Coverage required for testing POD
+All tests successful.
+Files=4, Tests=383,  0 wallclock secs ( 0.09 usr  0.02 sys +  0.15 cusr  0.00 csys =  0.26 CPU)
+Result: PASS
+Manifying blib/man3/Business::ISBN::Data.3
+Installing <i>your_home_directory</i>b/lib/perl5/Business/ISBN/Data.pm
+Installing <i>your_home_directory</i>/mylib/man/man3/Business::ISBN::Data.3
+Appending installation info to <i>your_home_directory</i>/mylib/lib/perl5/i686-linux/perllocal.pod
+</pre></div></div>
+   
+   <p>We've successfully installed Business::ISBN::Data to a directory not in @INC, but instead one called 
+    /mylib, under our home directory. You can see it there under the /lib/perl5 directory:</p>
+   
+<div class="interactiveBox"><div class="interactiveTitle">INTERACTIVE TERMINAL SESSION: Command to type</div><div class="interactive"><pre>cold:~/perl4/Business-ISBN-Data-20081208$ <ins>ls ~/mylib/lib/perl5/Business/ISBN</ins>
+Data.pm</pre></div></div>
+      
+   <p>The path in @INC we need in order to find that module is ~/mylib/lib/perl5.  You can check
+    that with the -I flag to perl, which tells it to add a directory to @INC:</p>
+   
+<div class="interactiveBox"><div class="interactiveTitle">INTERACTIVE TERMINAL SESSION: One-liner</div><div class="interactive"><pre>cold:~/perl4/Business-ISBN-Data-20081208$ <ins>perl -I ~/mylib/lib/perl5 -MBusiness::ISBN::Data -e 0</ins>
+cold:~/perl4/Business-ISBN-Data-20081208$</pre></div></div>
+    
+   <p>We'll discuss how to tell our Perl programs to find it later (you don't want to use -I inside a program).</p>
+    
+   <p>Now let's go back to installing the other prerequisite for Business::ISBN. I'll give you the URL:</p>
+   
+<div class="interactiveBox"><div class="interactiveTitle">INTERACTIVE TERMINAL SESSION: Commands to run</div><div class="interactive"><pre>cold:~/perl4/Business-ISBN-Data-20081208$ <ins>cd ..</ins>
+cold:~/perl4$ <ins>wget http://search.cpan.org/CPAN/authors/id/G/GA/GAAS/URI-1.58.tar.gz</ins>
+[<b>wget</b> output omitted]
+cold:~/perl4$ <ins>tar zxf URI-1.58.tar.gz</ins>
+cold:~/perl4$ <ins>cd URI-1.58</ins>
+cold:~/perl4/URI-1.58$ <ins>perl Makefile.PL INSTALL_BASE=~/mylib</ins>
+Checking if your kit is complete...
+Looks good
+Writing Makefile for URI
+cold:~/perl4/URI-1.58$ <ins>make test install</ins>
+cp URI/_ldap.pm blib/lib/URI/_ldap.pm
+[More <b>cp</b> lines omitted]
+PERL_DL_NONLAZY=1 /usr/local/encap/perl-5.10.1/bin/perl "-MExtUtils::Command::MM" "-e" "test_harness(0, 'blib/lib', 'blib/arch')" t/*.t
+t/abs.t .......... ok     
+[More testing lines omitted]
+All tests successful.
+Files=38, Tests=603,  3 wallclock secs ( 0.17 usr  0.12 sys +  1.16 cusr  0.46 csys =  1.91 CPU)
+Result: PASS
+Manifying blib/man3/URI::WithBase.3
+[More <b>Manifying</b> lines omitted]
+Installing /<i>your_home_directory</i>/mylib/lib/perl5/URI.pm
+[More <b>Installing</b> lines omitted]
+Appending installation info to <i>your_home_directory</i>/mylib/lib/perl5/i686-linux/perllocal.pod 
+</pre></div></div>
+   
+   <p>Now that we have both of the prerequisites for Business::ISBN installed, we can go back to that
+    distribution and try again:</p>
+   
+<div class="interactiveBox"><div class="interactiveTitle">INTERACTIVE TERMINAL SESSION: Commands to run</div><div class="interactive"><pre>cold:~/perl4/URI-1.58$ <ins>cd ../Business-ISBN-2.05</ins>
+cold:~/perl4/Business-ISBN-2.05$ <ins>make distclean</ins></pre></div></div>
+   
+   <p>Now let's try creating our Makefile again:</p>
+   
+<div class="interactiveBox"><div class="interactiveTitle">INTERACTIVE TERMINAL SESSION: Commands to run</div><div class="interactive"><pre>cold:~/perl4/Business-ISBN-2.05$ <ins>perl Makefile.PL INSTALL_BASE=~/mylib</ins>
+Warning: prerequisite Business::ISBN::Data 20081208 not found.
+Writing Makefile for Business::ISBN
+</pre></div></div>
+   
+   <p>Whoops. Perl still doesn't see the prerequisite, because INSTALL_BASE tells Perl where to 
+    <i>install</i> modules, not where to <i>find</i> them. We have to tell Perl where to find them by 
+    setting the environment variable PERL5LIB, and then again when we go to make and install the 
+    module:</p>
+   
+<div class="interactiveBox"><div class="interactiveTitle">INTERACTIVE TERMINAL SESSION: Command to type</div><div class="interactive"><pre>cold:~/perl4/Business-ISBN-2.05$ <ins>PERL5LIB=~/mylib/lib/perl5 perl Makefile.PL INSTALL_BASE=~/mylib</ins>
+
+Writing Makefile for Business::ISBN
+cold:~/perl4/Business-ISBN-2.05$ <ins>PERL5LIB=~/mylib/lib/perl5 make test install</ins>
+cp lib/ISBN10.pm blib/lib/Business/ISBN10.pm
+cp lib/ISBN13.pm blib/lib/Business/ISBN13.pm
+cp lib/ISBN.pm blib/lib/Business/ISBN.pm
+PERL_DL_NONLAZY=1 /usr/local/encap/perl-5.10.1/bin/perl "-MExtUtils::Command::MM" "-e" "test_harness(0, 'blib/lib', 'blib/arch')" t/*.t
+t/albania.t .............. ok     
+t/constants.t ............ ok    
+t/interface.t ............ ok   
+t/isbn10.t ............... 1/? # 
+# Checking ISBNs... (this may take a bit)
+t/isbn10.t ............... 38/? # 
+# Checking bad ISBNs... (this should be fast)
+t/isbn10.t ............... ok    
+t/isbn13.t ............... 1/? # 
+# Checking ISBN13s... (this may take a bit)
+# 
+# Checking bad ISBN13s... (this should be fast)
+t/isbn13.t ............... ok    
+t/load.t ................. ok   
+t/png_barcode.t .......... skipped: You need GD::Barcode::EAN13 to make barcodes
+t/pod.t .................. skipped: Test::Pod 1.00 required for testing POD
+t/pod_coverage.t ......... ok   
+t/valid_isbn_checksum.t .. ok   
+t/xisbn10.t .............. 
+--------------------------------------------------------
+I cannot run these tests unless I can connect to labs.oclc.org.
+You may not be connected to the network or the host may
+be down.
+--------------------------------------------------------
+t/xisbn10.t .............. skipped: Could not reach labs.oclc.org: skipping tests
+All tests successful.
+Files=11, Tests=118, 13 wallclock secs ( 0.05 usr  0.05 sys +  7.17 cusr  0.11 csys =  7.38 CPU)
+Result: PASS
+Manifying blib/man3/ISBN10.3
+Manifying blib/man3/ISBN13.3
+Manifying blib/man3/ISBN.3
+Installing <i>your_home_directory</i>/mylib/lib/perl5/Business/ISBN10.pm
+Installing <i>your_home_directory</i>/mylib/lib/perl5/Business/ISBN13.pm
+Installing <i>your_home_directory</i>/mylib/lib/perl5/Business/ISBN.pm
+Installing <i>your_home_directory</i>/mylib/man/man3/ISBN10.3
+Installing <i>your_home_directory</i>/mylib/man/man3/ISBN13.3
+Installing <i>your_home_directory</i>/mylib/man/man3/ISBN.3
+Appending installation info to <i>your_home_directory</i>/mylib/lib/perl5/i686-linux/perllocal.pod
+</pre></div></div>
+   
+   <p>At the point above where the output said "this may take a bit," expect a lengthy delay. Also, some of the 
+    tests depend on connecting to an external host that isn't reachable through the student machine firewall; 
+    the tests were smart enough to recognize that and issue a warning before proceeding. </p>
+   
+   <p><div class="c"><table class="noteBox fBox pBox "><tr><td class="noteTitle">Note</td><td class="note"> Remember the path listed as <i>your_home_directory</i> in the output above. We'll use that later.</td></tr></table></div></p>
+     
+   <p>There's a more straightforward, <a href="http://en.wikipedia.org/wiki/Larry_Wall#Virtues_of_a_programmer" target="_blank">lazier, way</a> to install modules though; that's the subject of our next section.</p>
+ 
+  </div></div>
+ </div>
+ <a href="Perl4-05.html" name="running_cpan_pm"></a>
+ <a name="h_02"></a><div class="heading">Running CPAN.pm</div><div class="headingText">
+   
+  <p>As you've seen, there are a number of tedious aspects to installing a module the first way. But fortunately, a
+   long time ago, some smart people created a module that comes with Perl that automates them: <b>CPAN.pm</b>. (We'll 
+   refer to it as CPAN.pm from now on, to differentiate it from CPAN the repository.)</p>
+   
+  <p>The usual way to install a module with CPAN.pm is with this command: </p>
+  
+<div class="observeBox"><div class="observeTitle">OBSERVE: CPAN.pm Module Installation</div><div class="observe"><pre>cold:~/perl4/Business-ISBN-2.05$ <ins>cd ~/perl4</ins>
+cold:~/perl4$ <ins>perl -MCPAN -e 'install Business::ISBN'</ins></pre></div></div>
+   
+  <p>That's still a lot to type though, so now there's a program called <b>cpan</b> 
+   that comes with Perl that reduces the typing required:</p>
+   
+  <div class="observeBox"><div class="observeTitle">OBSERVE: CPAN.pm Module Installation</div><div class="observe"><pre>cold:~/perl4$ <ins>cpan Business::ISBN</ins></pre></div></div>
+
+  <a name="s_01"></a><div id="s_01"><div class="subheading">Configuring CPAN.pm</div><div class="subheadingText">
+   
+   <p>The first time you run either of those commands, you'll be taken through an interactive dialog. Right 
+    now, you're going to go through that initial configuration this way:</p>
+   
+<div class="interactiveBox"><div class="interactiveTitle">INTERACTIVE TERMINAL SESSION: Commands to type</div><div class="interactive"><pre>cold:~/perl4/Business-ISBN-2.05$ <ins>cd ..</ins>
+cold:~/perl4$ <ins>cpan</ins>
+CPAN is the world-wide archive of perl resources. It consists of about
+300 sites that all replicate the same contents around the globe. Many
+countries have at least one CPAN site already. The resources found on
+CPAN are easily accessible with the CPAN.pm module. If you want to use
+CPAN.pm, lots of things have to be configured. Fortunately, most of
+them can be determined automatically. If you prefer the automatic
+configuration, answer 'yes' below.
+
+If you prefer to enter a dialog instead, you can answer 'no' to this
+question and I'll let you configure in small steps one thing after the
+other. (Note: you can revisit this dialog anytime later by typing 'o
+conf init' at the cpan prompt.)
+Would you like me to configure as much as possible automatically? [yes] <ins>(Press the <b>Enter</b> key)</ins>
+[Output omitted]
+cpan[1]&gt;
+</pre></div></div>
+   
+   <p><div class="c"><table class="noteBox fBox pBox "><tr><td class="noteTitle">Note</td><td class="note">Earlier versions of Perl/CPAN.pm than the one on this machine would've asked at this point "Are you 
+    ready for manual configuration?", with "yes" as the default answer.</td></tr></table></div></p>
+   
+   <p>Before we finish, we need to tell CPAN.pm to install to our special location:</p>
+   
+<div class="interactiveBox"><div class="interactiveTitle">INTERACTIVE TERMINAL SESSION: Command to type</div><div class="interactive"><pre><u>cpan[1]&gt;</u> <ins>o conf makepl_arg INSTALL_BASE=<i>your_home_directory</i>/mylib</ins>
+makepl_arg         [INSTALL_BASE=/users/<i>your_username</i>/mylib]
+Please use 'o conf commit' to make the config permanent!
+<u>cpan[1]&gt;</u> <ins>o conf mbuild_install_arg '--install_base <i>your_home_directory</i>/mylib'</ins>
+[output omitted]
+Please use 'o conf commit' to make the config permanent!</pre></div></div>
+   
+   <p>In place of <i>your_home_directory</i> above, use your actual home directory (for example, <i>/users/jdoe</i>). 
+    We need to type the full path because the CPAN.pm shell won't expand the tilde (<b>~</b>). Now we have some more 
+    configuration to perform before we quit:</p>
+   
+<div class="interactiveBox"><div class="interactiveTitle">INTERACTIVE TERMINAL SESSION: Commands to type</div><div class="interactive"><pre>
+<u>cpan[2]&gt;</u> <ins>o conf prerequisites_policy follow</ins>
+Please use 'o conf commit' to make the config permanent!
+<u>cpan[3]&gt;</u> <ins>o conf urllist file:///software/CPAN</ins>
+Please use 'o conf commit' to make the config permanent!
+<u>cpan[4]&gt;</u> <ins>o conf commit</ins>
+commit: wrote '<i>your_home_directory</i>/.cpan/CPAN/MyConfig.pm'
+<u>cpan[5]&gt;</u> <ins>q</ins>
+Terminal does not support GetHistory.
+Lockfile removed.
+cold:~/perl4$ 
+</pre></div></div>
+   
+   <p>Here's what those commands do:</p>
+   
+<div class="observeBox"><div class="observeTitle">OBSERVE: cpan command</div><div class="observe"><pre><ins>o conf prerequisites_policy follow</ins></pre></div></div>
+   
+   <p>This tells Perl that if we attempt to install a module that needs another module, to just fetch and 
+    install that other module without asking.</p>
+   
+   <div class="observeBox"><div class="observeTitle">OBSERVE: cpan command</div><div class="observe"><pre><ins>o conf urllist ftp://mirror.team-cymru.org/CPAN</ins></pre></div></div>
+   
+   <p>Then, because we're on a machine that is behind a firewall that blocks connections to most outside 
+    machines, we configured Perl to fetch its modules from one of the few outside machines to which we permit connections. 
+    <i>You will not need to do this step on another machine unless you are in the same type of firewall 
+     situation; in that case, see the system administrator for that machine.</i></p>
+   
+   <div class="observeBox"><div class="observeTitle">OBSERVE: cpan command</div><div class="observe"><pre><ins>o conf commit</ins>
+<ins>q</ins></pre></div></div>
+    
+   <p>Finally, we follow Perl's instructions to commit our configuration changes and quit.</p>
+   
+   <p><div class="c"><table class="noteBox fBox pBox "><tr><td class="noteTitle">Note</td><td class="note"> Some versions of CPAN.pm will autocommit your changes.<br><br>
+    
+   Also, you may be prompted to update CPAN quite often. A new version of CPAN.pm comes out every 
+   few days, it seems! It's up to you to decide when to perform updates, but generally, you don't need to 
+   update unless there is a specific new feature you require.</td></tr></table></div></p>
+ 
+  </div></div>
+  <a name="s_02"></a><div id="s_02"><div class="subheading">Using CPAN.pm</div><div class="subheadingText">
+   
+   <p>So far, so good. Now we're ready to use CPAN.pm. to install Business::ISBN just like we did before. First, we 
+    need to wipe out the installation we made doing it the other way, and then reset PERL5LIB so 
+    that the testing process can find <b>Business::ISBN::Data in ~/mylib</b> after it's <i>automatically</i> fetched 
+    and installed:</p>
+     
+<div class="interactiveBox"><div class="interactiveTitle">INTERACTIVE TERMINAL SESSION: Command to type</div><div class="interactive"><pre>cold:~/perl4$ <ins>rm -rf ~/mylib</ins>
+cold:~/perl4$ <ins>PERL5LIB=~/mylib/lib/perl5 cpan Business::ISBN</ins>
+[<i>Lots</i> of output omitted]</pre></div></div>
+     
+   <p>Wow. Do you realize what just happened? The cpan command figured out what the latest version of the 
+    Business::ISBN module was, fetched it, determined that it had two dependencies (required modules) we didn't have, located and 
+    fetched them, then tested and installed all three modules!</p>
+     
+   <p>And that's all there is to it. CPAN.pm wouldn't have installed Business::ISBN if it hadn't passed its 
+    tests, so you can have a high degree of confidence that it's been done correctly. Now you can see that the 
+    module is there:</p>
+   
+<div class="interactiveBox"><div class="interactiveTitle">INTERACTIVE TERMINAL SESSION: One-liner</div><div class="interactive"><pre>cold:~/perl4$ <ins>perl -I ~/mylib/lib/perl5 -MBusiness::ISBN -e 0</ins>
+cold:~/perl4$</pre></div></div>
+
+  </div></div>
+ </div>
+ <a href="Perl4-05.html" name="using_privately_installed_modules"></a>
+ <a name="h_03"></a><div class="heading">Using Privately Installed Modules</div><div class="headingText">
+  
+  <p>I promised you earlier that I would show you how to use a module that had been installed in a private
+   directory from a program, like we've done in <b>~/mylib</b>, so here we go. Create <b>use_isbn.pl</b> as shown:</p>
+  
+<div class="listingBox"><div class="listingTitle">CODE TO ENTER:</div><div class="listing"><pre>#!/usr/local/bin/perl
+use strict;
+use warnings;
+
+use lib qw(<i>your_home_directory</i>/mylib/lib/perl5);
+
+use Business::ISBN;
+
+print Business::ISBN-&gt;new( '0201795264' )-&gt;as_string, "\n";
+</pre></div></div>
+  
+  <p>Enter whatever your home directory is in place of <i>your_home_directory</i>; Perl doesn't expand tildes 
+   in file specifications. Save and run that program and you'll see this:</p>
+
+<div class="interactiveBox"><div class="interactiveTitle">INTERACTIVE TERMINAL SESSION: Command to type</div><div class="interactive"><pre>cold:~/perl4$ <ins>./use_isbn.pl</ins>
+0-201-79526-4
+</pre></div></div>
+  
+  <p>The <b>use lib</b> pragma loads in a module named <b>lib.pm</b> from somewhere 
+   in Perl's @INC path that adds one or more directories to the beginning of @INC so that subsequent <b>use</b> 
+   statements will look there also.</p>
+  
+  <div class="c"><table class="noteBox fBox pBox "><tr><td class="noteTitle">Note</td><td class="note">Do not set the PERL5LIB environment variable when you are running a Perl program.
+   You only need to do that when you run the cpan program.</td></tr></table></div>
+ 
+ </div>
+ <a href="Perl4-05.html" name="inc"></a>
+ <a name="h_04"></a><div class="heading">%INC</div><div class="headingText">
+  
+  <p>When Perl loads a module with <b>use</b>, it remembers that it's done that to avoid loading it 
+   again unnecessarily (it's not uncommon for a large set of modules to end up loading the same ones more than 
+   once). Perl does this using a special hash, <b>%INC</b>. You can see its contents with this one-liner:</p>
+  
+<div class="interactiveBox"><div class="interactiveTitle">INTERACTIVE TERMINAL SESSION: One-liner</div><div class="interactive"><pre>cold:~/perl4$ <ins>perl -I ~/mylib/lib/perl5 -MBusiness::ISBN -le 'print "$_\t$INC{$_}" for sort keys %INC'</ins>
+Business/ISBN.pm        <i>your_home_directory</i>/mylib/lib/perl5/Business/ISBN.pm
+Business/ISBN/Data.pm   <i>your_home_directory</i>/mylib/lib/perl5/Business/ISBN/Data.pm
+Business/ISBN10.pm      <i>your_home_directory</i>/mylib/lib/perl5/Business/ISBN10.pm
+Business/ISBN13.pm      <i>your_home_directory</i>/mylib/lib/perl5/Business/ISBN13.pm
+Carp.pm /usr/local/encap/perl-5.10.1/lib/5.10.1/Carp.pm
+Data/Dumper.pm  /usr/local/encap/perl-5.10.1/lib/5.10.1/i686-linux/Data/Dumper.pm
+Exporter.pm     /usr/local/encap/perl-5.10.1/lib/5.10.1/Exporter.pm
+Exporter/Heavy.pm       /usr/local/encap/perl-5.10.1/lib/5.10.1/Exporter/Heavy.pm
+XSLoader.pm     /usr/local/encap/perl-5.10.1/lib/5.10.1/i686-linux/XSLoader.pm
+base.pm /usr/local/encap/perl-5.10.1/lib/5.10.1/base.pm
+bytes.pm        /usr/local/encap/perl-5.10.1/lib/5.10.1/bytes.pm
+overload.pm     /usr/local/encap/perl-5.10.1/lib/5.10.1/overload.pm
+strict.pm       /usr/local/encap/perl-5.10.1/lib/5.10.1/strict.pm
+subs.pm /usr/local/encap/perl-5.10.1/lib/5.10.1/subs.pm
+vars.pm /usr/local/encap/perl-5.10.1/lib/5.10.1/vars.pm
+warnings.pm     /usr/local/encap/perl-5.10.1/lib/5.10.1/warnings.pm
+warnings/register.pm    /usr/local/encap/perl-5.10.1/lib/5.10.1/warnings/register.pm
+</pre></div></div>
+ 
+  <p>The values are the locations at which the modules were found in @INC. Can you see where the <b>strict</b> 
+   and <b>warnings</b> modules came from?</p> 
+  
+  <p>%INC can be useful when you want to find out quickly where a module is installed. Another way that works for
+   system modules (that is, modules not installed locally) is the -l flag to perldoc:</p>
+ 
+<div class="interactiveBox"><div class="interactiveTitle">INTERACTIVE TERMINAL SESSION: Command to type</div><div class="interactive"><pre>cold:~/perl4$ <ins>perldoc -l Time::Local</ins>
+/usr/local/encap/perl-5.10.1/lib/5.10.1/Time/Local.pm
+</pre></div></div>
+
+  <p><table class="noteBox fBox pBox "><tr><td class="noteTitle">Note</td><td class="note">If you are on a system that has the module <b>local::lib</b> installed at the system level (in @INC), it 
+   will make installing local versions of modules easier. <b>local::lib</b> is not located within the core of any 
+   version of Perl through at least 5.14, so we won't go over its use in this course. But if you find 
+   yourself using a machine that does have it, you can look up its documentation 
+   at search.cpan.org.</td></tr></table></p>
+  
+ </div>
+  
+   <p>Once you finish the lesson, go back to the syllabus to complete the homework.</p>
+   
+<div class="footer"><div id="timeSurvey"></div>				
+				Copyright © 1998-2014 O'Reilly Media, Inc.<br><img src="https://courses.oreillyschool.com/common/cclicense.png"><br>
+				This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 Unported License.<br>
+				See <a href="http://creativecommons.org/licenses/by-sa/3.0/legalcode">http://creativecommons.org/licenses/by-sa/3.0/legalcode</a> 
+				for more information.
+				</div><iframe id="t" width="1" height="1" border="0" style="display:none"></iframe><script language="javascript">bodyLoaded();</script><script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+  ga('create', 'UA-44720547-1', 'oreillyschool.com');
+  ga('send', 'pageview');
+</script></body></html>

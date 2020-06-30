@@ -1,0 +1,372 @@
+<html><!-- Copyright (c) 1998-2014 O'Reilly Media, Inc.
+			This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 Unported License.
+			See http://creativecommons.org/licenses/by-sa/3.0/legalcode for more information.
+            --><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"><link rel="stylesheet" type="text/css" href="../common/Lab.css"><script type="text/javascript" src="../common/Lab.js"></script><script language="javascript"></script><title>Your First Loop Statement</title></head><body id="body"><a name="top"></a><div class="title">Your First Loop Statement</div><div class="resize"><a href="Perl1-08.html#top" onclick="changeSize('smaller');" class="aS" title="Keep clicking to make fonts smaller">A</a><a href="Perl1-08.html#top" onclick="changeSize('larger');" class="aL" title="Keep clikcing to make fonts larger">A</a><a href="Perl1-08.html#top" onclick="lv()" class="lv" title="Adjust Page for High Contrast">HC</a><div id="fh"><p>Click on <span class="aS">A</span> to make all fonts on the page smaller.</p><p>Click on <span class="aL">A</span> to make all fonts on the page larger.</p><p>Click on <span class="lv">HC</span> to toggle high contrast mode. When you move your mouse over 
+                 some bold words in high contrast mode, related words are automatically highlighted. Text is shown
+                 in black and white. 
+             </p></div></div><hr>
+ 
+ <div class="goalTitle">Lesson Objectives</div><div class="goals">
+  
+  
+  When you complete this lesson, you will be able to:
+  
+  <ul><li>write a loop statement.</li><li>use nested loops.</li><li>use while loops.</li></ul>
+ </div><hr>
+ 
+ <a name="h_01"></a><div class="heading">While Loops</div><div class="headingText">
+    <p>
+   Good to have you back. Until now, you could only write programs that would progress in one 
+   direction: from top to bottom. The only way you could change its course was to introduce an 
+     <span class="purple">if</span> block that might cause part of the code to be skipped. That's all going to change 
+     though, as we learn about <i>loops</i>. 
+  </p>
+  
+  <p><table class="noteBox fBox pBox "><tr><td class="noteTitle">WARNING</td><td class="note">This means your program can go around in circles, potentially <i>never ending</i>. If you think that you might do that by 
+   mistake, make sure you know how to interrupt a program that's going nowhere fast. Usually you type a <b>Ctrl-C</b> in the shell window to 
+   interrupt the program. </td></tr></table></p>
+  <a name="s_01"></a><div id="s_01"><div class="subheading">While Loop Syntax</div><div class="subheadingText">
+   <p>
+    Remember the <i>condition</i> of an <span class="purple">if</span> statement?  (I hope you do...you needed it
+    on the last homework project!)  Conditions are also used in <span class="purple">while</span> loops, like this:
+   </p>
+
+<div class="observeBox"><div class="observeTitle">OBSERVE: while statement form</div><div class="observe"><pre>
+<span class="purple">while</span> ( <span class="darkblue"><i>condition</i></span> )
+{
+  <span class="orange"><i>code...</i></span>
+} 
+</pre></div></div>
+
+   <p><div class="c"><img src="images/while.png"></div></p>
+    
+   <p>
+    If the <span class="darkblue"><i>condition</i></span> is true, then the <span class="orange"><i>code</i></span> contained within the curly brackets will be 
+    executed. After executing the block, Perl evaluates the <span class="darkblue"><i>condition</i></span> again, and if it's true, then Perl executes 
+    the <span class="orange"><i>code</i></span> again. This process repeats to make the loop. If the <span class="darkblue"><i>condition</i></span> is false, 
+    the first time Perl encounters it, then the block will never be executed. If it becomes false in the <span class="orange"><i>code</i>, the loop 
+     stops.</span> 
+    </p>
+    
+   <p>Let's try an example. Create a file called <b>square.pl</b> as shown:</p>
+   
+<div class="listingBox"><div class="listingTitle">CODE TO TYPE:</div><div class="listing"><pre><ins>#!/usr/bin/perl
+use strict;
+use warnings;
+
+my $x = 0;
+while ( $x &lt; 10 )
+{
+  $x += 1;
+  print "$x squared = ", $x**2, "\n";
+}
+</ins></pre></div></div>
+   
+   <p><img src="images/coderunner/checksyntax.JPG"> and run it. </p>
+   
+<div class="interactiveBox"><div class="interactiveTitle">INTERACTIVE TERMINAL SESSION:</div><div class="interactive"><pre>cold:~$ <ins>cd perl1</ins>
+cold:~/perl1$ <ins>./square.pl</ins>
+1 squared = 1
+2 squared = 4
+3 squared = 9
+4 squared = 16
+5 squared = 25
+6 squared = 36
+7 squared = 49
+8 squared = 64
+9 squared = 81
+10 squared = 100
+cold:~/perl1$    
+</pre></div></div>
+   
+   <p>This example gives you a sense of the way <span class="purple">while</span> works in your program. 
+   Now let's mix it up a bit and add in square roots. Modify your code as shown:</p>
+   
+<div class="listingBox"><div class="listingTitle">CODE TO TYPE:</div><div class="listing"><pre>#!/usr/bin/perl
+use strict;
+use warnings;
+
+my $x = 0;
+while ( $x &lt; 10 )
+{
+  $x += 1;
+  print "$x squared = ", $x**2, "<ins>; </ins>";
+<ins>  print "Square root of $x = ", sqrt($x), "\n";</ins>
+}
+</pre></div></div>
+   
+   <p><img src="images/coderunner/checksyntax.JPG"> and run it. </p>
+   
+<div class="interactiveBox"><div class="interactiveTitle">INTERACTIVE TERMINAL SESSION:</div><div class="interactive"><pre>cold:~/perl1$ <ins>./square.pl</ins>
+1 squared = 1; Square root of 1 = 1
+2 squared = 4; Square root of 2 = 1.4142135623731
+3 squared = 9; Square root of 3 = 1.73205080756888
+4 squared = 16; Square root of 4 = 2
+5 squared = 25; Square root of 5 = 2.23606797749979
+6 squared = 36; Square root of 6 = 2.44948974278318
+7 squared = 49; Square root of 7 = 2.64575131106459
+8 squared = 64; Square root of 8 = 2.82842712474619
+9 squared = 81; Square root of 9 = 3
+10 squared = 100; Square root of 10 = 3.16227766016838    
+cold:~/perl1$    
+</pre></div></div>
+   
+   <p>Okay, now change <b>square.pl</b> as shown:
+   </p>
+
+<div class="listingBox"><div class="listingTitle">CODE TO EDIT:</div><div class="listing"><pre>#!/usr/bin/perl
+use strict;
+use warnings;
+
+my $x = 0;
+<ins>while ( $x++ &lt; 10 )</ins>
+{
+   <del>$x += 1;</del>
+   print "$x squared = ", $x**2, "; ";
+   print "Square root of $x = ", sqrt($x), "\n";
+}
+</pre></div></div> 
+   
+   <p><img src="images/coderunner/checksyntax.JPG"> and run it.</p>
+   
+   <p>Even after we changed the code, it produced the exact 
+    same result. How can that be? The <span class="darkgreen">++</span> operator is called the 
+    <b>postincrement</b> operator. Here's how the <span class="darkgreen">++</span> operator works: the value of 
+    <span class="darkred">$x</span><span class="darkgreen">++</span> is whatever is in <span class="darkred">$x</span>, but before Perl goes on to the 
+    next statement, it adds one to <span class="darkred">$x</span>.
+   </p>
+   <p>
+    Does that make sense?  Take a look at this code: 
+   </p>
+   
+   <div class="c"><span class="purple">while</span> ( <span class="darkred">$x</span><span class="darkgreen">++ &lt;</span> <span class="orange">10</span> )</div>
+   
+   <p>This code tells Perl that "if <span class="darkred">$x</span> is less than <span class="orange">10</span>, then execute the block; if 
+   not, then don't execute the 
+    block. But either way, before executing the next piece of code, add one to <span class="darkred">$x</span>."</p>
+   
+   <p>This operation is called <b>post</b>incrementing because it happens <i>after</i> the statement. (There's also a 
+    <b>pre</b>increment operator, which is written like this: <span class="darkred">++</span><span class="darkred">$x</span>.) The 
+    postincrement operator is particularly useful; you'll use it often.
+   </p>
+     
+   <p>Let's try another example of the <span class="purple">while</span> loop. Create a file called <b>order_queue.pl</b> as shown:</p>
+   
+<div class="listingBox"><div class="listingTitle">CODE TO TYPE:</div><div class="listing"><pre><ins>#!/usr/bin/perl
+use strict;
+use warnings;
+
+my @inventory = qw(Pallet1 Pallet2);
+my @receiving = qw(Pallet3 Pallet4 Pallet5);
+my @orders = qw(Order1 Order2 Order3 Order4 Order5 Order6);
+
+my $order;
+while ( $order = shift @orders )
+{
+  while ( my $supply = shift @receiving )
+  {
+    push @inventory, $supply;
+  }
+
+  if ( my $supply = shift @inventory )
+  {
+    print "Fulfilling $order with $supply\n";
+  }
+}
+</ins></pre></div></div>
+   
+   <p><img src="images/coderunner/checksyntax.JPG"> and run it. </p>
+   
+<div class="interactiveBox"><div class="interactiveTitle">INTERACTIVE TERMINAL SESSION:</div><div class="interactive"><pre>cold:~/perl1$ <ins>./order_queue.pl</ins>
+Fulfilling Order1 with Pallet1
+Fulfilling Order2 with Pallet2
+Fulfilling Order3 with Pallet3
+Fulfilling Order4 with Pallet4
+Fulfilling Order5 with Pallet5    
+cold:~/perl1$    
+</pre></div></div>
+   
+   <p>There are several new concepts being demonstrated at once in this program, and I'm confident you can handle them! 
+   There are <i>nested</i> <span class="purple">while</span> loops—a 
+    <span class="purple">while</span> loop (as well as an <span class="purple">if</span> block) <i>inside</i> another
+    <span class="purple">while</span> loop. The inner blocks introduce what's known as an additional <i>scope</i>
+    level. Levels are good (as long as you don't overdo the nesting); we'll see why later.</p>
+   
+   <p>The conditions of each <span class="purple">while</span> loop in this code are <i>assignments</i>. 
+     That's fine—as long as you know that in Perl, the result of an assignment is the thing that got assigned.In other words, where we 
+     use an assignment as an expression—somewhere that the value gets used—the value
+    of that expression is whatever the thing being assigned to gets set to.  
+    Take a look at the <b>outer while loop</b> code:</p>
+   
+<div class="observeBox"><div class="observeTitle">OBSERVE:</div><div class="observe"><pre>
+<span class="purple">while</span> ( <span class="darkred">$order</span> = <span class="darkgreen">shift</span> <span class="darkred">@orders</span> )
+{
+}
+</pre></div></div>
+   
+   <p>This code tells Perl to <span class="darkgreen">shift()</span> the first element of <span class="darkred">@orders</span> and put it in 
+    <span class="darkred">$order</span>; then if <span class="darkred">$order</span> is true, execute the <span class="purple">while</span> block. 
+    When there is nothing in an array and you call <span class="darkgreen">shift()</span>, 
+    you get back <span class="orange">undef</span>, which is false. So when there's nothing left in 
+    <span class="darkred">@orders</span>, the <span class="purple">while</span> condition will be false and the block will stop being 
+    executed.</p>
+   
+  
+   
+   <p>Check out this next bit of sample code:</p>
+   
+<div class="observeBox"><div class="observeTitle">OBSERVE: while-scoped my</div><div class="observe"><pre>
+ <span class="purple">while</span> (<span class="purple">my</span> <span class="darkred">$supply</span> = <span class="darkgreen">shift</span> <span class="darkred">@receiving</span> )
+{
+}
+</pre></div></div>
+   <p>The two inner conditions contain the <span class="purple">my</span> keyword <i>inside</i> of
+    the condition itself! That has the effect of <i>scoping</i> the variable being initialized to
+    the block to which the condition belongs—it's as if the variable <i>doesn't exist</i> outside of that block.
+    So, inside the outermost <span class="purple">while</span> loop, there are two <i>different</i> <span class="darkred">$supply</span>
+    variables that are <i>completely independent</i> of each other. It is as if you had written this:</p>
+   
+<div class="observeBox"><div class="observeTitle">OBSERVE: explicit my</div><div class="observe"><pre>
+{
+  my $supply;
+ <span class="purple">while</span> ( <span class="darkred">$supply</span> = <span class="darkgreen">shift</span> <span class="darkred">@receiving</span> )
+  {
+  }
+}
+</pre></div></div>
+   
+   <p>We'll learn more about this issue of <i>scoping</i> later.</p>
+   
+  </div></div>
+  <a name="s_02"></a><div id="s_02"><div class="subheading">Until Loops</div><div class="subheadingText">
+   
+   <p>You can type:</p>
+   
+<div class="observeBox"><div class="observeTitle">OBSERVE: until</div><div class="observe"><pre>
+<span class="purple">until</span> ( <span class="orange"><i>condition</i></span> )
+{
+    <span class="orange"><i>code...</i></span>
+}
+</pre></div></div>
+   
+   <p>as a convenient shorthand for:</p>
+   
+<div class="observeBox"><div class="observeTitle">while (not)</div><div class="observe"><pre>
+<span class="purple">while</span> ( ! <span class="orange"><i>condition</i></span> )
+{
+    <span class="orange"><i>code...</i></span>
+}
+</pre></div></div>
+   
+   <p>By the way, you can alsotype:</p>
+      
+<div class="observeBox"><div class="observeTitle">unless</div><div class="observe"><pre>
+<span class="purple">unless</span> ( <span class="orange"><i>condition</i></span> )
+{
+    <span class="orange"><i>code...</i></span>
+}
+</pre></div></div>
+   
+   <p>as a convenient shorthand for:</p>
+      
+<div class="observeBox"><div class="observeTitle">if (not)</div><div class="observe"><pre>
+<span class="purple">if</span> ( ! <span class="orange"><i>condition</i></span> )
+{
+    <span class="orange"><i>code...</i></span>
+}
+</pre></div></div>
+   
+   <p>Pretty cool, huh?</p>
+  
+  </div></div>
+  <a name="s_03"></a><div id="s_03"><div class="subheading">Loop Control Statements</div><div class="subheadingText">
+   
+   <p> Now let's learn how to escape a <span class="purple">while</span> loop before it would normally stop on its own. 
+   (It's important to know how to exit an escape loop like this, just in case you 
+    create a <span class="purple">while</span> loop using the statement <span class="darkblue">while ( 1 )</span>, which 
+    <i>never</i> stops on its own.)</p>
+    
+   <p>The <span class="purple">last</span> statement (that's a statement called <span class="purple">last</span> ... not the 
+    final statement in a previous program!) means, "Exit whatever <i>looping</i> block I am currently 
+    executing as though the block had finished by itself."  Note the emphasis on <i>looping</i>—this 
+    <i>doesn't</i> apply to blocks of <span class="purple">if</span> statements. If you call <span class="purple">last</span> 
+    from within an <span class="purple">if</span> block, it will exit the looping block that contains that 
+    <span class="purple">if</span> statement, or give you an error if there is no looping block anywhere around the 
+    <span class="purple">last</span> statement. I'm calling these "looping" blocks here rather than "while" blocks, 
+    because there are other kinds of looping blocks that we'll learn about later.
+   </p>
+   
+   <p><div class="c"><img src="images/last.png"></div></p>
+   
+   <p>
+    If Perl is working within a looping block that's located inside of another looping block when it encounters a 
+    <span class="purple">last</span> statement, the inner block is the one that is exited.  
+   </p>
+   <p>
+    Let's look at an example. Create a file called <b>last.pl</b> as shown:
+   </p>
+
+<div class="listingBox"><div class="listingTitle">CODE TO TYPE:</div><div class="listing"><pre><ins>#!/usr/bin/perl
+use strict;
+use warnings;
+
+my @instructions = qw( PUSH POP UNSHIFT QUIT NOTREACHED );
+my @extra = qw( POP PUSH );
+while ( my $instruction = shift @instructions )
+{
+  if ( $instruction eq 'QUIT' )
+  {
+    print "Quitting\n";
+    last;
+  }
+  print "Executing $instruction\n";
+  if ( $instruction eq 'POP' )
+  {
+    pop @instructions;
+  }
+  elsif ( $instruction eq 'SHIFT' )
+  {
+    shift @instructions;
+  }
+  elsif ( $instruction eq 'PUSH' )
+  {
+    push @instructions, shift @extra;
+  }
+  elsif ( $instruction eq 'UNSHIFT' )
+  {
+    unshift @instructions, shift @extra;
+  }
+}</ins>
+</pre></div></div>
+   
+   <p>Perl quits the <span class="purple">while</span> loop when it reads an "instruction" to quit. Can you 
+    follow the program logic and predict what items Perl will print without running it?</p>
+   
+   <p><img src="images/coderunner/checksyntax.JPG"> and run it. </p>
+   
+<div class="interactiveBox"><div class="interactiveTitle">INTERACTIVE TERMINAL SESSION:</div><div class="interactive"><pre>cold:~/perl1$ <ins>./last.pl</ins>
+Executing PUSH
+Executing POP
+Executing UNSHIFT
+Executing PUSH
+Quitting    
+cold:~/perl1$    
+</pre></div></div>
+    
+  </div></div>
+  
+  <p>We've covered a lot here. Good job staying with it! See you in the next lesson...</p>
+ </div>
+<div class="footer"><div id="timeSurvey"></div>				
+				Copyright © 1998-2014 O'Reilly Media, Inc.<br><img src="https://courses.oreillyschool.com/common/cclicense.png"><br>
+				This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 Unported License.<br>
+				See <a href="http://creativecommons.org/licenses/by-sa/3.0/legalcode">http://creativecommons.org/licenses/by-sa/3.0/legalcode</a> 
+				for more information.
+				</div><iframe id="t" width="1" height="1" border="0" style="display:none"></iframe><script language="javascript">bodyLoaded();</script><script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+  ga('create', 'UA-44720547-1', 'oreillyschool.com');
+  ga('send', 'pageview');
+</script></body></html>

@@ -1,0 +1,385 @@
+<html><!-- Copyright (c) 1998-2014 O'Reilly Media, Inc.
+			This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 Unported License.
+			See http://creativecommons.org/licenses/by-sa/3.0/legalcode for more information.
+            --><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"><link rel="stylesheet" type="text/css" href="../common/Lab.css"><script type="text/javascript" src="../common/Lab.js"></script><script language="javascript"></script><title>Aggregates, Subroutines, and Command-Line Arguments</title></head><body id="body"><a name="top"></a><div class="title">Aggregates, Subroutines, and Command-Line Arguments</div><div class="resize"><a href="Perl1-14.html#top" onclick="changeSize('smaller');" class="aS" title="Keep clicking to make fonts smaller">A</a><a href="Perl1-14.html#top" onclick="changeSize('larger');" class="aL" title="Keep clikcing to make fonts larger">A</a><a href="Perl1-14.html#top" onclick="lv()" class="lv" title="Adjust Page for High Contrast">HC</a><div id="fh"><p>Click on <span class="aS">A</span> to make all fonts on the page smaller.</p><p>Click on <span class="aL">A</span> to make all fonts on the page larger.</p><p>Click on <span class="lv">HC</span> to toggle high contrast mode. When you move your mouse over 
+                 some bold words in high contrast mode, related words are automatically highlighted. Text is shown
+                 in black and white. 
+             </p></div></div><hr>
+ 
+ <div class="goalTitle">Lesson Objectives</div><div class="goals">
+  
+  
+  When you complete this lesson, you will be able to:
+  
+  <ul><li>use aggregates.</li><li>use subroutines.</li><li>write command-line arguments.</li><li>pass arrays to and from subrountines.</li><li>pass hashes to and from subroutines.</li></ul>
+ </div><hr>
+ <p><div class="c">“There are no failures—just experiences and your reactions to them.”<br>
+  -Tom Krause</div></p>
+ <a name="h_01"></a><div class="heading">Aggregates, Subroutines, and Command-Line Arguments</div><div class="headingText">
+  
+  <p>Now that we've built a solid foundation, we're ready to refine our understanding of aggregates (arrays and 
+   hashes). By the time we finish this lesson, 
+   you'll be confident in your ability to use arrays and hashes, and 
+   pass them to and from subroutines using the command line. </p>
+  
+  <a name="s_01"></a><div id="s_01"><div class="subheading">Command Line Arguments</div><div class="subheadingText">
+   
+   <p>Retrieving arguments from the command line is pretty straightforward. They
+    arrive into your program in the special array <span class="darkred">@ARGV</span>. 
+    A command line 
+    argument is anything you type on the command line after the name of your Perl program.
+    If you've made the program executable and refer to it directly with a command such as:</p>
+   
+<div class="observeBox"><div class="observeTitle">OBSERVE: argumentless command</div><div class="observe"><pre>
+<span class="darkred"><b>./terraform.pl</b></span>
+</pre></div></div>
+   
+   <p>...then the arguments follow <span class="darkred">terraform.pl</span>, and are separated by spaces:</p>
+   
+<div class="observeBox"><div class="observeTitle">OBSERVE: command with arguments</div><div class="observe"><pre>
+<b><span class="darkred">./terraform.pl</span></b> -d --jovian "Phase 2 of Invasion Plan" Ganymede Callisto
+</pre></div></div> 
+   
+   <p>If you invoke the program by calling perl, your command line will look similar:</p>
+   
+<div class="observeBox"><div class="observeTitle">OBSERVE: command with arguments</div><div class="observe"><pre>
+perl <b><span class="darkred">terraform.pl</span></b> -d --jovian "Phase 2 of Invasion Plan" Ganymede Callisto
+</pre></div></div>
+   
+   <p>The rules for forming command line arguments
+    are <i>not defined by Perl</i>; they're defined by the command shell 
+    you're using, and the program that interprets what you type and subsequently prints the 
+    prompt string. When you press 
+    <b>Enter</b>, that shell interprets the line you typed according to its particular rules for processing, 
+    and then determines which information it will give to Perl. </p>
+   
+   <p>Most programs refer to arguments that begin with hyphens (like <b>-d</b>
+    and <b>--jovian</b> as we saw in our example) or slashes, as <b>options</b>
+    or <b>flags</b> and treat them differently. But to the shell, and to Perl, they are regular command line
+    arguments.</p>
+   
+   <p>White space (spaces or tabs) separates each command line argument and indicates to the shell
+   where one argument ends and another one begins. If you want to enter an
+    argument that contains white space, then you need to surround it with quotation marks,
+    like <b>"Phase 2 of Invasion Plan"</b> above.  Most shells accept either single or
+    double quotation marks for this purpose.</p>
+   
+   <p>Alright. Let's give this a try! We'll write a program that does nothing but report on the command line 
+    arguments. Create a file called <b>terraform.pl</b> as shown:</p>
+   
+<div class="listingBox"><div class="listingTitle">CODE TO TYPE: terraform.pl</div><div class="listing"><pre><ins>#!/usr/bin/perl
+use strict;
+use warnings;
+
+my $count = 0;
+foreach my $argument ( @ARGV )
+{
+  print '$ARGV[', $count++, '] = ', $argument, "\n";
+}</ins>
+</pre></div></div>
+   
+   <p><img src="images/coderunner/checksyntax.JPG"> and run it without any 
+    arguments. Then run it with one argument, and then run it again with three arguments.  Try putting quotation marks around an 
+    argument containing white space to see how that works. Start a terminal session and type these commands:</p>
+    
+<div class="interactiveBox"><div class="interactiveTitle">INTERACTIVE TERMINAL SESSION</div><div class="interactive"><pre>cold:~$ <ins>cd perl1</ins>
+cold:~/perl1$ <ins>./terraform.pl</ins>
+cold:~/perl1$ <ins>./terraform.pl test</ins>
+$ARGV[0] = test
+cold:~/perl1$ <ins>./terraform.pl test test2 test3</ins>
+$ARGV[0] = test
+$ARGV[1] = test2
+$ARGV[2] = test3
+cold:~/perl1$ <ins>./terraform.pl test "test2 test3"</ins>
+$ARGV[0] = test
+$ARGV[1] = test2 test3
+cold:~/perl1$
+</pre></div></div>
+   
+   <p>Our command shell parses metacharacters—as most of them do—so try passing some metacharacters in 
+   command arguments to see what the shell does with them before Perl sees the arguments. An 
+   argument consisting of the asterisk character (<b>*</b>) usually expands to the names of all of the files in the current 
+   directory; that's a good metacharacter to try!</p>
+   
+   <p>The array <span class="darkred">@ARGV</span> is special to Perl, so you don't declare it with
+    <span class="purple">my</span>—it doesn't belong to you, it belongs to Perl.</p>
+   
+   <p>One more thing—remember how <span class="darkgreen">shift()</span> inside a subroutine defaults 
+    to shifting <span class="darkred">@_</span>, the array of subroutine arguments? Well, <i>outside</i> of subroutines, array 
+    <span class="darkgreen">shift()</span> defaults to <span class="darkred">@ARGV</span>! (By the way, if you're a C
+    programmer and you're wondering what happened to the name of the program, it's in 
+    <span class="darkred">$0</span>.)</p>
+  
+  </div></div>
+  <a name="s_02"></a><div id="s_02"><div class="subheading">Passing Arrays To and From Subroutines</div><div class="subheadingText">
+   
+   <p>Passing arguments to a subroutine is like putting various sticks through a wood chipper—everything that 
+   comes out the other end looks the same. Whether you pass 
+    scalars, arrays, or hashes, everything gets flattened into a list on the way in and put 
+    into an array (<span class="darkred">@_</span>).</p>
+   
+   <p>An array in a list context expands to the list of the
+    elements in the array.  Passing arguments to a subroutine imposes list context.</p>
+   
+   <p>Here's an example to illustrate these points. Create a file called <b>interleave.pl</b> 
+    as shown:</p>
+   
+<div class="listingBox"><div class="listingTitle">CODE TO TYPE: interleave.pl</div><div class="listing"><pre><ins>#!/usr/bin/perl
+use strict;
+use warnings;
+
+my @first = qw(Can unlock secret);
+my @second = qw(you the code?);
+
+my @mixed = interleave_words( scalar(@first), @first, @second );
+print "Result: @mixed\n";
+
+sub interleave_words
+{
+  my @results;
+  
+  my $count = shift;
+  foreach my $index ( 0 .. $count-1 )
+  {
+    $results[$index * 2] = shift;
+  }
+  if ( @_ != $count )
+  {
+    die "Second array not same size ($count) as the first\n";
+  }
+  foreach my $index ( 0 .. $count-1 )
+  {
+    $results[$index * 2 + 1] = shift;
+  }
+
+  return @results;
+}</ins>
+</pre></div></div>
+   
+   <p><img src="images/coderunner/checksyntax.JPG"> and run it.</p>
+   
+<div class="interactiveBox"><div class="interactiveTitle">INTERACTIVE TERMINAL SESSION:</div><div class="interactive"><pre>cold:~/perl1$ <ins>./interleave.pl</ins>
+Result: Can you unlock the secret code?
+cold:~/perl1$
+</pre></div></div>
+
+   <p>The subroutine <span class="darkblue">interleave_words</span> has been written so that it will interleave 
+    the contents of any two arrays that are passed to it. Its first argument is the number of 
+    entries in the first array. Why do we do that? After all, doesn't Perl know how many 
+    elements there are in an array? </p>
+   
+   <p>Yes, Perl does know that, but when we pass an array to a subroutine, its identity as an 
+    array is lost. Its contents are copied into a list of all the subroutine arguments, which 
+    are flattened together into one big long list. (Technically, the contents are not copied but 
+    <i>aliased</i>, meaning that you could modify them, but as I said before, that's not a good 
+    idea, so don't try.)</p>
+   
+   <p>So, if you pass two arrays to a subroutine, the subroutine can't tell where one array's 
+    contents end and the next begin, unless we provide that information, by passing the size of 
+    the first array as the very first argument. (This particular subroutine was intended to have two 
+    arrays of equal size passed to it. Using a dividing line set halfway through <span class="darkred">@_</span>, 
+    it could be written under the assumption that it will always be called correctly, 
+    but this leaves no 
+    margin for error.)</p>
+   
+   <p>The <span class="darkgreen">scalar()</span> function puts its argument into
+    scalar context, so by calling <span class="darkgreen">scalar()</span> on an array, we are guaranteed to 
+    retrieve the size of the array being called. </p>
+   
+   <p>The result returned from <span class="darkblue">interleave_words</span> is an array, which is evaluated
+    in list context because it is being assigned to an array (<span class="darkred">@mixed</span>), and so
+    results in a copy of the array that was <span class="darkred">@results</span> inside the subroutine. Context 
+    propagates into subroutines, which is an elegant way of saying that if you want to figure out 
+    the context, just imagine that the subroutine call was replaced with whatever follows the 
+    word <span class="purple">return</span> in the subroutine. In this case we have:</p>
+   
+<div class="observeBox"><div class="observeTitle">OBSERVE: subroutine context propagation</div><div class="observe"><pre>
+<span class="purple">my</span> <span class="darkred">@mixed</span> = <span class="darkblue">interleave_words (...</span>
+.
+.
+.
+  <span class="purple">return</span> <span class="darkred">@results</span>;
+</pre></div></div>
+   
+   <p>...and so—for the purposes of determining context—imagine that it was saying this 
+    instead:</p>
+   
+<div class="observeBox"><div class="observeTitle">OBSERVE: subroutine context propagation</div><div class="observe"><pre>
+<span class="purple">my</span> <span class="darkred">@mixed</span> = <span class="darkred">@results</span>;
+</pre></div></div>
+   
+   <p>This little trick will save you much time and trouble. If what follows the 
+    <span class="purple">return</span> statement is a call to another subroutine, you can keep going 
+    deeper.</p>
+ 
+  </div></div>
+  <a name="s_03"></a><div id="s_03"><div class="subheading">Passing Hashes To and From Subroutines</div><div class="subheadingText">
+   
+   <p>So, what does a hash evaluate as in list context? </p>
+   
+   <p>It evaluates as a list of key-value pairs, identical to a list that could
+    have been used to initialize the hash to its current state. Each pair consists of two elements in
+    the list, the key followed by the value. The order of the pairs is uncertain, but each 
+    value follows its corresponding key in the list.</p>
+   
+   <p>That allows us to understand how copying a hash works. When you have code that looks like this: </p>
+   
+<div class="observeBox"><div class="observeTitle">OBSERVE: hash copying</div><div class="observe"><pre>
+<span class="purple">my</span> <span class="darkred">%copy</span> = <span class="darkred">%original</span>;
+</pre></div></div>
+   
+   <p>...the information on the right side of the equals sign (<b>=</b>) is placed in list context and 
+    evaluates to a list of key-value pairs that is then assigned to the left side of the equals sign (<b>=</b>). 
+    Previously, you might have looked at that statement and assumed that it resulted in 
+    a copy because that's what it looks like, but now you know how it works!</p>
+   
+   <p>Armed with this knowledge, we can use the subroutine <span class="darkblue">interleave_words</span> to
+    perform an entirely different task—creating a hash, given an array of its keys and 
+    another array of its values—<i>without changing</i> the subroutine definition at all! This 
+    is the sort of thing that makes strictly typed languages insanely jealous. Copy 
+    <span class="darkred">interleave.pl</span> to <span class="darkred">make_hash.pl</span> and edit it as 
+    shown:</p>
+   
+<div class="listingBox"><div class="listingTitle">CODE TO TYPE: make_hash.pl</div><div class="listing"><pre>#!/usr/bin/perl
+use strict;
+use warnings;
+<ins>
+my @keys   = qw(tetra hexa octa dodeca icosa);
+my @values = (4, 6, 8, 12, 20);
+
+foreach my $key ( @keys )
+{
+  $key .= 'hedron';
+}
+my %faces = interleave_words( scalar(@keys), @keys, @values );
+foreach my $solid ( keys %faces )
+{
+  print "A(n) $solid has $faces{$solid} faces\n";
+}
+</ins>
+sub interleave_words
+{
+  my @results;
+  
+  my $count = shift;
+  foreach my $index ( 0 .. $count-1 )
+  {
+    $results[$index * 2] = shift;
+  }
+  if ( @_ != $count )
+  {
+    die "Second array not same size ($count) as the first\n";
+  }
+  foreach my $index ( 0 .. $count-1 )
+  {
+    $results[$index * 2 + 1] = shift;
+  }
+
+  return @results;
+}
+</pre></div></div>
+   
+   <p><img src="images/coderunner/checksyntax.JPG"> and run it.</p>
+   
+<div class="interactiveBox"><div class="interactiveTitle">INTERACTIVE TERMINAL SESSION:</div><div class="interactive"><pre>cold:~/perl1$ <ins>./make_hash.pl</ins>
+A(n) tetrahedron has 4 faces
+A(n) dodecahedron has 12 faces
+A(n) icosahedron has 20 faces
+A(n) octahedron has 8 faces
+A(n) hexahedron has 6 faces
+cold:~/perl1$    
+</pre></div></div>
+   
+   <p>Hashes do not interpolate in 
+    double-quoted strings. We print the contents of this 
+    hash with the usual kind of iterative loop.</p>
+   
+   <p>When I ran this program, it printed the results in this order: 4, 12, 20, 8, 6. What order 
+    did your program print them in?</p>
+   
+   <p>Notice that rather than type the "hedron" suffix many times, I employed a 
+    short loop to add it in. In this case, it ended up taking more room than it would have just 
+    to type in the longer words, but in a later course you'll find out how to add a suffix like 
+    this in just a few words. Right now, we want to get used to the idea of eliminating 
+    duplication.</p>
+    
+   <p>And the <span class="darkred">$key</span> in that 
+    loop is an <i>alias</i> for each member of the <span class="darkred">@keys</span> array: that is, another 
+    name for each element of the array in turn. If it were a <i>copy</i> of the element, then 
+    the original array elements would not have <span class="orange">"hedron"</span> concatenated to them. 
+    This aliasing feature is useful for allowing us to modify arrays like we did here, but be 
+    careful not to change the loop element of a <span class="purple">foreach</span> loop by accident, or 
+    you'll overwrite whatever it's aliased to!</p>
+   
+   <p>Returning a hash from a subroutine isn't too complicated—subroutines return 
+    lists, and you assign that list to a hash when you call the subroutine.</p>
+   
+   <H4>Passing Named Arguments to Subroutines</H4>
+   
+   <p>When a subroutine takes more than a couple of arguments, it becomes more challenging to remember the order in which 
+   they should be passed. It also becomes more difficult to handle the cases where one or more
+    arguments are optional. Now, Perl doesn't have named parameter passing, but we can pretend
+    that it does by using the fat comma and a hash. Here's how that works:</p>
+   
+   <p><b>Step One:</b> when calling the subroutine, precede each argument with a name and a fat 
+    comma. For example: </p>
+   
+<div class="observeBox"><div class="observeTitle">OBSERVE:</div><div class="observe"><pre>
+<span class="purple">my</span> <span class="darkred">$burger_cost</span> = <span class="darkblue">prepare_burger</span>( <span class="orange">patties</span> <span class="darkgreen">=&gt;</span> <span class="orange">2</span>,
+                                  <span class="orange">condiment</span> <span class="darkgreen">=&gt;</span> <span class="orange">'mustard'</span>,
+                                  <span class="orange">buns</span> <span class="darkgreen">=&gt;</span> <span class="orange">'wheat'</span>,
+                                  <span class="orange">tomato</span> <span class="darkgreen">=&gt;</span> <span class="orange">1</span> );
+</pre></div></div>
+   
+   <p><b>Step Two:</b> when defining the subroutine, copy the arguments into a hash:</p>
+   
+   <div class="observeBox"><div class="observeTitle">OBSERVE:</div><div class="observe"><pre>
+<span class="purple">sub</span> <span class="darkblue">prepare_burger</span>
+{
+  <span class="purple">my</span> <span class="darkred">%arg</span> = <span class="darkred">@_</span>;
+  # ...
+</pre></div></div>
+   
+   <p>Now you can access the arguments as hash entries whose keys are the names of the 
+    arguments:</p>
+   
+   <div class="observeBox"><div class="observeTitle">OBSERVE:</div><div class="observe"><pre>
+  # ... continuing the subroutine definition...
+  <span class="purple">my</span> <span class="darkred">$cost</span> = <span class="orange">0</span>;
+  <span class="purple">if</span> ( <span class="darkred">$arg{tomato}</span> ) 
+  {
+    <span class="darkred">$cost</span> <span class="darkgreen">+=</span> <span class="darkred">$tomato_slice_cost</span>;
+  }
+  <span class="darkred">$cost</span> <span class="darkgreen">+=</span> <span class="darkred">patty_cost</span> <span class="darkgreen">*</span> <span class="darkred">$arg{patties}</span>;
+  # ...   
+</pre></div></div>
+   
+   <p>The order in which we pass arguments to the subroutine makes no difference; their names 
+    tell us where they are. And, if we want to leave out an optional argument when calling the
+    subroutine, we can tell that from within the subroutine by testing for the existence of the
+    hash element with the argument's name.</p>
+   
+   <p>To impose rules on the way your subroutine gets called, you can 
+    test for compliance by looking at the elements of the hash you copy <span class="darkred">@_</span> into. 
+    If the rules are not followed, then you can have the subroutine <span class="darkgreen">die()</span>.</p>
+  
+  </div></div>
+   
+  <br><br><br><br>
+  
+  <p>See you in the next lesson!</p>
+ 
+ </div>
+<div class="footer"><div id="timeSurvey"></div>				
+				Copyright © 1998-2014 O'Reilly Media, Inc.<br><img src="https://courses.oreillyschool.com/common/cclicense.png"><br>
+				This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 Unported License.<br>
+				See <a href="http://creativecommons.org/licenses/by-sa/3.0/legalcode">http://creativecommons.org/licenses/by-sa/3.0/legalcode</a> 
+				for more information.
+				</div><iframe id="t" width="1" height="1" border="0" style="display:none"></iframe><script language="javascript">bodyLoaded();</script><script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+  ga('create', 'UA-44720547-1', 'oreillyschool.com');
+  ga('send', 'pageview');
+</script></body></html>
